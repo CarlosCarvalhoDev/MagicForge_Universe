@@ -6,6 +6,7 @@ import {
   C2SMoveInputPayload,
   C2SPingPayload,
   C2SUseItemPayload,
+  C2SSellItemPayload,
   NetworkMessage,
   Opcode,
   S2CLoginSuccessPayload,
@@ -60,6 +61,10 @@ export class PacketHandler {
 
       case Opcode.C2S_USE_ITEM:
         this.handleUseItem(connection, message.data as C2SUseItemPayload);
+        break;
+
+      case Opcode.C2S_SELL_ITEM:
+        this.handleSellItem(connection, message.data as C2SSellItemPayload);
         break;
 
       case Opcode.C2S_PING:
@@ -178,5 +183,12 @@ export class PacketHandler {
     const player = this.world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
     this.world.usePlayerItem(player, payload.slotIndex);
+  }
+
+  private handleSellItem(connection: Connection, payload: C2SSellItemPayload): void {
+    if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
+    const player = this.world.entityManager.getPlayer(connection.playerId);
+    if (!player || player.isDead) return;
+    this.world.sellPlayerItem(player, payload.slotIndex);
   }
 }

@@ -590,4 +590,29 @@ export class World {
 
     return true;
   }
+
+  public sellPlayerItem(player: Player, slotIndex: number): boolean {
+    const item = player.inventory.find((i) => i.slotIndex === slotIndex);
+    if (!item || item.isEquipped) return false;
+
+    const itemDef = ITEMS_DATABASE[item.itemId];
+    if (!itemDef) return false;
+
+    const earnedGold = (itemDef.sellPrice || 1) * item.quantity;
+    this.db.removeItemFromInventory(player.dbCharacterId, slotIndex, item.quantity);
+    player.gold = this.db.updateCharacterGold(player.dbCharacterId, earnedGold);
+    player.inventory = this.db.getInventory(player.dbCharacterId);
+
+    const conn = this.connections.get(player.id);
+    if (conn) {
+      conn.send(Opcode.S2C_INVENTORY_UPDATE, {
+        slots: player.inventory,
+        gold: player.gold,
+        totalCombatPower: player.CombatPower,
+        lootMessage: `Vendido ${itemDef.name} x${item.quantity} por +${earnedGold} Ouro!`,
+      } as S2CInventoryUpdatePayload);
+    }
+
+    return true;
+  }
 }

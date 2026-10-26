@@ -33,6 +33,7 @@ export enum Opcode {
   C2S_LOOT_ITEM = 0x42,
   S2C_INVENTORY_UPDATE = 0x43,
   C2S_USE_ITEM = 0x44,
+  C2S_SELL_ITEM = 0x45,
 
   // --- Progression & Leveling (0x50 - 0x5F) ---
   S2C_PLAYER_EXP_UPDATE = 0x50,

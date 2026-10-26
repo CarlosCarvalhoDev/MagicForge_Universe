@@ -964,44 +964,508 @@
         margin-top: 8px;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
       }
+
+      /* =========================================
+         NOVA HUD MOBILE (STICKMAN GO / IDLE MMORPG)
+         ========================================= */
+
+      /* 1. Top-Left Hero Status Card */
+      #hero-status-card {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 14px;
+        border-radius: 16px;
+        z-index: 25;
+        pointer-events: auto;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+
+      .hero-avatar-box {
+        position: relative;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        border: 2.5px solid #fbbf24;
+        box-shadow: 0 0 14px rgba(251, 191, 36, 0.5);
+        overflow: hidden;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .hero-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .hero-level-badge {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        background: linear-gradient(135deg, #f59e0b, #b45309);
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 1px 5px;
+        border-radius: 6px;
+        border: 1px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      }
+
+      .hero-info-col {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .hero-title-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .hero-name-label {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #f8fafc;
+      }
+
+      .hero-honor-tag {
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.15);
+        padding: 1px 5px;
+        border-radius: 4px;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+      }
+
+      .hero-cp-brand {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+      }
+
+      .hero-cp-tag {
+        font-size: 0.75rem;
+        font-weight: 900;
+        color: #fbbf24;
+        letter-spacing: 0.05em;
+      }
+
+      .hero-cp-number {
+        font-family: 'Cinzel', serif;
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #fbbf24;
+        text-shadow: 0 0 12px rgba(251, 191, 36, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
+      }
+
+      .hero-vitals-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        width: 160px;
+      }
+
+      .mini-bar-track {
+        height: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 5px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .mini-bar-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.58rem;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+      }
+
+      /* 2. Top-Right Location Card */
+      #top-right-location-card {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        z-index: 25;
+        pointer-events: auto;
+      }
+
+      .zone-info-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+      }
+
+      .zone-title {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #38bdf8;
+      }
+
+      .stage-badge {
+        background: linear-gradient(135deg, #059669, #047857);
+        color: #fff;
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+
+      /* 3. Top-Center Wave Card */
+      #top-center-wave-card {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 18px;
+        border-radius: 14px;
+        z-index: 25;
+        pointer-events: auto;
+        border: 1px solid rgba(251, 191, 36, 0.35);
+      }
+
+      .btn-boss-challenge {
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 8px;
+        border: 1px solid #f87171;
+        cursor: pointer;
+        animation: pulseBoss 1.5s infinite;
+      }
+
+      @keyframes pulseBoss {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+        50% { transform: scale(1.06); box-shadow: 0 0 18px rgba(239, 68, 68, 0.9); }
+      }
+
+      /* 4. Bottom Mobile Dock Navigation */
+      #dock-navigation-bar {
+        display: flex;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 18px;
+        pointer-events: auto;
+        background: rgba(15, 23, 42, 0.92);
+        border: 1.5px solid rgba(251, 191, 36, 0.35);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      }
+
+      .dock-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        width: 62px;
+        height: 52px;
+        border-radius: 12px;
+        background: rgba(30, 41, 59, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #cbd5e1;
+        font-size: 0.65rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s ease-out;
+        outline: none;
+      }
+
+      .dock-btn .dock-icon {
+        font-size: 1.15rem;
+      }
+
+      .dock-btn:hover {
+        background: rgba(251, 191, 36, 0.18);
+        border-color: #fbbf24;
+        color: #fbbf24;
+        transform: translateY(-2px);
+      }
+
+      .dock-btn:active {
+        transform: scale(0.92);
+      }
+
+      /* 5. Character Paperdoll Modal Styles */
+      .character-modal-body {
+        display: flex;
+        gap: 24px;
+        padding: 16px 8px;
+      }
+
+      .paperdoll-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: radial-gradient(circle, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+        border: 1px solid rgba(251, 191, 36, 0.25);
+        border-radius: 16px;
+        padding: 18px;
+      }
+
+      .paperdoll-slots-col {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .equipment-slot {
+        width: 62px;
+        height: 62px;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+
+      .equipment-slot:hover {
+        border-color: #fbbf24;
+        box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+      }
+
+      .equipment-slot.equipped {
+        border-color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+      }
+
+      .slot-placeholder-icon {
+        font-size: 1.4rem;
+        opacity: 0.45;
+      }
+
+      .slot-label {
+        font-size: 0.6rem;
+        color: #94a3b8;
+        margin-top: 2px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .paperdoll-hero-stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+      }
+
+      .paperdoll-hero-img {
+        width: 140px;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 16px;
+        border: 2px solid #fbbf24;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+      }
+
+      .paperdoll-hero-badge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .character-stats-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .character-cp-card {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+        border: 1.5px solid #fbbf24;
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 0 16px rgba(251, 191, 36, 0.25);
+      }
+
+      .character-cp-title {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: #94a3b8;
+        letter-spacing: 0.1em;
+      }
+
+      .character-cp-value {
+        font-family: 'Cinzel', serif;
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: #fbbf24;
+        text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+      }
+
+      .stats-grid-box,
+      .combat-substats-box {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .stats-section-title {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: #fbbf24;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding-bottom: 4px;
+        margin-bottom: 2px;
+      }
+
+      .dnd-stat-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        padding: 3px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .substat-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        padding: 2px 0;
+        color: #cbd5e1;
+      }
+
+      /* 6. Quick Use Toast */
+      #quick-use-toast {
+        position: absolute;
+        bottom: 110px;
+        right: 24px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1.5px solid #fbbf24;
+        border-radius: 14px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 40;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        animation: slideInRight 0.3s ease-out;
+      }
+
+      @keyframes slideInRight {
+        from { transform: translateX(50px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
     </style>
   </head>
   <body>
-    <!-- Top HUD Header -->
-    <header id="top-hud">
-      <div class="glass-panel logo-title" style="padding: 8px 16px">
-        <span>⚔️</span> MagicForge: Universe (Mobile MMORPG)
+    <!-- 1. Top-Left Hero Status Card (Estilo Stickman Go) -->
+    <div id="hero-status-card" class="glass-panel">
+      <div class="hero-avatar-box" id="hud-avatar-btn" title="Abrir Ficha de Personagem & Equipamentos [C]">
+        <img id="hud-hero-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Avatar" class="hero-avatar-img" />
+        <span id="hud-hero-level" class="hero-level-badge">Nv. 3</span>
+      </div>
+      <div class="hero-info-col">
+        <div class="hero-title-row">
+          <span id="hud-hero-name" class="hero-name-label">LordAventureiro</span>
+          <span class="hero-honor-tag">Cavaleiro Honrado</span>
+        </div>
+        <div class="hero-cp-brand">
+          <span class="hero-cp-tag">PC</span>
+          <span id="hud-cp-big" class="hero-cp-number">1.425</span>
+        </div>
+        <div class="hero-vitals-bars">
+          <div class="mini-bar-track">
+            <div id="hud-hero-hp-bar" class="vital-bar-fill hp-fill" style="width: 100%"></div>
+            <span id="hud-hero-hp-text" class="mini-bar-text">1085 / 1130</span>
+          </div>
+          <div class="mini-bar-track">
+            <div id="hud-hero-mp-bar" class="vital-bar-fill mp-fill" style="width: 100%"></div>
+            <span id="hud-hero-mp-text" class="mini-bar-text">100 / 100</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Top-Center Wave & Boss Stage Card -->
+    <div id="top-center-wave-card" class="glass-panel">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+        <span style="font-size: 0.65rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Progresso da Fase</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="wave-progress-text" style="font-size: 0.8rem; font-weight: 800; color: #fbbf24;">⚔️ Onda 1/5 • Monstros: 8/10</span>
+          <button id="btn-boss-challenge" class="btn-boss-challenge" style="display: inline-block;">💀 DESAFIAR CHEFÃO</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Top-Right Location & Server Status Card -->
+    <div id="top-right-location-card">
+      <div class="glass-panel zone-info-pill">
+        <span style="font-size: 0.9rem;">🌲</span>
+        <div style="display: flex; flex-direction: column;">
+          <span id="zone-location-title" class="zone-title">Floresta da Forja (1)</span>
+          <span style="font-size: 0.65rem; color: #94a3b8;">Canal 1 • Coords: (0, 0)</span>
+        </div>
+        <span id="current-stage-badge" class="stage-badge">Fase 1/10</span>
       </div>
 
-      <div class="metrics-bar">
+      <div style="display: flex; gap: 8px;">
         <div class="glass-panel metric-pill" style="color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35);" title="Ouro Acumulado">
           <span>💰</span>
           <span id="player-gold-text">0 Ouro</span>
         </div>
-        <button id="btn-open-inventory" class="glass-panel metric-pill" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); cursor: pointer; transition: all 0.2s;" title="Abrir Mochila de Itens [I]">
-          <span>🎒</span> Mochila [I]
-        </button>
-        <button id="btn-open-skillbook" class="glass-panel metric-pill" style="color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); cursor: pointer; transition: all 0.2s;" title="Abrir Grimório de Habilidades [K]">
-          <span>📖</span> Grimório [K]
+        <button id="btn-power-save" class="glass-panel metric-pill" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); cursor: pointer;" title="Modo de Economia de Bateria">
+          <span>🌙</span> Economia
         </button>
         <div class="glass-panel metric-pill">
           <div id="status-dot" class="status-dot"></div>
           <span id="connection-status">Desconectado</span>
         </div>
         <div class="glass-panel metric-pill">
-          <span>📶 Ping:</span>
+          <span>📶</span>
           <span id="ping-text" style="color: #38bdf8">-- ms</span>
         </div>
         <div class="glass-panel metric-pill">
-          <span>⚙️ Tick:</span>
-          <span id="tick-text" style="color: #a78bfa">#0 (20Hz)</span>
+          <span>⚙️</span>
+          <span id="tick-text" style="color: #a78bfa">#0</span>
         </div>
         <div class="glass-panel metric-pill">
-          <span>🖥️ FPS:</span>
-          <span id="fps-text" style="color: #34d399">--</span>
+          <span>🖥️</span>
+          <span id="fps-text" style="color: #34d399">-- FPS</span>
         </div>
       </div>
-    </header>
+    </div>
 
     <!-- Canvas Viewport -->
     <canvas id="game-canvas"></canvas>
@@ -1114,6 +1578,30 @@
             <span id="target-hp-text" class="vital-bar-text">-- / --</span>
           </div>
         </div>
+      </div>
+
+      <!-- Mobile Dock Navigation Bar (Stickman Go Style) -->
+      <div id="dock-navigation-bar">
+        <button class="dock-btn" id="btn-dock-character" title="Ficha do Personagem & Equipamentos [C]">
+          <span class="dock-icon">👤</span>
+          <span>Herói</span>
+        </button>
+        <button class="dock-btn" id="btn-dock-inventory" title="Mochila de Itens [I]">
+          <span class="dock-icon">🎒</span>
+          <span>Mochila</span>
+        </button>
+        <button class="dock-btn" id="btn-dock-skillbook" title="Grimório de Habilidades [K]">
+          <span class="dock-icon">📖</span>
+          <span>Grimório</span>
+        </button>
+        <button class="dock-btn" id="btn-dock-farm" title="Assistente de Farm Idle">
+          <span class="dock-icon">🤖</span>
+          <span>Farm</span>
+        </button>
+        <button class="dock-btn" id="btn-dock-ranking" title="Classificação e Rankings">
+          <span class="dock-icon">🏆</span>
+          <span>Rank</span>
+        </button>
       </div>
 
       <!-- 4 Active Skill Buttons Bar -->
@@ -1255,6 +1743,178 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Character Paperdoll Modal (Ficha do Herói & Equipamentos) -->
+    <div id="character-modal" class="modal-backdrop" style="display: none;">
+      <div class="glass-panel modal-content" style="max-width: 820px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>👤</span> Ficha do Personagem & Equipamentos
+          </div>
+          <button id="btn-close-character" class="btn-close" title="Fechar (ESC ou C)">✕</button>
+        </div>
+
+        <div class="character-modal-body">
+          <!-- Left: Hero Paperdoll with 6 Slots Around Body -->
+          <div class="paperdoll-container">
+            <div class="paperdoll-slots-col left">
+              <!-- Helmet -->
+              <div class="equipment-slot" id="equip-slot-head" data-slot="head" title="Elmo / Cabeça">
+                <span class="slot-placeholder-icon">🧢</span>
+                <span class="slot-label">Elmo</span>
+              </div>
+              <!-- Armor -->
+              <div class="equipment-slot" id="equip-slot-chest" data-slot="chest" title="Peitoral / Armadura">
+                <span class="slot-placeholder-icon">🦺</span>
+                <span class="slot-label">Armadura</span>
+              </div>
+              <!-- Boots -->
+              <div class="equipment-slot" id="equip-slot-legs" data-slot="legs" title="Botas / Calça">
+                <span class="slot-placeholder-icon">👖</span>
+                <span class="slot-label">Botas</span>
+              </div>
+            </div>
+
+            <!-- Center: Hero Avatar Stage & Visual -->
+            <div class="paperdoll-hero-stage">
+              <img id="paperdoll-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Herói" class="paperdoll-hero-img" />
+              <div class="paperdoll-hero-badge">
+                <span id="paperdoll-hero-name" style="font-size: 0.85rem; font-weight: 800; color: #f8fafc;">LordAventureiro</span>
+                <span id="paperdoll-hero-class" style="color: #fbbf24; font-size: 0.72rem; font-weight: 700;">Guerreiro (Nv. 3)</span>
+              </div>
+            </div>
+
+            <div class="paperdoll-slots-col right">
+              <!-- Weapon -->
+              <div class="equipment-slot" id="equip-slot-main_hand" data-slot="main_hand" title="Arma Principal">
+                <span class="slot-placeholder-icon">⚔️</span>
+                <span class="slot-label">Arma</span>
+              </div>
+              <!-- Shield / Offhand -->
+              <div class="equipment-slot" id="equip-slot-off_hand" data-slot="off_hand" title="Escudo / Secundária">
+                <span class="slot-placeholder-icon">🛡️</span>
+                <span class="slot-label">Escudo</span>
+              </div>
+              <!-- Relic / Ring -->
+              <div class="equipment-slot" id="equip-slot-relic" data-slot="relic" title="Relíquia / Anel">
+                <span class="slot-placeholder-icon">💍</span>
+                <span class="slot-label">Relíquia</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Attributes Sheet & Combat Power -->
+          <div class="character-stats-panel">
+            <div class="character-cp-card">
+              <span class="character-cp-title">PODER DE COMBATE (CP)</span>
+              <div class="character-cp-value" id="paperdoll-cp-value">⚔️ 1.425</div>
+            </div>
+
+            <div class="stats-grid-box">
+              <div class="stats-section-title">Atributos D&D 5e</div>
+              <div class="dnd-stat-row">
+                <span class="stat-name"><strong style="color: #f87171;">FOR</strong> (Força):</span>
+                <span class="stat-val" id="stat-forca">16</span>
+              </div>
+              <div class="dnd-stat-row">
+                <span class="stat-name"><strong style="color: #34d399;">DES</strong> (Destreza):</span>
+                <span class="stat-val" id="stat-destreza">12</span>
+              </div>
+              <div class="dnd-stat-row">
+                <span class="stat-name"><strong style="color: #fb923c;">CON</strong> (Constituição):</span>
+                <span class="stat-val" id="stat-constituicao">15</span>
+              </div>
+              <div class="dnd-stat-row">
+                <span class="stat-name"><strong style="color: #38bdf8;">INT</strong> (Inteligência):</span>
+                <span class="stat-val" id="stat-inteligencia">10</span>
+              </div>
+              <div class="dnd-stat-row">
+                <span class="stat-name"><strong style="color: #a78bfa;">SAB</strong> (Sabedoria):</span>
+                <span class="stat-val" id="stat-sabedoria">12</span>
+              </div>
+              <div class="dnd-stat-row">
+                <span class="stat-name"><strong style="color: #facc15;">CAR</strong> (Carisma):</span>
+                <span class="stat-val" id="stat-carisma">14</span>
+              </div>
+            </div>
+
+            <div class="combat-substats-box">
+              <div class="stats-section-title">Estatísticas de Batalha</div>
+              <div class="substat-row"><span>Vida Máxima:</span><strong id="paperdoll-max-hp" style="color: #34d399;">1.130</strong></div>
+              <div class="substat-row"><span>Dano Base:</span><strong id="paperdoll-base-damage" style="color: #f87171;">89</strong></div>
+              <div class="substat-row"><span>Alcance de Ataque:</span><strong id="paperdoll-attack-range">2.5m (Melee)</strong></div>
+              <div class="substat-row"><span>Chance de Crítico:</span><strong id="paperdoll-crit" style="color: #fbbf24;">18%</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Farm Helper Modal (Assistente de Farm Idle & Auto-Venda) -->
+    <div id="farm-helper-modal" class="modal-backdrop" style="display: none;">
+      <div class="glass-panel modal-content" style="max-width: 520px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🤖</span> Farm Helper (Automação Idle)
+          </div>
+          <button id="btn-close-farm" class="btn-close" title="Fechar (ESC)">✕</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px; padding: 12px 6px;">
+          <!-- Auto HP Potion -->
+          <div class="form-group" style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label for="slider-auto-hp">🧪 Auto-Poção de Vida (HP):</label>
+              <span id="label-auto-hp" style="font-size: 0.75rem; color: #34d399; font-weight: 700;">Usar se HP &lt; 60%</span>
+            </div>
+            <input type="range" id="slider-auto-hp" min="20" max="90" step="5" value="60" style="margin-top: 6px;" />
+            <span style="font-size: 0.68rem; color: #94a3b8;">Consome poções de HP automaticamente da mochila durante o combate contínuo.</span>
+          </div>
+
+          <!-- Auto MP Potion -->
+          <div class="form-group" style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label for="slider-auto-mp">💧 Auto-Poção de Energia / MP:</label>
+              <span id="label-auto-mp" style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">Usar se Recurso &lt; 40%</span>
+            </div>
+            <input type="range" id="slider-auto-mp" min="20" max="80" step="5" value="40" style="margin-top: 6px;" />
+          </div>
+
+          <!-- Auto Sell by Rarity -->
+          <div class="form-group" style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+            <span style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; margin-bottom: 6px;">💰 Auto-Venda na Bag (Sem ir a NPC):</span>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.75rem;">
+                <input type="checkbox" id="chk-auto-sell-common" checked />
+                <span>Auto-vender itens <strong style="color: #94a3b8;">Comuns (Cinza)</strong> por Ouro</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.75rem;">
+                <input type="checkbox" id="chk-auto-sell-uncommon" checked />
+                <span>Auto-vender itens <strong style="color: #4ade80;">Incomuns (Verde)</strong> por Ouro</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.75rem;">
+                <input type="checkbox" id="chk-auto-sell-rare" />
+                <span>Auto-vender itens <strong style="color: #38bdf8;">Raros (Azul)</strong> por Ouro</span>
+              </label>
+            </div>
+          </div>
+
+          <button id="btn-save-farm-helper" class="btn-action-primary" style="width: 100%; padding: 10px;">
+            Salvar & Ativar Farm Helper
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Use Toast Notification -->
+    <div id="quick-use-toast" style="display: none;">
+      <div id="quick-use-icon" style="font-size: 1.5rem;">📦</div>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 0.68rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Novo Drop Obtido!</span>
+        <span id="quick-use-name" style="font-size: 0.78rem; font-weight: 800; color: #fbbf24;">Baú de Equipamento</span>
+      </div>
+      <button id="btn-quick-use-action" class="btn-action-primary" style="padding: 6px 14px; font-size: 0.72rem;">Usar</button>
     </div>
 
     <script type="module" src="/src/main.ts"></script>

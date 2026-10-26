@@ -164,6 +164,10 @@ export interface C2SUseItemPayload {
   slotIndex: number;
 }
 
+export interface C2SSellItemPayload {
+  slotIndex: number;
+}
+
 // ==========================================
 // Progression & Leveling Payloads
 // ==========================================

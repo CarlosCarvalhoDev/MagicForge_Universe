@@ -20,6 +20,8 @@ export enum EquipmentSlot {
   ARMADURA = 'ARMADURA',
   ESCUDO = 'ESCUDO',
   ACESSORIO = 'ACESSORIO',
+  ELMO = 'ELMO',
+  BOTAS = 'BOTAS',
 }
 
 export interface ItemAttributesBonus {

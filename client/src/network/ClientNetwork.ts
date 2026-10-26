@@ -6,6 +6,7 @@ import {
   C2SMoveInputPayload,
   C2SPingPayload,
   C2SUseItemPayload,
+  C2SSellItemPayload,
   CharacterClass,
   NetworkMessage,
   Opcode,
@@ -161,6 +162,11 @@ export class ClientNetwork {
   public sendUseItem(slotIndex: number): void {
     const payload: C2SUseItemPayload = { slotIndex };
     this.send(Opcode.C2S_USE_ITEM, payload);
+  }
+
+  public sendSellItem(slotIndex: number): void {
+    const payload: C2SSellItemPayload = { slotIndex };
+    this.send(Opcode.C2S_SELL_ITEM, payload);
   }
 
   private startPingHeartbeat(): void {

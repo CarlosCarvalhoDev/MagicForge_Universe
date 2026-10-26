@@ -11,8 +11,10 @@ import {
   InventoryItemPayload,
   RARITY_COLORS,
   ItemType,
+  ItemRarity,
   EquipmentSlot,
   S2CInventoryUpdatePayload,
+  CLASS_STAT_GROWTH,
 } from '@magicforge/shared';
 import { ClientNetwork } from './network/ClientNetwork';
 import { SnapshotBuffer } from './interpolation/SnapshotBuffer';
@@ -72,6 +74,64 @@ const hudPlayerName = document.getElementById('hud-player-name') as HTMLSpanElem
 const hudCpVal = document.getElementById('hud-cp-val') as HTMLSpanElement | null;
 const playerExpBar = document.getElementById('player-exp-bar') as HTMLDivElement | null;
 const playerExpText = document.getElementById('player-exp-text') as HTMLSpanElement | null;
+
+// Top-Left Hero Card DOM (Stickman Go Style)
+const hudHeroPortrait = document.getElementById('hud-hero-portrait') as HTMLImageElement | null;
+const hudHeroLevel = document.getElementById('hud-hero-level') as HTMLSpanElement | null;
+const hudHeroName = document.getElementById('hud-hero-name') as HTMLSpanElement | null;
+const hudCpBig = document.getElementById('hud-cp-big') as HTMLSpanElement | null;
+const hudHeroHpBar = document.getElementById('hud-hero-hp-bar') as HTMLDivElement | null;
+const hudHeroHpText = document.getElementById('hud-hero-hp-text') as HTMLSpanElement | null;
+const hudHeroMpBar = document.getElementById('hud-hero-mp-bar') as HTMLDivElement | null;
+const hudHeroMpText = document.getElementById('hud-hero-mp-text') as HTMLSpanElement | null;
+const hudAvatarBtn = document.getElementById('hud-avatar-btn') as HTMLDivElement | null;
+
+// Top-Center & Top-Right Cards
+const waveProgressText = document.getElementById('wave-progress-text') as HTMLSpanElement | null;
+const btnBossChallenge = document.getElementById('btn-boss-challenge') as HTMLButtonElement | null;
+const currentStageBadge = document.getElementById('current-stage-badge') as HTMLSpanElement | null;
+const zoneLocationTitle = document.getElementById('zone-location-title') as HTMLSpanElement | null;
+const btnPowerSave = document.getElementById('btn-power-save') as HTMLButtonElement | null;
+
+// Mobile Dock Navigation Buttons
+const btnDockCharacter = document.getElementById('btn-dock-character') as HTMLButtonElement | null;
+const btnDockInventory = document.getElementById('btn-dock-inventory') as HTMLButtonElement | null;
+const btnDockSkillbook = document.getElementById('btn-dock-skillbook') as HTMLButtonElement | null;
+const btnDockFarm = document.getElementById('btn-dock-farm') as HTMLButtonElement | null;
+const btnDockRanking = document.getElementById('btn-dock-ranking') as HTMLButtonElement | null;
+
+// Character (Paperdoll) Modal Elements
+const characterModal = document.getElementById('character-modal') as HTMLDivElement | null;
+const btnCloseCharacter = document.getElementById('btn-close-character') as HTMLButtonElement | null;
+const paperdollCpValue = document.getElementById('paperdoll-cp-value') as HTMLDivElement | null;
+const statForca = document.getElementById('stat-forca') as HTMLSpanElement | null;
+const statDestreza = document.getElementById('stat-destreza') as HTMLSpanElement | null;
+const statConstituicao = document.getElementById('stat-constituicao') as HTMLSpanElement | null;
+const statInteligencia = document.getElementById('stat-inteligencia') as HTMLSpanElement | null;
+const statSabedoria = document.getElementById('stat-sabedoria') as HTMLSpanElement | null;
+const statCarisma = document.getElementById('stat-carisma') as HTMLSpanElement | null;
+const paperdollMaxHp = document.getElementById('paperdoll-max-hp') as HTMLElement | null;
+const paperdollBaseDamage = document.getElementById('paperdoll-base-damage') as HTMLElement | null;
+const paperdollAttackRange = document.getElementById('paperdoll-attack-range') as HTMLElement | null;
+const paperdollCrit = document.getElementById('paperdoll-crit') as HTMLElement | null;
+
+// Farm Helper Modal Elements
+const farmHelperModal = document.getElementById('farm-helper-modal') as HTMLDivElement | null;
+const btnCloseFarm = document.getElementById('btn-close-farm') as HTMLButtonElement | null;
+const sliderAutoHp = document.getElementById('slider-auto-hp') as HTMLInputElement | null;
+const labelAutoHp = document.getElementById('label-auto-hp') as HTMLSpanElement | null;
+const sliderAutoMp = document.getElementById('slider-auto-mp') as HTMLInputElement | null;
+const labelAutoMp = document.getElementById('label-auto-mp') as HTMLSpanElement | null;
+const chkAutoSellCommon = document.getElementById('chk-auto-sell-common') as HTMLInputElement | null;
+const chkAutoSellUncommon = document.getElementById('chk-auto-sell-uncommon') as HTMLInputElement | null;
+const chkAutoSellRare = document.getElementById('chk-auto-sell-rare') as HTMLInputElement | null;
+const btnSaveFarmHelper = document.getElementById('btn-save-farm-helper') as HTMLButtonElement | null;
+
+// Quick Use Toast Notification
+const quickUseToast = document.getElementById('quick-use-toast') as HTMLDivElement | null;
+const quickUseIcon = document.getElementById('quick-use-icon') as HTMLDivElement | null;
+const quickUseName = document.getElementById('quick-use-name') as HTMLSpanElement | null;
+const btnQuickUseAction = document.getElementById('btn-quick-use-action') as HTMLButtonElement | null;
 
 let playerLevel: number = 1;
 let playerCurrentXp: number = 0;
@@ -500,6 +560,384 @@ function selectInventorySlot(slotIndex: number) {
   }
 }
 
+// ==========================================
+// Paperdoll (Equipment Manequin) & Character Modal
+// ==========================================
+const paperdollPortrait = document.getElementById('paperdoll-portrait') as HTMLImageElement | null;
+const paperdollHeroName = document.getElementById('paperdoll-hero-name') as HTMLSpanElement | null;
+const paperdollHeroClass = document.getElementById('paperdoll-hero-class') as HTMLSpanElement | null;
+
+type PaperdollSlotKey = 'head' | 'chest' | 'legs' | 'main_hand' | 'off_hand' | 'relic';
+
+const paperdollSlotMapping: Record<PaperdollSlotKey, EquipmentSlot> = {
+  head: EquipmentSlot.ELMO,
+  chest: EquipmentSlot.ARMADURA,
+  legs: EquipmentSlot.BOTAS,
+  main_hand: EquipmentSlot.ARMA,
+  off_hand: EquipmentSlot.ESCUDO,
+  relic: EquipmentSlot.ACESSORIO,
+};
+
+const paperdollSlotElements: Record<PaperdollSlotKey, HTMLElement | null> = {
+  head: document.getElementById('equip-slot-head'),
+  chest: document.getElementById('equip-slot-chest'),
+  legs: document.getElementById('equip-slot-legs'),
+  main_hand: document.getElementById('equip-slot-main_hand'),
+  off_hand: document.getElementById('equip-slot-off_hand'),
+  relic: document.getElementById('equip-slot-relic'),
+};
+
+const defaultSlotIcons: Record<PaperdollSlotKey, { emoji: string; label: string }> = {
+  head: { emoji: '🧢', label: 'Elmo' },
+  chest: { emoji: '🦺', label: 'Armadura' },
+  legs: { emoji: '👖', label: 'Botas' },
+  main_hand: { emoji: '⚔️', label: 'Arma' },
+  off_hand: { emoji: '🛡️', label: 'Escudo' },
+  relic: { emoji: '💍', label: 'Relíquia' },
+};
+
+function renderCharacterModal(): void {
+  const chosenClass = (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
+  const classDef = CLASS_DEFINITIONS[chosenClass];
+  if (!classDef) return;
+
+  // 1. Calculate live attributes: Base + Growth * (Level - 1) + Equipment Bonuses
+  const currentAttrs: CharacterAttributes = { ...classDef.baseStats };
+  const growth = CLASS_STAT_GROWTH[chosenClass] || {};
+  const levelMult = Math.max(0, playerLevel - 1);
+
+  if (growth.forca) currentAttrs.forca += growth.forca * levelMult;
+  if (growth.destreza) currentAttrs.destreza += growth.destreza * levelMult;
+  if (growth.constituicao) currentAttrs.constituicao += growth.constituicao * levelMult;
+  if (growth.inteligencia) currentAttrs.inteligencia += growth.inteligencia * levelMult;
+  if (growth.sabedoria) currentAttrs.sabedoria += growth.sabedoria * levelMult;
+  if (growth.carisma) currentAttrs.carisma += growth.carisma * levelMult;
+
+  // Equipment bonuses
+  let bonusMaxHp = 0;
+  playerInventory.forEach((item) => {
+    if (item.isEquipped) {
+      const def = ITEMS_DATABASE[item.itemId];
+      if (def && def.statsBonus) {
+        if (def.statsBonus.forca) currentAttrs.forca += def.statsBonus.forca;
+        if (def.statsBonus.destreza) currentAttrs.destreza += def.statsBonus.destreza;
+        if (def.statsBonus.constituicao) currentAttrs.constituicao += def.statsBonus.constituicao;
+        if (def.statsBonus.inteligencia) currentAttrs.inteligencia += def.statsBonus.inteligencia;
+        if (def.statsBonus.sabedoria) currentAttrs.sabedoria += def.statsBonus.sabedoria;
+        if (def.statsBonus.carisma) currentAttrs.carisma += def.statsBonus.carisma;
+        if (def.statsBonus.maxHp) bonusMaxHp += def.statsBonus.maxHp;
+      }
+    }
+  });
+
+  // Derived Stats
+  const calculatedMaxHp = currentAttrs.constituicao * 35 + 450 + bonusMaxHp;
+  let primeStat = currentAttrs.forca;
+  if (classDef.mainStat === PrimaryStatType.DESTREZA) primeStat = currentAttrs.destreza;
+  else if (classDef.mainStat === PrimaryStatType.INTELIGENCIA) primeStat = currentAttrs.inteligencia;
+  else if (classDef.mainStat === PrimaryStatType.SABEDORIA) primeStat = currentAttrs.sabedoria;
+  else if (classDef.mainStat === PrimaryStatType.CARISMA) primeStat = currentAttrs.carisma;
+  else if (classDef.mainStat === PrimaryStatType.FORCA_E_CARISMA) primeStat = currentAttrs.forca + currentAttrs.carisma;
+  const baseDmg = primeStat * 3 + 5;
+  const critPct = Math.min(60, 5 + Math.floor(currentAttrs.destreza * 0.8));
+
+  // Update DOM values
+  if (statForca) statForca.textContent = `${currentAttrs.forca}`;
+  if (statDestreza) statDestreza.textContent = `${currentAttrs.destreza}`;
+  if (statConstituicao) statConstituicao.textContent = `${currentAttrs.constituicao}`;
+  if (statInteligencia) statInteligencia.textContent = `${currentAttrs.inteligencia}`;
+  if (statSabedoria) statSabedoria.textContent = `${currentAttrs.sabedoria}`;
+  if (statCarisma) statCarisma.textContent = `${currentAttrs.carisma}`;
+
+  if (paperdollMaxHp) paperdollMaxHp.textContent = `${calculatedMaxHp}`;
+  if (paperdollBaseDamage) paperdollBaseDamage.textContent = `${baseDmg}`;
+  if (paperdollAttackRange) paperdollAttackRange.textContent = `${classDef.attackRange}m (${classDef.isRanged ? 'Ranged' : 'Melee'})`;
+  if (paperdollCrit) paperdollCrit.textContent = `${critPct}%`;
+
+  if (paperdollCpValue) paperdollCpValue.textContent = `⚔️ ${playerCombatPower.toLocaleString('pt-BR')}`;
+  if (hudCpBig) hudCpBig.textContent = playerCombatPower.toLocaleString('pt-BR');
+
+  // Center stage avatar
+  const charName = charNameInput.value.trim() || 'Aventureiro';
+  if (paperdollPortrait) paperdollPortrait.src = `/assets/portraits/${chosenClass}.jpg`;
+  if (paperdollHeroName) paperdollHeroName.textContent = charName;
+  if (paperdollHeroClass) paperdollHeroClass.textContent = `${classDef.displayName} (Nv. ${playerLevel})`;
+
+  // Render 6 Equipment Slots
+  Object.entries(paperdollSlotElements).forEach(([slotKeyStr, slotEl]) => {
+    if (!slotEl) return;
+    const slotKey = slotKeyStr as PaperdollSlotKey;
+    const equipSlot = paperdollSlotMapping[slotKey];
+    const equippedItem = playerInventory.find((i) => {
+      if (!i.isEquipped) return false;
+      const def = ITEMS_DATABASE[i.itemId];
+      return def && def.equipmentSlot === equipSlot;
+    });
+
+    if (equippedItem) {
+      const def = ITEMS_DATABASE[equippedItem.itemId]!;
+      const rarityTheme = RARITY_COLORS[def.rarity] || { border: '#fbbf24', text: '#fbbf24', glow: 'rgba(251,191,36,0.3)' };
+      slotEl.style.borderColor = rarityTheme.border;
+      slotEl.style.boxShadow = `0 0 12px ${rarityTheme.glow}`;
+      slotEl.innerHTML = `
+        <span class="slot-placeholder-icon" style="font-size: 1.5rem;">${getItemEmoji(def.itemId, def.type)}</span>
+        <span class="slot-label" style="color: ${rarityTheme.text}; font-weight: 700;">${def.name}</span>
+      `;
+      slotEl.title = `[Equipado] ${def.name} (${def.rarity})\nClique para Desequipar`;
+      slotEl.onclick = () => {
+        network.sendUseItem(equippedItem.slotIndex);
+      };
+    } else {
+      const defSlot = defaultSlotIcons[slotKey];
+      slotEl.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+      slotEl.style.boxShadow = 'none';
+      slotEl.innerHTML = `
+        <span class="slot-placeholder-icon">${defSlot.emoji}</span>
+        <span class="slot-label">${defSlot.label}</span>
+      `;
+      slotEl.title = `[Vazio] Slot de ${defSlot.label}\nAbra a Mochila [I] para equipar`;
+      slotEl.onclick = () => {
+        openInventory();
+      };
+    }
+  });
+}
+
+function openCharacterModal(): void {
+  if (!characterModal) return;
+  characterModal.style.display = 'flex';
+  renderCharacterModal();
+}
+
+function closeCharacterModal(): void {
+  if (!characterModal) return;
+  characterModal.style.display = 'none';
+}
+
+function toggleCharacterModal(force?: boolean): void {
+  if (!characterModal) return;
+  const isCurrentlyOpen = characterModal.style.display === 'flex';
+  const shouldOpen = force !== undefined ? force : !isCurrentlyOpen;
+  if (shouldOpen) {
+    openCharacterModal();
+  } else {
+    closeCharacterModal();
+  }
+}
+
+// ==========================================
+// Farm Helper (Automação Idle & Auto-Venda)
+// ==========================================
+interface FarmHelperSettings {
+  autoHpPercent: number;
+  autoMpPercent: number;
+  autoSellCommon: boolean;
+  autoSellUncommon: boolean;
+  autoSellRare: boolean;
+}
+
+const FARM_STORAGE_KEY = 'magicforge_farm_helper_config';
+let farmSettings: FarmHelperSettings = {
+  autoHpPercent: 60,
+  autoMpPercent: 40,
+  autoSellCommon: true,
+  autoSellUncommon: true,
+  autoSellRare: false,
+};
+
+function loadFarmHelperSettings(): void {
+  try {
+    const raw = localStorage.getItem(FARM_STORAGE_KEY);
+    if (raw) {
+      farmSettings = { ...farmSettings, ...JSON.parse(raw) };
+    }
+  } catch {
+    // Ignore
+  }
+
+  if (sliderAutoHp) sliderAutoHp.value = `${farmSettings.autoHpPercent}`;
+  if (labelAutoHp) labelAutoHp.textContent = `Usar se HP < ${farmSettings.autoHpPercent}%`;
+  if (sliderAutoMp) sliderAutoMp.value = `${farmSettings.autoMpPercent}`;
+  if (labelAutoMp) labelAutoMp.textContent = `Usar se Recurso < ${farmSettings.autoMpPercent}%`;
+
+  if (chkAutoSellCommon) chkAutoSellCommon.checked = farmSettings.autoSellCommon;
+  if (chkAutoSellUncommon) chkAutoSellUncommon.checked = farmSettings.autoSellUncommon;
+  if (chkAutoSellRare) chkAutoSellRare.checked = farmSettings.autoSellRare;
+}
+
+function saveFarmHelperSettings(): void {
+  if (sliderAutoHp) farmSettings.autoHpPercent = parseInt(sliderAutoHp.value, 10);
+  if (sliderAutoMp) farmSettings.autoMpPercent = parseInt(sliderAutoMp.value, 10);
+  if (chkAutoSellCommon) farmSettings.autoSellCommon = chkAutoSellCommon.checked;
+  if (chkAutoSellUncommon) farmSettings.autoSellUncommon = chkAutoSellUncommon.checked;
+  if (chkAutoSellRare) farmSettings.autoSellRare = chkAutoSellRare.checked;
+
+  try {
+    localStorage.setItem(FARM_STORAGE_KEY, JSON.stringify(farmSettings));
+  } catch {
+    // Ignore
+  }
+}
+
+function openFarmHelper(): void {
+  if (!farmHelperModal) return;
+  loadFarmHelperSettings();
+  farmHelperModal.style.display = 'flex';
+}
+
+function closeFarmHelper(): void {
+  if (!farmHelperModal) return;
+  farmHelperModal.style.display = 'none';
+}
+
+function toggleFarmHelper(force?: boolean): void {
+  if (!farmHelperModal) return;
+  const isCurrentlyOpen = farmHelperModal.style.display === 'flex';
+  const shouldOpen = force !== undefined ? force : !isCurrentlyOpen;
+  if (shouldOpen) openFarmHelper();
+  else closeFarmHelper();
+}
+
+let lastAutoHpPotionTime = 0;
+let lastAutoMpPotionTime = 0;
+
+function checkAutoPotions(hp: number, maxHp: number, mp: number, maxMp: number): void {
+  if (!network.isConnected) return;
+  const now = performance.now();
+
+  // 1. Check HP Potion
+  if (maxHp > 0 && (hp / maxHp) * 100 < farmSettings.autoHpPercent) {
+    if (now - lastAutoHpPotionTime > 2000) {
+      const potion = playerInventory.find((i) => i.itemId.startsWith('potion_hp_'));
+      if (potion) {
+        lastAutoHpPotionTime = now;
+        network.sendUseItem(potion.slotIndex);
+      }
+    }
+  }
+
+  // 2. Check MP Potion
+  if (maxMp > 0 && (mp / maxMp) * 100 < farmSettings.autoMpPercent) {
+    if (now - lastAutoMpPotionTime > 2000) {
+      const potion = playerInventory.find((i) => i.itemId.startsWith('potion_mp_'));
+      if (potion) {
+        lastAutoMpPotionTime = now;
+        network.sendUseItem(potion.slotIndex);
+      }
+    }
+  }
+}
+
+function processAutoSell(): void {
+  if (!network.isConnected) return;
+  for (const item of playerInventory) {
+    if (item.isEquipped) continue;
+    const def = ITEMS_DATABASE[item.itemId];
+    if (!def) continue;
+
+    const isCommon = def.rarity === ItemRarity.COMUM && farmSettings.autoSellCommon;
+    const isUncommon = def.rarity === ItemRarity.INCOMUM && farmSettings.autoSellUncommon;
+    const isRare = def.rarity === ItemRarity.RARO && farmSettings.autoSellRare;
+
+    if (isCommon || isUncommon || isRare) {
+      network.sendSellItem(item.slotIndex);
+      break; // Send one per tick / batch
+    }
+  }
+}
+
+// Quick Use Toast Notification helper
+let quickToastTimeout: number | null = null;
+function triggerQuickUseToast(name: string, emoji: string, slotIndex: number): void {
+  if (!quickUseToast || !quickUseName || !quickUseIcon || !btnQuickUseAction) return;
+
+  quickUseName.textContent = name;
+  quickUseIcon.textContent = emoji;
+  quickUseToast.style.display = 'flex';
+
+  btnQuickUseAction.onclick = () => {
+    network.sendUseItem(slotIndex);
+    quickUseToast.style.display = 'none';
+  };
+
+  if (quickToastTimeout) clearTimeout(quickToastTimeout);
+  quickToastTimeout = window.setTimeout(() => {
+    quickUseToast.style.display = 'none';
+  }, 5000);
+}
+
+// Bind Dock Navigation Buttons
+if (btnDockCharacter) btnDockCharacter.addEventListener('click', () => toggleCharacterModal());
+if (btnDockInventory) btnDockInventory.addEventListener('click', () => toggleInventoryModal());
+if (btnDockSkillbook) btnDockSkillbook.addEventListener('click', () => {
+  if (skillbookModal && skillbookModal.style.display === 'flex') closeSkillbook();
+  else openSkillbook();
+});
+if (btnDockFarm) btnDockFarm.addEventListener('click', () => toggleFarmHelper());
+if (btnDockRanking) btnDockRanking.addEventListener('click', () => {
+  alert(`🏆 MagicForge: Rankings Globais\n\n1º LordKael - CP: 18.420 (Mago)\n2º Valerius - CP: 16.900 (Guerreiro)\n3º Selene - CP: 15.350 (Arqueira)\n\nSeu CP Atual: ${playerCombatPower.toLocaleString('pt-BR')} (Top 12%)`);
+});
+
+// Bind Hero Avatar click on top-left card
+if (hudAvatarBtn) {
+  hudAvatarBtn.addEventListener('click', () => toggleCharacterModal());
+}
+
+// Bind Modal Close buttons
+if (btnCloseCharacter) {
+  btnCloseCharacter.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeCharacterModal();
+  });
+}
+if (characterModal) {
+  characterModal.addEventListener('click', (e) => {
+    if (e.target === characterModal) closeCharacterModal();
+  });
+}
+
+if (btnCloseFarm) {
+  btnCloseFarm.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeFarmHelper();
+  });
+}
+if (farmHelperModal) {
+  farmHelperModal.addEventListener('click', (e) => {
+    if (e.target === farmHelperModal) closeFarmHelper();
+  });
+}
+
+if (sliderAutoHp && labelAutoHp) {
+  sliderAutoHp.addEventListener('input', () => {
+    labelAutoHp.textContent = `Usar se HP < ${sliderAutoHp.value}%`;
+  });
+}
+if (sliderAutoMp && labelAutoMp) {
+  sliderAutoMp.addEventListener('input', () => {
+    labelAutoMp.textContent = `Usar se Recurso < ${sliderAutoMp.value}%`;
+  });
+}
+if (btnSaveFarmHelper) {
+  btnSaveFarmHelper.addEventListener('click', () => {
+    saveFarmHelperSettings();
+    closeFarmHelper();
+  });
+}
+
+// Battery Power Save mode toggle
+let isPowerSave = false;
+if (btnPowerSave) {
+  btnPowerSave.addEventListener('click', () => {
+    isPowerSave = !isPowerSave;
+    btnPowerSave.style.background = isPowerSave ? 'rgba(56, 189, 248, 0.35)' : 'rgba(15, 23, 42, 0.75)';
+    btnPowerSave.textContent = isPowerSave ? '🌙 Economia ON' : '🌙 Economia';
+  });
+}
+
+// Initial farm helper settings load
+loadFarmHelperSettings();
+
 // Core Game Client Systems
 const network = new ClientNetwork();
 const snapshotBuffer = new SnapshotBuffer();
@@ -602,15 +1040,22 @@ network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
   playerGold = payload.gold;
   playerCombatPower = payload.totalCombatPower;
 
-  if (playerGoldText) playerGoldText.textContent = `${playerGold} Ouro`;
-  if (inventoryGoldLabel) inventoryGoldLabel.textContent = `${playerGold} Ouro`;
-  if (modalCpText) modalCpText.textContent = `${playerCombatPower}`;
-  if (hudCpVal) hudCpVal.textContent = `${playerCombatPower}`;
+  if (playerGoldText) playerGoldText.textContent = `${playerGold.toLocaleString('pt-BR')} Ouro`;
+  if (inventoryGoldLabel) inventoryGoldLabel.textContent = `${playerGold.toLocaleString('pt-BR')} Ouro`;
+  if (modalCpText) modalCpText.textContent = `${playerCombatPower.toLocaleString('pt-BR')}`;
+  if (hudCpVal) hudCpVal.textContent = `${playerCombatPower.toLocaleString('pt-BR')}`;
+  if (hudCpBig) hudCpBig.textContent = playerCombatPower.toLocaleString('pt-BR');
 
   renderInventorySlots();
   if (selectedSlotIndex !== null) {
     selectInventorySlot(selectedSlotIndex);
   }
+
+  // Refresh Paperdoll equipment manequin and attributes sheet
+  renderCharacterModal();
+
+  // Run idle farm helper auto-sell rules
+  processAutoSell();
 };
 
 network.onLoginSuccess = (payload) => {
@@ -619,11 +1064,18 @@ network.onLoginSuccess = (payload) => {
   playerXpToNextLevel = payload.xpToNextLevel ?? 150;
   playerGold = payload.gold ?? 0;
 
+  const chosenClass = (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
+  if (hudHeroPortrait) hudHeroPortrait.src = `/assets/portraits/${chosenClass}.jpg`;
+  if (hudHeroName) hudHeroName.textContent = payload.characterName || 'Jogador';
+  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
+
   updateExpBarUI(playerLevel, playerCurrentXp, playerXpToNextLevel);
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
   if (hudPlayerName) hudPlayerName.textContent = payload.characterName || 'Jogador';
-  if (playerGoldText) playerGoldText.textContent = `${playerGold} Ouro`;
-  if (inventoryGoldLabel) inventoryGoldLabel.textContent = `${playerGold} Ouro`;
+  if (playerGoldText) playerGoldText.textContent = `${playerGold.toLocaleString('pt-BR')} Ouro`;
+  if (inventoryGoldLabel) inventoryGoldLabel.textContent = `${playerGold.toLocaleString('pt-BR')} Ouro`;
+
+  renderCharacterModal();
 };
 
 network.onPlayerExpUpdate = (payload) => {
@@ -719,9 +1171,15 @@ window.addEventListener('keydown', (e) => {
     }
   } else if (e.key === 'i' || e.key === 'I') {
     toggleInventoryModal();
+  } else if (e.key === 'c' || e.key === 'C') {
+    toggleCharacterModal();
+  } else if (e.key === 'f' || e.key === 'F') {
+    toggleFarmHelper();
   } else if (e.key === 'Escape') {
     closeSkillbook();
     closeInventory();
+    closeCharacterModal();
+    closeFarmHelper();
   }
 });
 
@@ -921,16 +1379,38 @@ function gameLoop() {
     playerHpBar.style.width = `${hpPct}%`;
     playerHpText.textContent = `${myPlayer.currentHp} / ${myPlayer.maxHp}`;
 
+    if (hudHeroHpBar) hudHeroHpBar.style.width = `${hpPct}%`;
+    if (hudHeroHpText) hudHeroHpText.textContent = `${myPlayer.currentHp} / ${myPlayer.maxHp}`;
+
+    let resPct = 100;
     if (myPlayer.currentResource !== undefined && myPlayer.maxResource) {
-      const resPct = Math.max(0, Math.min(100, (myPlayer.currentResource / myPlayer.maxResource) * 100));
+      resPct = Math.max(0, Math.min(100, (myPlayer.currentResource / myPlayer.maxResource) * 100));
       playerResourceBar.style.width = `${resPct}%`;
       playerResourceText.textContent = `${myPlayer.currentResource} / ${myPlayer.maxResource}`;
       playerResourceLabel.textContent = myPlayer.resourceType === 'Energia' ? 'EN' : 'MP';
       playerResourceBar.className = `vital-bar-fill ${myPlayer.resourceType === 'Energia' ? 'energy-fill' : 'mp-fill'}`;
+
+      if (hudHeroMpBar) hudHeroMpBar.style.width = `${resPct}%`;
+      if (hudHeroMpText) hudHeroMpText.textContent = `${myPlayer.currentResource} / ${myPlayer.maxResource}`;
     }
+
     if (myPlayer.level && playerLevelBadge) {
       playerLevelBadge.textContent = `Nv. ${myPlayer.level}`;
     }
+    if (myPlayer.level && hudHeroLevel) {
+      hudHeroLevel.textContent = `Nv. ${myPlayer.level}`;
+    }
+    if (hudHeroName) {
+      hudHeroName.textContent = myPlayer.name || charNameInput.value.trim() || 'Aventureiro';
+    }
+
+    // Farm Helper Auto-Potions check
+    checkAutoPotions(
+      myPlayer.currentHp,
+      myPlayer.maxHp,
+      myPlayer.currentResource ?? 0,
+      myPlayer.maxResource ?? 100
+    );
   }
 
   // 3. Update Target Vitals HUD
