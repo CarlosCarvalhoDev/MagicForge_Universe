@@ -84,6 +84,21 @@ export class GameRenderer {
     });
   }
 
+  public addSkillEffectText(worldPos: Vector3, skillName: string, amount: number, isHeal: boolean, isCritical: boolean): void {
+    let text = isHeal ? `+${amount} (${skillName})` : `-${amount} [${skillName}]`;
+    let color = isHeal ? '#4ade80' : isCritical ? '#fbbf24' : '#c084fc';
+
+    this.floatingTexts.push({
+      id: Math.random().toString(),
+      text,
+      color,
+      x: worldPos.x + (Math.random() - 0.5) * 1.8,
+      y: worldPos.z - 1.8,
+      opacity: 1.0,
+      createdAt: performance.now(),
+    });
+  }
+
   public render(entities: InterpolatedEntity[], myPlayerId: string | null): void {
     const { ctx, canvas } = this;
     const width = canvas.width;
@@ -248,6 +263,25 @@ export class GameRenderer {
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
       ctx.lineWidth = 1;
       ctx.strokeRect(screenX - barWidth / 2, screenY + 16, barWidth, barHeight);
+
+      // Draw Resource Bar (Mana / Energia)
+      if (ent.currentResource !== undefined && ent.maxResource) {
+        const resPercent = Math.max(0, Math.min(1, ent.currentResource / ent.maxResource));
+        const resColor = ent.resourceType === 'Energia' ? '#facc15' : '#38bdf8';
+
+        // Resource BG
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillRect(screenX - barWidth / 2, screenY + 22, barWidth, 3);
+
+        // Resource Fill
+        ctx.fillStyle = resColor;
+        ctx.fillRect(screenX - barWidth / 2, screenY + 22, barWidth * resPercent, 3);
+
+        // Resource Border
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(screenX - barWidth / 2, screenY + 22, barWidth, 3);
+      }
     }
 
     // 4. Draw Floating Combat Text

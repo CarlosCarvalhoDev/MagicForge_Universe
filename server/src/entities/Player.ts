@@ -22,6 +22,13 @@ export class Player extends Entity {
   public attackRange: number;
   public attackIntervalSec: number;
 
+  // Resource & Skills
+  public currentResource: number;
+  public maxResource: number;
+  public readonly resourceType: 'Mana' | 'Energia';
+  public resourceRegenPerSec: number = 8.0;
+  public skillCooldowns = new Map<number, number>(); // slot -> remaining seconds
+
   public targetDestination: Vector3 | null = null;
   public moveDirection: Vector3 | null = null;
   public attackTimer: number = 0;
@@ -39,6 +46,12 @@ export class Player extends Entity {
     this.speed = classDef.baseSpeed;
     this.attackRange = classDef.attackRange;
     this.attackIntervalSec = classDef.attackIntervalSec;
+
+    // Resource allocation based on class (Mana for casters, Energia for martials)
+    const isCaster = classType === CharacterClass.MAGO || classType === CharacterClass.CLERIGO || classType === CharacterClass.BRUXO;
+    this.resourceType = isCaster ? 'Mana' : 'Energia';
+    this.maxResource = isCaster ? 100 + (this.attributes.inteligencia || this.attributes.sabedoria || 10) * 8 : 100;
+    this.currentResource = this.maxResource;
   }
 
   public get BaseDamage(): number {
@@ -107,9 +120,24 @@ export class Player extends Entity {
   public override update(deltaTimeSec: number): void {
     if (this.isDead) return;
 
-    // Tick cooldowns
+    // Tick basic attack cooldown
     if (this.attackTimer > 0) {
       this.attackTimer -= deltaTimeSec;
+    }
+
+    // Tick Skill Cooldowns
+    for (const [slot, cd] of this.skillCooldowns) {
+      const remaining = cd - deltaTimeSec;
+      if (remaining <= 0) {
+        this.skillCooldowns.delete(slot);
+      } else {
+        this.skillCooldowns.set(slot, remaining);
+      }
+    }
+
+    // Passive Resource Regeneration (Mana / Energia)
+    if (this.currentResource < this.maxResource) {
+      this.currentResource = Math.min(this.maxResource, this.currentResource + this.resourceRegenPerSec * deltaTimeSec);
     }
 
     // Authoritative Continuous Direction Movement (Mobile Virtual Joystick)
@@ -169,6 +197,22 @@ export class Player extends Entity {
     }
   }
 
+  public getSkillCooldown(slot: number): number {
+    return this.skillCooldowns.get(slot) || 0;
+  }
+
+  public setSkillCooldown(slot: number, durationSec: number): void {
+    this.skillCooldowns.set(slot, durationSec);
+  }
+
+  public consumeResource(amount: number): boolean {
+    if (this.currentResource >= amount) {
+      this.currentResource -= amount;
+      return true;
+    }
+    return false;
+  }
+
   private clampToBounds(): void {
     const { minX, maxX, minZ, maxZ } = SERVER_CONFIG.MAP_BOUNDS;
     this.position.x = Math.max(minX, Math.min(maxX, this.position.x));
@@ -180,6 +224,9 @@ export class Player extends Entity {
     return {
       ...base,
       classType: this.classType,
+      currentResource: Math.round(this.currentResource),
+      maxResource: this.maxResource,
+      resourceType: this.resourceType,
     };
   }
 }

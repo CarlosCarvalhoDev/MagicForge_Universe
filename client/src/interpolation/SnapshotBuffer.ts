@@ -21,6 +21,9 @@ export interface InterpolatedEntity {
   headingYaw: number;
   currentHp: number;
   maxHp: number;
+  currentResource?: number;
+  maxResource?: number;
+  resourceType?: 'Mana' | 'Energia';
   isMoving: boolean;
   targetId?: string | null;
   classType?: string;
@@ -138,6 +141,9 @@ export class SnapshotBuffer {
           headingYaw: newerEnt.headingYaw,
           currentHp: newerEnt.currentHp,
           maxHp: newerEnt.maxHp,
+          currentResource: newerEnt.currentResource,
+          maxResource: newerEnt.maxResource,
+          resourceType: newerEnt.resourceType,
           isMoving: newerEnt.isMoving,
           targetId: newerEnt.targetId,
           classType: newerEnt.classType,
@@ -160,6 +166,9 @@ export class SnapshotBuffer {
         headingYaw: interpolatedYaw,
         currentHp: newerEnt.currentHp,
         maxHp: newerEnt.maxHp,
+        currentResource: newerEnt.currentResource,
+        maxResource: newerEnt.maxResource,
+        resourceType: newerEnt.resourceType,
         isMoving: newerEnt.isMoving,
         targetId: newerEnt.targetId,
         classType: newerEnt.classType,

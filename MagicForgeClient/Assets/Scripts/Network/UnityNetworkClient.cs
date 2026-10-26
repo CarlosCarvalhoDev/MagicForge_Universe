@@ -93,6 +93,20 @@ namespace MagicForge.Network
             await SendPacket(Opcode.C2S_MOVE_INPUT, JsonUtility.ToJson(moveInput));
         }
 
+        public async void SendCastSkill(int slot, string targetId = null, Vector3? targetPosition = null)
+        {
+            if (!isConnected) return;
+
+            var castSkill = new CastSkillRequestDTO
+            {
+                slot = slot,
+                targetEntityId = targetId,
+                targetPosition = targetPosition.HasValue ? Vector3DTO.FromUnityVector3(targetPosition.Value) : default
+            };
+
+            await SendPacket(Opcode.C2S_CAST_SKILL, JsonUtility.ToJson(castSkill));
+        }
+
         private async Task SendPacket(Opcode op, string jsonData)
         {
             if (webSocket == null || webSocket.State != WebSocketState.Open) return;

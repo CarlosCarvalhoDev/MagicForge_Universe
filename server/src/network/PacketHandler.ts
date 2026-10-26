@@ -1,5 +1,6 @@
 import {
   C2SAttackTargetPayload,
+  C2SCastSkillPayload,
   C2SLoginPayload,
   C2SMoveInputPayload,
   C2SPingPayload,
@@ -45,6 +46,10 @@ export class PacketHandler {
 
       case Opcode.C2S_ATTACK_TARGET:
         this.handleAttackTarget(connection, message.data as C2SAttackTargetPayload);
+        break;
+
+      case Opcode.C2S_CAST_SKILL:
+        this.handleCastSkill(connection, message.data as C2SCastSkillPayload);
         break;
 
       case Opcode.C2S_PING:
@@ -121,6 +126,15 @@ export class PacketHandler {
     if (!player || player.isDead) return;
 
     player.targetId = payload.targetEntityId || null;
+  }
+
+  private handleCastSkill(connection: Connection, payload: C2SCastSkillPayload): void {
+    if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slot !== 'number') return;
+
+    const player = this.world.entityManager.getPlayer(connection.playerId);
+    if (!player || player.isDead) return;
+
+    this.world.castPlayerSkill(player, payload.slot, payload.targetEntityId, payload.targetPosition);
   }
 
   private handlePing(connection: Connection, payload: C2SPingPayload): void {

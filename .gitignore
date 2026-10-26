@@ -62,6 +62,11 @@ yarn-error.log*
 .env.*.local
 *.env
 
+# SQLite WAL and lock journals
+*.db-wal
+*.db-shm
+*.db-journal
+
 # --- OS & System ---
 .DS_Store
 Thumbs.db

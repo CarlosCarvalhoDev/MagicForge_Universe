@@ -130,6 +130,9 @@ export interface EntitySnapshotState {
   headingYaw: number; // Rotation in degrees (Y-axis)
   currentHp: number;
   maxHp: number;
+  currentResource?: number;
+  maxResource?: number;
+  resourceType?: 'Mana' | 'Energia';
   isMoving: boolean;
   targetId?: string | null;
   classType?: CharacterClass;

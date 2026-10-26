@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4517576ec6e8144e8eb1f2bf85a1210, type: 3}
+  m_Name: Bruxo
+  m_EditorClassIdentifier: Assembly-CSharp::MagicForge.Core.CharacterClassSO
+  className: Bruxo
+  classDescription: Cultista e invocador que domina chamas sombrias da Forja. Ataca a distancia usando Carisma (CHA).
+  classIcon: {fileID: 21300000, guid: a10000053a6524c489205bd51885cc05, type: 3}
+  defaultElement: 6
+  mainStat: 4
+  isRanged: 1
+  attackRange: 10
+  attackIntervalSec: 1.5
+  baseSpeed: 5
+  baseForca: 8
+  baseDestreza: 10
+  baseConstituicao: 10
+  baseInteligencia: 12
+  baseSabedoria: 10
+  baseCarisma: 18
+  ganhoForcaPorLevel: 0
+  ganhoDestrezaPorLevel: 1
+  ganhoConstituicaoPorLevel: 1
+  ganhoInteligenciaPorLevel: 1
+  ganhoSabedoriaPorLevel: 0
+  ganhoCarismaPorLevel: 3
+  isTier1: 1
+  evolutionOptionA: {fileID: 0}
+  evolutionOptionB: {fileID: 0}

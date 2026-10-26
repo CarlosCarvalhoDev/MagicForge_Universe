@@ -1,5 +1,6 @@
 import {
   C2SAttackTargetPayload,
+  C2SCastSkillPayload,
   C2SLoginPayload,
   C2SMoveInputPayload,
   C2SPingPayload,
@@ -10,6 +11,7 @@ import {
   S2CLoginSuccessPayload,
   S2CPongPayload,
   S2CPositionCorrectionPayload,
+  S2CSkillCastEventPayload,
   S2CWorldSnapshotPayload,
   Vector3,
 } from '@magicforge/shared';
@@ -30,6 +32,7 @@ export class ClientNetwork {
   public onLoginSuccess: MessageListener<S2CLoginSuccessPayload> | null = null;
   public onSnapshot: MessageListener<S2CWorldSnapshotPayload> | null = null;
   public onCombatEvent: MessageListener<S2CCombatEventPayload> | null = null;
+  public onSkillCastEvent: MessageListener<S2CSkillCastEventPayload> | null = null;
   public onPositionCorrection: MessageListener<S2CPositionCorrectionPayload> | null = null;
   public onLatencyUpdated: ((pingMs: number) => void) | null = null;
   public onConnectionStateChange: ((connected: boolean) => void) | null = null;
@@ -129,6 +132,15 @@ export class ClientNetwork {
     this.send(Opcode.C2S_ATTACK_TARGET, payload);
   }
 
+  public sendCastSkill(slot: number, targetEntityId?: string, targetPosition?: Vector3): void {
+    const payload: C2SCastSkillPayload = {
+      slot,
+      targetEntityId,
+      targetPosition,
+    };
+    this.send(Opcode.C2S_CAST_SKILL, payload);
+  }
+
   private startPingHeartbeat(): void {
     this.stopPingHeartbeat();
     this.pingIntervalId = window.setInterval(() => {
@@ -164,6 +176,11 @@ export class ClientNetwork {
 
         case Opcode.S2C_COMBAT_EVENT: {
           this.onCombatEvent?.(packet.data as S2CCombatEventPayload);
+          break;
+        }
+
+        case Opcode.S2C_SKILL_CAST_EVENT: {
+          this.onSkillCastEvent?.(packet.data as S2CSkillCastEventPayload);
           break;
         }
 

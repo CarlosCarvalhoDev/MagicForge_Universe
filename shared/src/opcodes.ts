@@ -24,6 +24,8 @@ export enum Opcode {
   C2S_ATTACK_TARGET = 0x30,
   S2C_COMBAT_EVENT = 0x31,
   S2C_ENTITY_STAT_UPDATE = 0x32,
+  C2S_CAST_SKILL = 0x33,
+  S2C_SKILL_CAST_EVENT = 0x34,
 
   // --- Heartbeat & Quality of Service (0xF0 - 0xFF) ---
   C2S_PING = 0xF0,

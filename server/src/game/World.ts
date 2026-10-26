@@ -2,12 +2,16 @@ import {
   CharacterClass,
   createVector3,
   distance,
+  distanceSquared,
   EntitySnapshotState,
   Opcode,
   S2CCombatEventPayload,
   S2CEntityDespawnPayload,
   S2CEntitySpawnPayload,
+  S2CSkillCastEventPayload,
   S2CWorldSnapshotPayload,
+  SKILLS_DATABASE,
+  calculateSkillPower,
   Vector3,
 } from '@magicforge/shared';
 import { EntityManager } from './EntityManager';
@@ -233,6 +237,91 @@ export class World {
       this.broadcast(Opcode.S2C_COMBAT_EVENT, combatEvent);
       monster.attackCooldown = monster.attackIntervalSec;
     }
+  }
+
+  /**
+   * Conjuração Autoritativa de Habilidades Ativas (Slots 1 a 4)
+   */
+  public castPlayerSkill(player: Player, slot: number, targetId?: string, targetPos?: Vector3): boolean {
+    if (player.isDead) return false;
+
+    const skillKey = `${player.classType.toLowerCase()}_${slot}`;
+    const skill = SKILLS_DATABASE[skillKey];
+    if (!skill) {
+      console.warn(`[World] Skill não encontrada: ${skillKey}`);
+      return false;
+    }
+
+    // 1. Validação de Cooldown
+    if (player.getSkillCooldown(slot) > 0) {
+      return false;
+    }
+
+    // 2. Validação de Recurso (Mana / Energia)
+    if (!player.consumeResource(skill.cost)) {
+      return false;
+    }
+
+    // 3. Inicia o Cooldown
+    player.setSkillCooldown(slot, skill.cooldownSec);
+
+    // 4. Calcula Poder (Fórmula D&D)
+    const power = calculateSkillPower(skill, player.attributes, player.level);
+    const isCritical = Math.random() < (player.attributes.destreza * 0.02);
+    const finalPower = isCritical ? Math.round(power * 1.5) : power;
+
+    const affectedIds: string[] = [];
+
+    // 5. Aplica Efeito
+    if (skill.isHeal) {
+      player.heal(finalPower);
+      affectedIds.push(player.id);
+    } else if (skill.isAoe) {
+      // Habilidade em Área
+      const aoeOrigin = targetPos || player.position;
+      const radiusSq = (skill.aoeRadius || 5.0) * (skill.aoeRadius || 5.0);
+
+      const nearbyMonsters = this.entityManager.getAllMonsters();
+      for (const m of nearbyMonsters) {
+        if (!m.isDead && distanceSquared(aoeOrigin, m.position) <= radiusSq) {
+          m.takeDamage(finalPower);
+          affectedIds.push(m.id);
+        }
+      }
+    } else {
+      // Alvo Único
+      let target: Entity | null = targetId ? (this.entityManager.getEntity(targetId) || null) : null;
+      if (!target || target.isDead) {
+        target = this.entityManager.findNearestMonster(player.position, skill.range);
+      }
+
+      if (target && !target.isDead) {
+        const d = distance(player.position, target.position);
+        if (d <= skill.range * 1.3) {
+          target.takeDamage(finalPower);
+          affectedIds.push(target.id);
+        }
+      }
+    }
+
+    // 6. Transmite Evento de Conjuração para Todos na Área
+    const castPayload: S2CSkillCastEventPayload = {
+      casterId: player.id,
+      skillId: skill.skillId,
+      slot: skill.slot,
+      skillName: skill.name,
+      targetId: targetId || (affectedIds.length > 0 ? affectedIds[0] : undefined),
+      targetPosition: targetPos,
+      damageOrHeal: finalPower,
+      isHeal: skill.isHeal,
+      isCritical,
+      affectedEntityIds: affectedIds,
+      casterCurrentResource: Math.round(player.currentResource),
+      casterMaxResource: player.maxResource,
+    };
+
+    this.broadcast(Opcode.S2C_SKILL_CAST_EVENT, castPayload);
+    return true;
   }
 
   private broadcastSnapshot(): void {

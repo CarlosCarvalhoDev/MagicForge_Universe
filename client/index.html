@@ -262,15 +262,198 @@
         transition: transform 0.05s ease-out;
       }
 
-      /* Instructions badge */
-      #instructions-hint {
+      /* Bottom Combat & Action HUD */
+      #bottom-action-container {
         position: absolute;
         bottom: 20px;
-        left: 380px;
-        padding: 10px 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        z-index: 25;
+        pointer-events: none;
+      }
+
+      #vitals-hud {
+        padding: 8px 14px;
+        border-radius: 10px;
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        pointer-events: auto;
+      }
+
+      .vital-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .vital-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        width: 28px;
+        text-transform: uppercase;
+      }
+
+      .vital-bar-track {
+        flex: 1;
+        height: 12px;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .vital-bar-fill {
+        height: 100%;
+        transition: width 0.12s ease-out;
+      }
+
+      .hp-fill {
+        background: linear-gradient(90deg, #059669, #10b981);
+      }
+
+      .mp-fill {
+        background: linear-gradient(90deg, #0284c7, #38bdf8);
+      }
+
+      .energy-fill {
+        background: linear-gradient(90deg, #d97706, #fbbf24);
+      }
+
+      .target-hp-fill {
+        background: linear-gradient(90deg, #dc2626, #ef4444);
+      }
+
+      .vital-bar-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+      }
+
+      #skill-action-bar {
+        display: flex;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 16px;
+        pointer-events: auto;
+      }
+
+      .skill-btn {
+        position: relative;
+        width: 66px;
+        height: 66px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+        border: 1.5px solid rgba(251, 191, 36, 0.35);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        outline: none;
+        transition: transform 0.1s, border-color 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        padding: 0;
+        user-select: none;
+      }
+
+      .skill-btn:hover {
+        border-color: #fbbf24;
+        box-shadow: 0 0 14px rgba(251, 191, 36, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .skill-btn:active {
+        transform: scale(0.93);
+      }
+
+      .skill-btn-ult {
+        border-color: #f59e0b;
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+      }
+
+      .skill-key-badge {
+        position: absolute;
+        top: 3px;
+        left: 4px;
+        background: rgba(0, 0, 0, 0.65);
+        color: #fbbf24;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 1px 5px;
+        border-radius: 4px;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+
+      .skill-icon {
+        font-size: 1.35rem;
+        margin-top: 2px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      }
+
+      .skill-name {
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: #f1f5f9;
+        max-width: 58px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-top: 1px;
+      }
+
+      .skill-cost {
+        font-size: 0.58rem;
+        font-weight: 700;
+        color: #38bdf8;
+      }
+
+      .cooldown-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 15, 29, 0.85);
+        border-radius: 12px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .cooldown-overlay.active {
+        display: flex;
+      }
+
+      .cooldown-text {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #fbbf24;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+      }
+
+      /* Instructions badge positioned at top-center */
+      #instructions-hint {
+        position: absolute;
+        top: 66px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 6px 16px;
         font-size: 0.78rem;
         color: #94a3b8;
         pointer-events: none;
+        z-index: 10;
+        white-space: nowrap;
       }
 
       #instructions-hint strong {
@@ -318,7 +501,7 @@
 
         <label for="char-class" style="margin-top: 6px">Classe (D&D):</label>
         <select id="char-class">
-          <option value="GUERREIRO" selected>Guerreiro (Melee - STR)</option>
+          <option value="GUERREIRO" selected>Guerreiro (Melee - STR+CHA)</option>
           <option value="CLERIGO">Clérigo (Ranged - WIS)</option>
           <option value="BARBARO">Bárbaro (Melee - STR)</option>
           <option value="MONGE">Monge (Melee - DEX)</option>
@@ -326,6 +509,14 @@
           <option value="MAGO">Mago (Ranged - INT)</option>
           <option value="BRUXO">Bruxo (Ranged - CHA)</option>
         </select>
+
+        <div id="class-preview-card" style="display: flex; align-items: center; gap: 10px; margin-top: 6px; padding: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 8px;">
+          <img id="class-portrait-img" src="/assets/portraits/GUERREIRO.jpg" alt="Retrato da Classe" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1.5px solid #fbbf24;" />
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span id="class-preview-title" style="font-size: 0.8rem; font-weight: 700; color: #fbbf24;">Guerreiro (Forjado)</span>
+            <span id="class-preview-stats" style="font-size: 0.7rem; color: #cbd5e1;">HP: 190 • Dano: 89 • CP: 1150</span>
+          </div>
+        </div>
 
         <button id="btn-connect" class="btn-primary" style="margin-top: 8px">
           Conectar ao Servidor (ws://3000)
@@ -366,9 +557,85 @@
       </div>
     </div>
 
-    <!-- Bottom Instructions Hint -->
+    <!-- Instructions Hint -->
     <div id="instructions-hint" class="glass-panel">
-      🕹️ <strong>Joystick Virtual</strong> ou <strong>Clique no chão</strong> para andar • <strong>Clique em um Monstro</strong> para travar alvo
+      🕹️ <strong>Joystick</strong> ou <strong>Clique</strong> para mover • <strong>Clique em Monstro</strong> para travar • Teclas <strong>[1, 2, 3, 4]</strong> para Magias
+    </div>
+
+    <!-- Bottom Combat & Skill Center Container -->
+    <div id="bottom-action-container">
+      <!-- Player & Target Vitals HUD -->
+      <div id="vitals-hud" class="glass-panel">
+        <div class="vital-row">
+          <div class="vital-label" style="color: #34d399;">HP</div>
+          <div class="vital-bar-track">
+            <div id="player-hp-bar" class="vital-bar-fill hp-fill" style="width: 100%"></div>
+            <span id="player-hp-text" class="vital-bar-text">190 / 190</span>
+          </div>
+        </div>
+        <div class="vital-row">
+          <div id="player-resource-label" class="vital-label" style="color: #38bdf8;">MP</div>
+          <div class="vital-bar-track">
+            <div id="player-resource-bar" class="vital-bar-fill mp-fill" style="width: 100%"></div>
+            <span id="player-resource-text" class="vital-bar-text">100 / 100</span>
+          </div>
+        </div>
+        <!-- Active Target Sub-Bar (displayed when a monster is targeted) -->
+        <div id="target-vital-row" class="vital-row" style="display: none; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px; margin-top: 2px;">
+          <div id="target-name-label" class="vital-label" style="color: #f87171; width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Alvo</div>
+          <div class="vital-bar-track">
+            <div id="target-hp-bar" class="vital-bar-fill target-hp-fill" style="width: 100%"></div>
+            <span id="target-hp-text" class="vital-bar-text">-- / --</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Active Skill Buttons Bar -->
+      <div id="skill-action-bar" class="glass-panel">
+        <!-- Slot 1 -->
+        <button class="skill-btn" id="skill-btn-1" data-slot="1" title="Habilidade Slot 1">
+          <span class="skill-key-badge">1</span>
+          <span class="skill-icon" id="skill-icon-1">⚔️</span>
+          <span class="skill-name" id="skill-name-1">Golpe</span>
+          <span class="skill-cost" id="skill-cost-1">15 MP</span>
+          <div class="cooldown-overlay" id="skill-cd-overlay-1">
+            <span class="cooldown-text" id="skill-cd-text-1"></span>
+          </div>
+        </button>
+
+        <!-- Slot 2 -->
+        <button class="skill-btn" id="skill-btn-2" data-slot="2" title="Habilidade Slot 2">
+          <span class="skill-key-badge">2</span>
+          <span class="skill-icon" id="skill-icon-2">🛡️</span>
+          <span class="skill-name" id="skill-name-2">Defesa</span>
+          <span class="skill-cost" id="skill-cost-2">25 MP</span>
+          <div class="cooldown-overlay" id="skill-cd-overlay-2">
+            <span class="cooldown-text" id="skill-cd-text-2"></span>
+          </div>
+        </button>
+
+        <!-- Slot 3 -->
+        <button class="skill-btn" id="skill-btn-3" data-slot="3" title="Habilidade Slot 3">
+          <span class="skill-key-badge">3</span>
+          <span class="skill-icon" id="skill-icon-3">⚡</span>
+          <span class="skill-name" id="skill-name-3">Corte</span>
+          <span class="skill-cost" id="skill-cost-3">35 MP</span>
+          <div class="cooldown-overlay" id="skill-cd-overlay-3">
+            <span class="cooldown-text" id="skill-cd-text-3"></span>
+          </div>
+        </button>
+
+        <!-- Slot 4 (Ultimate) -->
+        <button class="skill-btn skill-btn-ult" id="skill-btn-4" data-slot="4" title="Habilidade Suprema">
+          <span class="skill-key-badge">4</span>
+          <span class="skill-icon" id="skill-icon-4">👑</span>
+          <span class="skill-name" id="skill-name-4">Suprema</span>
+          <span class="skill-cost" id="skill-cost-4">50 MP</span>
+          <div class="cooldown-overlay" id="skill-cd-overlay-4">
+            <span class="cooldown-text" id="skill-cd-text-4"></span>
+          </div>
+        </button>
+      </div>
     </div>
 
     <script type="module" src="/src/main.ts"></script>

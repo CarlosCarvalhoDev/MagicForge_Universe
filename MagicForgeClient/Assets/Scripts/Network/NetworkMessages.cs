@@ -23,6 +23,8 @@ namespace MagicForge.Network
         C2S_ATTACK_TARGET = 0x30,
         S2C_COMBAT_EVENT = 0x31,
         S2C_ENTITY_STAT_UPDATE = 0x32,
+        C2S_CAST_SKILL = 0x33,
+        S2C_SKILL_CAST_EVENT = 0x34,
 
         // Heartbeat (0xF0 - 0xFF)
         C2S_PING = 0xF0,
@@ -59,6 +61,9 @@ namespace MagicForge.Network
         public float headingYaw;
         public int currentHp;
         public int maxHp;
+        public int currentResource;
+        public int maxResource;
+        public string resourceType;
         public bool isMoving;
         public string targetId;
         public string classType;
@@ -110,5 +115,30 @@ namespace MagicForge.Network
         public int targetRemainingHp;
         public int targetMaxHp;
         public bool isTargetDead;
+    }
+
+    [Serializable]
+    public class CastSkillRequestDTO
+    {
+        public int slot;
+        public string targetEntityId;
+        public Vector3DTO targetPosition;
+    }
+
+    [Serializable]
+    public class SkillCastEventDTO
+    {
+        public string casterId;
+        public string skillId;
+        public int slot;
+        public string skillName;
+        public string targetId;
+        public Vector3DTO targetPosition;
+        public int damageOrHeal;
+        public bool isHeal;
+        public bool isCritical;
+        public string[] affectedEntityIds;
+        public int casterCurrentResource;
+        public int casterMaxResource;
     }
 }

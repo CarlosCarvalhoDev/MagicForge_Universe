@@ -25,3 +25,9 @@ Cada classe possui uma mecânica de combate e um atributo principal (Modificador
 *   **Ataque Básico Inteligente:** Classes mágicas e arqueiros param de correr antes e disparam ataques à distância. Classes físicas colam no alvo.
 *   **Reatividade Inimiga:** Os monstros não são sacos de pancada passivos. Eles possuem velocidade de ataque e dano próprio, forçando o jogador a upar sua Constituição/Defesa.
 *   **Skill Slots:** 4 Slots de Habilidades Ativas customizáveis (exigem cooldown).
+
+## 6. Lore, Direção de Arte e Documentos Complementares
+*   **Enredo Principal & Vilão:** A Ruptura da Bigorna Primordial (*MagicForge*) causada por **Malakor, o Arquifalsário Cinzento**.
+*   **Bíblia de Lore, Classes, Bestiário e Eventos:** Consulte [`Docs/Lore_And_Art_Bible.md`](./Lore_And_Art_Bible.md).
+*   **Padrão de Sprites Isométricos (Top-Down 3/4, 45°):** Consulte [`Docs/GUIA_PROMPTS_ASSETS_IA.md`](./GUIA_PROMPTS_ASSETS_IA.md).
+

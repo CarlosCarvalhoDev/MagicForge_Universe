@@ -97,6 +97,27 @@ export interface S2CEntityStatUpdatePayload {
   combatPower: number;
 }
 
+export interface C2SCastSkillPayload {
+  slot: number; // 1 to 4
+  targetEntityId?: string;
+  targetPosition?: Vector3;
+}
+
+export interface S2CSkillCastEventPayload {
+  casterId: string;
+  skillId: string;
+  slot: number;
+  skillName: string;
+  targetId?: string;
+  targetPosition?: Vector3;
+  damageOrHeal: number;
+  isHeal: boolean;
+  isCritical: boolean;
+  affectedEntityIds: string[];
+  casterCurrentResource: number; // remaining mana/energy
+  casterMaxResource: number;
+}
+
 // ==========================================
 // Quality of Service / Ping-Pong Payloads
 // ==========================================
