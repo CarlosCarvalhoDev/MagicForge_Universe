@@ -693,6 +693,180 @@
       #instructions-hint strong {
         color: #38bdf8;
       }
+
+      /* Inventory Modal Styles */
+      .inventory-body {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .inventory-grid-container {
+        flex: 1;
+        min-width: 320px;
+      }
+
+      .inventory-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+
+      .inventory-slot {
+        aspect-ratio: 1;
+        border-radius: 10px;
+        background: rgba(30, 41, 59, 0.6);
+        border: 1.5px solid rgba(255, 255, 255, 0.08);
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease-out;
+        user-select: none;
+      }
+
+      .inventory-slot:hover {
+        border-color: rgba(251, 191, 36, 0.5);
+        background: rgba(30, 41, 59, 0.9);
+        transform: translateY(-2px);
+      }
+
+      .inventory-slot.selected {
+        border-color: #fbbf24;
+        box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+      }
+
+      .inventory-slot.equipped {
+        border-color: #10b981;
+      }
+
+      .slot-equipped-badge {
+        position: absolute;
+        top: 3px;
+        left: 4px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        background: rgba(16, 185, 129, 0.85);
+        color: #ffffff;
+        padding: 1px 4px;
+        border-radius: 3px;
+        letter-spacing: 0.04em;
+      }
+
+      .slot-qty-badge {
+        position: absolute;
+        bottom: 3px;
+        right: 4px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        background: rgba(0, 0, 0, 0.75);
+        color: #f1f5f9;
+        padding: 1px 5px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .slot-icon-text {
+        font-size: 1.6rem;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+      }
+
+      .inventory-inspector {
+        width: 320px;
+        background: rgba(30, 41, 59, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .inspector-item-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .inspector-item-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1.5px solid #fbbf24;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+      }
+
+      .inspector-item-title-box {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .inspector-item-name {
+        font-family: 'Cinzel', serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #fbbf24;
+      }
+
+      .inspector-item-tag {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #94a3b8;
+      }
+
+      .inspector-stats-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        background: rgba(15, 23, 42, 0.6);
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        font-size: 0.8rem;
+      }
+
+      .inspector-stat-row {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .inspector-desc {
+        font-size: 0.78rem;
+        color: #cbd5e1;
+        line-height: 1.45;
+        font-style: italic;
+      }
+
+      .inspector-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+      }
+
+      .btn-action-primary {
+        flex: 1;
+        padding: 10px;
+        background: linear-gradient(135deg, #d97706, #b45309);
+        border: 1.5px solid #fbbf24;
+        border-radius: 8px;
+        color: white;
+        font-weight: 700;
+        font-size: 0.82rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-action-primary:hover {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+      }
     </style>
   </head>
   <body>
@@ -703,6 +877,13 @@
       </div>
 
       <div class="metrics-bar">
+        <div class="glass-panel metric-pill" style="color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35);" title="Ouro Acumulado">
+          <span>💰</span>
+          <span id="player-gold-text">0 Ouro</span>
+        </div>
+        <button id="btn-open-inventory" class="glass-panel metric-pill" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); cursor: pointer; transition: all 0.2s;" title="Abrir Mochila de Itens [I]">
+          <span>🎒</span> Mochila [I]
+        </button>
         <button id="btn-open-skillbook" class="glass-panel metric-pill" style="color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); cursor: pointer; transition: all 0.2s;" title="Abrir Grimório de Habilidades [K]">
           <span>📖</span> Grimório [K]
         </button>
@@ -894,6 +1075,62 @@
 
         <!-- Skills Cards Grid -->
         <div class="skills-cards-grid" id="skillbook-cards-grid"></div>
+      </div>
+    </div>
+
+    <!-- Inventory Modal (Mochila de Itens & Equipamentos) -->
+    <div id="inventory-modal" class="modal-backdrop" style="display: none;">
+      <div class="glass-panel modal-content" style="max-width: 760px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🎒</span> Mochila de Itens & Equipamentos
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="font-size: 0.85rem; color: #fbbf24; font-weight: 700;">
+              ⚔️ Poder de Combate (CP): <strong id="modal-cp-text">1150</strong>
+            </span>
+            <button id="btn-close-inventory" class="btn-close" title="Fechar (ESC ou I)">✕</button>
+          </div>
+        </div>
+
+        <div class="inventory-body">
+          <!-- 20 Slots Grid Container -->
+          <div class="inventory-grid-container">
+            <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between;">
+              <span>SLOTS (20)</span>
+              <span id="inventory-gold-label" style="color: #fbbf24;">0 Ouro</span>
+            </div>
+            <div class="inventory-slots-grid" id="inventory-slots-grid">
+              <!-- 20 slots dynamically injected or initialized -->
+            </div>
+          </div>
+
+          <!-- Item Details Inspector Panel -->
+          <div class="inventory-inspector" id="inventory-inspector">
+            <div class="inspector-item-header">
+              <div class="inspector-item-icon" id="inspector-icon">📦</div>
+              <div class="inspector-item-title-box">
+                <span class="inspector-item-name" id="inspector-name">Selecione um Item</span>
+                <span class="inspector-item-tag" id="inspector-tag">Mochila</span>
+              </div>
+            </div>
+
+            <div class="inspector-stats-list" id="inspector-stats-list">
+              <span style="color: #94a3b8; font-size: 0.75rem;">Clique em um dos slots ao lado para inspecionar atributos, equipar armas/armaduras ou consumir poções.</span>
+            </div>
+
+            <p class="inspector-desc" id="inspector-desc">Espaço seguro para carregar espólios de batalha e artefatos forjados no Universo MagicForge.</p>
+
+            <div class="inspector-stat-row" style="font-size: 0.75rem; color: #94a3b8;">
+              <span>Preço de Venda:</span>
+              <strong id="inspector-sell-price" style="color: #fbbf24;">--</strong>
+            </div>
+
+            <div class="inspector-actions">
+              <button id="btn-inventory-action" class="btn-action-primary" style="display: none;">Equipar</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

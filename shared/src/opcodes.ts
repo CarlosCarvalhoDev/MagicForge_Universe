@@ -27,6 +27,13 @@ export enum Opcode {
   C2S_CAST_SKILL = 0x33,
   S2C_SKILL_CAST_EVENT = 0x34,
 
+  // --- Items, Drops & Inventory (0x40 - 0x4F) ---
+  S2C_ITEM_DROP_SPAWN = 0x40,
+  S2C_ITEM_DROP_DESPAWN = 0x41,
+  C2S_LOOT_ITEM = 0x42,
+  S2C_INVENTORY_UPDATE = 0x43,
+  C2S_USE_ITEM = 0x44,
+
   // --- Heartbeat & Quality of Service (0xF0 - 0xFF) ---
   C2S_PING = 0xF0,
   S2C_PONG = 0xF1,

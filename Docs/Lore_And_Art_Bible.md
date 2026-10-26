@@ -120,12 +120,35 @@ Todos os 5 monstros abaixo já estão ativos no servidor autoritativo ([`server/
 
 ---
 
-## 6. Padrão Técnico para Futuras Sprites 2D de Gameplay (Arena)
+## 6. Galeria Completa de Sprites Isométricas 2D de Gameplay (Top-Down 3/4, 45°)
 
 > [!IMPORTANT]
-> **Alinhamento com [`Docs/GUIA_PROMPTS_ASSETS_IA.md`](./GUIA_PROMPTS_ASSETS_IA.md):**
-> * As artes desta Bíblia são **Concept Arts / Retratos de UI (`classIcon` / `portraitImage`)**.
-> * Sempre que formos gerar **sprites de gameplay (bonequinhos andando na arena, monstros in-game e tilesets de chão)**, seguiremos estritamente a Fórmula de Ouro definida em [`GUIA_PROMPTS_ASSETS_IA.md`](./GUIA_PROMPTS_ASSETS_IA.md):
->   * **Ângulo:** `top-down 3/4 isometric perspective, 45-degree angled view`
->   * **Fundo:** `isolated on solid plain black background, no shadows, no ground, clean silhouette`
->   * **Estilo:** `stylized low-poly 3D render, mobile RPG game asset, vibrant colors, clean outlines, cel-shaded fantasy aesthetic`
+> **100% Concluído e Integrado:** Todas as 15 sprites isométricas (7 classes, 5 monstros do `World.ts`, 1 vilão principal e 2 tilesets seamless de cenário) estão salvas e configuradas como `Sprite (2D and UI)` em `MagicForgeClient/Assets/Textures/Sprites/`, vinculadas no campo `isometricWorldSprite` dos 7 arquivos `.asset` e disponíveis em `client/public/assets/isometric/`.
+
+### 6.1 Sprites Isométricas das 7 Classes (`isometricWorldSprite`)
+| Classe | Arquivo em `Assets/Textures/Sprites/` | Preview Isométrico 3/4 (45°) |
+| :--- | :--- | :---: |
+| **Guerreiro** | `iso_hero_guerreiro.jpg` | <img src="./Art/Isometric/iso_hero_guerreiro.jpg" width="120" /> |
+| **Clérigo** | `iso_hero_clerigo.jpg` | <img src="./Art/Isometric/iso_hero_clerigo.jpg" width="120" /> |
+| **Bárbaro** | `iso_hero_barbaro.jpg` | <img src="./Art/Isometric/iso_hero_barbaro.jpg" width="120" /> |
+| **Monge** | `iso_hero_monge.jpg` | <img src="./Art/Isometric/iso_hero_monge.jpg" width="120" /> |
+| **Bruxo** | `iso_hero_bruxo.jpg` | <img src="./Art/Isometric/iso_hero_bruxo.jpg" width="120" /> |
+| **Mago** | `iso_hero_mago.jpg` | <img src="./Art/Isometric/iso_hero_mago.jpg" width="120" /> |
+| **Arqueiro** | `iso_hero_arqueiro.jpg` | <img src="./Art/Isometric/iso_hero_arqueiro.jpg" width="120" /> |
+
+### 6.2 Sprites Isométricas dos Monstros (`World.ts`) & Bosses
+| Inimigo / Boss | Arquivo em `Assets/Textures/Sprites/` | Preview Isométrico 3/4 (45°) |
+| :--- | :--- | :---: |
+| **Goblin Lanceiro (`mob_1`)** | `iso_mob_goblin_lanceiro.jpg` | <img src="./Art/Isometric/iso_mob_goblin_lanceiro.jpg" width="120" /> |
+| **Goblin Arqueiro (`mob_2`)** | `iso_mob_goblin_arqueiro.jpg` | <img src="./Art/Isometric/iso_mob_goblin_arqueiro.jpg" width="120" /> |
+| **Slime da Floresta (`mob_3`)** | `iso_mob_slime_floresta.jpg` | <img src="./Art/Isometric/iso_mob_slime_floresta.jpg" width="120" /> |
+| **Lobo Selvagem (`mob_4`)** | `iso_mob_lobo_selvagem.jpg` | <img src="./Art/Isometric/iso_mob_lobo_selvagem.jpg" width="120" /> |
+| **Chefe Goblin (`mob_5`)** | `iso_boss_chefe_goblin.jpg` | <img src="./Art/Isometric/iso_boss_chefe_goblin.jpg" width="120" /> |
+| **Malakor (Vilão Principal)** | `iso_boss_malakor.jpg` | <img src="./Art/Isometric/iso_boss_malakor.jpg" width="120" /> |
+
+### 6.3 Tilesets Seamless de Chão (Arena & Floresta)
+| Tileset | Arquivo em `Assets/Textures/Sprites/` | Preview Top-Down Ortográfico |
+| :--- | :--- | :---: |
+| **Piso de Pedra da Arena** | `tile_arena_stone.jpg` | <img src="./Art/Isometric/tile_arena_stone.jpg" width="140" /> |
+| **Grama de Fantasia** | `tile_fantasy_grass.jpg` | <img src="./Art/Isometric/tile_fantasy_grass.jpg" width="140" /> |
+

@@ -1,6 +1,7 @@
 import { Opcode } from './opcodes';
 import { Vector3 } from './math';
 import { CharacterClass, EntitySnapshotState, EntityType, CharacterAttributes } from './entities';
+import { ItemRarity } from './items';
 
 // ==========================================
 // Base Packet Structure
@@ -116,6 +117,47 @@ export interface S2CSkillCastEventPayload {
   affectedEntityIds: string[];
   casterCurrentResource: number; // remaining mana/energy
   casterMaxResource: number;
+}
+
+// ==========================================
+// Items, Drops & Inventory Payloads
+// ==========================================
+export interface S2CItemDropSpawnPayload {
+  dropId: string;
+  itemId: string;
+  name: string;
+  rarity: ItemRarity;
+  quantity: number;
+  position: Vector3;
+  despawnTimeSec: number;
+}
+
+export interface S2CItemDropDespawnPayload {
+  dropId: string;
+  looterId?: string;
+  reason: 'LOOTED' | 'EXPIRED';
+}
+
+export interface C2SLootItemPayload {
+  dropId: string;
+}
+
+export interface InventoryItemPayload {
+  slotIndex: number;
+  itemId: string;
+  quantity: number;
+  isEquipped: boolean;
+}
+
+export interface S2CInventoryUpdatePayload {
+  slots: InventoryItemPayload[];
+  gold: number;
+  totalCombatPower: number;
+  lootMessage?: string;
+}
+
+export interface C2SUseItemPayload {
+  slotIndex: number;
 }
 
 // ==========================================

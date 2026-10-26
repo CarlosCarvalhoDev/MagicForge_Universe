@@ -107,6 +107,20 @@ namespace MagicForge.Network
             await SendPacket(Opcode.C2S_CAST_SKILL, JsonUtility.ToJson(castSkill));
         }
 
+        public async void SendLootItem(string dropId)
+        {
+            if (!isConnected) return;
+            var lootReq = new LootItemRequestDTO { dropId = dropId };
+            await SendPacket(Opcode.C2S_LOOT_ITEM, JsonUtility.ToJson(lootReq));
+        }
+
+        public async void SendUseItem(int slotIndex)
+        {
+            if (!isConnected) return;
+            var useReq = new UseItemRequestDTO { slotIndex = slotIndex };
+            await SendPacket(Opcode.C2S_USE_ITEM, JsonUtility.ToJson(useReq));
+        }
+
         private async Task SendPacket(Opcode op, string jsonData)
         {
             if (webSocket == null || webSocket.State != WebSocketState.Open) return;

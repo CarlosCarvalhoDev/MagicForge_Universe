@@ -11,7 +11,10 @@ namespace MagicForge.Core
         [Header("Informações Básicas")]
         public string className;
         [TextArea] public string classDescription;
+        [Tooltip("Retrato 2D de UI / Lore")]
         public Sprite classIcon;
+        [Tooltip("Sprite Isométrica Top-Down 3/4 (45°) para o Mundo/Arena")]
+        public Sprite isometricWorldSprite;
         public ElementType defaultElement;
 
         [Header("Regras de Combate (D&D & Servidor 20Hz)")]

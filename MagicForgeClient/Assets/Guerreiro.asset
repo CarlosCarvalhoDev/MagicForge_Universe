@@ -15,6 +15,7 @@ MonoBehaviour:
   className: Guerreiro
   classDescription: Vanguarda blindada da Ordem da Bigorna. Combate corpo-a-corpo combinando Forca (STR) e Carisma (CHA).
   classIcon: {fileID: 21300000, guid: a10000023a6524c489205bd51885cc02, type: 3}
+  isometricWorldSprite: {fileID: 21300000, guid: b20000013a6524c489205bd51885cc01, type: 3}
   defaultElement: 5
   mainStat: 5
   isRanged: 0

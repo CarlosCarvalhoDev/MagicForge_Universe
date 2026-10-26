@@ -15,6 +15,7 @@ MonoBehaviour:
   className: Mago
   classDescription: Arquimago da termodinamica da Forja (Fogo e Gelo). Conjura ataques devastadores a distancia com Inteligencia (INT).
   classIcon: {fileID: 21300000, guid: a10000063a6524c489205bd51885cc06, type: 3}
+  isometricWorldSprite: {fileID: 21300000, guid: 17dc4d9c8486610f9db2094372d27f75, type: 3}
   defaultElement: 1
   mainStat: 2
   isRanged: 1

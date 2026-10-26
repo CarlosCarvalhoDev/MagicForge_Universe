@@ -6,6 +6,12 @@ import {
   SKILLS_DATABASE,
   SkillDefinition,
   S2CSkillCastEventPayload,
+  ITEMS_DATABASE,
+  InventoryItemPayload,
+  RARITY_COLORS,
+  ItemType,
+  EquipmentSlot,
+  S2CInventoryUpdatePayload,
 } from '@magicforge/shared';
 import { ClientNetwork } from './network/ClientNetwork';
 import { SnapshotBuffer } from './interpolation/SnapshotBuffer';
@@ -18,6 +24,22 @@ const connectionStatus = document.getElementById('connection-status') as HTMLSpa
 const pingText = document.getElementById('ping-text') as HTMLSpanElement;
 const tickText = document.getElementById('tick-text') as HTMLSpanElement;
 const fpsText = document.getElementById('fps-text') as HTMLSpanElement;
+
+// Gold & Inventory DOM
+const playerGoldText = document.getElementById('player-gold-text') as HTMLSpanElement | null;
+const btnOpenInventory = document.getElementById('btn-open-inventory') as HTMLButtonElement | null;
+const btnCloseInventory = document.getElementById('btn-close-inventory') as HTMLButtonElement | null;
+const inventoryModal = document.getElementById('inventory-modal') as HTMLDivElement | null;
+const inventorySlotsGrid = document.getElementById('inventory-slots-grid') as HTMLDivElement | null;
+const inventoryGoldLabel = document.getElementById('inventory-gold-label') as HTMLSpanElement | null;
+const modalCpText = document.getElementById('modal-cp-text') as HTMLElement | null;
+const inspectorIcon = document.getElementById('inspector-icon') as HTMLDivElement | null;
+const inspectorName = document.getElementById('inspector-name') as HTMLSpanElement | null;
+const inspectorTag = document.getElementById('inspector-tag') as HTMLSpanElement | null;
+const inspectorStatsList = document.getElementById('inspector-stats-list') as HTMLDivElement | null;
+const inspectorDesc = document.getElementById('inspector-desc') as HTMLParagraphElement | null;
+const inspectorSellPrice = document.getElementById('inspector-sell-price') as HTMLElement | null;
+const btnInventoryAction = document.getElementById('btn-inventory-action') as HTMLButtonElement | null;
 
 const charNameInput = document.getElementById('char-name') as HTMLInputElement;
 const charClassSelect = document.getElementById('char-class') as HTMLSelectElement;
@@ -220,6 +242,227 @@ function updateClassPreview() {
 charClassSelect.addEventListener('change', updateClassPreview);
 updateClassPreview();
 
+// Inventory State & UI Management
+let playerInventory: InventoryItemPayload[] = [];
+let playerGold: number = 0;
+let playerCombatPower: number = 1000;
+let selectedSlotIndex: number | null = null;
+
+function getItemEmoji(itemId: string, type: ItemType): string {
+  if (itemId === 'gold') return '💰';
+  if (itemId.includes('hp')) return '🧪';
+  if (itemId.includes('mp')) return '💧';
+  if (itemId.includes('sword') || itemId.includes('dagger') || itemId.includes('greatsword')) return '⚔️';
+  if (itemId.includes('bow')) return '🏹';
+  if (itemId.includes('staff')) return '🪄';
+  if (itemId.includes('tome')) return '📜';
+  if (itemId.includes('armor')) return '🦺';
+  if (itemId.includes('shield')) return '🛡️';
+  if (itemId.includes('relic')) return '👑';
+  if (itemId.includes('essence') || itemId.includes('rune')) return '✨';
+  if (itemId.includes('ore')) return '💎';
+  if (itemId.includes('fang')) return '🐺';
+  if (type === ItemType.CONSUMIVEL) return '🧪';
+  if (type === ItemType.EQUIPAMENTO) return '⚔️';
+  return '📦';
+}
+
+function openInventory() {
+  if (!inventoryModal) return;
+  inventoryModal.style.display = 'flex';
+  if (selectedSlotIndex === null && playerInventory.length > 0) {
+    selectedSlotIndex = playerInventory[0].slotIndex;
+  }
+  renderInventorySlots();
+  if (selectedSlotIndex !== null) {
+    selectInventorySlot(selectedSlotIndex);
+  }
+}
+
+function closeInventory() {
+  if (!inventoryModal) return;
+  inventoryModal.style.display = 'none';
+}
+
+function toggleInventoryModal(force?: boolean) {
+  if (!inventoryModal) return;
+  const isCurrentlyOpen = inventoryModal.style.display === 'flex';
+  const shouldOpen = force !== undefined ? force : !isCurrentlyOpen;
+  if (shouldOpen) {
+    openInventory();
+  } else {
+    closeInventory();
+  }
+}
+
+if (btnOpenInventory) {
+  btnOpenInventory.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openInventory();
+  });
+}
+if (btnCloseInventory) {
+  btnCloseInventory.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeInventory();
+  });
+}
+if (inventoryModal) {
+  inventoryModal.addEventListener('click', (e) => {
+    if (e.target === inventoryModal) closeInventory();
+  });
+}
+
+function renderInventorySlots() {
+  if (!inventorySlotsGrid) return;
+  inventorySlotsGrid.innerHTML = '';
+
+  for (let slot = 0; slot < 20; slot++) {
+    const item = playerInventory.find((i) => i.slotIndex === slot);
+    const itemDef = item ? ITEMS_DATABASE[item.itemId] : null;
+
+    const slotEl = document.createElement('div');
+    slotEl.className = 'inventory-slot';
+    if (slot === selectedSlotIndex) slotEl.classList.add('selected');
+
+    if (item && itemDef) {
+      const rarityTheme = RARITY_COLORS[itemDef.rarity] || { border: '#ffffff', glow: 'rgba(255,255,255,0.3)', text: '#ffffff', bg: 'rgba(30,41,59,0.6)' };
+      slotEl.style.borderColor = rarityTheme.border;
+
+      if (item.isEquipped) {
+        slotEl.classList.add('equipped');
+        const eqBadge = document.createElement('span');
+        eqBadge.className = 'slot-equipped-badge';
+        eqBadge.textContent = 'EQ';
+        slotEl.appendChild(eqBadge);
+      }
+
+      const iconEl = document.createElement('span');
+      iconEl.className = 'slot-icon-text';
+      iconEl.textContent = getItemEmoji(item.itemId, itemDef.type);
+      slotEl.appendChild(iconEl);
+
+      if (item.quantity > 1) {
+        const qtyBadge = document.createElement('span');
+        qtyBadge.className = 'slot-qty-badge';
+        qtyBadge.textContent = `${item.quantity}`;
+        slotEl.appendChild(qtyBadge);
+      }
+    } else {
+      // Empty slot placeholder
+      slotEl.style.opacity = '0.35';
+    }
+
+    slotEl.addEventListener('click', () => {
+      selectInventorySlot(slot);
+    });
+
+    inventorySlotsGrid.appendChild(slotEl);
+  }
+}
+
+function selectInventorySlot(slotIndex: number) {
+  selectedSlotIndex = slotIndex;
+  renderInventorySlots();
+
+  const item = playerInventory.find((i) => i.slotIndex === slotIndex);
+  const itemDef = item ? ITEMS_DATABASE[item.itemId] : null;
+
+  if (!item || !itemDef) {
+    if (inspectorIcon) inspectorIcon.textContent = '📦';
+    if (inspectorName) {
+      inspectorName.textContent = 'Slot Vazio';
+      inspectorName.style.color = '#94a3b8';
+    }
+    if (inspectorTag) inspectorTag.textContent = `Slot #${slotIndex + 1}`;
+    if (inspectorStatsList) {
+      inspectorStatsList.innerHTML = `<span style="color: #64748b; font-size: 0.75rem;">Nenhum item alocado neste slot da mochila.</span>`;
+    }
+    if (inspectorDesc) inspectorDesc.textContent = 'Vença monstros e explore as forjas antigas para saquear equipamentos épicos e ingredientes.';
+    if (inspectorSellPrice) inspectorSellPrice.textContent = '--';
+    if (btnInventoryAction) btnInventoryAction.style.display = 'none';
+    return;
+  }
+
+  const rarityTheme = RARITY_COLORS[itemDef.rarity] || { border: '#ffffff', glow: 'rgba(255,255,255,0.3)', text: '#ffffff', bg: 'rgba(30,41,59,0.6)' };
+
+  if (inspectorIcon) {
+    inspectorIcon.textContent = getItemEmoji(item.itemId, itemDef.type);
+    inspectorIcon.style.borderColor = rarityTheme.border;
+  }
+  if (inspectorName) {
+    inspectorName.textContent = itemDef.name;
+    inspectorName.style.color = rarityTheme.text;
+  }
+  if (inspectorTag) {
+    const slotTag = itemDef.equipmentSlot ? `[${itemDef.equipmentSlot}] ` : '';
+    inspectorTag.textContent = `${slotTag}${itemDef.type} • ${itemDef.rarity}`;
+    inspectorTag.style.color = rarityTheme.text;
+  }
+  if (inspectorDesc) {
+    inspectorDesc.textContent = itemDef.description;
+  }
+  if (inspectorSellPrice) {
+    inspectorSellPrice.textContent = `${itemDef.sellPrice} Ouro`;
+  }
+
+  if (inspectorStatsList) {
+    inspectorStatsList.innerHTML = '';
+    if (itemDef.type === ItemType.EQUIPAMENTO && itemDef.statsBonus) {
+      const bonus = itemDef.statsBonus;
+      const statRows: Array<{ label: string; val?: number; color: string }> = [
+        { label: 'Força (STR)', val: bonus.forca, color: '#f87171' },
+        { label: 'Destreza (DEX)', val: bonus.destreza, color: '#fbbf24' },
+        { label: 'Constituição (CON)', val: bonus.constituicao, color: '#4ade80' },
+        { label: 'Inteligência (INT)', val: bonus.inteligencia, color: '#60a5fa' },
+        { label: 'Sabedoria (WIS)', val: bonus.sabedoria, color: '#a78bfa' },
+        { label: 'Carisma (CHA)', val: bonus.carisma, color: '#f472b6' },
+        { label: 'Vida Máxima (HP)', val: bonus.maxHp, color: '#34d399' },
+        { label: 'Recurso Máximo', val: bonus.maxResource, color: '#38bdf8' },
+      ];
+
+      statRows.forEach((sr) => {
+        if (sr.val) {
+          const row = document.createElement('div');
+          row.className = 'inspector-stat-row';
+          row.innerHTML = `<span style="color: ${sr.color};">${sr.label}:</span><strong>+${sr.val}</strong>`;
+          inspectorStatsList.appendChild(row);
+        }
+      });
+    } else if (itemDef.type === ItemType.CONSUMIVEL) {
+      const row = document.createElement('div');
+      row.className = 'inspector-stat-row';
+      row.innerHTML = `<span style="color: #4ade80;">Efeito Consumível:</span><strong>Restaura Instantaneamente</strong>`;
+      inspectorStatsList.appendChild(row);
+    } else {
+      const row = document.createElement('div');
+      row.className = 'inspector-stat-row';
+      row.innerHTML = `<span style="color: #94a3b8;">Tipo:</span><strong>Material de Forja e Alquimia</strong>`;
+      inspectorStatsList.appendChild(row);
+    }
+  }
+
+  if (btnInventoryAction) {
+    if (itemDef.type === ItemType.EQUIPAMENTO) {
+      btnInventoryAction.style.display = 'block';
+      btnInventoryAction.textContent = item.isEquipped ? 'Desequipar' : 'Equipar';
+      btnInventoryAction.style.background = item.isEquipped ? '#dc2626' : 'linear-gradient(135deg, #d97706, #b45309)';
+      btnInventoryAction.onclick = () => {
+        network.sendUseItem(item.slotIndex);
+      };
+    } else if (itemDef.type === ItemType.CONSUMIVEL) {
+      btnInventoryAction.style.display = 'block';
+      btnInventoryAction.textContent = 'Usar Item (Consumir)';
+      btnInventoryAction.style.background = 'linear-gradient(135deg, #059669, #047857)';
+      btnInventoryAction.onclick = () => {
+        network.sendUseItem(item.slotIndex);
+      };
+    } else {
+      btnInventoryAction.style.display = 'none';
+    }
+  }
+}
+
 // Core Game Client Systems
 const network = new ClientNetwork();
 const snapshotBuffer = new SnapshotBuffer();
@@ -296,6 +539,29 @@ network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
   renderer.addSkillEffectText(effectPos, event.skillName, event.damageOrHeal, event.isHeal, event.isCritical);
 };
 
+network.onItemDropSpawn = (payload) => {
+  renderer.addOrUpdateDrop(payload);
+};
+
+network.onItemDropDespawn = (payload) => {
+  renderer.removeDrop(payload.dropId);
+};
+
+network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
+  playerInventory = payload.slots;
+  playerGold = payload.gold;
+  playerCombatPower = payload.totalCombatPower;
+
+  if (playerGoldText) playerGoldText.textContent = `${playerGold} Ouro`;
+  if (inventoryGoldLabel) inventoryGoldLabel.textContent = `${playerGold} Ouro`;
+  if (modalCpText) modalCpText.textContent = `${playerCombatPower}`;
+
+  renderInventorySlots();
+  if (selectedSlotIndex !== null) {
+    selectInventorySlot(selectedSlotIndex);
+  }
+};
+
 // Skill Casting Action
 function castSkill(slot: number) {
   if (!network.isConnected || !network.myPlayerId) return;
@@ -340,20 +606,23 @@ Object.entries(skillSlots).forEach(([slotStr, slotUI]) => {
   });
 });
 
-// Bind keyboard shortcuts (1, 2, 3, 4, K, Escape)
+// Bind keyboard shortcuts (1, 2, 3, 4, K, I, Escape)
 window.addEventListener('keydown', (e) => {
   if (document.activeElement === charNameInput) return;
 
   if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
     castSkill(parseInt(e.key, 10));
   } else if (e.key === 'k' || e.key === 'K') {
-    if (skillbookModal.style.display === 'flex') {
+    if (skillbookModal && skillbookModal.style.display === 'flex') {
       closeSkillbook();
     } else {
       openSkillbook();
     }
+  } else if (e.key === 'i' || e.key === 'I') {
+    toggleInventoryModal();
   } else if (e.key === 'Escape') {
     closeSkillbook();
+    closeInventory();
   }
 });
 
@@ -456,14 +725,25 @@ joystickBase.addEventListener('pointerup', (e) => {
 
 joystickBase.addEventListener('pointercancel', handleJoystickEnd);
 
-// Canvas Interaction (Click / Touch-to-Move fallback)
+// Canvas Interaction (Click / Touch-to-Move fallback & Looting)
 canvas.addEventListener('pointerdown', (e) => {
   if (!network.isConnected || !network.myPlayerId) return;
 
   const clickWorldPos = renderer.screenToWorld(e.clientX, e.clientY);
   const entities = snapshotBuffer.getInterpolatedEntities();
 
-  // Check if clicked on a monster to target
+  // 1. Check if clicked on a ground item drop
+  const nearestDrop = renderer.findDropNearWorldPos(clickWorldPos, 3.5);
+  if (nearestDrop) {
+    network.sendLootItem(nearestDrop.dropId);
+    // Also move player towards drop position
+    const myPlayer = entities.find((e) => e.id === network.myPlayerId);
+    const currentPos = myPlayer ? myPlayer.position : { x: 0, y: 0, z: 0 };
+    network.sendMoveInput(nearestDrop.position, currentPos);
+    return;
+  }
+
+  // 2. Check if clicked on a monster to target
   let clickedMonsterId: string | null = null;
   let minDistance = 2.5; // click tolerance in world units
 

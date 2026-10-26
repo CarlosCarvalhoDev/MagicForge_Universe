@@ -2,12 +2,17 @@ import {
   C2SAttackTargetPayload,
   C2SCastSkillPayload,
   C2SLoginPayload,
+  C2SLootItemPayload,
   C2SMoveInputPayload,
   C2SPingPayload,
+  C2SUseItemPayload,
   CharacterClass,
   NetworkMessage,
   Opcode,
   S2CCombatEventPayload,
+  S2CInventoryUpdatePayload,
+  S2CItemDropDespawnPayload,
+  S2CItemDropSpawnPayload,
   S2CLoginSuccessPayload,
   S2CPongPayload,
   S2CPositionCorrectionPayload,
@@ -34,6 +39,9 @@ export class ClientNetwork {
   public onCombatEvent: MessageListener<S2CCombatEventPayload> | null = null;
   public onSkillCastEvent: MessageListener<S2CSkillCastEventPayload> | null = null;
   public onPositionCorrection: MessageListener<S2CPositionCorrectionPayload> | null = null;
+  public onItemDropSpawn: MessageListener<S2CItemDropSpawnPayload> | null = null;
+  public onItemDropDespawn: MessageListener<S2CItemDropDespawnPayload> | null = null;
+  public onInventoryUpdate: MessageListener<S2CInventoryUpdatePayload> | null = null;
   public onLatencyUpdated: ((pingMs: number) => void) | null = null;
   public onConnectionStateChange: ((connected: boolean) => void) | null = null;
 
@@ -141,6 +149,16 @@ export class ClientNetwork {
     this.send(Opcode.C2S_CAST_SKILL, payload);
   }
 
+  public sendLootItem(dropId: string): void {
+    const payload: C2SLootItemPayload = { dropId };
+    this.send(Opcode.C2S_LOOT_ITEM, payload);
+  }
+
+  public sendUseItem(slotIndex: number): void {
+    const payload: C2SUseItemPayload = { slotIndex };
+    this.send(Opcode.C2S_USE_ITEM, payload);
+  }
+
   private startPingHeartbeat(): void {
     this.stopPingHeartbeat();
     this.pingIntervalId = window.setInterval(() => {
@@ -186,6 +204,21 @@ export class ClientNetwork {
 
         case Opcode.S2C_POSITION_CORRECTION: {
           this.onPositionCorrection?.(packet.data as S2CPositionCorrectionPayload);
+          break;
+        }
+
+        case Opcode.S2C_ITEM_DROP_SPAWN: {
+          this.onItemDropSpawn?.(packet.data as S2CItemDropSpawnPayload);
+          break;
+        }
+
+        case Opcode.S2C_ITEM_DROP_DESPAWN: {
+          this.onItemDropDespawn?.(packet.data as S2CItemDropDespawnPayload);
+          break;
+        }
+
+        case Opcode.S2C_INVENTORY_UPDATE: {
+          this.onInventoryUpdate?.(packet.data as S2CInventoryUpdatePayload);
           break;
         }
 

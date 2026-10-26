@@ -2,8 +2,10 @@ import {
   C2SAttackTargetPayload,
   C2SCastSkillPayload,
   C2SLoginPayload,
+  C2SLootItemPayload,
   C2SMoveInputPayload,
   C2SPingPayload,
+  C2SUseItemPayload,
   NetworkMessage,
   Opcode,
   S2CLoginSuccessPayload,
@@ -50,6 +52,14 @@ export class PacketHandler {
 
       case Opcode.C2S_CAST_SKILL:
         this.handleCastSkill(connection, message.data as C2SCastSkillPayload);
+        break;
+
+      case Opcode.C2S_LOOT_ITEM:
+        this.handleLootItem(connection, message.data as C2SLootItemPayload);
+        break;
+
+      case Opcode.C2S_USE_ITEM:
+        this.handleUseItem(connection, message.data as C2SUseItemPayload);
         break;
 
       case Opcode.C2S_PING:
@@ -150,5 +160,19 @@ export class PacketHandler {
     };
 
     connection.send(Opcode.S2C_PONG, pongPayload);
+  }
+
+  private handleLootItem(connection: Connection, payload: C2SLootItemPayload): void {
+    if (!connection.isAuthenticated || !connection.playerId || !payload || !payload.dropId) return;
+    const player = this.world.entityManager.getPlayer(connection.playerId);
+    if (!player || player.isDead) return;
+    this.world.lootItem(player, payload.dropId);
+  }
+
+  private handleUseItem(connection: Connection, payload: C2SUseItemPayload): void {
+    if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
+    const player = this.world.entityManager.getPlayer(connection.playerId);
+    if (!player || player.isDead) return;
+    this.world.usePlayerItem(player, payload.slotIndex);
   }
 }

@@ -15,6 +15,7 @@ MonoBehaviour:
   className: "Cl\xE9rigo"
   classDescription: Canalizador da Luz e Natureza da MagicForge. Ataca de longe com Sabedoria (WIS) e sustenta aliados.
   classIcon: {fileID: 21300000, guid: a10000013a6524c489205bd51885cc01, type: 3}
+  isometricWorldSprite: {fileID: 21300000, guid: 8d158f9128ae8dadb33aaa16f1f2730f, type: 3}
   defaultElement: 5
   mainStat: 3
   isRanged: 1

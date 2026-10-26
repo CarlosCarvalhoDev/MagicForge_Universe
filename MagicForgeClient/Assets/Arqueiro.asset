@@ -15,6 +15,7 @@ MonoBehaviour:
   className: Arqueiro
   classDescription: Patrulheiro e atirador de elite dos bosques cristalizados. Maior alcance de ataque (12m) e critico elevado por Destreza (DEX).
   classIcon: {fileID: 21300000, guid: a10000073a6524c489205bd51885cc07, type: 3}
+  isometricWorldSprite: {fileID: 21300000, guid: b5f686bec0aa8f9d64fedf1e04d51c74, type: 3}
   defaultElement: 3
   mainStat: 1
   isRanged: 1

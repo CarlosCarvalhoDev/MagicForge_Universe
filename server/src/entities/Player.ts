@@ -10,17 +10,25 @@ import {
   cloneVector3,
   createVector3,
   EntitySnapshotState,
+  InventoryItemPayload,
+  ITEMS_DATABASE,
 } from '@magicforge/shared';
 import { Entity } from './Entity';
 import { SERVER_CONFIG } from '../config';
 
 export class Player extends Entity {
   public readonly classType: CharacterClass;
+  public baseAttributes: CharacterAttributes;
   public attributes: CharacterAttributes;
   public level: number = 1;
   public speed: number;
   public attackRange: number;
   public attackIntervalSec: number;
+
+  // Inventory & Database
+  public dbCharacterId: string = '';
+  public gold: number = 0;
+  public inventory: InventoryItemPayload[] = [];
 
   // Resource & Skills
   public currentResource: number;
@@ -42,6 +50,7 @@ export class Player extends Entity {
     super(id, EntityType.PLAYER, name, initialPosition, maxHp);
 
     this.classType = classType;
+    this.baseAttributes = { ...classDef.baseStats };
     this.attributes = { ...classDef.baseStats };
     this.speed = classDef.baseSpeed;
     this.attackRange = classDef.attackRange;
@@ -52,6 +61,33 @@ export class Player extends Entity {
     this.resourceType = isCaster ? 'Mana' : 'Energia';
     this.maxResource = isCaster ? 100 + (this.attributes.inteligencia || this.attributes.sabedoria || 10) * 8 : 100;
     this.currentResource = this.maxResource;
+  }
+
+  public recalculateStatsFromEquipment(): void {
+    const nextAttrs: CharacterAttributes = { ...this.baseAttributes };
+
+    for (const slot of this.inventory) {
+      if (slot.isEquipped) {
+        const itemDef = ITEMS_DATABASE[slot.itemId];
+        if (itemDef && itemDef.statsBonus) {
+          if (itemDef.statsBonus.forca) nextAttrs.forca += itemDef.statsBonus.forca;
+          if (itemDef.statsBonus.destreza) nextAttrs.destreza += itemDef.statsBonus.destreza;
+          if (itemDef.statsBonus.constituicao) nextAttrs.constituicao += itemDef.statsBonus.constituicao;
+          if (itemDef.statsBonus.inteligencia) nextAttrs.inteligencia += itemDef.statsBonus.inteligencia;
+          if (itemDef.statsBonus.sabedoria) nextAttrs.sabedoria += itemDef.statsBonus.sabedoria;
+          if (itemDef.statsBonus.carisma) nextAttrs.carisma += itemDef.statsBonus.carisma;
+        }
+      }
+    }
+
+    this.attributes = nextAttrs;
+    this.maxHp = this.attributes.constituicao * 10 + 50;
+    this.currentHp = Math.min(this.currentHp, this.maxHp);
+
+    const isCaster = this.classType === CharacterClass.MAGO || this.classType === CharacterClass.CLERIGO || this.classType === CharacterClass.BRUXO;
+    if (isCaster) {
+      this.maxResource = 100 + (this.attributes.inteligencia || this.attributes.sabedoria || 10) * 8;
+    }
   }
 
   public get BaseDamage(): number {
@@ -211,6 +247,10 @@ export class Player extends Entity {
       return true;
     }
     return false;
+  }
+
+  public restoreResource(amount: number): void {
+    this.currentResource = Math.min(this.maxResource, this.currentResource + amount);
   }
 
   private clampToBounds(): void {

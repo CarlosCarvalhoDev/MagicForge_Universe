@@ -1,4 +1,4 @@
-import { Vector3 } from '@magicforge/shared';
+import { ItemRarity, RARITY_COLORS, S2CItemDropSpawnPayload, Vector3, distance } from '@magicforge/shared';
 import { InterpolatedEntity } from '../interpolation/SnapshotBuffer';
 
 export interface FloatingText {
@@ -11,10 +11,22 @@ export interface FloatingText {
   createdAt: number;
 }
 
+export interface ActiveItemDrop {
+  dropId: string;
+  itemId: string;
+  name: string;
+  rarity: ItemRarity;
+  quantity: number;
+  position: Vector3;
+  despawnTimeSec: number;
+  spawnTimestamp: number;
+}
+
 export class GameRenderer {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private floatingTexts: FloatingText[] = [];
+  public activeDrops = new Map<string, ActiveItemDrop>();
 
   // World to screen mapping
   public zoom: number = 8.5; // pixels per world unit
@@ -25,6 +37,8 @@ export class GameRenderer {
   // Sprite animation assets
   private knightWalkFrames: HTMLImageElement[] = [];
   private knightIdleFrames: HTMLImageElement[] = [];
+  private heroIsoSprites: Record<string, HTMLImageElement> = {};
+  private monsterIsoSprites: Record<string, HTMLImageElement> = {};
   private animTimer: number = 0;
   private currentFrameIndex: number = 0;
   private spritesLoaded: boolean = false;
@@ -36,6 +50,40 @@ export class GameRenderer {
     this.ctx = context;
 
     this.loadKnightSprites();
+    this.loadIsometricSprites();
+  }
+
+  private loadIsometricSprites(): void {
+    const classMap: Record<string, string> = {
+      GUERREIRO: '/assets/isometric/iso_hero_guerreiro.jpg',
+      CLERIGO: '/assets/isometric/iso_hero_clerigo.jpg',
+      BARBARO: '/assets/isometric/iso_hero_barbaro.jpg',
+      MONGE: '/assets/isometric/iso_hero_monge.jpg',
+      BRUXO: '/assets/isometric/iso_hero_bruxo.jpg',
+      MAGO: '/assets/isometric/iso_hero_mago.jpg',
+      ARQUEIRO: '/assets/isometric/iso_hero_arqueiro.jpg',
+    };
+
+    for (const [key, src] of Object.entries(classMap)) {
+      const img = new Image();
+      img.src = src;
+      this.heroIsoSprites[key] = img;
+    }
+
+    const mobMap: Record<string, string> = {
+      'Goblin Lanceiro': '/assets/isometric/iso_mob_goblin_lanceiro.jpg',
+      'Goblin Arqueiro': '/assets/isometric/iso_mob_goblin_arqueiro.jpg',
+      'Slime da Floresta': '/assets/isometric/iso_mob_slime_floresta.jpg',
+      'Lobo Selvagem': '/assets/isometric/iso_mob_lobo_selvagem.jpg',
+      'Chefe Goblin': '/assets/isometric/iso_boss_chefe_goblin.jpg',
+      Malakor: '/assets/isometric/iso_boss_malakor.jpg',
+    };
+
+    for (const [key, src] of Object.entries(mobMap)) {
+      const img = new Image();
+      img.src = src;
+      this.monsterIsoSprites[key] = img;
+    }
   }
 
   private loadKnightSprites(): void {
@@ -202,24 +250,41 @@ export class GameRenderer {
           ctx.fill();
         }
       } else {
-        // --- RENDER MONSTER BADGE ---
+        // --- RENDER MONSTER ISOMETRIC SPRITE ---
         const isBoss = ent.maxHp > 200;
-        const radius = isBoss ? 20 : 14;
+        const radius = isBoss ? 24 : 18;
+        const mobSprite = this.monsterIsoSprites[ent.name];
 
-        ctx.beginPath();
-        ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
-        ctx.fillStyle = isBoss ? '#7f1d1d' : '#991b1b';
-        ctx.fill();
-        ctx.strokeStyle = isBoss ? '#f59e0b' : '#ef4444';
-        ctx.lineWidth = isBoss ? 2.5 : 1.5;
-        ctx.stroke();
+        if (mobSprite && mobSprite.complete && mobSprite.naturalWidth > 0) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(mobSprite, screenX - radius, screenY - radius, radius * 2, radius * 2);
+          ctx.restore();
 
-        // Monster Icon / Emoji
-        ctx.font = isBoss ? '16px serif' : '12px serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        const icon = isBoss ? '💀' : ent.name.includes('Slime') ? '🧪' : ent.name.includes('Lobo') ? '🐺' : '👹';
-        ctx.fillText(icon, screenX, screenY);
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+          ctx.strokeStyle = isBoss ? '#f59e0b' : '#ef4444';
+          ctx.lineWidth = isBoss ? 2.5 : 1.5;
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+          ctx.fillStyle = isBoss ? '#7f1d1d' : '#991b1b';
+          ctx.fill();
+          ctx.strokeStyle = isBoss ? '#f59e0b' : '#ef4444';
+          ctx.lineWidth = isBoss ? 2.5 : 1.5;
+          ctx.stroke();
+
+          // Monster Icon / Emoji fallback
+          ctx.font = isBoss ? '16px serif' : '12px serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const icon = isBoss ? '💀' : ent.name.includes('Slime') ? '🧪' : ent.name.includes('Lobo') ? '🐺' : '👹';
+          ctx.fillText(icon, screenX, screenY);
+        }
       }
 
       // Draw Orientation Arrow
@@ -284,7 +349,10 @@ export class GameRenderer {
       }
     }
 
-    // 4. Draw Floating Combat Text
+    // 4. Draw Ground Item Drops (Glowing beacons & loot bags)
+    this.renderItemDrops(screenCenterX, screenCenterY);
+
+    // 5. Draw Floating Combat Text
     this.renderFloatingText(screenCenterX, screenCenterY);
   }
 
@@ -386,5 +454,120 @@ export class GameRenderer {
     const worldZ = (y - screenCenterY) / this.zoom + this.cameraOffset.y;
 
     return { x: worldX, y: 0, z: worldZ };
+  }
+
+  public addOrUpdateDrop(payload: S2CItemDropSpawnPayload): void {
+    this.activeDrops.set(payload.dropId, {
+      ...payload,
+      spawnTimestamp: performance.now(),
+    });
+  }
+
+  public removeDrop(dropId: string): void {
+    this.activeDrops.delete(dropId);
+  }
+
+  public clearDrops(): void {
+    this.activeDrops.clear();
+  }
+
+  public findDropNearWorldPos(worldPos: Vector3, maxRadius = 3.5): ActiveItemDrop | null {
+    let nearest: ActiveItemDrop | null = null;
+    let minDist = maxRadius;
+
+    for (const drop of this.activeDrops.values()) {
+      const d = distance(worldPos, drop.position);
+      if (d <= minDist) {
+        minDist = d;
+        nearest = drop;
+      }
+    }
+
+    return nearest;
+  }
+
+  private renderItemDrops(cx: number, cy: number): void {
+    const { ctx } = this;
+    const now = performance.now();
+
+    for (const drop of this.activeDrops.values()) {
+      const sx = cx + (drop.position.x - this.cameraOffset.x) * this.zoom;
+      const sy = cy + (drop.position.z - this.cameraOffset.y) * this.zoom;
+
+      const rarityTheme = RARITY_COLORS[drop.rarity] || {
+        border: '#ffffff',
+        glow: 'rgba(255, 255, 255, 0.4)',
+        text: '#ffffff',
+        bg: 'rgba(30, 41, 59, 0.6)',
+      };
+      const rarityColor = rarityTheme.border;
+      const bobOffset = Math.sin(now * 0.005 + drop.position.x) * 4;
+
+      ctx.save();
+
+      // 1. Vertical Beaming Light Pillar
+      const beamGrad = ctx.createLinearGradient(sx, sy, sx, sy - 55);
+      beamGrad.addColorStop(0, rarityColor);
+      beamGrad.addColorStop(0.3, rarityTheme.glow);
+      beamGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.fillStyle = beamGrad;
+      ctx.beginPath();
+      ctx.moveTo(sx - 6, sy);
+      ctx.lineTo(sx - 1.5, sy - 55);
+      ctx.lineTo(sx + 1.5, sy - 55);
+      ctx.lineTo(sx + 6, sy);
+      ctx.closePath();
+      ctx.fill();
+
+      // 2. Ground Pulsing Aura Ring
+      const auraPulse = 1.0 + Math.sin(now * 0.006) * 0.2;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, 12 * auraPulse, 6 * auraPulse, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = rarityColor;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = rarityTheme.bg;
+      ctx.fill();
+
+      // 3. Loot Icon (Floating glowing bag/chest)
+      const iconY = sy - 14 + bobOffset;
+      ctx.fillStyle = drop.itemId === 'gold' ? '#fbbf24' : '#f8fafc';
+      ctx.beginPath();
+      ctx.arc(sx, iconY, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = rarityColor;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Inner icon symbol
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 9px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(drop.itemId === 'gold' ? '💰' : '📦', sx, iconY);
+
+      // 4. Floating Name Badge
+      const textY = iconY - 12;
+      const labelText = drop.quantity > 1 ? `${drop.name} (${drop.quantity})` : drop.name;
+      ctx.font = 'bold 11px Inter, sans-serif';
+      const textMetrics = ctx.measureText(labelText);
+      const bgWidth = textMetrics.width + 12;
+      const bgHeight = 16;
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(sx - bgWidth / 2, textY - 11, bgWidth, bgHeight);
+      ctx.strokeStyle = rarityColor;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sx - bgWidth / 2, textY - 11, bgWidth, bgHeight);
+
+      ctx.fillStyle = rarityTheme.text;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(labelText, sx, textY - 3);
+
+      ctx.restore();
+    }
   }
 }

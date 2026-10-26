@@ -16,8 +16,11 @@ Este roadmap organiza a evolução técnica do nosso MMORPG Mobile, dividida em 
 | **Controles Touch Mobile (Virtual Joystick)** | ✅ Concluído | Joystick analógico virtual com vetor normalizado contínuo + toque na tela. |
 | **Banco de Dados & Persistência (SQLite)** | ✅ Concluído | Contas, Heróis, Atributos D&D e Posição salvos em `server/data/magicforge.db`. |
 | **Sistema de Skills Ativas (4 Slots D&D 5e)** | ✅ Concluído | 28 magias autoritativas, cooldown sweep, HUD de MP/Energia, teclas 1-4 e botões touch. |
-| **Cliente Demonstrador Web** | ✅ Concluído | `/client` com HUD completa, sprites reais animados do guerreiro, skills e arena. |
-| **Contrato C# para Unity** | ✅ Concluído | `NetworkMessages.cs` e `UnityNetworkClient.cs` com suporte a movimento e skills. |
+| **Grimório de Habilidades Interativo** | ✅ Concluído | Modal [K] com 28 ícones RPG em alta resolução, abas por classe, filtros D&D e tiers. |
+| **Sistema de Drops & Loot no Chão** | ✅ Concluído | Monstros dropam espólios com pilares verticais de luz e auras coloridas por raridade; auto-loot e clique. |
+| **Mochila & Inventário Persistido (SQLite)** | ✅ Concluído | 20 slots de inventário, painel de inspeção de itens, bônus de stats, equipamentos, poções consumíveis, cálculo de Poder de Combate (CP) e Ouro salvos no SQLite. |
+| **Cliente Demonstrador Web** | ✅ Concluído | `/client` com HUD completa, sprites reais animados do guerreiro, skills, mochila e arena. |
+| **Contrato C# para Unity** | ✅ Concluído | `NetworkMessages.cs` e `UnityNetworkClient.cs` sincronizados com movimento, skills, drops e inventário. |
 | **Guia de Assets com IA** | ✅ Concluído | `Docs/GUIA_PROMPTS_ASSETS_IA.md` com prompts para personagens, monstros e chão. |
 | **Guia do Banco de Dados** | ✅ Concluído | `Docs/GUIA_BANCO_DE_DADOS_SQLITE.md` com instruções do DB Browser e queries. |
 
@@ -25,16 +28,16 @@ Este roadmap organiza a evolução técnica do nosso MMORPG Mobile, dividida em 
 
 ## 🚀 Próximos Passos (Ordem de Execução Recomendada)
 
-### 1. Sistema de Drops, Loot no Chão & Inventário
-* **Objetivo:** Monstros dropam itens, ouro e relíquias ao morrer, alimentando a progressão de Combat Power (CP) e o inventário persistido em SQLite.
+### 1. Sistema de Níveis, Experiência (EXP) & Progressão D&D 5e
+* **Objetivo:** Matar monstros concede EXP de forma autoritativa. Ao subir de nível, atributos base (STR, DEX, CON, INT, WIS, CHA) aumentam, recalculando HP Máximo, Mana/Energia e Poder de Combate (CP), tudo persistido no SQLite.
 * **Solução:**
-  * Opcodes: `S2C_ITEM_DROP_SPAWN`, `C2S_LOOT_ITEM`, `S2C_INVENTORY_UPDATE`.
-  * Visualização de baú/sacos brilhantes no chão que podem ser coletados com clique ou proximidade.
+  * Barra de EXP no HUD inferior e efeito visual de "Level Up!".
+  * Notificação na tela e recalculo dinâmico de atributos no servidor.
 
-### 2. Sistema de Níveis, Experiência (EXP) & Progressão D&D 5e
-* **Objetivo:** Matar monstros concede EXP. Ao subir de nível, atributos base (STR, DEX, CON, INT, WIS, CHA) sobem, aumentando HP máximo, Mana/Energia e dano.
-* **Solução:** Barra de EXP no HUD e fórmulas D&D autoritativas no servidor.
+### 2. Chat do MMORPG (Global, Local & Sistema)
+* **Objetivo:** Jogadores podem se comunicar no mapa, ver mensagens de combate/sistema (ex: *"LordAventureiro obteve [Relíquia da Forja Antiga]!"* ou *"Chefe Goblin foi derrotado!"*).
+* **Solução:** Caixa de texto colapsável para mobile e desktop com opcodes `C2S_CHAT_SEND` e `S2C_CHAT_BROADCAST`.
 
-### 3. Chat do MMORPG (Global, Local & Sistema)
-* **Objetivo:** Jogadores podem se comunicar no mapa, ver avisos do sistema (ex: "Chefe Goblin derrotado!") e conversar entre si.
-* **Solução:** Caixa de texto expansível na interface mobile/desktop com opcodes `C2S_CHAT_SEND` e `S2C_CHAT_BROADCAST`.
+### 3. Sistema de Grupos (Party) & Vida dos Aliados
+* **Objetivo:** Jogadores podem convidar aliados para formar grupo de até 4 membros, compartilhando EXP e exibindo barras de vida da equipe no canto superior da tela.
+

@@ -26,6 +26,13 @@ namespace MagicForge.Network
         C2S_CAST_SKILL = 0x33,
         S2C_SKILL_CAST_EVENT = 0x34,
 
+        // Items, Drops & Inventory (0x40 - 0x4F)
+        S2C_ITEM_DROP_SPAWN = 0x40,
+        S2C_ITEM_DROP_DESPAWN = 0x41,
+        C2S_LOOT_ITEM = 0x42,
+        S2C_INVENTORY_UPDATE = 0x43,
+        C2S_USE_ITEM = 0x44,
+
         // Heartbeat (0xF0 - 0xFF)
         C2S_PING = 0xF0,
         S2C_PONG = 0xF1,
@@ -140,5 +147,55 @@ namespace MagicForge.Network
         public string[] affectedEntityIds;
         public int casterCurrentResource;
         public int casterMaxResource;
+    }
+
+    [Serializable]
+    public class ItemDropSpawnDTO
+    {
+        public string dropId;
+        public string itemId;
+        public string name;
+        public string rarity;
+        public int quantity;
+        public Vector3DTO position;
+        public int despawnTimeSec;
+    }
+
+    [Serializable]
+    public class ItemDropDespawnDTO
+    {
+        public string dropId;
+        public string looterId;
+        public string reason;
+    }
+
+    [Serializable]
+    public class LootItemRequestDTO
+    {
+        public string dropId;
+    }
+
+    [Serializable]
+    public class InventoryItemDTO
+    {
+        public int slotIndex;
+        public string itemId;
+        public int quantity;
+        public bool isEquipped;
+    }
+
+    [Serializable]
+    public class InventoryUpdateDTO
+    {
+        public InventoryItemDTO[] slots;
+        public int gold;
+        public int totalCombatPower;
+        public string lootMessage;
+    }
+
+    [Serializable]
+    public class UseItemRequestDTO
+    {
+        public int slotIndex;
     }
 }

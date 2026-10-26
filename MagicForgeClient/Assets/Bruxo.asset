@@ -15,6 +15,7 @@ MonoBehaviour:
   className: Bruxo
   classDescription: Cultista e invocador que domina chamas sombrias da Forja. Ataca a distancia usando Carisma (CHA).
   classIcon: {fileID: 21300000, guid: a10000053a6524c489205bd51885cc05, type: 3}
+  isometricWorldSprite: {fileID: 21300000, guid: ae228c740085f104bb6aaf651779db46, type: 3}
   defaultElement: 6
   mainStat: 4
   isRanged: 1

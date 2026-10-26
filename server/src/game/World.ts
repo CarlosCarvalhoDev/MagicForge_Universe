@@ -8,10 +8,16 @@ import {
   S2CCombatEventPayload,
   S2CEntityDespawnPayload,
   S2CEntitySpawnPayload,
+  S2CInventoryUpdatePayload,
+  S2CItemDropDespawnPayload,
+  S2CItemDropSpawnPayload,
   S2CSkillCastEventPayload,
   S2CWorldSnapshotPayload,
   SKILLS_DATABASE,
   calculateSkillPower,
+  ItemDropState,
+  ITEMS_DATABASE,
+  ItemType,
   Vector3,
 } from '@magicforge/shared';
 import { EntityManager } from './EntityManager';
@@ -28,6 +34,7 @@ export class World {
   public readonly spatialGrid = new SpatialGrid(20.0);
   public readonly db = new DatabaseManager();
   public currentTick: number = 0;
+  public activeItemDrops = new Map<string, ItemDropState>();
   private connections = new Map<string, Connection>();
 
   constructor() {
@@ -89,6 +96,28 @@ export class World {
         } as S2CEntitySpawnPayload);
       }
     }
+
+    // Send active item drops to the new player
+    const now = Date.now();
+    for (const drop of this.activeItemDrops.values()) {
+      const remainingSec = Math.max(0, Math.round(drop.despawnSec - (now - drop.spawnTime) / 1000));
+      connection.send(Opcode.S2C_ITEM_DROP_SPAWN, {
+        dropId: drop.dropId,
+        itemId: drop.itemId,
+        name: drop.name,
+        rarity: drop.rarity,
+        quantity: drop.quantity,
+        position: drop.position,
+        despawnTimeSec: remainingSec,
+      } as S2CItemDropSpawnPayload);
+    }
+
+    // Send player inventory & gold state
+    connection.send(Opcode.S2C_INVENTORY_UPDATE, {
+      slots: player.inventory,
+      gold: player.gold,
+      totalCombatPower: player.CombatPower,
+    } as S2CInventoryUpdatePayload);
 
     console.log(`[World] Player "${player.name}" (${player.classType}) pronto em [${player.position.x.toFixed(1)}, ${player.position.z.toFixed(1)}]. Total players: ${this.entityManager.getAllPlayers().length}`);
     return player;
@@ -152,7 +181,25 @@ export class World {
       this.processMonsterCombat(monster);
     }
 
-    // 3. Build & Broadcast World Snapshot (Partitioned by Area of Interest)
+    // 3. Update Item Drops (despawn countdown & player proximity auto-loot)
+    const now = Date.now();
+    for (const [dropId, drop] of this.activeItemDrops) {
+      if ((now - drop.spawnTime) / 1000 >= drop.despawnSec) {
+        this.activeItemDrops.delete(dropId);
+        this.broadcast(Opcode.S2C_ITEM_DROP_DESPAWN, { dropId } as S2CItemDropDespawnPayload);
+        continue;
+      }
+
+      // Proximity auto-pickup (distance <= 2.2m)
+      for (const player of players) {
+        if (!player.isDead && distance(player.position, drop.position) <= 2.2) {
+          this.lootItem(player, dropId);
+          break; // drop picked up, break player loop
+        }
+      }
+    }
+
+    // 4. Build & Broadcast World Snapshot (Partitioned by Area of Interest)
     this.broadcastSnapshot();
   }
 
@@ -187,6 +234,7 @@ export class World {
   }
 
   private executePlayerAttack(player: Player, target: Monster): void {
+    const wasAlive = !target.isDead;
     const rawDamage = player.BaseDamage;
     // Simple critical strike formula based on DEX
     const isCritical = Math.random() < (player.attributes.destreza * 0.015);
@@ -206,6 +254,10 @@ export class World {
     };
 
     this.broadcast(Opcode.S2C_COMBAT_EVENT, combatEvent);
+
+    if (wasAlive && target.isDead) {
+      this.handleMonsterDeath(target, player);
+    }
   }
 
   private processMonsterCombat(monster: Monster): void {
@@ -284,8 +336,12 @@ export class World {
       const nearbyMonsters = this.entityManager.getAllMonsters();
       for (const m of nearbyMonsters) {
         if (!m.isDead && distanceSquared(aoeOrigin, m.position) <= radiusSq) {
+          const wasAlive = !m.isDead;
           m.takeDamage(finalPower);
           affectedIds.push(m.id);
+          if (wasAlive && m.isDead) {
+            this.handleMonsterDeath(m, player);
+          }
         }
       }
     } else {
@@ -295,11 +351,15 @@ export class World {
         target = this.entityManager.findNearestMonster(player.position, skill.range);
       }
 
-      if (target && !target.isDead) {
+      if (target && !target.isDead && target instanceof Monster) {
         const d = distance(player.position, target.position);
         if (d <= skill.range * 1.3) {
+          const wasAlive = !target.isDead;
           target.takeDamage(finalPower);
           affectedIds.push(target.id);
+          if (wasAlive && target.isDead) {
+            this.handleMonsterDeath(target, player);
+          }
         }
       }
     }
@@ -366,5 +426,126 @@ export class World {
         conn.send(op, data);
       }
     }
+  }
+
+  public handleMonsterDeath(monster: Monster, killer?: Player): void {
+    const rolledDrops = monster.rollLoot();
+    const now = Date.now();
+
+    for (const drop of rolledDrops) {
+      const itemDef = ITEMS_DATABASE[drop.itemId];
+      if (!itemDef) continue;
+
+      const dropId = `drop_${now}_${Math.random().toString(36).substring(2, 7)}`;
+      // Slight random scatter offset around monster position (-1.2 to +1.2)
+      const dropPos = createVector3(
+        monster.position.x + (Math.random() - 0.5) * 2.0,
+        monster.position.y,
+        monster.position.z + (Math.random() - 0.5) * 2.0
+      );
+
+      const dropState: ItemDropState = {
+        dropId,
+        itemId: itemDef.itemId,
+        name: itemDef.name,
+        rarity: itemDef.rarity,
+        quantity: drop.quantity,
+        position: dropPos,
+        spawnTime: now,
+        despawnSec: 60,
+      };
+
+      this.activeItemDrops.set(dropId, dropState);
+
+      this.broadcast(Opcode.S2C_ITEM_DROP_SPAWN, {
+        dropId: dropState.dropId,
+        itemId: dropState.itemId,
+        name: dropState.name,
+        rarity: dropState.rarity,
+        quantity: dropState.quantity,
+        position: dropState.position,
+        despawnTimeSec: dropState.despawnSec,
+      } as S2CItemDropSpawnPayload);
+    }
+  }
+
+  public lootItem(player: Player, dropId: string): boolean {
+    const drop = this.activeItemDrops.get(dropId);
+    if (!drop) return false;
+
+    // Validate distance (leeway up to 4.5m for tap or lag)
+    if (distance(player.position, drop.position) > 4.5) {
+      return false;
+    }
+
+    if (drop.itemId === 'gold') {
+      player.gold += drop.quantity;
+      this.db.updateCharacterGold(player.dbCharacterId, player.gold);
+    } else {
+      const added = this.db.addItemToInventory(player.dbCharacterId, drop.itemId, drop.quantity);
+      if (!added) {
+        // Inventory full
+        return false;
+      }
+      player.inventory = this.db.getInventory(player.dbCharacterId);
+      player.recalculateStatsFromEquipment();
+    }
+
+    this.activeItemDrops.delete(dropId);
+
+    // Broadcast despawn to all players
+    this.broadcast(Opcode.S2C_ITEM_DROP_DESPAWN, {
+      dropId,
+      looterId: player.id,
+    } as S2CItemDropDespawnPayload);
+
+    // Send inventory update to looter
+    const conn = this.connections.get(player.id);
+    if (conn) {
+      conn.send(Opcode.S2C_INVENTORY_UPDATE, {
+        slots: player.inventory,
+        gold: player.gold,
+        totalCombatPower: player.CombatPower,
+      } as S2CInventoryUpdatePayload);
+    }
+
+    return true;
+  }
+
+  public usePlayerItem(player: Player, slotIndex: number): boolean {
+    const item = player.inventory.find((i) => i.slotIndex === slotIndex);
+    if (!item) return false;
+
+    const itemDef = ITEMS_DATABASE[item.itemId];
+    if (!itemDef) return false;
+
+    if (itemDef.type === ItemType.CONSUMIVEL) {
+      if (item.itemId === 'potion_hp_minor') {
+        player.heal(50);
+      } else if (item.itemId === 'potion_hp_major') {
+        player.heal(150);
+      } else if (item.itemId === 'potion_mp_minor') {
+        player.restoreResource(40);
+      } else if (item.itemId === 'potion_mp_major') {
+        player.restoreResource(100);
+      }
+      this.db.removeItemFromInventory(player.dbCharacterId, slotIndex, 1);
+    } else if (itemDef.type === ItemType.EQUIPAMENTO) {
+      this.db.toggleEquipItem(player.dbCharacterId, slotIndex);
+    }
+
+    player.inventory = this.db.getInventory(player.dbCharacterId);
+    player.recalculateStatsFromEquipment();
+
+    const conn = this.connections.get(player.id);
+    if (conn) {
+      conn.send(Opcode.S2C_INVENTORY_UPDATE, {
+        slots: player.inventory,
+        gold: player.gold,
+        totalCombatPower: player.CombatPower,
+      } as S2CInventoryUpdatePayload);
+    }
+
+    return true;
   }
 }

@@ -15,6 +15,7 @@ MonoBehaviour:
   className: Monge
   classDescription: Mestre marcial do Chi. Golpes corpo-a-corpo ultra-rapidos (0.9s) e alta esquiva guiados por Destreza (DEX).
   classIcon: {fileID: 21300000, guid: a10000043a6524c489205bd51885cc04, type: 3}
+  isometricWorldSprite: {fileID: 21300000, guid: 4c136abc801bee2c98cd4e206fd0c7b4, type: 3}
   defaultElement: 2
   mainStat: 1
   isRanged: 0

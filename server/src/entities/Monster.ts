@@ -15,6 +15,13 @@ export enum MonsterState {
   RETURNING = 'RETURNING',
 }
 
+export interface LootDropEntry {
+  itemId: string;
+  dropChance: number; // 0.0 to 1.0 (e.g. 0.8 = 80%)
+  minQty: number;
+  maxQty: number;
+}
+
 export class Monster extends Entity {
   public spawnPosition: Vector3;
   public state: MonsterState = MonsterState.IDLE;
@@ -28,11 +35,66 @@ export class Monster extends Entity {
   public targetPlayer: Entity | null = null;
   public respawnTimer: number = 0;
   public readonly respawnDelaySec: number = 6.0;
+  public lootTable: LootDropEntry[] = [];
 
   constructor(id: string, name: string, spawnPos: Vector3, maxHp = 100, damage = 15) {
     super(id, EntityType.MONSTER, name, spawnPos, maxHp);
     this.spawnPosition = cloneVector3(spawnPos);
     this.attackDamage = damage;
+    this.configureDefaultLoot();
+  }
+
+  private configureDefaultLoot(): void {
+    if (this.name.includes('Slime')) {
+      this.lootTable = [
+        { itemId: 'gold', dropChance: 1.0, minQty: 5, maxQty: 12 },
+        { itemId: 'essence_slime', dropChance: 0.8, minQty: 1, maxQty: 2 },
+        { itemId: 'potion_hp_minor', dropChance: 0.35, minQty: 1, maxQty: 1 },
+      ];
+    } else if (this.name.includes('Lobo')) {
+      this.lootTable = [
+        { itemId: 'gold', dropChance: 1.0, minQty: 8, maxQty: 18 },
+        { itemId: 'wolf_fang', dropChance: 0.75, minQty: 1, maxQty: 2 },
+        { itemId: 'armor_chainmail', dropChance: 0.15, minQty: 1, maxQty: 1 },
+      ];
+    } else if (this.name.includes('Arqueiro')) {
+      this.lootTable = [
+        { itemId: 'gold', dropChance: 1.0, minQty: 10, maxQty: 20 },
+        { itemId: 'essence_goblin', dropChance: 0.7, minQty: 1, maxQty: 2 },
+        { itemId: 'potion_mp_minor', dropChance: 0.4, minQty: 1, maxQty: 1 },
+        { itemId: 'bow_hunting', dropChance: 0.12, minQty: 1, maxQty: 1 },
+      ];
+    } else if (this.name.includes('Chefe')) {
+      this.lootTable = [
+        { itemId: 'gold', dropChance: 1.0, minQty: 60, maxQty: 120 },
+        { itemId: 'potion_hp_major', dropChance: 1.0, minQty: 1, maxQty: 2 },
+        { itemId: 'rune_fragment', dropChance: 0.85, minQty: 1, maxQty: 3 },
+        { itemId: 'shield_iron_buckler', dropChance: 0.45, minQty: 1, maxQty: 1 },
+        { itemId: 'relic_ancient_forge', dropChance: 0.3, minQty: 1, maxQty: 1 }, // Lendário!
+      ];
+    } else {
+      // Goblin Lanceiro / padrão
+      this.lootTable = [
+        { itemId: 'gold', dropChance: 1.0, minQty: 6, maxQty: 15 },
+        { itemId: 'essence_goblin', dropChance: 0.65, minQty: 1, maxQty: 2 },
+        { itemId: 'potion_hp_minor', dropChance: 0.35, minQty: 1, maxQty: 1 },
+        { itemId: 'ore_iron_arcane', dropChance: 0.25, minQty: 1, maxQty: 2 },
+        { itemId: 'sword_iron_broadsword', dropChance: 0.1, minQty: 1, maxQty: 1 },
+      ];
+    }
+  }
+
+  public rollLoot(): Array<{ itemId: string; quantity: number }> {
+    const drops: Array<{ itemId: string; quantity: number }> = [];
+
+    for (const entry of this.lootTable) {
+      if (Math.random() <= entry.dropChance) {
+        const qty = Math.floor(Math.random() * (entry.maxQty - entry.minQty + 1)) + entry.minQty;
+        drops.push({ itemId: entry.itemId, quantity: qty });
+      }
+    }
+
+    return drops;
   }
 
   public override update(deltaTimeSec: number): void {
