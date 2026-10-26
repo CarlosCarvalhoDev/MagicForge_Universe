@@ -17,10 +17,12 @@ import { Monster, MonsterState } from '../entities/Monster';
 import { Connection } from '../network/Connection';
 import { SpatialGrid } from './SpatialGrid';
 import { SERVER_CONFIG } from '../config';
+import { DatabaseManager } from '../database/DatabaseManager';
 
 export class World {
   public readonly entityManager = new EntityManager();
   public readonly spatialGrid = new SpatialGrid(20.0);
+  public readonly db = new DatabaseManager();
   public currentTick: number = 0;
   private connections = new Map<string, Connection>();
 
@@ -58,16 +60,10 @@ export class World {
   }
 
   public createPlayer(connection: Connection, name: string, classType: CharacterClass): Player {
-    // Generate spawn point (near center with slight random offset)
-    const randomAngle = Math.random() * Math.PI * 2;
-    const randomDist = 2 + Math.random() * 4;
-    const spawnPos = createVector3(
-      Math.cos(randomAngle) * randomDist,
-      0,
-      Math.sin(randomAngle) * randomDist
-    );
+    // 1. Busca ou cria a conta e carrega/cria o personagem no banco de dados SQLite
+    const account = this.db.getOrCreateAccount(name);
+    const player = this.db.loadOrCreatePlayer(connection.id, account.id, name, classType);
 
-    const player = new Player(connection.id, name, classType, spawnPos);
     this.entityManager.addPlayer(player);
     this.spatialGrid.updateEntity(player);
     connection.playerId = player.id;
@@ -90,7 +86,7 @@ export class World {
       }
     }
 
-    console.log(`[World] Player "${player.name}" (${player.classType}) spawned at [${player.position.x.toFixed(1)}, ${player.position.z.toFixed(1)}]. Total players: ${this.entityManager.getAllPlayers().length}`);
+    console.log(`[World] Player "${player.name}" (${player.classType}) pronto em [${player.position.x.toFixed(1)}, ${player.position.z.toFixed(1)}]. Total players: ${this.entityManager.getAllPlayers().length}`);
     return player;
   }
 
@@ -98,12 +94,22 @@ export class World {
     const player = this.entityManager.removePlayer(playerId);
     this.spatialGrid.removeEntity(playerId);
     if (player) {
-      console.log(`[World] Player "${player.name}" disconnected.`);
+      // Salva o progresso mais recente no banco de dados SQLite
+      this.db.savePlayer(player);
+      console.log(`[World] Player "${player.name}" desconectou e foi salvo com sucesso no SQLite.`);
       this.broadcast(Opcode.S2C_ENTITY_DESPAWN, {
         entityId: playerId,
         reason: 'DISCONNECTED',
       } as S2CEntityDespawnPayload);
     }
+  }
+
+  public saveAllPlayers(): void {
+    const players = this.entityManager.getAllPlayers();
+    for (const p of players) {
+      this.db.savePlayer(p);
+    }
+    console.log(`[World] Todos os ${players.length} jogadores foram salvos no banco de dados.`);
   }
 
   /**

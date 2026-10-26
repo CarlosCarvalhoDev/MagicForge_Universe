@@ -54,6 +54,7 @@ httpServer.listen(SERVER_CONFIG.PORT, () => {
 // Graceful Shutdown
 function handleShutdown(signal: string) {
   console.log(`\n[Server] Received ${signal}. Gracefully stopping server...`);
+  world.saveAllPlayers();
   gameLoop.stop();
   network.close();
   httpServer.close(() => {
