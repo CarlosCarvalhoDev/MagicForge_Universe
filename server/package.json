@@ -1,0 +1,23 @@
+{
+  "name": "@magicforge/server",
+  "version": "1.0.0",
+  "description": "MagicForge: Universe - 20Hz Authoritative Game Server",
+  "main": "dist/server/src/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/server/src/index.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "@types/ws": "^8.5.12",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "keywords": ["mmorpg", "authoritative-server", "websockets", "20hz"],
+  "author": "MagicForge Team",
+  "license": "MIT"
+}

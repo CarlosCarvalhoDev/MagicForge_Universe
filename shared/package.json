@@ -1,0 +1,12 @@
+{
+  "name": "@magicforge/shared",
+  "version": "1.0.0",
+  "description": "MagicForge: Universe - Shared Network Protocol and DTOs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": ["mmorpg", "networking", "protocol"],
+  "license": "MIT"
+}
