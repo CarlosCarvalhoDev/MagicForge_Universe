@@ -15,8 +15,9 @@ Este roadmap organiza a evolução técnica do nosso MMORPG Mobile, dividida em 
 | **Área de Interesse (AOI / Spatial Grid)** | ✅ Concluído | Células de 20x20m no servidor. O cliente só recebe entidades do seu quadrante. |
 | **Controles Touch Mobile (Virtual Joystick)** | ✅ Concluído | Joystick analógico virtual com vetor normalizado contínuo + toque na tela. |
 | **Banco de Dados & Persistência (SQLite)** | ✅ Concluído | Contas, Heróis, Atributos D&D e Posição salvos em `server/data/magicforge.db`. |
-| **Cliente Demonstrador Web** | ✅ Concluído | `/client` com HUD completa, sprites reais animados do guerreiro e arena. |
-| **Contrato C# para Unity** | ✅ Concluído | `NetworkMessages.cs`, `UnityNetworkClient.cs` e `NetworkInterpolatedEntity.cs`. |
+| **Sistema de Skills Ativas (4 Slots D&D 5e)** | ✅ Concluído | 28 magias autoritativas, cooldown sweep, HUD de MP/Energia, teclas 1-4 e botões touch. |
+| **Cliente Demonstrador Web** | ✅ Concluído | `/client` com HUD completa, sprites reais animados do guerreiro, skills e arena. |
+| **Contrato C# para Unity** | ✅ Concluído | `NetworkMessages.cs` e `UnityNetworkClient.cs` com suporte a movimento e skills. |
 | **Guia de Assets com IA** | ✅ Concluído | `Docs/GUIA_PROMPTS_ASSETS_IA.md` com prompts para personagens, monstros e chão. |
 | **Guia do Banco de Dados** | ✅ Concluído | `Docs/GUIA_BANCO_DE_DADOS_SQLITE.md` com instruções do DB Browser e queries. |
 
@@ -24,12 +25,16 @@ Este roadmap organiza a evolução técnica do nosso MMORPG Mobile, dividida em 
 
 ## 🚀 Próximos Passos (Ordem de Execução Recomendada)
 
-### 1. Sistema de Habilidades Ativas (4 Skill Slots D&D 5e)
-* **Objetivo:** Conforme o GDD, cada classe terá 4 habilidades especiais com tempo de recarga (cooldown) e consumo de mana, respeitando a progressão D&D 5e.
+### 1. Sistema de Drops, Loot no Chão & Inventário
+* **Objetivo:** Monstros dropam itens, ouro e relíquias ao morrer, alimentando a progressão de Combat Power (CP) e o inventário persistido em SQLite.
 * **Solução:**
-  * Opcodes: `C2S_CAST_SKILL` e `S2C_SKILL_EFFECT`.
-  * Validação autoritativa de cooldown e custo de mana no servidor.
+  * Opcodes: `S2C_ITEM_DROP_SPAWN`, `C2S_LOOT_ITEM`, `S2C_INVENTORY_UPDATE`.
+  * Visualização de baú/sacos brilhantes no chão que podem ser coletados com clique ou proximidade.
 
-### 2. Sistema de Drops, Inventário e Equipamentos (Gacha / Relíquias do GDD)
-* **Objetivo:** Monstros dropam itens/equipamentos ao morrer, alimentando a progressão de Combat Power (CP).
-* **Solução:** Tabela `inventory` (já criada no SQLite) e broadcast de itens no chão.
+### 2. Sistema de Níveis, Experiência (EXP) & Progressão D&D 5e
+* **Objetivo:** Matar monstros concede EXP. Ao subir de nível, atributos base (STR, DEX, CON, INT, WIS, CHA) sobem, aumentando HP máximo, Mana/Energia e dano.
+* **Solução:** Barra de EXP no HUD e fórmulas D&D autoritativas no servidor.
+
+### 3. Chat do MMORPG (Global, Local & Sistema)
+* **Objetivo:** Jogadores podem se comunicar no mapa, ver avisos do sistema (ex: "Chefe Goblin derrotado!") e conversar entre si.
+* **Solução:** Caixa de texto expansível na interface mobile/desktop com opcodes `C2S_CHAT_SEND` e `S2C_CHAT_BROADCAST`.
