@@ -45,8 +45,7 @@ const targetHpText = document.getElementById('target-hp-text') as HTMLSpanElemen
 // Skill Slots UI References
 interface SkillSlotUI {
   button: HTMLButtonElement;
-  icon: HTMLSpanElement;
-  name: HTMLSpanElement;
+  img: HTMLImageElement;
   cost: HTMLSpanElement;
   overlay: HTMLDivElement;
   cdText: HTMLSpanElement;
@@ -56,8 +55,7 @@ interface SkillSlotUI {
 const skillSlots: Record<number, SkillSlotUI> = {
   1: {
     button: document.getElementById('skill-btn-1') as HTMLButtonElement,
-    icon: document.getElementById('skill-icon-1') as HTMLSpanElement,
-    name: document.getElementById('skill-name-1') as HTMLSpanElement,
+    img: document.getElementById('skill-img-1') as HTMLImageElement,
     cost: document.getElementById('skill-cost-1') as HTMLSpanElement,
     overlay: document.getElementById('skill-cd-overlay-1') as HTMLDivElement,
     cdText: document.getElementById('skill-cd-text-1') as HTMLSpanElement,
@@ -65,8 +63,7 @@ const skillSlots: Record<number, SkillSlotUI> = {
   },
   2: {
     button: document.getElementById('skill-btn-2') as HTMLButtonElement,
-    icon: document.getElementById('skill-icon-2') as HTMLSpanElement,
-    name: document.getElementById('skill-name-2') as HTMLSpanElement,
+    img: document.getElementById('skill-img-2') as HTMLImageElement,
     cost: document.getElementById('skill-cost-2') as HTMLSpanElement,
     overlay: document.getElementById('skill-cd-overlay-2') as HTMLDivElement,
     cdText: document.getElementById('skill-cd-text-2') as HTMLSpanElement,
@@ -74,8 +71,7 @@ const skillSlots: Record<number, SkillSlotUI> = {
   },
   3: {
     button: document.getElementById('skill-btn-3') as HTMLButtonElement,
-    icon: document.getElementById('skill-icon-3') as HTMLSpanElement,
-    name: document.getElementById('skill-name-3') as HTMLSpanElement,
+    img: document.getElementById('skill-img-3') as HTMLImageElement,
     cost: document.getElementById('skill-cost-3') as HTMLSpanElement,
     overlay: document.getElementById('skill-cd-overlay-3') as HTMLDivElement,
     cdText: document.getElementById('skill-cd-text-3') as HTMLSpanElement,
@@ -83,44 +79,12 @@ const skillSlots: Record<number, SkillSlotUI> = {
   },
   4: {
     button: document.getElementById('skill-btn-4') as HTMLButtonElement,
-    icon: document.getElementById('skill-icon-4') as HTMLSpanElement,
-    name: document.getElementById('skill-name-4') as HTMLSpanElement,
+    img: document.getElementById('skill-img-4') as HTMLImageElement,
     cost: document.getElementById('skill-cost-4') as HTMLSpanElement,
     overlay: document.getElementById('skill-cd-overlay-4') as HTMLDivElement,
     cdText: document.getElementById('skill-cd-text-4') as HTMLSpanElement,
     definition: null,
   },
-};
-
-const SKILL_ICONS: Record<string, string> = {
-  guerreiro_1: '⚔️',
-  guerreiro_2: '🛡️',
-  guerreiro_3: '🌪️',
-  guerreiro_4: '👑',
-  clerigo_1: '✨',
-  clerigo_2: '☀️',
-  clerigo_3: '🌟',
-  clerigo_4: '🕊️',
-  mago_1: '🔥',
-  mago_2: '⚡',
-  mago_3: '❄️',
-  mago_4: '☄️',
-  arqueiro_1: '🏹',
-  arqueiro_2: '🎯',
-  arqueiro_3: '🌧️',
-  arqueiro_4: '🦅',
-  barbaro_1: '🪓',
-  barbaro_2: '🩸',
-  barbaro_3: '🌋',
-  barbaro_4: '💀',
-  monge_1: '👊',
-  monge_2: '💨',
-  monge_3: '🧘',
-  monge_4: '🐉',
-  bruxo_1: '🔮',
-  bruxo_2: '👁️',
-  bruxo_3: '🌀',
-  bruxo_4: '😈',
 };
 
 // Cooldown map: slot -> timestamp (ms) when cooldown expires
@@ -135,13 +99,94 @@ function updateSkillsForClass(chosenClass: CharacterClass) {
     const slotUI = skillSlots[s.slot];
     if (slotUI) {
       slotUI.definition = s;
-      slotUI.name.textContent = s.name;
+      slotUI.img.src = `/assets/skills/${s.skillId}.png`;
+      slotUI.img.alt = s.name;
       slotUI.cost.textContent = `${s.cost} ${s.resourceType === 'Energia' ? 'EN' : 'MP'}`;
       slotUI.cost.style.color = s.resourceType === 'Energia' ? '#facc15' : '#38bdf8';
-      slotUI.icon.textContent = SKILL_ICONS[s.skillId] || '✨';
       slotUI.button.title = `[Slot ${s.slot}] ${s.name} (Tier ${s.tier})\nCusto: ${s.cost} ${s.resourceType} • Recarga: ${s.cooldownSec}s\nAlcance: ${s.range}m\n${s.description}`;
     }
   }
+}
+
+// Skill Book (Grimório) Modal Elements & Logic
+const skillbookModal = document.getElementById('skillbook-modal') as HTMLDivElement;
+const btnOpenSkillbook = document.getElementById('btn-open-skillbook') as HTMLButtonElement;
+const btnCloseSkillbook = document.getElementById('btn-close-skillbook') as HTMLButtonElement;
+const skillbookClassTabs = document.getElementById('skillbook-class-tabs') as HTMLDivElement;
+const skillbookCardsGrid = document.getElementById('skillbook-cards-grid') as HTMLDivElement;
+
+let currentGrimorioClass: CharacterClass = CharacterClass.GUERREIRO;
+
+function openSkillbook(classType?: CharacterClass) {
+  if (classType) {
+    currentGrimorioClass = classType;
+  } else {
+    currentGrimorioClass = (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
+  }
+  renderGrimorioTabs();
+  renderGrimorioSkills(currentGrimorioClass);
+  skillbookModal.style.display = 'flex';
+}
+
+function closeSkillbook() {
+  skillbookModal.style.display = 'none';
+}
+
+if (btnOpenSkillbook) btnOpenSkillbook.addEventListener('click', () => openSkillbook());
+if (btnCloseSkillbook) btnCloseSkillbook.addEventListener('click', closeSkillbook);
+if (skillbookModal) {
+  skillbookModal.addEventListener('click', (e) => {
+    if (e.target === skillbookModal) closeSkillbook();
+  });
+}
+
+function renderGrimorioTabs() {
+  if (!skillbookClassTabs) return;
+  skillbookClassTabs.innerHTML = '';
+  const classes = Object.values(CharacterClass);
+
+  classes.forEach((cls) => {
+    const btn = document.createElement('button');
+    btn.className = `class-tab-btn ${cls === currentGrimorioClass ? 'active' : ''}`;
+    const def = CLASS_DEFINITIONS[cls];
+    btn.textContent = def ? def.displayName : cls;
+    btn.addEventListener('click', () => {
+      currentGrimorioClass = cls;
+      renderGrimorioTabs();
+      renderGrimorioSkills(cls);
+    });
+    skillbookClassTabs.appendChild(btn);
+  });
+}
+
+function renderGrimorioSkills(classType: CharacterClass) {
+  if (!skillbookCardsGrid) return;
+  skillbookCardsGrid.innerHTML = '';
+  const skills = Object.values(SKILLS_DATABASE)
+    .filter((s) => s.classType === classType)
+    .sort((a, b) => a.slot - b.slot);
+
+  skills.forEach((s) => {
+    const card = document.createElement('div');
+    card.className = 'skill-card';
+    card.innerHTML = `
+      <img src="/assets/skills/${s.skillId}.png" alt="${s.name}" class="skill-card-img" />
+      <div class="skill-card-info">
+        <div class="skill-card-title-row">
+          <span class="skill-card-title">[Slot ${s.slot}] ${s.name}</span>
+          <span class="skill-tier-badge">Tier ${s.tier} (Nv. ${s.unlockLevel})</span>
+        </div>
+        <div class="skill-meta-pills">
+          <span class="skill-pill cost">${s.cost} ${s.resourceType}</span>
+          <span class="skill-pill cooldown">⏱️ ${s.cooldownSec}s CD</span>
+          <span class="skill-pill type">🎯 ${s.range === 0 ? 'Pessoal' : s.isAoe ? `Área (${s.aoeRadius || 5}m)` : `${s.range}m`}</span>
+          <span class="skill-pill" style="color: #f59e0b;">⚔️ ${s.damageType}</span>
+        </div>
+        <p class="skill-card-desc">${s.description}</p>
+      </div>
+    `;
+    skillbookCardsGrid.appendChild(card);
+  });
 }
 
 function updateClassPreview() {
@@ -295,12 +340,20 @@ Object.entries(skillSlots).forEach(([slotStr, slotUI]) => {
   });
 });
 
-// Bind keyboard shortcuts (1, 2, 3, 4)
+// Bind keyboard shortcuts (1, 2, 3, 4, K, Escape)
 window.addEventListener('keydown', (e) => {
   if (document.activeElement === charNameInput) return;
 
   if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
     castSkill(parseInt(e.key, 10));
+  } else if (e.key === 'k' || e.key === 'K') {
+    if (skillbookModal.style.display === 'flex') {
+      closeSkillbook();
+    } else {
+      openSkillbook();
+    }
+  } else if (e.key === 'Escape') {
+    closeSkillbook();
   }
 });
 

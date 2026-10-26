@@ -420,15 +420,49 @@
         color: #38bdf8;
       }
 
+      .skill-btn img.skill-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
+        z-index: 1;
+        transition: transform 0.15s ease-out;
+      }
+
+      .skill-btn:hover img.skill-img {
+        transform: scale(1.08);
+      }
+
+      .skill-footer-gradient {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(to top, rgba(15, 23, 42, 0.95), transparent);
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .skill-key-badge {
+        z-index: 3;
+      }
+
       .cooldown-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(10, 15, 29, 0.85);
+        background: rgba(10, 15, 29, 0.88);
         border-radius: 12px;
         display: none;
         align-items: center;
         justify-content: center;
         pointer-events: none;
+        z-index: 4;
       }
 
       .cooldown-overlay.active {
@@ -440,6 +474,206 @@
         font-weight: 800;
         color: #fbbf24;
         text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+      }
+
+      /* Skill Book Modal Styles */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.78);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        animation: fadeIn 0.2s ease;
+      }
+
+      .modal-content {
+        width: 92%;
+        max-width: 860px;
+        max-height: 86vh;
+        overflow-y: auto;
+        padding: 24px;
+        border: 1.5px solid rgba(251, 191, 36, 0.4);
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.96);
+        box-shadow: 0 16px 50px rgba(0, 0, 0, 0.85);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 12px;
+      }
+
+      .modal-title {
+        font-family: 'Cinzel', serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #fbbf24;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-shadow: 0 2px 10px rgba(251, 191, 36, 0.3);
+      }
+
+      .btn-close {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #94a3b8;
+        font-size: 1.1rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+
+      .btn-close:hover {
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+      }
+
+      .class-tabs-bar {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+
+      .class-tab-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .class-tab-btn:hover {
+        background: rgba(51, 65, 85, 0.9);
+        border-color: #38bdf8;
+      }
+
+      .class-tab-btn.active {
+        background: linear-gradient(135deg, #d97706, #b45309);
+        border-color: #fbbf24;
+        color: #ffffff;
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+      }
+
+      .skills-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 16px;
+      }
+
+      .skill-card {
+        display: flex;
+        gap: 14px;
+        padding: 14px;
+        background: rgba(30, 41, 59, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        transition: border-color 0.2s, transform 0.2s;
+      }
+
+      .skill-card:hover {
+        border-color: rgba(251, 191, 36, 0.5);
+        transform: translateY(-2px);
+      }
+
+      .skill-card-img {
+        width: 74px;
+        height: 74px;
+        border-radius: 12px;
+        border: 1.5px solid #fbbf24;
+        object-fit: cover;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+        flex-shrink: 0;
+      }
+
+      .skill-card-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+      }
+
+      .skill-card-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .skill-card-title {
+        font-family: 'Cinzel', serif;
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #fbbf24;
+      }
+
+      .skill-tier-badge {
+        font-size: 0.68rem;
+        font-weight: 700;
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        padding: 2px 7px;
+        border-radius: 4px;
+        border: 1px solid rgba(245, 158, 11, 0.35);
+      }
+
+      .skill-meta-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 4px 0;
+        font-size: 0.7rem;
+        color: #94a3b8;
+      }
+
+      .skill-pill {
+        background: rgba(15, 23, 42, 0.7);
+        padding: 2px 7px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .skill-pill.cost {
+        color: #38bdf8;
+        font-weight: 700;
+      }
+
+      .skill-pill.cooldown {
+        color: #a78bfa;
+      }
+
+      .skill-pill.type {
+        color: #34d399;
+      }
+
+      .skill-card-desc {
+        font-size: 0.76rem;
+        color: #cbd5e1;
+        line-height: 1.4;
       }
 
       /* Instructions badge positioned at top-center */
@@ -469,6 +703,9 @@
       </div>
 
       <div class="metrics-bar">
+        <button id="btn-open-skillbook" class="glass-panel metric-pill" style="color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); cursor: pointer; transition: all 0.2s;" title="Abrir Grimório de Habilidades [K]">
+          <span>📖</span> Grimório [K]
+        </button>
         <div class="glass-panel metric-pill">
           <div id="status-dot" class="status-dot"></div>
           <span id="connection-status">Desconectado</span>
@@ -595,9 +832,10 @@
         <!-- Slot 1 -->
         <button class="skill-btn" id="skill-btn-1" data-slot="1" title="Habilidade Slot 1">
           <span class="skill-key-badge">1</span>
-          <span class="skill-icon" id="skill-icon-1">⚔️</span>
-          <span class="skill-name" id="skill-name-1">Golpe</span>
-          <span class="skill-cost" id="skill-cost-1">15 MP</span>
+          <img class="skill-img" id="skill-img-1" src="/assets/skills/guerreiro_1.png" alt="Slot 1" />
+          <div class="skill-footer-gradient">
+            <span class="skill-cost" id="skill-cost-1">15 EN</span>
+          </div>
           <div class="cooldown-overlay" id="skill-cd-overlay-1">
             <span class="cooldown-text" id="skill-cd-text-1"></span>
           </div>
@@ -606,9 +844,10 @@
         <!-- Slot 2 -->
         <button class="skill-btn" id="skill-btn-2" data-slot="2" title="Habilidade Slot 2">
           <span class="skill-key-badge">2</span>
-          <span class="skill-icon" id="skill-icon-2">🛡️</span>
-          <span class="skill-name" id="skill-name-2">Defesa</span>
-          <span class="skill-cost" id="skill-cost-2">25 MP</span>
+          <img class="skill-img" id="skill-img-2" src="/assets/skills/guerreiro_2.png" alt="Slot 2" />
+          <div class="skill-footer-gradient">
+            <span class="skill-cost" id="skill-cost-2">25 EN</span>
+          </div>
           <div class="cooldown-overlay" id="skill-cd-overlay-2">
             <span class="cooldown-text" id="skill-cd-text-2"></span>
           </div>
@@ -617,9 +856,10 @@
         <!-- Slot 3 -->
         <button class="skill-btn" id="skill-btn-3" data-slot="3" title="Habilidade Slot 3">
           <span class="skill-key-badge">3</span>
-          <span class="skill-icon" id="skill-icon-3">⚡</span>
-          <span class="skill-name" id="skill-name-3">Corte</span>
-          <span class="skill-cost" id="skill-cost-3">35 MP</span>
+          <img class="skill-img" id="skill-img-3" src="/assets/skills/guerreiro_3.png" alt="Slot 3" />
+          <div class="skill-footer-gradient">
+            <span class="skill-cost" id="skill-cost-3">40 EN</span>
+          </div>
           <div class="cooldown-overlay" id="skill-cd-overlay-3">
             <span class="cooldown-text" id="skill-cd-text-3"></span>
           </div>
@@ -628,13 +868,32 @@
         <!-- Slot 4 (Ultimate) -->
         <button class="skill-btn skill-btn-ult" id="skill-btn-4" data-slot="4" title="Habilidade Suprema">
           <span class="skill-key-badge">4</span>
-          <span class="skill-icon" id="skill-icon-4">👑</span>
-          <span class="skill-name" id="skill-name-4">Suprema</span>
-          <span class="skill-cost" id="skill-cost-4">50 MP</span>
+          <img class="skill-img" id="skill-img-4" src="/assets/skills/guerreiro_4.png" alt="Slot 4" />
+          <div class="skill-footer-gradient">
+            <span class="skill-cost" id="skill-cost-4">70 EN</span>
+          </div>
           <div class="cooldown-overlay" id="skill-cd-overlay-4">
             <span class="cooldown-text" id="skill-cd-text-4"></span>
           </div>
         </button>
+      </div>
+    </div>
+
+    <!-- Skill Book Modal (Grimório de Habilidades & Magias D&D 5e) -->
+    <div id="skillbook-modal" class="modal-backdrop" style="display: none;">
+      <div class="glass-panel modal-content">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>📖</span> Grimório de Habilidades & Magias (D&D 5e)
+          </div>
+          <button id="btn-close-skillbook" class="btn-close" title="Fechar (ESC)">✕</button>
+        </div>
+
+        <!-- Class Tabs Filter -->
+        <div class="class-tabs-bar" id="skillbook-class-tabs"></div>
+
+        <!-- Skills Cards Grid -->
+        <div class="skills-cards-grid" id="skillbook-cards-grid"></div>
       </div>
     </div>
 

@@ -18,43 +18,65 @@ Para evitar estilos desconexos e imagens que não encaixam no jogo, **todo promp
 
 ---
 
-## 2. Prompts Prontos para Personagens (Heróis)
+## 2. Prompts Prontos para as 7 Classes (Heróis)
 
-### Guerreiro / Paladino (STR)
+### 2.1 Guerreiro / Paladino (`GUERREIRO` — STR + CHA) ✅ *(Gerado e salvo em `Assets/Textures/Sprites/iso_hero_guerreiro.jpg`)*
+![Sprite Isométrica Guerreiro](./Art/Isometric/iso_hero_guerreiro.jpg)
 > **Prompt:**  
-> `Top-down 3/4 isometric perspective of a heroic fantasy knight character, stylized mobile RPG art style, wearing silver plate armor with gold trim and a crimson cape, holding a glowing steel broadsword and kite shield, cute yet valiant proportions, clean silhouette, isolated on a solid dark background, cel-shaded, vibrant saturated colors, game-ready sprite asset, high resolution, Unreal Engine 5 stylized render, --ar 1:1 --no background, floor, shadow`
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a heroic fantasy knight warrior character, full body standing stance, stylized low-poly 3D render, mobile RPG game asset, wearing silver plate armor with gold trim and a crimson cape, holding a glowing steel broadsword and kite shield, cute yet valiant proportions, clean silhouette, isolated on a solid pure black background, no shadows, no ground, no floor, cel-shaded fantasy aesthetic, vibrant saturated colors, game-ready sprite asset, --ar 1:1`
 
-### Mago / Bruxo (INT / CHA)
+### 2.2 Clérigo (`CLERIGO` — WIS)
 > **Prompt:**  
-> `Top-down 3/4 isometric view of a fantasy wizard character, stylized mobile game art, wearing deep sapphire blue hooded robes with glowing gold runes, holding an ancient wooden magical staff with a floating cyan crystal, arcane particle aura, isolated on pure black background, clean edges, crisp details, mobile RPG character sprite, --ar 1:1`
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a holy cleric priestess character, full body standing stance, stylized low-poly 3D render, mobile RPG game asset, white and gold vestments with subtle green nature runes, holding a glowing divine scepter, gentle golden halo light above head, cute yet valiant proportions, clean silhouette, isolated on a solid pure black background, no shadows, no ground, no floor, cel-shaded fantasy aesthetic, vibrant saturated colors, game-ready sprite asset, --ar 1:1`
 
-### Arqueiro / Caçador (DEX)
+### 2.3 Bárbaro (`BARBARO` — STR)
 > **Prompt:**  
-> `Top-down 3/4 isometric view of an agile elf ranger archer character, stylized mobile RPG, wearing leather scout armor and green hood, holding an ornate wooden recurve bow with quiver on back, nimble stance, isolated on plain black background, clean sprite asset, vibrant cartoon shading, --ar 1:1`
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a fierce fantasy barbarian berserker character, full body combat stance, stylized low-poly 3D render, mobile RPG game asset, muscular build with fur pelts and glowing blue war paint, wielding a massive fiery two-handed greataxe, cute yet fierce proportions, clean silhouette, isolated on a solid pure black background, no shadows, no ground, no floor, cel-shaded fantasy aesthetic, vibrant saturated colors, game-ready sprite asset, --ar 1:1`
 
-### Clérigo (WIS)
+### 2.4 Monge (`MONGE` — DEX)
 > **Prompt:**  
-> `Top-down 3/4 isometric view of a holy cleric priestess, stylized mobile RPG, white and gold vestments, holding a glowing divine scepter, gentle halo light above head, isolated on solid dark background, mobile game character sprite asset, --ar 1:1`
+> `Top-down 3/4 isometric perspective, 45-degree angled view of an agile fantasy martial arts monk character, full body martial stance, stylized low-poly 3D render, mobile RPG game asset, wearing saffron orange and dark leather robes with prayer beads, fists glowing with cyan and gold Chi energy, cute yet dynamic proportions, clean silhouette, isolated on a solid pure black background, no shadows, no ground, no floor, cel-shaded fantasy aesthetic, vibrant saturated colors, game-ready sprite asset, --ar 1:1`
+
+### 2.5 Bruxo (`BRUXO` — CHA)
+> **Prompt:**  
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a dark fantasy warlock summoner character, full body casting stance, stylized low-poly 3D render, mobile RPG game asset, wearing dark obsidian and violet robes with glowing purple runes, holding an eldritch grimoire in one hand and violet shadow-flame in the other, clean silhouette, isolated on a solid pure black background, no shadows, no ground, no floor, cel-shaded fantasy aesthetic, vibrant saturated colors, game-ready sprite asset, --ar 1:1`
+
+### 2.6 Mago (`MAGO` — INT)
+> **Prompt:**  
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a fantasy wizard mage character, full body casting stance, stylized low-poly 3D render, mobile RPG game asset, wearing deep sapphire blue and crimson robes with gold runes, holding an ancient magical staff with a floating cyan crystal and fire orb, clean silhouette, isolated on a solid pure black background, no shadows, no ground, no floor, cel-shaded fantasy aesthetic, vibrant saturated colors, game-ready sprite asset, --ar 1:1`
+
+### 2.7 Arqueiro (`ARQUEIRO` — DEX)
+> **Prompt:**  
+> `Top-down 3/4 isometric perspective, 45-degree angled view of an agile elf ranger archer character, full body aiming stance, stylized low-poly 3D render, mobile RPG game asset, wearing leather scout armor and emerald green hood, holding an ornate wooden recurve bow with a glowing green energy arrow and quiver on back, clean silhouette, isolated on a solid pure black background, no shadows, no ground, no floor, cel-shaded fantasy aesthetic, vibrant saturated colors, game-ready sprite asset, --ar 1:1`
 
 ---
 
-## 3. Prompts Prontos para Monstros & Inimigos
+## 3. Prompts Prontos para Monstros & Bosses (`World.ts`)
 
-### Goblin Guerreiro
+### 3.1 Goblin Lanceiro (`mob_1`)
 > **Prompt:**  
-> `Top-down 3/4 angled view of a small fierce fantasy goblin monster, stylized mobile RPG game sprite, green skin, large pointy ears, toothy grin, holding a jagged bone spear and wooden buckler, wearing crude leather rags, isolated on pure black background, clean edges for cutout, --ar 1:1`
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a small fierce fantasy goblin lancer monster, stylized low-poly 3D render, mobile RPG game sprite, green skin, large pointy ears, toothy grin, holding a jagged rune-etched spear and wooden buckler, wearing crude scavenged iron armor, isolated on pure black background, no shadows, no ground, clean edges for cutout, --ar 1:1`
 
-### Slime Mágico da Floresta
+### 3.2 Goblin Arqueiro (`mob_2`)
 > **Prompt:**  
-> `Top-down 3/4 angled view of a translucent green gelatinous slime monster, glowing inner core, cute dangerous expression with big cartoon eyes, slight splash droplets, stylized mobile game asset, clean silhouette isolated on plain black background, high gloss jelly shader, --ar 1:1`
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a sneaky fantasy goblin archer monster, stylized low-poly 3D render, mobile RPG game sprite, green skin, ragged hood, aiming a crude shortbow with a glowing green poison arrow, isolated on pure black background, no shadows, no ground, clean edges for cutout, --ar 1:1`
 
-### Lobo Selvagem Alfa
+### 3.3 Slime da Floresta (`mob_3`)
 > **Prompt:**  
-> `Top-down 3/4 isometric view of a ferocious fantasy dire wolf creature, stylized mobile RPG, dark slate fur with glowing cyan markings, bared fangs, aggressive combat stance, isolated on solid black background, crisp character sprite asset, --ar 1:1`
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a translucent emerald green gelatinous slime monster, glowing MagicForge crystal shard floating inside its core, cute dangerous expression, slight splash droplets, stylized mobile game asset, clean silhouette isolated on plain black background, no shadows, no ground, high gloss jelly shader, --ar 1:1`
 
-### Chefe Golem de Pedra / Chefe da Floresta
+### 3.4 Lobo Selvagem Corrompido (`mob_4`)
 > **Prompt:**  
-> `Top-down 3/4 isometric view of a massive ancient stone golem boss monster, glowing emerald moss and runic carvings across giant boulder shoulders, menacing glowing eyes, heavy stone fists, stylized mobile fantasy boss sprite, isolated on pure black background, --ar 1:1`
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a ferocious fantasy dire wolf creature, stylized low-poly 3D render, mobile RPG sprite, dark obsidian fur with glowing violet corruption markings, bared fangs, aggressive combat stance, isolated on solid black background, no shadows, no ground, crisp character sprite asset, --ar 1:1`
+
+### 3.5 Chefe Goblin — Rei da Escória (`mob_5` — Boss Ato I)
+> **Prompt:**  
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a hulking hobgoblin warlord boss monster, wearing spiked iron armor and a glowing molten slag crown, wielding a brutal rune cleaver and heavy shield, stylized mobile fantasy boss sprite, isolated on pure black background, no shadows, no ground, clean silhouette, --ar 1:1`
+
+### 3.6 Malakor, o Arquifalsário Cinzento (Vilão Principal / World Boss)
+> **Prompt:**  
+> `Top-down 3/4 isometric perspective, 45-degree angled view of a towering undead Lich Warlord boss in obsidian and molten-gold plate armor, glowing crimson skull face, wielding a colossal corrupted warhammer dripping with magma, stylized mobile RPG raid boss sprite, isolated on pure black background, no shadows, no ground, clean silhouette, --ar 1:1`
+
 
 ---
 
