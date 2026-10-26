@@ -17,6 +17,13 @@ namespace MagicForge.Core
         public Sprite isometricWorldSprite;
         public ElementType defaultElement;
 
+        [Header("Sprite Sheets de Animação Isométrica (Multiple Slices)")]
+        public Sprite[] idleFrames;
+        public Sprite[] walkFrames;
+        public Sprite[] attackFrames;
+        public Sprite[] hitFrames;
+        public Sprite[] deathFrames;
+
         [Header("Regras de Combate (D&D & Servidor 20Hz)")]
         [Tooltip("Qual atributo essa classe usa para calcular seu dano base?")]
         public PrimaryStat mainStat;

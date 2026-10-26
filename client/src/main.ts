@@ -1,5 +1,6 @@
 import {
   CharacterClass,
+  CharacterAttributes,
   CLASS_DEFINITIONS,
   PrimaryStatType,
   distance,
@@ -61,8 +62,44 @@ const playerResourceLabel = document.getElementById('player-resource-label') as 
 
 const targetVitalRow = document.getElementById('target-vital-row') as HTMLDivElement;
 const targetNameLabel = document.getElementById('target-name-label') as HTMLDivElement;
+const targetLevelBadge = document.getElementById('target-level-badge') as HTMLSpanElement | null;
 const targetHpBar = document.getElementById('target-hp-bar') as HTMLDivElement;
 const targetHpText = document.getElementById('target-hp-text') as HTMLSpanElement;
+
+// Level & EXP HUD Elements & State
+const playerLevelBadge = document.getElementById('player-level-badge') as HTMLSpanElement | null;
+const hudPlayerName = document.getElementById('hud-player-name') as HTMLSpanElement | null;
+const hudCpVal = document.getElementById('hud-cp-val') as HTMLSpanElement | null;
+const playerExpBar = document.getElementById('player-exp-bar') as HTMLDivElement | null;
+const playerExpText = document.getElementById('player-exp-text') as HTMLSpanElement | null;
+
+let playerLevel: number = 1;
+let playerCurrentXp: number = 0;
+let playerXpToNextLevel: number = 150;
+
+function updateExpBarUI(level: number, currentXp: number, xpToNextLevel: number): void {
+  const pct = xpToNextLevel > 0 ? ((currentXp / xpToNextLevel) * 100).toFixed(1) : '100.0';
+  if (playerExpBar) playerExpBar.style.width = `${Math.min(100, Math.max(0, Number(pct)))}%`;
+  if (playerExpText) playerExpText.textContent = `XP [Nv. ${level}] ${currentXp} / ${xpToNextLevel} (${pct}%)`;
+}
+
+let bannerTimeout: number | null = null;
+function showLevelUpBanner(level: number, attrs: CharacterAttributes): void {
+  const banner = document.getElementById('levelup-banner');
+  const subtitle = document.getElementById('levelup-subtitle');
+  const stats = document.getElementById('levelup-stats');
+  if (!banner || !subtitle || !stats) return;
+
+  subtitle.textContent = `Você alcançou o Nível ${level}!`;
+  stats.textContent = `FOR ${attrs.forca} • DES ${attrs.destreza} • CON ${attrs.constituicao} • INT ${attrs.inteligencia} • SAB ${attrs.sabedoria} • CAR ${attrs.carisma}`;
+
+  banner.classList.add('active');
+
+  if (bannerTimeout) clearTimeout(bannerTimeout);
+  bannerTimeout = window.setTimeout(() => {
+    banner.classList.remove('active');
+  }, 4500);
+}
 
 // Skill Slots UI References
 interface SkillSlotUI {
@@ -224,7 +261,7 @@ function updateClassPreview() {
   }
   if (classPreviewStats) {
     const s = def.baseStats;
-    const hp = s.constituicao * 10 + 50;
+    const hp = s.constituicao * 35 + 450;
     let mod = s.forca;
     if (def.mainStat === PrimaryStatType.DESTREZA) mod = s.destreza;
     else if (def.mainStat === PrimaryStatType.INTELIGENCIA) mod = s.inteligencia;
@@ -503,6 +540,14 @@ network.onSnapshot = (snapshot) => {
 };
 
 network.onCombatEvent = (event) => {
+  // Trigger attack and hit/death animations on sprite sheets
+  renderer.triggerEntityAnimation(event.attackerId, 'attack');
+  if (event.isTargetDead) {
+    renderer.triggerEntityAnimation(event.targetId, 'death');
+  } else if (!event.isDodged && event.damage > 0) {
+    renderer.triggerEntityAnimation(event.targetId, 'hit');
+  }
+
   // Find target position from current snapshot
   const entities = snapshotBuffer.getInterpolatedEntities();
   const target = entities.find((e) => e.id === event.targetId);
@@ -512,6 +557,11 @@ network.onCombatEvent = (event) => {
 };
 
 network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
+  renderer.triggerEntityAnimation(event.casterId, 'attack');
+  if (event.targetId && !event.isHeal) {
+    renderer.triggerEntityAnimation(event.targetId, 'hit');
+  }
+
   // If local player casted, start cooldown
   if (event.casterId === network.myPlayerId) {
     const slotUI = skillSlots[event.slot];
@@ -555,10 +605,59 @@ network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
   if (playerGoldText) playerGoldText.textContent = `${playerGold} Ouro`;
   if (inventoryGoldLabel) inventoryGoldLabel.textContent = `${playerGold} Ouro`;
   if (modalCpText) modalCpText.textContent = `${playerCombatPower}`;
+  if (hudCpVal) hudCpVal.textContent = `${playerCombatPower}`;
 
   renderInventorySlots();
   if (selectedSlotIndex !== null) {
     selectInventorySlot(selectedSlotIndex);
+  }
+};
+
+network.onLoginSuccess = (payload) => {
+  playerLevel = payload.level ?? 1;
+  playerCurrentXp = payload.currentXp ?? 0;
+  playerXpToNextLevel = payload.xpToNextLevel ?? 150;
+  playerGold = payload.gold ?? 0;
+
+  updateExpBarUI(playerLevel, playerCurrentXp, playerXpToNextLevel);
+  if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
+  if (hudPlayerName) hudPlayerName.textContent = payload.characterName || 'Jogador';
+  if (playerGoldText) playerGoldText.textContent = `${playerGold} Ouro`;
+  if (inventoryGoldLabel) inventoryGoldLabel.textContent = `${playerGold} Ouro`;
+};
+
+network.onPlayerExpUpdate = (payload) => {
+  playerLevel = payload.level;
+  playerCurrentXp = payload.currentXp;
+  playerXpToNextLevel = payload.xpToNextLevel;
+
+  updateExpBarUI(playerLevel, playerCurrentXp, playerXpToNextLevel);
+  if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
+
+  // Spawn floating purple +XX XP text above player
+  const entities = snapshotBuffer.getInterpolatedEntities();
+  const myPlayer = entities.find((e) => e.id === network.myPlayerId);
+  if (myPlayer) {
+    renderer.addExperienceText(myPlayer.position, payload.expGained);
+  }
+};
+
+network.onPlayerLevelUp = (payload) => {
+  playerLevel = payload.newLevel;
+  if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
+  if (hudCpVal) hudCpVal.textContent = `${payload.totalCombatPower}`;
+  if (modalCpText) modalCpText.textContent = `${payload.totalCombatPower}`;
+
+  // Spawn floating Level Up effect above player
+  const entities = snapshotBuffer.getInterpolatedEntities();
+  const targetPlayer = entities.find((e) => e.id === payload.playerId);
+  if (targetPlayer) {
+    renderer.addLevelUpEffect(targetPlayer.position, payload.newLevel);
+  }
+
+  // Trigger celebration banner popup if local player leveled up
+  if (payload.playerId === network.myPlayerId) {
+    showLevelUpBanner(payload.newLevel, payload.newAttributes);
   }
 };
 
@@ -829,6 +928,9 @@ function gameLoop() {
       playerResourceLabel.textContent = myPlayer.resourceType === 'Energia' ? 'EN' : 'MP';
       playerResourceBar.className = `vital-bar-fill ${myPlayer.resourceType === 'Energia' ? 'energy-fill' : 'mp-fill'}`;
     }
+    if (myPlayer.level && playerLevelBadge) {
+      playerLevelBadge.textContent = `Nv. ${myPlayer.level}`;
+    }
   }
 
   // 3. Update Target Vitals HUD
@@ -837,6 +939,9 @@ function gameLoop() {
     if (target && target.currentHp > 0) {
       targetVitalRow.style.display = 'flex';
       targetNameLabel.textContent = target.name;
+      if (targetLevelBadge) {
+        targetLevelBadge.textContent = `Nv. ${target.level ?? 1}`;
+      }
       const targetHpPct = Math.max(0, Math.min(100, (target.currentHp / target.maxHp) * 100));
       targetHpBar.style.width = `${targetHpPct}%`;
       targetHpText.textContent = `${target.currentHp} / ${target.maxHp}`;

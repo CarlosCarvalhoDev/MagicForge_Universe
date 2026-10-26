@@ -17,6 +17,33 @@ MonoBehaviour:
   classIcon: {fileID: 21300000, guid: a10000023a6524c489205bd51885cc02, type: 3}
   isometricWorldSprite: {fileID: 21300000, guid: b20000013a6524c489205bd51885cc01, type: 3}
   defaultElement: 5
+  idleFrames:
+  - {fileID: 21300000, guid: 71f5026090514840aa3f24dc762f73d7, type: 3}
+  - {fileID: 21300002, guid: 71f5026090514840aa3f24dc762f73d7, type: 3}
+  - {fileID: 21300004, guid: 71f5026090514840aa3f24dc762f73d7, type: 3}
+  - {fileID: 21300006, guid: 71f5026090514840aa3f24dc762f73d7, type: 3}
+  walkFrames:
+  - {fileID: 21300000, guid: 10269989391b4c6e84f78ff18cffc819, type: 3}
+  - {fileID: 21300002, guid: 10269989391b4c6e84f78ff18cffc819, type: 3}
+  - {fileID: 21300004, guid: 10269989391b4c6e84f78ff18cffc819, type: 3}
+  - {fileID: 21300006, guid: 10269989391b4c6e84f78ff18cffc819, type: 3}
+  - {fileID: 21300008, guid: 10269989391b4c6e84f78ff18cffc819, type: 3}
+  - {fileID: 21300010, guid: 10269989391b4c6e84f78ff18cffc819, type: 3}
+  attackFrames:
+  - {fileID: 21300000, guid: 85515890b2ec4c5da026712ca2185f8b, type: 3}
+  - {fileID: 21300002, guid: 85515890b2ec4c5da026712ca2185f8b, type: 3}
+  - {fileID: 21300004, guid: 85515890b2ec4c5da026712ca2185f8b, type: 3}
+  - {fileID: 21300006, guid: 85515890b2ec4c5da026712ca2185f8b, type: 3}
+  - {fileID: 21300008, guid: 85515890b2ec4c5da026712ca2185f8b, type: 3}
+  - {fileID: 21300010, guid: 85515890b2ec4c5da026712ca2185f8b, type: 3}
+  hitFrames:
+  - {fileID: 21300000, guid: 9ed5c8cf1e364bf79deee3c07b6ff383, type: 3}
+  - {fileID: 21300002, guid: 9ed5c8cf1e364bf79deee3c07b6ff383, type: 3}
+  deathFrames:
+  - {fileID: 21300000, guid: d7e57fa647a141b2a671d15cdbb14a7f, type: 3}
+  - {fileID: 21300002, guid: d7e57fa647a141b2a671d15cdbb14a7f, type: 3}
+  - {fileID: 21300004, guid: d7e57fa647a141b2a671d15cdbb14a7f, type: 3}
+  - {fileID: 21300006, guid: d7e57fa647a141b2a671d15cdbb14a7f, type: 3}
   mainStat: 5
   isRanged: 0
   attackRange: 2.5

@@ -867,6 +867,103 @@
         background: linear-gradient(135deg, #f59e0b, #d97706);
         box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
       }
+
+      /* Bottom Global Experience (EXP) Bar */
+      #exp-bar-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 16px;
+        background: rgba(10, 15, 29, 0.92);
+        border-top: 1px solid rgba(168, 85, 247, 0.35);
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: auto;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      .exp-bar-track {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.85);
+        overflow: hidden;
+      }
+
+      .exp-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #7c3aed, #a855f7 40%, #eab308 85%, #f59e0b 100%);
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .exp-bar-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #f8fafc;
+        letter-spacing: 0.05em;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+        pointer-events: none;
+      }
+
+      /* Level Up Celebration Toast / Popup */
+      .levelup-banner {
+        position: absolute;
+        top: 25%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        padding: 22px 44px;
+        background: radial-gradient(circle, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+        border: 2px solid #fbbf24;
+        border-radius: 18px;
+        box-shadow: 0 0 35px rgba(251, 191, 36, 0.6), inset 0 0 20px rgba(251, 191, 36, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease-out, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .levelup-banner.active {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      .levelup-title {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: #fbbf24;
+        letter-spacing: 0.1em;
+        text-shadow: 0 0 16px rgba(251, 191, 36, 0.8), 0 2px 4px rgba(0, 0, 0, 0.9);
+      }
+
+      .levelup-subtitle {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #f8fafc;
+        margin-top: 4px;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+      }
+
+      .levelup-stats {
+        font-size: 0.82rem;
+        color: #34d399;
+        font-weight: 600;
+        margin-top: 8px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+      }
     </style>
   </head>
   <body>
@@ -932,7 +1029,7 @@
           <img id="class-portrait-img" src="/assets/portraits/GUERREIRO.jpg" alt="Retrato da Classe" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1.5px solid #fbbf24;" />
           <div style="display: flex; flex-direction: column; gap: 2px;">
             <span id="class-preview-title" style="font-size: 0.8rem; font-weight: 700; color: #fbbf24;">Guerreiro (Forjado)</span>
-            <span id="class-preview-stats" style="font-size: 0.7rem; color: #cbd5e1;">HP: 190 • Dano: 89 • CP: 1150</span>
+            <span id="class-preview-stats" style="font-size: 0.7rem; color: #cbd5e1;">HP: 940 • Dano: 89 • CP: 1150</span>
           </div>
         </div>
 
@@ -984,6 +1081,14 @@
     <div id="bottom-action-container">
       <!-- Player & Target Vitals HUD -->
       <div id="vitals-hud" class="glass-panel">
+        <!-- Player Level Badge & Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span id="player-level-badge" style="background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);">Nv. 1</span>
+            <span id="hud-player-name" style="font-size: 0.78rem; font-weight: 700; color: #f8fafc;">Jogador</span>
+          </div>
+          <span id="hud-player-cp" style="font-size: 0.72rem; font-weight: 700; color: #fbbf24;">⚔️ CP: <span id="hud-cp-val">1150</span></span>
+        </div>
         <div class="vital-row">
           <div class="vital-label" style="color: #34d399;">HP</div>
           <div class="vital-bar-track">
@@ -1000,7 +1105,10 @@
         </div>
         <!-- Active Target Sub-Bar (displayed when a monster is targeted) -->
         <div id="target-vital-row" class="vital-row" style="display: none; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px; margin-top: 2px;">
-          <div id="target-name-label" class="vital-label" style="color: #f87171; width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Alvo</div>
+          <div style="display: flex; align-items: center; gap: 4px; width: 85px;">
+            <span id="target-level-badge" style="background: rgba(239, 68, 68, 0.4); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.62rem; font-weight: 800; padding: 1px 3px; border-radius: 3px;">Nv. 1</span>
+            <span id="target-name-label" style="color: #f87171; font-size: 0.72rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Alvo</span>
+          </div>
           <div class="vital-bar-track">
             <div id="target-hp-bar" class="vital-bar-fill target-hp-fill" style="width: 100%"></div>
             <span id="target-hp-text" class="vital-bar-text">-- / --</span>
@@ -1058,6 +1166,21 @@
           </div>
         </button>
       </div>
+    </div>
+
+    <!-- Bottom Global Experience (EXP) Bar -->
+    <div id="exp-bar-container">
+      <div class="exp-bar-track">
+        <div id="player-exp-bar" class="exp-bar-fill" style="width: 0%;"></div>
+        <span id="player-exp-text" class="exp-bar-text">XP [Nv. 1] 0 / 150 (0.0%)</span>
+      </div>
+    </div>
+
+    <!-- Level Up Celebration Banner Popup -->
+    <div id="levelup-banner" class="levelup-banner">
+      <div class="levelup-title">✦ NÍVEL SUPERADO! ✦</div>
+      <div class="levelup-subtitle" id="levelup-subtitle">Você alcançou o Nível 2!</div>
+      <div class="levelup-stats" id="levelup-stats">+Atributos D&D • HP & Recurso Totalmente Restaurados!</div>
     </div>
 
     <!-- Skill Book Modal (Grimório de Habilidades & Magias D&D 5e) -->

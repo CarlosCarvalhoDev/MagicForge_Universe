@@ -86,6 +86,10 @@ export class PacketHandler {
       classType: player.classType,
       position: player.position,
       stats: player.attributes,
+      level: player.level,
+      currentXp: player.currentXp,
+      xpToNextLevel: player.xpToNextLevel,
+      gold: player.gold,
       serverTickRate: SERVER_CONFIG.TICK_RATE,
       tickIntervalMs: SERVER_CONFIG.TICK_INTERVAL_MS,
     };

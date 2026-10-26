@@ -136,4 +136,26 @@ export interface EntitySnapshotState {
   isMoving: boolean;
   targetId?: string | null;
   classType?: CharacterClass;
+  level?: number;
 }
+
+/**
+ * MMORPG Leveling Curve formula
+ */
+export function getXpForNextLevel(level: number): number {
+  if (level <= 1) return 150;
+  return Math.round(150 * Math.pow(level, 1.55));
+}
+
+/**
+ * D&D 5e-inspired Stat Growth per Level for each Class
+ */
+export const CLASS_STAT_GROWTH: Record<CharacterClass, Partial<CharacterAttributes>> = {
+  [CharacterClass.GUERREIRO]: { forca: 2, constituicao: 2, destreza: 1 },
+  [CharacterClass.BARBARO]: { forca: 3, constituicao: 2 },
+  [CharacterClass.CLERIGO]: { sabedoria: 2, constituicao: 2, forca: 1 },
+  [CharacterClass.MONGE]: { destreza: 2, sabedoria: 2, constituicao: 1 },
+  [CharacterClass.ARQUEIRO]: { destreza: 3, constituicao: 1, sabedoria: 1 },
+  [CharacterClass.MAGO]: { inteligencia: 3, constituicao: 1, sabedoria: 1 },
+  [CharacterClass.BRUXO]: { carisma: 3, constituicao: 2 },
+};

@@ -186,6 +186,14 @@ namespace MagicForge.Network
                     case Opcode.S2C_COMBAT_EVENT:
                         Debug.Log("<color=yellow>[COMBATE]</color> Evento de combate recebido do servidor autoritativo.");
                         break;
+
+                    case Opcode.S2C_PLAYER_EXP_UPDATE:
+                        Debug.Log("<color=magenta>[PROGRESSÃO]</color> Experiência recebida do servidor!");
+                        break;
+
+                    case Opcode.S2C_PLAYER_LEVEL_UP:
+                        Debug.Log("<color=yellow>[PROGRESSÃO]</color> LEVEL UP! Novo nível alcançado no Servidor Autoritativo!");
+                        break;
                 }
             }
             catch (Exception ex)

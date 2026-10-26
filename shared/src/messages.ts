@@ -28,6 +28,10 @@ export interface S2CLoginSuccessPayload {
   classType: CharacterClass;
   position: Vector3;
   stats: CharacterAttributes;
+  level: number;
+  currentXp: number;
+  xpToNextLevel: number;
+  gold: number;
   serverTickRate: number; // e.g. 20
   tickIntervalMs: number; // e.g. 50
 }
@@ -158,6 +162,27 @@ export interface S2CInventoryUpdatePayload {
 
 export interface C2SUseItemPayload {
   slotIndex: number;
+}
+
+// ==========================================
+// Progression & Leveling Payloads
+// ==========================================
+export interface S2CPlayerExpUpdatePayload {
+  playerId: string;
+  currentXp: number;
+  xpToNextLevel: number;
+  level: number;
+  expGained: number;
+  sourceText?: string;
+}
+
+export interface S2CPlayerLevelUpPayload {
+  playerId: string;
+  newLevel: number;
+  newAttributes: CharacterAttributes;
+  newMaxHp: number;
+  newMaxResource: number;
+  totalCombatPower: number;
 }
 
 // ==========================================

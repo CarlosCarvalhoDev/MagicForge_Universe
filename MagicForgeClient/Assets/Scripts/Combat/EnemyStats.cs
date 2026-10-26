@@ -1,4 +1,5 @@
 using UnityEngine;
+using MagicForge.Core;
 
 namespace MagicForge.Combat
 {
@@ -9,6 +10,20 @@ namespace MagicForge.Combat
     {
         public string enemyName = "Slime de Grama";
         public int health = 100;
+        public Sprite enemyWorldSprite;
+
+        private void Start()
+        {
+            if (enemyWorldSprite != null)
+            {
+                IsometricEntityVisual visual = GetComponent<IsometricEntityVisual>();
+                if (visual == null)
+                {
+                    visual = gameObject.AddComponent<IsometricEntityVisual>();
+                }
+                visual.InitializeMonster(enemyWorldSprite, 1.45f);
+            }
+        }
 
         public void TakeDamage(int damage)
         {

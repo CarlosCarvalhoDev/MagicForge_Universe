@@ -47,7 +47,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     classType: CharacterClass.GUERREIRO,
     cost: 25,
     resourceType: 'Energia',
-    cooldownSec: 12.0,
+    cooldownSec: 5.0,
     range: 0,
     isAoe: false,
     isHeal: true,
@@ -533,6 +533,11 @@ export function calculateSkillPower(skill: SkillDefinition, stats: CharacterAttr
     case CharacterClass.BRUXO:
       modifier = stats.carisma;
       break;
+  }
+
+  if (skill.isHeal) {
+    // Generous heal formula for testing & high survivability
+    return Math.round(150 + modifier * 6 + level * 20);
   }
 
   // Escalonamento por Tier (1: 1.5x, 2: 1.8x, 3: 2.2x, 4: 3.5x)

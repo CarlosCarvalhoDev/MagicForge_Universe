@@ -33,6 +33,10 @@ namespace MagicForge.Network
         S2C_INVENTORY_UPDATE = 0x43,
         C2S_USE_ITEM = 0x44,
 
+        // Level, Progression & EXP (0x50 - 0x5F)
+        S2C_PLAYER_EXP_UPDATE = 0x50,
+        S2C_PLAYER_LEVEL_UP = 0x51,
+
         // Heartbeat (0xF0 - 0xFF)
         C2S_PING = 0xF0,
         S2C_PONG = 0xF1,
@@ -74,6 +78,7 @@ namespace MagicForge.Network
         public bool isMoving;
         public string targetId;
         public string classType;
+        public int level;
     }
 
     [Serializable]
@@ -109,6 +114,10 @@ namespace MagicForge.Network
         public Vector3DTO position;
         public int serverTickRate;
         public int tickIntervalMs;
+        public int level;
+        public int currentXp;
+        public int xpToNextLevel;
+        public int gold;
     }
 
     [Serializable]
@@ -197,5 +206,38 @@ namespace MagicForge.Network
     public class UseItemRequestDTO
     {
         public int slotIndex;
+    }
+
+    [Serializable]
+    public class PlayerExpUpdateDTO
+    {
+        public string playerId;
+        public int currentXp;
+        public int xpToNextLevel;
+        public int level;
+        public int expGained;
+        public string source;
+    }
+
+    [Serializable]
+    public class CharacterAttributesDTO
+    {
+        public int forca;
+        public int destreza;
+        public int constituicao;
+        public int inteligencia;
+        public int sabedoria;
+        public int carisma;
+    }
+
+    [Serializable]
+    public class PlayerLevelUpDTO
+    {
+        public string playerId;
+        public int newLevel;
+        public CharacterAttributesDTO newAttributes;
+        public int newMaxHp;
+        public int newMaxResource;
+        public int totalCombatPower;
     }
 }

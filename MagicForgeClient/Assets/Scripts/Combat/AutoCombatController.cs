@@ -68,6 +68,12 @@ namespace MagicForge.Combat
         {
             if (alvoAtual != null && myStats != null)
             {
+                IsometricEntityVisual visual = GetComponent<IsometricEntityVisual>();
+                if (visual != null)
+                {
+                    visual.PlayAttack(alvoAtual.transform.position);
+                }
+
                 int dano = myStats.DanoBase; // Agora puxa a matemática inteligente!
                 alvoAtual.TakeDamage(dano);
             }

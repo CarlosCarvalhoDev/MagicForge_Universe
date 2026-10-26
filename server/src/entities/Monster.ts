@@ -36,6 +36,7 @@ export class Monster extends Entity {
   public respawnTimer: number = 0;
   public readonly respawnDelaySec: number = 6.0;
   public lootTable: LootDropEntry[] = [];
+  public expReward: number = 35;
 
   constructor(id: string, name: string, spawnPos: Vector3, maxHp = 100, damage = 15) {
     super(id, EntityType.MONSTER, name, spawnPos, maxHp);
@@ -46,18 +47,21 @@ export class Monster extends Entity {
 
   private configureDefaultLoot(): void {
     if (this.name.includes('Slime')) {
+      this.expReward = 25;
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 5, maxQty: 12 },
         { itemId: 'essence_slime', dropChance: 0.8, minQty: 1, maxQty: 2 },
         { itemId: 'potion_hp_minor', dropChance: 0.35, minQty: 1, maxQty: 1 },
       ];
     } else if (this.name.includes('Lobo')) {
+      this.expReward = 50;
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 8, maxQty: 18 },
         { itemId: 'wolf_fang', dropChance: 0.75, minQty: 1, maxQty: 2 },
         { itemId: 'armor_chainmail', dropChance: 0.15, minQty: 1, maxQty: 1 },
       ];
     } else if (this.name.includes('Arqueiro')) {
+      this.expReward = 40;
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 10, maxQty: 20 },
         { itemId: 'essence_goblin', dropChance: 0.7, minQty: 1, maxQty: 2 },
@@ -65,6 +69,7 @@ export class Monster extends Entity {
         { itemId: 'bow_hunting', dropChance: 0.12, minQty: 1, maxQty: 1 },
       ];
     } else if (this.name.includes('Chefe')) {
+      this.expReward = 250;
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 60, maxQty: 120 },
         { itemId: 'potion_hp_major', dropChance: 1.0, minQty: 1, maxQty: 2 },
@@ -74,6 +79,7 @@ export class Monster extends Entity {
       ];
     } else {
       // Goblin Lanceiro / padrão
+      this.expReward = 35;
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 6, maxQty: 15 },
         { itemId: 'essence_goblin', dropChance: 0.65, minQty: 1, maxQty: 2 },

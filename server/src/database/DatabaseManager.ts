@@ -182,7 +182,8 @@ export class DatabaseManager {
 
       player.dbCharacterId = existing.id;
       player.gold = existing.gold || 0;
-      player.level = existing.level;
+      player.level = existing.level || 1;
+      player.currentXp = existing.experience || 0;
       player.currentHp = Math.min(existing.max_hp, existing.current_hp);
       player.attributes = {
         forca: existing.forca,
@@ -195,6 +196,9 @@ export class DatabaseManager {
 
       player.inventory = this.getInventory(player.dbCharacterId);
       player.recalculateStatsFromEquipment();
+      // Garante que o jogador conecte com 100% de HP e vivo para testes fluídos
+      player.currentHp = player.maxHp;
+      player.isDead = false;
       return player;
     }
 
@@ -271,6 +275,7 @@ export class DatabaseManager {
       this.db.prepare(`
         UPDATE characters SET
           level = ?,
+          experience = ?,
           gold = ?,
           current_hp = ?,
           max_hp = ?,
@@ -288,6 +293,7 @@ export class DatabaseManager {
         WHERE name = ?
       `).run(
         player.level,
+        player.currentXp,
         player.gold,
         player.currentHp,
         player.maxHp,

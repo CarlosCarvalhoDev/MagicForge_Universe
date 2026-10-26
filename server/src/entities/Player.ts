@@ -2,9 +2,11 @@ import {
   CharacterAttributes,
   CharacterClass,
   CLASS_DEFINITIONS,
+  CLASS_STAT_GROWTH,
   distance,
   distanceSquared,
   EntityType,
+  getXpForNextLevel,
   PrimaryStatType,
   Vector3,
   cloneVector3,
@@ -21,9 +23,14 @@ export class Player extends Entity {
   public baseAttributes: CharacterAttributes;
   public attributes: CharacterAttributes;
   public level: number = 1;
+  public currentXp: number = 0;
   public speed: number;
   public attackRange: number;
   public attackIntervalSec: number;
+
+  public get xpToNextLevel(): number {
+    return getXpForNextLevel(this.level);
+  }
 
   // Inventory & Database
   public dbCharacterId: string = '';
@@ -41,11 +48,13 @@ export class Player extends Entity {
   public moveDirection: Vector3 | null = null;
   public attackTimer: number = 0;
   public lastProcessedInputSeq: number = 0;
+  public deathTimer: number = 0;
+  public readonly respawnDelaySec: number = 3.0; // Auto-revive em 3 segundos para fluidez nos testes
 
   constructor(id: string, name: string, classType: CharacterClass, initialPosition: Vector3) {
     const classDef = CLASS_DEFINITIONS[classType] || CLASS_DEFINITIONS[CharacterClass.GUERREIRO];
-    // HP = constituicao * 10 + (level * 50) as defined in BaseStats.cs
-    const maxHp = classDef.baseStats.constituicao * 10 + 50;
+    // HP robusto para testes e fluidez (CON * 35 + 450)
+    const maxHp = classDef.baseStats.constituicao * 35 + 450;
 
     super(id, EntityType.PLAYER, name, initialPosition, maxHp);
 
@@ -81,13 +90,23 @@ export class Player extends Entity {
     }
 
     this.attributes = nextAttrs;
-    this.maxHp = this.attributes.constituicao * 10 + 50;
+    this.maxHp = this.attributes.constituicao * 35 + 450 + (this.level - 1) * 60;
     this.currentHp = Math.min(this.currentHp, this.maxHp);
 
     const isCaster = this.classType === CharacterClass.MAGO || this.classType === CharacterClass.CLERIGO || this.classType === CharacterClass.BRUXO;
     if (isCaster) {
       this.maxResource = 100 + (this.attributes.inteligencia || this.attributes.sabedoria || 10) * 8;
     }
+  }
+
+  public respawn(): void {
+    this.isDead = false;
+    this.deathTimer = 0;
+    this.currentHp = this.maxHp;
+    this.currentResource = this.maxResource;
+    this.position = createVector3(0, 0, 0); // Retorna seguro ao Altar Rúnico Central (0, 0)
+    this.stopMoving();
+    console.log(`[Player] "${this.name}" reviveu no Altar Central com HP cheio (${this.currentHp}/${this.maxHp})!`);
   }
 
   public get BaseDamage(): number {
@@ -154,7 +173,19 @@ export class Player extends Entity {
   }
 
   public override update(deltaTimeSec: number): void {
-    if (this.isDead) return;
+    // Se estiver morto, avança timer de auto-revive e renasce no altar
+    if (this.isDead) {
+      this.deathTimer += deltaTimeSec;
+      if (this.deathTimer >= this.respawnDelaySec) {
+        this.respawn();
+      }
+      return;
+    }
+
+    // Regeneração passiva constante de HP (25 HP/segundo para alta sobrevivência em testes)
+    if (this.currentHp < this.maxHp) {
+      this.currentHp = Math.min(this.maxHp, this.currentHp + 25 * deltaTimeSec);
+    }
 
     // Tick basic attack cooldown
     if (this.attackTimer > 0) {
@@ -253,6 +284,39 @@ export class Player extends Entity {
     this.currentResource = Math.min(this.maxResource, this.currentResource + amount);
   }
 
+  public addExperience(amount: number): { leveledUp: boolean; newLevel: number; levelsGained: number } {
+    this.currentXp += amount;
+    let levelsGained = 0;
+
+    while (this.currentXp >= this.xpToNextLevel) {
+      this.currentXp -= this.xpToNextLevel;
+      this.level += 1;
+      levelsGained += 1;
+
+      // Increment base attributes with class stat growth
+      const growth = CLASS_STAT_GROWTH[this.classType] || {};
+      if (growth.forca) this.baseAttributes.forca += growth.forca;
+      if (growth.destreza) this.baseAttributes.destreza += growth.destreza;
+      if (growth.constituicao) this.baseAttributes.constituicao += growth.constituicao;
+      if (growth.inteligencia) this.baseAttributes.inteligencia += growth.inteligencia;
+      if (growth.sabedoria) this.baseAttributes.sabedoria += growth.sabedoria;
+      if (growth.carisma) this.baseAttributes.carisma += growth.carisma;
+
+      // Recalculate max HP & stats and restore to 100%
+      this.recalculateStatsFromEquipment();
+      this.currentHp = this.maxHp;
+      this.currentResource = this.maxResource;
+
+      console.log(`[Player] "${this.name}" subiu para o NÍVEL ${this.level}! CP: ${this.CombatPower}`);
+    }
+
+    return {
+      leveledUp: levelsGained > 0,
+      newLevel: this.level,
+      levelsGained,
+    };
+  }
+
   private clampToBounds(): void {
     const { minX, maxX, minZ, maxZ } = SERVER_CONFIG.MAP_BOUNDS;
     this.position.x = Math.max(minX, Math.min(maxX, this.position.x));
@@ -267,6 +331,7 @@ export class Player extends Entity {
       currentResource: Math.round(this.currentResource),
       maxResource: this.maxResource,
       resourceType: this.resourceType,
+      level: this.level,
     };
   }
 }

@@ -27,6 +27,7 @@ export interface InterpolatedEntity {
   isMoving: boolean;
   targetId?: string | null;
   classType?: string;
+  level?: number;
   rawPosition: Vector3; // Position in latest raw snapshot (for visual comparison)
 }
 
@@ -147,6 +148,7 @@ export class SnapshotBuffer {
           isMoving: newerEnt.isMoving,
           targetId: newerEnt.targetId,
           classType: newerEnt.classType,
+          level: newerEnt.level,
         });
         continue;
       }
@@ -172,6 +174,7 @@ export class SnapshotBuffer {
         isMoving: newerEnt.isMoving,
         targetId: newerEnt.targetId,
         classType: newerEnt.classType,
+        level: newerEnt.level,
       });
     }
 

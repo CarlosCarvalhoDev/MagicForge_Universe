@@ -34,6 +34,10 @@ export enum Opcode {
   S2C_INVENTORY_UPDATE = 0x43,
   C2S_USE_ITEM = 0x44,
 
+  // --- Progression & Leveling (0x50 - 0x5F) ---
+  S2C_PLAYER_EXP_UPDATE = 0x50,
+  S2C_PLAYER_LEVEL_UP = 0x51,
+
   // --- Heartbeat & Quality of Service (0xF0 - 0xFF) ---
   C2S_PING = 0xF0,
   S2C_PONG = 0xF1,

@@ -11,6 +11,8 @@ import {
   S2CInventoryUpdatePayload,
   S2CItemDropDespawnPayload,
   S2CItemDropSpawnPayload,
+  S2CPlayerExpUpdatePayload,
+  S2CPlayerLevelUpPayload,
   S2CSkillCastEventPayload,
   S2CWorldSnapshotPayload,
   SKILLS_DATABASE,
@@ -429,6 +431,46 @@ export class World {
   }
 
   public handleMonsterDeath(monster: Monster, killer?: Player): void {
+    // 1. Authoritative Experience (EXP) & Level Up Progression
+    if (killer && !killer.isDead && killer instanceof Player) {
+      const expReward = monster.expReward;
+      const progress = killer.addExperience(expReward);
+      this.db.savePlayer(killer);
+
+      const killerConn = this.connections.get(killer.id);
+      if (killerConn) {
+        killerConn.send(Opcode.S2C_PLAYER_EXP_UPDATE, {
+          playerId: killer.id,
+          currentXp: killer.currentXp,
+          xpToNextLevel: killer.xpToNextLevel,
+          level: killer.level,
+          expGained: expReward,
+          source: monster.name,
+        } as S2CPlayerExpUpdatePayload);
+      }
+
+      if (progress.leveledUp) {
+        this.broadcast(Opcode.S2C_PLAYER_LEVEL_UP, {
+          playerId: killer.id,
+          newLevel: killer.level,
+          newAttributes: killer.attributes,
+          newMaxHp: killer.maxHp,
+          newMaxResource: killer.maxResource,
+          totalCombatPower: killer.CombatPower,
+        } as S2CPlayerLevelUpPayload);
+
+        // Notify killer with fresh inventory / CP
+        if (killerConn) {
+          killerConn.send(Opcode.S2C_INVENTORY_UPDATE, {
+            slots: killer.inventory,
+            gold: killer.gold,
+            totalCombatPower: killer.CombatPower,
+          } as S2CInventoryUpdatePayload);
+        }
+      }
+    }
+
+    // 2. Loot Generation & Drop Scattering
     const rolledDrops = monster.rollLoot();
     const now = Date.now();
 

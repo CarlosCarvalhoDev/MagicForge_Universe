@@ -14,6 +14,9 @@ namespace MagicForge.Core
         public string characterName = "Herói Misterioso";
         public int level = 1;
         public CharacterClassSO currentClass;
+        public Sprite floorTileSprite;
+
+        private IsometricEntityVisual entityVisual;
 
         [Header("Atributos Primários (D&D)")]
         public int forca = 10;
@@ -74,6 +77,14 @@ namespace MagicForge.Core
             }
 
             vidaAtual = VidaMaxima;
+
+            entityVisual = GetComponent<IsometricEntityVisual>();
+            if (entityVisual == null)
+            {
+                entityVisual = gameObject.AddComponent<IsometricEntityVisual>();
+            }
+            entityVisual.InitializeHero(currentClass, floorTileSprite);
+
             Debug.Log($"<color=cyan>[STATUS]</color> {characterName} (Lvl {level}) inicializado! CP: {CombatPower}");
         }
 
@@ -102,7 +113,12 @@ namespace MagicForge.Core
             if(vidaAtual <= 0)
             {
                 vidaAtual = 0;
+                if (entityVisual != null) entityVisual.PlayDeath();
                 Debug.Log($"<color=black>💀 [GAME OVER]</color> O Herói tombou em batalha!");
+            }
+            else
+            {
+                if (entityVisual != null) entityVisual.PlayHit();
             }
         }
     }

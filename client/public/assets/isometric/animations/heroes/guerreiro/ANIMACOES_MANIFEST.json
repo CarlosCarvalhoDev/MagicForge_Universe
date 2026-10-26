@@ -1,0 +1,55 @@
+{
+  "name": "MagicForge Guerreiro — regenerated distinct-pose sprite sheets",
+  "frame_size": [
+    512,
+    512
+  ],
+  "background": "#000000",
+  "animations": {
+    "idle": {
+      "filename": "iso_hero_guerreiro_idle_sheet.png",
+      "frames": 4,
+      "columns": 2,
+      "rows": 2,
+      "fps_suggested": 5,
+      "loop": true,
+      "order": "left to right, top to bottom"
+    },
+    "walk": {
+      "filename": "iso_hero_guerreiro_walk_sheet.png",
+      "frames": 6,
+      "columns": 3,
+      "rows": 2,
+      "fps_suggested": 9,
+      "loop": true,
+      "order": "left to right, top to bottom"
+    },
+    "attack": {
+      "filename": "iso_hero_guerreiro_attack_sheet.png",
+      "frames": 6,
+      "columns": 3,
+      "rows": 2,
+      "fps_suggested": 11,
+      "loop": false,
+      "order": "left to right, top to bottom"
+    },
+    "hit": {
+      "filename": "iso_hero_guerreiro_hit_sheet.png",
+      "frames": 2,
+      "columns": 2,
+      "rows": 1,
+      "fps_suggested": 10,
+      "loop": false,
+      "order": "left to right, top to bottom"
+    },
+    "death": {
+      "filename": "iso_hero_guerreiro_death_sheet.png",
+      "frames": 4,
+      "columns": 2,
+      "rows": 2,
+      "fps_suggested": 7,
+      "loop": false,
+      "order": "left to right, top to bottom"
+    }
+  }
+}

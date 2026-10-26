@@ -14,6 +14,8 @@ import {
   S2CItemDropDespawnPayload,
   S2CItemDropSpawnPayload,
   S2CLoginSuccessPayload,
+  S2CPlayerExpUpdatePayload,
+  S2CPlayerLevelUpPayload,
   S2CPongPayload,
   S2CPositionCorrectionPayload,
   S2CSkillCastEventPayload,
@@ -42,6 +44,8 @@ export class ClientNetwork {
   public onItemDropSpawn: MessageListener<S2CItemDropSpawnPayload> | null = null;
   public onItemDropDespawn: MessageListener<S2CItemDropDespawnPayload> | null = null;
   public onInventoryUpdate: MessageListener<S2CInventoryUpdatePayload> | null = null;
+  public onPlayerExpUpdate: MessageListener<S2CPlayerExpUpdatePayload> | null = null;
+  public onPlayerLevelUp: MessageListener<S2CPlayerLevelUpPayload> | null = null;
   public onLatencyUpdated: ((pingMs: number) => void) | null = null;
   public onConnectionStateChange: ((connected: boolean) => void) | null = null;
 
@@ -219,6 +223,16 @@ export class ClientNetwork {
 
         case Opcode.S2C_INVENTORY_UPDATE: {
           this.onInventoryUpdate?.(packet.data as S2CInventoryUpdatePayload);
+          break;
+        }
+
+        case Opcode.S2C_PLAYER_EXP_UPDATE: {
+          this.onPlayerExpUpdate?.(packet.data as S2CPlayerExpUpdatePayload);
+          break;
+        }
+
+        case Opcode.S2C_PLAYER_LEVEL_UP: {
+          this.onPlayerLevelUp?.(packet.data as S2CPlayerLevelUpPayload);
           break;
         }
 
