@@ -11,12 +11,16 @@ import {
   Vector3,
 } from '@magicforge/shared';
 import { EntityManager } from './EntityManager';
+import { Entity } from '../entities/Entity';
 import { Player } from '../entities/Player';
 import { Monster, MonsterState } from '../entities/Monster';
 import { Connection } from '../network/Connection';
+import { SpatialGrid } from './SpatialGrid';
+import { SERVER_CONFIG } from '../config';
 
 export class World {
   public readonly entityManager = new EntityManager();
+  public readonly spatialGrid = new SpatialGrid(20.0);
   public currentTick: number = 0;
   private connections = new Map<string, Connection>();
 
@@ -36,9 +40,10 @@ export class World {
     mobSpawns.forEach((spawn, idx) => {
       const monster = new Monster(`mob_${idx + 1}`, spawn.name, spawn.pos, spawn.hp, spawn.damage);
       this.entityManager.addMonster(monster);
+      this.spatialGrid.updateEntity(monster);
     });
 
-    console.log(`[World] Spawned ${mobSpawns.length} initial monsters in the world.`);
+    console.log(`[World] Spawned ${mobSpawns.length} initial monsters in Spatial Grid (20m cells).`);
   }
 
   public registerConnection(connection: Connection): void {
@@ -64,6 +69,7 @@ export class World {
 
     const player = new Player(connection.id, name, classType, spawnPos);
     this.entityManager.addPlayer(player);
+    this.spatialGrid.updateEntity(player);
     connection.playerId = player.id;
     connection.isAuthenticated = true;
 
@@ -90,6 +96,7 @@ export class World {
 
   private handlePlayerDisconnect(playerId: string): void {
     const player = this.entityManager.removePlayer(playerId);
+    this.spatialGrid.removeEntity(playerId);
     if (player) {
       console.log(`[World] Player "${player.name}" disconnected.`);
       this.broadcast(Opcode.S2C_ENTITY_DESPAWN, {
@@ -105,16 +112,17 @@ export class World {
   public update(deltaTimeSec: number): void {
     this.currentTick++;
 
-    // 1. Update all Players
+    // 1. Update all Players & Spatial Cell Index
     const players = this.entityManager.getAllPlayers();
     for (const player of players) {
       player.update(deltaTimeSec);
+      this.spatialGrid.updateEntity(player);
 
       // Auto-Combat AI for Players (matching Unity AutoCombatController logic)
       this.processPlayerAutoCombat(player);
     }
 
-    // 2. Update all Monsters & AI
+    // 2. Update all Monsters & Spatial Cell Index
     const monsters = this.entityManager.getAllMonsters();
     for (const monster of monsters) {
       // Monster Aggro targeting
@@ -128,12 +136,13 @@ export class World {
       }
 
       monster.update(deltaTimeSec);
+      this.spatialGrid.updateEntity(monster);
 
       // Monster Combat Attack
       this.processMonsterCombat(monster);
     }
 
-    // 3. Build & Broadcast World Snapshot
+    // 3. Build & Broadcast World Snapshot (Partitioned by Area of Interest)
     this.broadcastSnapshot();
   }
 
@@ -221,16 +230,39 @@ export class World {
   }
 
   private broadcastSnapshot(): void {
-    const entities = this.entityManager.getAllEntities();
-    const entitySnapshots: EntitySnapshotState[] = entities.map((e) => e.toSnapshotState());
+    const now = Date.now();
 
-    const snapshotPayload: S2CWorldSnapshotPayload = {
-      serverTick: this.currentTick,
-      serverTimestamp: Date.now(),
-      entities: entitySnapshots,
-    };
+    for (const [_, conn] of this.connections) {
+      if (!conn.isAuthenticated) continue;
 
-    this.broadcast(Opcode.S2C_WORLD_SNAPSHOT, snapshotPayload);
+      let entitiesToSend: Entity[];
+
+      if (conn.playerId) {
+        const player = this.entityManager.getPlayer(conn.playerId);
+        if (player) {
+          // AOI Partitioning: Only entities within visibility radius from player's spatial neighborhood
+          const aoiEntities = this.spatialGrid.getEntitiesInAOI(player.position, SERVER_CONFIG.VISIBILITY_RADIUS);
+          // Guarantee own player is always included
+          if (!aoiEntities.some((e) => e.id === player.id)) {
+            aoiEntities.push(player);
+          }
+          entitiesToSend = aoiEntities;
+        } else {
+          entitiesToSend = this.entityManager.getAllEntities();
+        }
+      } else {
+        entitiesToSend = this.entityManager.getAllEntities();
+      }
+
+      const entitySnapshots: EntitySnapshotState[] = entitiesToSend.map((e) => e.toSnapshotState());
+      const snapshotPayload: S2CWorldSnapshotPayload = {
+        serverTick: this.currentTick,
+        serverTimestamp: now,
+        entities: entitySnapshots,
+      };
+
+      conn.send(Opcode.S2C_WORLD_SNAPSHOT, snapshotPayload);
+    }
   }
 
   public broadcast<T>(op: Opcode, data: T, excludeConnectionId?: string): void {

@@ -23,6 +23,7 @@ export class Player extends Entity {
   public attackIntervalSec: number;
 
   public targetDestination: Vector3 | null = null;
+  public moveDirection: Vector3 | null = null;
   public attackTimer: number = 0;
   public lastProcessedInputSeq: number = 0;
 
@@ -77,12 +78,28 @@ export class Player extends Entity {
 
   public setMoveDestination(destination: Vector3, inputSeq: number): void {
     this.targetDestination = cloneVector3(destination);
+    this.moveDirection = null;
+    this.lastProcessedInputSeq = inputSeq;
+    this.isMoving = true;
+  }
+
+  public setMoveDirection(dir: Vector3, inputSeq: number): void {
+    const magSq = dir.x * dir.x + dir.z * dir.z;
+    if (magSq < 0.001) {
+      this.stopMoving();
+      return;
+    }
+
+    const mag = Math.sqrt(magSq);
+    this.moveDirection = createVector3(dir.x / mag, 0, dir.z / mag);
+    this.targetDestination = null;
     this.lastProcessedInputSeq = inputSeq;
     this.isMoving = true;
   }
 
   public stopMoving(): void {
     this.targetDestination = null;
+    this.moveDirection = null;
     this.isMoving = false;
     this.velocity = createVector3(0, 0, 0);
   }
@@ -95,7 +112,22 @@ export class Player extends Entity {
       this.attackTimer -= deltaTimeSec;
     }
 
-    // Authoritative Movement Simulation
+    // Authoritative Continuous Direction Movement (Mobile Virtual Joystick)
+    if (this.isMoving && this.moveDirection) {
+      this.velocity.x = this.moveDirection.x * this.speed;
+      this.velocity.y = 0;
+      this.velocity.z = this.moveDirection.z * this.speed;
+
+      this.headingYaw = (Math.atan2(this.moveDirection.x, this.moveDirection.z) * 180) / Math.PI;
+
+      this.position.x += this.velocity.x * deltaTimeSec;
+      this.position.z += this.velocity.z * deltaTimeSec;
+
+      this.clampToBounds();
+      return;
+    }
+
+    // Authoritative Destination Movement (Touch/Click-to-Move)
     if (this.isMoving && this.targetDestination) {
       const dx = this.targetDestination.x - this.position.x;
       const dz = this.targetDestination.z - this.position.z;

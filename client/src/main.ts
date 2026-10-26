@@ -83,7 +83,90 @@ sliderDelay.addEventListener('input', () => {
   delayLabel.textContent = `${val}ms (~${tickCount} Ticks)`;
 });
 
-// Canvas Interaction (Click / Touch)
+// Virtual Joystick Controller (Mobile)
+const joystickBase = document.getElementById('joystick-base') as HTMLDivElement;
+const joystickThumb = document.getElementById('joystick-thumb') as HTMLDivElement;
+
+let isJoystickActive = false;
+let joystickDir = { x: 0, y: 0, z: 0 };
+let joystickCenter = { x: 0, y: 0 };
+const maxJoystickRadius = 42; // px
+
+function handleJoystickStart(clientX: number, clientY: number) {
+  const rect = joystickBase.getBoundingClientRect();
+  joystickCenter = {
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+  };
+  isJoystickActive = true;
+  handleJoystickMove(clientX, clientY);
+}
+
+function handleJoystickMove(clientX: number, clientY: number) {
+  if (!isJoystickActive) return;
+
+  const dx = clientX - joystickCenter.x;
+  const dy = clientY - joystickCenter.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  let clampedX = dx;
+  let clampedY = dy;
+
+  if (dist > maxJoystickRadius) {
+    clampedX = (dx / dist) * maxJoystickRadius;
+    clampedY = (dy / dist) * maxJoystickRadius;
+  }
+
+  // Update visual thumb translation
+  joystickThumb.style.transform = `translate(${clampedX}px, ${clampedY}px)`;
+
+  // Normalized direction vector (X: left/right, Z: up/down in world)
+  joystickDir = {
+    x: clampedX / maxJoystickRadius,
+    y: 0,
+    z: clampedY / maxJoystickRadius,
+  };
+}
+
+function handleJoystickEnd() {
+  if (!isJoystickActive) return;
+  isJoystickActive = false;
+  joystickDir = { x: 0, y: 0, z: 0 };
+  joystickThumb.style.transform = `translate(0px, 0px)`;
+
+  // Send stop command
+  const entities = snapshotBuffer.getInterpolatedEntities();
+  const myPlayer = entities.find((e) => e.id === network.myPlayerId);
+  const currentPos = myPlayer ? myPlayer.position : { x: 0, y: 0, z: 0 };
+  network.sendMoveDirection({ x: 0, y: 0, z: 0 }, currentPos);
+}
+
+joystickBase.addEventListener('pointerdown', (e) => {
+  e.stopPropagation();
+  handleJoystickStart(e.clientX, e.clientY);
+  joystickBase.setPointerCapture(e.pointerId);
+});
+
+joystickBase.addEventListener('pointermove', (e) => {
+  if (isJoystickActive) {
+    e.stopPropagation();
+    handleJoystickMove(e.clientX, e.clientY);
+  }
+});
+
+joystickBase.addEventListener('pointerup', (e) => {
+  e.stopPropagation();
+  handleJoystickEnd();
+  try {
+    joystickBase.releasePointerCapture(e.pointerId);
+  } catch {
+    // Ignore
+  }
+});
+
+joystickBase.addEventListener('pointercancel', handleJoystickEnd);
+
+// Canvas Interaction (Click / Touch-to-Move fallback)
 canvas.addEventListener('pointerdown', (e) => {
   if (!network.isConnected || !network.myPlayerId) return;
 
@@ -118,16 +201,28 @@ canvas.addEventListener('pointerdown', (e) => {
 // Render Loop (60Hz / 120Hz native display rate)
 let frameCount = 0;
 let lastFpsTime = performance.now();
+let lastJoystickSendTime = 0;
 
 function gameLoop() {
   requestAnimationFrame(gameLoop);
 
-  frameCount++;
   const now = performance.now();
+  frameCount++;
   if (now - lastFpsTime >= 1000) {
     fpsText.textContent = `${frameCount} FPS`;
     frameCount = 0;
     lastFpsTime = now;
+  }
+
+  // If joystick is active, stream continuous direction at 20Hz (every 50ms)
+  if (isJoystickActive && (joystickDir.x !== 0 || joystickDir.z !== 0)) {
+    if (now - lastJoystickSendTime >= 50) {
+      const entities = snapshotBuffer.getInterpolatedEntities();
+      const myPlayer = entities.find((e) => e.id === network.myPlayerId);
+      const currentPos = myPlayer ? myPlayer.position : { x: 0, y: 0, z: 0 };
+      network.sendMoveDirection(joystickDir, currentPos);
+      lastJoystickSendTime = now;
+    }
   }
 
   // Retrieve interpolated states from snapshot buffer

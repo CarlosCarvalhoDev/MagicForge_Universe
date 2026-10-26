@@ -52,8 +52,9 @@ export interface S2CEntityDespawnPayload {
 // Movement & World Sync Payloads
 // ==========================================
 export interface C2SMoveInputPayload {
-  // Mobile touch/click destination or virtual joystick direction
-  targetPosition: Vector3;
+  // Mobile touch/click destination OR virtual joystick direction vector
+  targetPosition?: Vector3;
+  moveDirection?: Vector3; // Normalized direction vector (X, Z) from virtual joystick
   currentClientPosition: Vector3;
   inputSequence: number;
 }

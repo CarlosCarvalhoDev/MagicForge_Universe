@@ -36,12 +36,13 @@ namespace MagicForge.Combat
             {
                 float distanciaAteMonstro = Vector3.Distance(transform.position, alvoAtual.transform.position);
 
-                // A Mágica do Ranged vs Melee! 
-                // Se o personagem tem uma classe e ela for Ranged, ele ataca a 10 metros de distância. Senão, 2.5m (Colado).
+                // A Mágica do Ranged vs Melee! Sincronizado com CharacterClassSO e shared/entities.ts
                 float distanciaDeAtaqueDesejada = 2.5f;
-                if (myStats.currentClass != null && myStats.currentClass.isRanged)
+                if (myStats.currentClass != null)
                 {
-                    distanciaDeAtaqueDesejada = 10f;
+                    distanciaDeAtaqueDesejada = myStats.currentClass.attackRange > 0f
+                        ? myStats.currentClass.attackRange
+                        : (myStats.currentClass.isRanged ? 10f : 2.5f);
                 }
 
                 if (distanciaAteMonstro > distanciaDeAtaqueDesejada)
@@ -55,7 +56,9 @@ namespace MagicForge.Combat
                     if (cronometroAtaque <= 0f)
                     {
                         AtacarAlvo();
-                        cronometroAtaque = tempoEntreAtaques;
+                        cronometroAtaque = (myStats.currentClass != null && myStats.currentClass.attackIntervalSec > 0f)
+                            ? myStats.currentClass.attackIntervalSec
+                            : tempoEntreAtaques;
                     }
                 }
             }

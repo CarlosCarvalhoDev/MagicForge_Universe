@@ -11,14 +11,26 @@ namespace MagicForge.Core
         [Header("Informações Básicas")]
         public string className;
         [TextArea] public string classDescription;
+        public Sprite classIcon;
         public ElementType defaultElement;
 
-        [Header("Regras de Combate (D&D)")]
+        [Header("Regras de Combate (D&D & Servidor 20Hz)")]
         [Tooltip("Qual atributo essa classe usa para calcular seu dano base?")]
         public PrimaryStat mainStat;
         
         [Tooltip("Marque se essa classe joga magias/flechas de longe.")]
         public bool isRanged;
+        public float attackRange = 2.5f;
+        public float attackIntervalSec = 1.5f;
+        public float baseSpeed = 5.0f;
+
+        [Header("Atributos Base Nível 1 (Sincronizado com shared/entities.ts)")]
+        public int baseForca = 10;
+        public int baseDestreza = 10;
+        public int baseConstituicao = 10;
+        public int baseInteligencia = 10;
+        public int baseSabedoria = 10;
+        public int baseCarisma = 10;
 
         [Header("Ganhos de Status por Level (Crescimento)")]
         public int ganhoForcaPorLevel;

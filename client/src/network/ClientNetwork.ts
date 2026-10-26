@@ -113,6 +113,17 @@ export class ClientNetwork {
     return seq;
   }
 
+  public sendMoveDirection(moveDirection: Vector3, currentClientPosition: Vector3): number {
+    const seq = ++this.inputSequence;
+    const payload: C2SMoveInputPayload = {
+      moveDirection,
+      currentClientPosition,
+      inputSequence: seq,
+    };
+    this.send(Opcode.C2S_MOVE_INPUT, payload);
+    return seq;
+  }
+
   public sendAttackTarget(targetEntityId: string): void {
     const payload: C2SAttackTargetPayload = { targetEntityId };
     this.send(Opcode.C2S_ATTACK_TARGET, payload);

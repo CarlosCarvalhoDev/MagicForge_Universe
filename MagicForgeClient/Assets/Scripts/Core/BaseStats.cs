@@ -63,6 +63,16 @@ namespace MagicForge.Core
 
         private void Start()
         {
+            if (currentClass != null && level == 1)
+            {
+                forca = currentClass.baseForca;
+                destreza = currentClass.baseDestreza;
+                constituicao = currentClass.baseConstituicao;
+                inteligencia = currentClass.baseInteligencia;
+                sabedoria = currentClass.baseSabedoria;
+                carisma = currentClass.baseCarisma;
+            }
+
             vidaAtual = VidaMaxima;
             Debug.Log($"<color=cyan>[STATUS]</color> {characterName} (Lvl {level}) inicializado! CP: {CombatPower}");
         }

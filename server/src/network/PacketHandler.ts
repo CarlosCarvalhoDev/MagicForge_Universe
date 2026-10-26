@@ -88,10 +88,6 @@ export class PacketHandler {
       return;
     }
 
-    if (!payload.targetPosition) {
-      return;
-    }
-
     // Anticheat: Check if client claims to be radically far away from server authoritative position
     if (payload.currentClientPosition) {
       const clientServerDrift = distance(player.position, payload.currentClientPosition);
@@ -106,8 +102,16 @@ export class PacketHandler {
       }
     }
 
-    // Set authoritative destination
-    player.setMoveDestination(payload.targetPosition, payload.inputSequence);
+    // 1. Mobile Virtual Joystick continuous direction
+    if (payload.moveDirection) {
+      player.setMoveDirection(payload.moveDirection, payload.inputSequence);
+      return;
+    }
+
+    // 2. Click/Touch-to-Move destination
+    if (payload.targetPosition) {
+      player.setMoveDestination(payload.targetPosition, payload.inputSequence);
+    }
   }
 
   private handleAttackTarget(connection: Connection, payload: C2SAttackTargetPayload): void {

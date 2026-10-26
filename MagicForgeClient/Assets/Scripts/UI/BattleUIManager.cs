@@ -26,6 +26,11 @@ namespace MagicForge.UI
         // Método para ser chamado e atualizar a barra de vida/CP na tela
         public void UpdateUI(Core.BaseStats playerStats)
         {
+            if (portraitImage != null && playerStats.currentClass != null && playerStats.currentClass.classIcon != null)
+            {
+                portraitImage.sprite = playerStats.currentClass.classIcon;
+            }
+
             if (healthBar != null)
             {
                 healthBar.maxValue = playerStats.VidaMaxima;
