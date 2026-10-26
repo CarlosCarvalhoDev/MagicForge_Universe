@@ -22,11 +22,38 @@ export class GameRenderer {
   public showRawGhost: boolean = true;
   public selectedTargetId: string | null = null;
 
+  // Sprite animation assets
+  private knightWalkFrames: HTMLImageElement[] = [];
+  private knightIdleFrames: HTMLImageElement[] = [];
+  private animTimer: number = 0;
+  private currentFrameIndex: number = 0;
+  private spritesLoaded: boolean = false;
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     const context = canvas.getContext('2d');
     if (!context) throw new Error('Could not get 2D canvas context');
     this.ctx = context;
+
+    this.loadKnightSprites();
+  }
+
+  private loadKnightSprites(): void {
+    // Load 12 walk frames
+    for (let i = 0; i < 36; i += 3) {
+      const img = new Image();
+      img.src = `/assets/knight/clown_export-walk_${i}.png`;
+      this.knightWalkFrames.push(img);
+    }
+
+    // Load 8 idle frames
+    for (let i = 0; i < 20; i += 3) {
+      const img = new Image();
+      img.src = `/assets/knight/clown_export-idle_2_${i}.png`;
+      this.knightIdleFrames.push(img);
+    }
+
+    this.spritesLoaded = true;
   }
 
   public resize(width: number, height: number): void {
@@ -62,6 +89,10 @@ export class GameRenderer {
     const width = canvas.width;
     const height = canvas.height;
 
+    // Advance animation frame counter
+    this.animTimer += 0.2;
+    this.currentFrameIndex = Math.floor(this.animTimer);
+
     // Center camera on my player if available
     const myPlayer = entities.find((e) => e.id === myPlayerId);
     if (myPlayer) {
@@ -73,14 +104,21 @@ export class GameRenderer {
     const screenCenterY = height / 2;
 
     // 1. Clear background
-    ctx.fillStyle = '#0f172a'; // Deep slate MMO background
+    ctx.fillStyle = '#0a0f1d'; // Deep slate fantasy background
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Draw Grid & Boundaries
+    // 2. Draw Grid, Central Runic Circle & Boundaries
     this.drawArenaGrid(screenCenterX, screenCenterY);
 
-    // 3. Draw Entities
-    for (const ent of entities) {
+    // 3. Draw Entities (Monsters first, then Players on top)
+    const sortedEntities = [...entities].sort((a, b) => {
+      // Monsters first, players on top
+      if (a.type === 'MONSTER' && b.type !== 'MONSTER') return -1;
+      if (a.type !== 'MONSTER' && b.type === 'MONSTER') return 1;
+      return a.position.z - b.position.z; // Y-sorting (depth)
+    });
+
+    for (const ent of sortedEntities) {
       const isMe = ent.id === myPlayerId;
       const isSelected = ent.id === this.selectedTargetId;
       const isMonster = ent.type === 'MONSTER';
@@ -94,9 +132,9 @@ export class GameRenderer {
         const rawScreenY = screenCenterY + (ent.rawPosition.z - this.cameraOffset.y) * this.zoom;
 
         ctx.beginPath();
-        ctx.arc(rawScreenX, rawScreenY, 12, 0, Math.PI * 2);
-        ctx.fillStyle = isMe ? 'rgba(52, 211, 153, 0.2)' : 'rgba(239, 68, 68, 0.2)';
-        ctx.strokeStyle = isMe ? 'rgba(52, 211, 153, 0.5)' : 'rgba(239, 68, 68, 0.5)';
+        ctx.arc(rawScreenX, rawScreenY, 14, 0, Math.PI * 2);
+        ctx.fillStyle = isMe ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+        ctx.strokeStyle = isMe ? 'rgba(52, 211, 153, 0.4)' : 'rgba(239, 68, 68, 0.4)';
         ctx.lineWidth = 1;
         ctx.setLineDash([3, 3]);
         ctx.stroke();
@@ -104,72 +142,112 @@ export class GameRenderer {
         ctx.setLineDash([]);
       }
 
+      // Draw Drop Shadow
+      ctx.beginPath();
+      ctx.ellipse(screenX, screenY + 12, isMonster ? (ent.maxHp > 200 ? 20 : 14) : 16, 6, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.fill();
+
       // Draw Target Reticle
       if (isSelected) {
         ctx.beginPath();
-        ctx.arc(screenX, screenY, 22, 0, Math.PI * 2);
+        ctx.arc(screenX, screenY, 26, 0, Math.PI * 2);
         ctx.strokeStyle = '#f59e0b';
         ctx.lineWidth = 2.5;
+        ctx.setLineDash([4, 4]);
         ctx.stroke();
+        ctx.setLineDash([]);
       }
 
-      // Draw Entity Body
-      ctx.beginPath();
-      ctx.arc(screenX, screenY, isMonster ? (ent.maxHp > 200 ? 18 : 13) : 14, 0, Math.PI * 2);
+      if (!isMonster) {
+        // --- RENDER HERO SPRITE (Real Animated Knight!) ---
+        const frames = ent.isMoving ? this.knightWalkFrames : this.knightIdleFrames;
+        const frameIndex = frames.length > 0 ? this.currentFrameIndex % frames.length : 0;
+        const sprite = frames[frameIndex];
 
-      if (isMe) {
-        ctx.fillStyle = '#10b981'; // Vibrant emerald hero
-      } else if (isMonster) {
-        ctx.fillStyle = ent.maxHp > 200 ? '#b91c1c' : '#ef4444'; // Red monsters (dark crimson for boss)
+        if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+          const spriteWidth = 52;
+          const spriteHeight = 52;
+          ctx.save();
+          ctx.translate(screenX, screenY);
+
+          // Flip horizontally if moving/facing left
+          const facingLeft = ent.headingYaw > 180 && ent.headingYaw < 360;
+          if (facingLeft) {
+            ctx.scale(-1, 1);
+          }
+
+          ctx.drawImage(sprite, -spriteWidth / 2, -spriteHeight + 14, spriteWidth, spriteHeight);
+          ctx.restore();
+        } else {
+          // Fallback circle while loading
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, 15, 0, Math.PI * 2);
+          ctx.fillStyle = isMe ? '#10b981' : '#38bdf8';
+          ctx.fill();
+        }
       } else {
-        ctx.fillStyle = '#38bdf8'; // Cyan other players
+        // --- RENDER MONSTER BADGE ---
+        const isBoss = ent.maxHp > 200;
+        const radius = isBoss ? 20 : 14;
+
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+        ctx.fillStyle = isBoss ? '#7f1d1d' : '#991b1b';
+        ctx.fill();
+        ctx.strokeStyle = isBoss ? '#f59e0b' : '#ef4444';
+        ctx.lineWidth = isBoss ? 2.5 : 1.5;
+        ctx.stroke();
+
+        // Monster Icon / Emoji
+        ctx.font = isBoss ? '16px serif' : '12px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const icon = isBoss ? '💀' : ent.name.includes('Slime') ? '🧪' : ent.name.includes('Lobo') ? '🐺' : '👹';
+        ctx.fillText(icon, screenX, screenY);
       }
-      ctx.fill();
 
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = isMe ? 2.5 : 1.5;
-      ctx.stroke();
-
-      // Draw Heading / Orientation line
+      // Draw Orientation Arrow
       const rad = (ent.headingYaw * Math.PI) / 180;
-      const lineLen = isMonster ? 18 : 20;
+      const lineLen = isMonster ? 18 : 22;
       ctx.beginPath();
       ctx.moveTo(screenX, screenY);
       ctx.lineTo(screenX + Math.sin(rad) * lineLen, screenY + Math.cos(rad) * lineLen);
-      ctx.strokeStyle = '#f8fafc';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 1.5;
       ctx.stroke();
 
       // Draw Name & Class Badge
       ctx.fillStyle = '#f8fafc';
       ctx.font = isMe ? 'bold 12px Inter, sans-serif' : '11px Inter, sans-serif';
       ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
       const displayName = isMe ? `⭐ ${ent.name}` : ent.name;
-      ctx.fillText(displayName, screenX, screenY - 24);
+      ctx.fillText(displayName, screenX, screenY - 26);
 
       if (ent.classType) {
         ctx.fillStyle = '#94a3b8';
         ctx.font = '9px Inter, sans-serif';
-        ctx.fillText(`[${ent.classType}]`, screenX, screenY - 14);
+        ctx.fillText(`[${ent.classType}]`, screenX, screenY - 16);
       }
 
       // Draw Health Bar
-      const barWidth = 36;
-      const barHeight = 4;
+      const barWidth = 40;
+      const barHeight = 5;
       const hpPercent = Math.max(0, Math.min(1, ent.currentHp / ent.maxHp));
 
       // Bar BG
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
-      ctx.fillRect(screenX - barWidth / 2, screenY + 18, barWidth, barHeight);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(screenX - barWidth / 2, screenY + 16, barWidth, barHeight);
 
       // Bar Fill
       ctx.fillStyle = hpPercent > 0.5 ? '#22c55e' : hpPercent > 0.2 ? '#eab308' : '#ef4444';
-      ctx.fillRect(screenX - barWidth / 2, screenY + 18, barWidth * hpPercent, barHeight);
+      ctx.fillRect(screenX - barWidth / 2, screenY + 16, barWidth * hpPercent, barHeight);
 
       // Bar Border
-      ctx.strokeStyle = '#334155';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
       ctx.lineWidth = 1;
-      ctx.strokeRect(screenX - barWidth / 2, screenY + 18, barWidth, barHeight);
+      ctx.strokeRect(screenX - barWidth / 2, screenY + 16, barWidth, barHeight);
     }
 
     // 4. Draw Floating Combat Text
@@ -184,13 +262,17 @@ export class GameRenderer {
     const minScreenY = cy - (mapBounds + this.cameraOffset.y) * this.zoom;
     const maxScreenY = cy + (mapBounds - this.cameraOffset.y) * this.zoom;
 
-    // Outer Boundary Box
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 2;
+    // Outer Boundary Box with double line and glow
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(minScreenX, minScreenY, maxScreenX - minScreenX, maxScreenY - minScreenY);
+
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.2)';
+    ctx.lineWidth = 8;
     ctx.strokeRect(minScreenX, minScreenY, maxScreenX - minScreenX, maxScreenY - minScreenY);
 
     // Subtle grid lines every 10 units
-    ctx.strokeStyle = 'rgba(51, 65, 85, 0.25)';
+    ctx.strokeStyle = 'rgba(51, 65, 85, 0.2)';
     ctx.lineWidth = 1;
     for (let u = -mapBounds; u <= mapBounds; u += 10) {
       const gx = cx + (u - this.cameraOffset.x) * this.zoom;
@@ -206,6 +288,23 @@ export class GameRenderer {
       ctx.lineTo(maxScreenX, gy);
       ctx.stroke();
     }
+
+    // Center Spawn Altar / Runic Circle (World 0,0)
+    const altarScreenX = cx + (0 - this.cameraOffset.x) * this.zoom;
+    const altarScreenY = cy + (0 - this.cameraOffset.y) * this.zoom;
+
+    ctx.beginPath();
+    ctx.arc(altarScreenX, altarScreenY, 6 * this.zoom, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(147, 197, 253, 0.25)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(altarScreenX, altarScreenY, 2 * this.zoom, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(37, 99, 235, 0.08)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(147, 197, 253, 0.4)';
+    ctx.stroke();
   }
 
   private renderFloatingText(cx: number, cy: number): void {

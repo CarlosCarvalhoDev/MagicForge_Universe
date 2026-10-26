@@ -132,8 +132,38 @@ namespace MagicForge.Network
 
         private void ProcessIncomingPacket(string json)
         {
-            // O Unity processa snapshots autoritativos aqui para alimentar o interpolador
-            // Em uma arquitetura de MMORPG, os dados são desempacotados e passados para o InterpolatorBuffer
+            try
+            {
+                // Extrai o opcode básico
+                if (!json.Contains("\"op\":")) return;
+
+                int opIndex = json.IndexOf("\"op\":") + 5;
+                int opEnd = json.IndexOf(",", opIndex);
+                if (opEnd == -1) opEnd = json.IndexOf("}", opIndex);
+                int opCodeInt = int.Parse(json.Substring(opIndex, opEnd - opIndex).Trim());
+                Opcode op = (Opcode)opCodeInt;
+
+                switch (op)
+                {
+                    case Opcode.S2C_LOGIN_SUCCESS:
+                        Debug.Log("<color=green>[REDE]</color> Login autenticado com sucesso no Servidor!");
+                        break;
+
+                    case Opcode.S2C_WORLD_SNAPSHOT:
+                        // Em um projeto Unity completo com Newtonsoft.Json ou JsonUtility:
+                        // Os snapshots de 20Hz alimentam os componentes NetworkInterpolatedEntity
+                        lastServerTick++;
+                        break;
+
+                    case Opcode.S2C_COMBAT_EVENT:
+                        Debug.Log("<color=yellow>[COMBATE]</color> Evento de combate recebido do servidor autoritativo.");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[REDE] Erro ao processar pacote: {ex.Message}");
+            }
         }
 
         private void OnDestroy()
