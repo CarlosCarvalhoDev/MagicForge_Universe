@@ -1,0 +1,181 @@
+fileFormatVersion: 2
+guid: b1d7880e16183474990e7d81e1b2969c
+timeCreated: 1538139567
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: bag
+    100002: chest
+    100004: dubina
+    100006: foot.L
+    100008: foot.L.001
+    100010: foot.L_end
+    100012: foot.R
+    100014: foot.R.001
+    100016: foot.R_end
+    100018: forearm.L
+    100020: forearm.R
+    100022: general
+    100024: //RootNode
+    100026: goblin
+    100028: hand.L
+    100030: hand.L_end
+    100032: hand.R
+    100034: hand.R_end
+    100036: head
+    100038: head_end
+    100040: helmet_1
+    100042: hips
+    100044: neck
+    100046: rig
+    100048: shield
+    100050: shin.L
+    100052: shin.L_end
+    100054: shin.R
+    100056: shin.R_end
+    100058: shoulder.L
+    100060: shoulder.R
+    100062: spine
+    100064: sword
+    100066: thigh.L
+    100068: thigh.R
+    100070: upper_arm.L
+    100072: upper_arm.R
+    400000: bag
+    400002: chest
+    400004: dubina
+    400006: foot.L
+    400008: foot.L.001
+    400010: foot.L_end
+    400012: foot.R
+    400014: foot.R.001
+    400016: foot.R_end
+    400018: forearm.L
+    400020: forearm.R
+    400022: general
+    400024: //RootNode
+    400026: goblin
+    400028: hand.L
+    400030: hand.L_end
+    400032: hand.R
+    400034: hand.R_end
+    400036: head
+    400038: head_end
+    400040: helmet_1
+    400042: hips
+    400044: neck
+    400046: rig
+    400048: shield
+    400050: shin.L
+    400052: shin.L_end
+    400054: shin.R
+    400056: shin.R_end
+    400058: shoulder.L
+    400060: shoulder.R
+    400062: spine
+    400064: sword
+    400066: thigh.L
+    400068: thigh.R
+    400070: upper_arm.L
+    400072: upper_arm.R
+    4300000: bag
+    4300002: goblin
+    4300004: shield
+    4300006: sword
+    4300008: dubina
+    4300010: helmet_1
+    7400000: walk
+    7400002: attack_1
+    7400004: attack_2
+    7400006: dead
+    7400008: hit
+    7400010: idle
+    7400012: idle_2
+    7400014: jump
+    7400016: run
+    9500000: //RootNode
+    13700000: bag
+    13700002: dubina
+    13700004: goblin
+    13700006: helmet_1
+    13700008: shield
+    13700010: sword
+  materials:
+    importMaterials: 1
+    materialName: 1
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129599
+  packageName: Goblins -characters with animations
+  packageVersion: 2.0
+  assetPath: Assets/Goblins -characters with animations/Goblins -characters with
+    animations/models/goblin.fbx
+  uploadId: 633882

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4517576ec6e8144e8eb1f2bf85a1210, type: 3}
+  m_Name: Clerigo
+  m_EditorClassIdentifier: Assembly-CSharp::MagicForge.Core.CharacterClassSO
+  className: "Cl\xE9rigo"
+  classDescription: Curandeiro que ajuda o time
+  defaultElement: 5
+  mainStat: 3
+  isRanged: 1
+  ganhoForcaPorLevel: 1
+  ganhoDestrezaPorLevel: 0
+  ganhoConstituicaoPorLevel: 1
+  ganhoInteligenciaPorLevel: 0
+  ganhoSabedoriaPorLevel: 2
+  ganhoCarismaPorLevel: 0
+  isTier1: 1
+  evolutionOptionA: {fileID: 0}
+  evolutionOptionB: {fileID: 0}
