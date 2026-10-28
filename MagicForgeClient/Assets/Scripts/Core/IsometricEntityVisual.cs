@@ -33,6 +33,8 @@ namespace MagicForge.Core
         private Sprite[] attackFrames;
         private Sprite[] hitFrames;
         private Sprite[] deathFrames;
+        private float walkFps = 9f;
+        private float attackFps = 11f;
 
         private EntityAnimState currentState = EntityAnimState.Idle;
         private float animTimer;
@@ -49,7 +51,12 @@ namespace MagicForge.Core
                 staticSprite = PrepareSpriteChromaKey(classSO.isometricWorldSprite);
                 idleFrames = PrepareSpriteArrayChromaKey(classSO.idleFrames);
                 walkFrames = PrepareSpriteArrayChromaKey(classSO.walkFrames);
+                walkFps = Mathf.Max(1f, classSO.walkFps);
                 attackFrames = PrepareSpriteArrayChromaKey(classSO.attackFrames);
+                // Existing cleric cast slices remain in attackFrames; use the sheet's cast timing.
+                attackFps = classSO.attackFrames != null && classSO.attackFrames.Length > 0
+                    && classSO.attackFrames[0] != null
+                    && classSO.attackFrames[0].name.Contains("_cast_") ? 9f : 11f;
                 hitFrames = PrepareSpriteArrayChromaKey(classSO.hitFrames);
                 deathFrames = PrepareSpriteArrayChromaKey(classSO.deathFrames);
             }
@@ -120,7 +127,7 @@ namespace MagicForge.Core
             currentState = EntityAnimState.Attack;
             animTimer = 0f;
             int count = (attackFrames != null && attackFrames.Length > 0) ? attackFrames.Length : 6;
-            oneShotEndTime = Time.time + (count / 11f);
+            oneShotEndTime = Time.time + (count / attackFps);
         }
 
         public void PlayHit()
@@ -130,11 +137,12 @@ namespace MagicForge.Core
             currentState = EntityAnimState.Hit;
             animTimer = 0f;
             int count = (hitFrames != null && hitFrames.Length > 0) ? hitFrames.Length : 2;
-            oneShotEndTime = Time.time + Mathf.Max(0.22f, count / 10f);
+            oneShotEndTime = Time.time + count / 10f;
         }
 
         public void PlayDeath()
         {
+            if (currentState == EntityAnimState.Death) return;
             currentState = EntityAnimState.Death;
             animTimer = 0f;
         }
@@ -210,12 +218,12 @@ namespace MagicForge.Core
                     break;
                 case EntityAnimState.Walk:
                     activeFrames = walkFrames;
-                    fps = 9f;
+                    fps = walkFps;
                     loop = true;
                     break;
                 case EntityAnimState.Attack:
                     activeFrames = attackFrames;
-                    fps = 11f;
+                    fps = attackFps;
                     loop = false;
                     break;
                 case EntityAnimState.Hit:
@@ -286,7 +294,13 @@ namespace MagicForge.Core
             if (!ProcessedTextures.TryGetValue(texId, out Texture2D cleanTex))
             {
                 Color32[] pixels = srcTex.GetPixels32();
+                bool hasAuthoredAlpha = false;
                 for (int i = 0; i < pixels.Length; i++)
+                {
+                    if (pixels[i].a < 255) { hasAuthoredAlpha = true; break; }
+                }
+                // Preserve transparent PNGs, including dark clothing and soft effect edges.
+                for (int i = 0; !hasAuthoredAlpha && i < pixels.Length; i++)
                 {
                     Color32 c = pixels[i];
                     int maxCh = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
@@ -297,7 +311,7 @@ namespace MagicForge.Core
                     }
                     else if (maxCh <= 32)
                     {
-                        c.a = (byte)Mathf.Clamp((maxCh - 14) * 14, 0, 255);
+                        c.a = (byte)Mathf.Clamp(Mathf.RoundToInt((maxCh - 14) / 18f * 255f), 0, 255);
                         pixels[i] = c;
                     }
                 }

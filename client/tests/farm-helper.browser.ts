@@ -1,0 +1,55 @@
+import { setupFarmHelper } from '../src/ui/FarmHelper';
+import type { FarmHelperSettingsPayload } from '@magicforge/shared';
+
+const source = new DOMParser().parseFromString(await (await fetch('/index.html')).text(), 'text/html');
+for (const style of source.head.querySelectorAll('style')) document.head.append(document.importNode(style, true));
+document.body.append(document.importNode(source.getElementById('farm-helper-modal')!, true));
+const modal = document.getElementById('farm-helper-modal')!;
+modal.style.cssText = 'display:flex;position:relative;min-height:100vh;';
+(modal.firstElementChild as HTMLElement).style.maxHeight = 'none';
+const result = document.createElement('pre'); result.id = 'farm-test-result';
+result.style.cssText = 'color:#e2e8f0;white-space:pre-wrap;padding:16px;max-height:110px;overflow:auto';
+document.body.prepend(result);
+const input = (id: string) => document.getElementById(id) as HTMLInputElement;
+const click = (id: string) => document.getElementById(id)!.click();
+const saves: FarmHelperSettingsPayload[] = [], sales: boolean[] = [];
+let ready = false;
+const ui = setupFarmHelper({ isReady: () => ready, save: settings => saves.push(settings), salvage: rare => sales.push(rare) });
+const baseline: FarmHelperSettingsPayload = { autoHpPotionEnabled: true, autoHpPotionThreshold: 60, autoMpPotionEnabled: true, autoMpPotionThreshold: 40, autoSellCommon: false, autoSellUncommon: false, autoSellRare: false, autoLootEnabled: true };
+const passed: string[] = [];
+function check(condition: boolean, label: string) { if (!condition) throw new Error(label); passed.push(label); }
+try {
+  check(input('btn-save-farm-helper').disabled && input('btn-auto-salvage').disabled, 'Configuração e venda bloqueadas sem personagem confirmado');
+  ready = true; ui.onCharacterLogin(); ui.onSettingsUpdate({ settings: baseline });
+  check(input('slider-auto-hp').value === '60' && input('chk-auto-loot-enabled').checked, 'Snapshot preenche percentuais e auto-loot');
+  input('chk-auto-mp-enabled').checked = false; input('chk-auto-mp-enabled').dispatchEvent(new Event('change'));
+  check(input('slider-auto-mp').disabled, 'Desativar MP bloqueia seu slider');
+  input('slider-auto-hp').value = '75'; input('slider-auto-hp').dispatchEvent(new Event('input'));
+  click('btn-save-farm-helper'); click('btn-save-farm-helper');
+  check(saves.length === 1 && saves[0].autoHpPotionThreshold === 75 && saves[0].autoMpPotionEnabled === false, 'Salvar envia contrato completo uma única vez');
+  check(input('btn-save-farm-helper').disabled && document.getElementById('farm-settings-status')!.textContent!.includes('Aguardando'), 'Sem sucesso otimista antes do servidor');
+  ui.onSettingsUpdate({ settings: { ...baseline, autoHpPotionThreshold: 70, autoMpPotionEnabled: false }, message: 'Confirmado.' });
+  check(input('slider-auto-hp').value === '70' && !input('btn-save-farm-helper').disabled, 'Retorno autoritativo substitui rascunho pelo valor confirmado');
+  click('btn-auto-salvage'); click('btn-cancel-salvage');
+  check(sales.length === 0 && document.getElementById('farm-salvage-confirm')!.hidden, 'Cancelar venda não envia pacote');
+  click('btn-auto-salvage'); click('btn-confirm-salvage'); click('btn-confirm-salvage');
+  check(sales.length === 1 && sales[0] === false, 'Venda padrão exclui raros e bloqueia duplicação');
+  ui.onSalvageResult({ itemsSold: 0, goldEarned: 0, newGoldTotal: 100, message: 'Nenhum item elegível.' });
+  check(document.getElementById('farm-salvage-status')!.textContent === 'Nenhum item elegível.', 'Venda vazia mostra resposta real sem inventar lucro');
+  input('chk-salvage-rare').checked = true; click('btn-auto-salvage');
+  check(document.getElementById('farm-salvage-summary')!.textContent!.includes('raros') && input('chk-salvage-rare').disabled, 'Inclusão de raros aparece na confirmação e fica estável');
+  click('btn-confirm-salvage');
+  check(sales.length === 2 && sales[1] === true, 'Incluir raros só é enviado após confirmação explícita');
+  ui.onSalvageResult({ itemsSold: 3, goldEarned: 50, newGoldTotal: 150, message: 'Venda confirmada.' });
+  check(document.getElementById('farm-salvage-status')!.textContent!.includes('saldo 150'), 'Resultado usa saldo retornado pelo servidor');
+  ready = false; ui.onDisconnected();
+  check(input('btn-save-farm-helper').disabled && !input('chk-salvage-rare').checked, 'Desconexão limpa confirmação e seleção de raros');
+  ready = true; ui.onCharacterLogin(); ui.onSettingsUpdate({ settings: { ...baseline, autoHpPotionThreshold: 80 } });
+  check(input('slider-auto-hp').value === '80', 'Novo personagem não herda rascunho do anterior');
+  input('slider-auto-hp').value = '85'; click('btn-save-farm-helper');
+  result.textContent = 'TESTE ISOLADO · dados fictícios · aguardando timeout de 12 segundos…';
+  await new Promise(resolve => setTimeout(resolve, 12500));
+  check(input('slider-auto-hp').value === '80' && !input('btn-save-farm-helper').disabled && document.getElementById('farm-settings-status')!.textContent!.includes('Sem confirmação'), 'Timeout restaura última confirmação sem repetir o envio');
+  ui.onSettingsUpdate({ settings: { ...baseline, autoHpPotionThreshold: 75 }, message: 'Preferências confirmadas (teste).' });
+  result.textContent = 'TESTE ISOLADO · nenhum acesso ao banco\nPASS ' + passed.length + '/' + passed.length + '\n' + passed.join('\n'); result.dataset.result = 'pass';
+} catch (error) { result.textContent = 'FAIL após ' + passed.length + ': ' + error; result.dataset.result = 'fail'; console.error(error); }

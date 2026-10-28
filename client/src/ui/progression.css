@@ -1,0 +1,17 @@
+#leaderboard-dialog { width:min(1000px,94vw); max-height:90vh; padding:24px; border:1px solid #fbbf2466; border-radius:16px; background:#111a2a; color:#e2e8f0; }
+#leaderboard-dialog::backdrop { background:#030712cc; }
+.ranking-header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.ranking-header h2 { color:#fbbf24; font:700 22px 'Cinzel',serif; }
+.ranking-tabs { display:flex; gap:8px; flex-wrap:wrap; margin:20px 0; }
+#leaderboard-dialog button, #inventory-expansion-confirm button { min-height:44px; padding:8px 12px; border:1px solid #fbbf2444; border-radius:7px; color:#e2e8f0; background:#1d2940; cursor:pointer; }
+.ranking-tabs [aria-selected=true] { color:#fbbf24 !important; border-color:#fbbf24 !important; }
+.ranking-table-wrap { overflow-x:auto; }
+.ranking-table-wrap table { width:100%; border-collapse:collapse; font-size:12px; }
+.ranking-table-wrap th,.ranking-table-wrap td { text-align:left; padding:12px 10px; border-bottom:1px solid #94a3b822; white-space:nowrap; }
+.ranking-me { background:#fbbf2410; color:#fde68a; }
+#leaderboard-personal { padding:16px; margin:16px 0; border:1px solid #fbbf2433; border-radius:8px; }
+#leaderboard-status,#inventory-expansion-status { font-size:12px; color:#cbd5e1; line-height:1.6; }
+#inventory-expansion-confirm { border:1px solid #fbbf2444; padding:12px; border-radius:8px; margin:8px 0; }
+#inventory-expansion-confirm[hidden] { display:none; }
+.chat-msg-malak { background:linear-gradient(90deg,#272532,#111827); border-left:2px solid #a8a29e; padding:7px; }
+.chat-tag-malak { color:#e7e5e4; font-weight:700; }

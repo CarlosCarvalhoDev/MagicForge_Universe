@@ -1,0 +1,89 @@
+{
+  "Sheet": "iso_hero_clerigo_walk_sheet.png",
+  "Columns": 4,
+  "Rows": 2,
+  "CellSize": 512,
+  "SheetSHA256": "6DF92CAA03553F97E8284B5676576BD6BA81B3A30043CFCE1CE4614F6DDC2751",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_clerigo_walk_00.png",
+      "Source": "exec-d51feb6e-3a4f-4423-8221-2e50312af5d6.png",
+      "SourceSHA256": "A1760F05696C98A3625A510F35F155576A900198E2D1F7620C936BCBF19A7C7C",
+      "FrameSHA256": "31066E647C193065F013008124CBB0EE72242D173D288B885B91249BAC231D9B",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 1,
+      "File": "iso_hero_clerigo_walk_01.png",
+      "Source": "exec-7dd133a2-94aa-4259-9ebd-96ed3ba019f1.png",
+      "SourceSHA256": "BB01A2AB99A3BFB4316AC090E7483283EC586616AD26AC0C0EA13D6FE0714C87",
+      "FrameSHA256": "6B91467270CAFA2A2F7F4F2C254DDFCB16C940E6A6A37E68D27EA5BFCE560EE9",
+      "X": 512,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 2,
+      "File": "iso_hero_clerigo_walk_02.png",
+      "Source": "exec-1008159d-b69f-4701-9fb1-3a6990a69fde.png",
+      "SourceSHA256": "B84C89AD6A0F291258D22B1C96A583EE22F6932791A07DF1B5E54961FD6328C8",
+      "FrameSHA256": "9430ABD6C393C562835529F69279F7ACC3ECB4E1614FB3D29057EC3AB6D553D6",
+      "X": 1024,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 3,
+      "File": "iso_hero_clerigo_walk_03.png",
+      "Source": "exec-38537f3a-76c6-4d8f-9150-b4be5ae7e088.png",
+      "SourceSHA256": "FD5BE2CE924D30D5DF98EE95998A931540A1B9211A8DBB7C01B00E6E3D653670",
+      "FrameSHA256": "854C1A2753017F9E9B0EB943773FD6F7225C9C7EF14BB08E499500BC95CD33E3",
+      "X": 1536,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 4,
+      "File": "iso_hero_clerigo_walk_04.png",
+      "Source": "exec-8380a600-81a4-4301-b646-fe059792757d.png",
+      "SourceSHA256": "87FFF1F8A952F024F221D35AB358430717BE6DFEFD35C5CEE58F1C56BDB8A8B9",
+      "FrameSHA256": "BBAF75987FC1C61D62F2BE464ACEA84EB0E81C8565D329EAC6219ACE797897D1",
+      "X": 0,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 5,
+      "File": "iso_hero_clerigo_walk_05.png",
+      "Source": "exec-c0f9b070-6306-409b-92c9-a04c0954e4cb.png",
+      "SourceSHA256": "E8F5B4D8D58AC16FE17DFD73EF55586F6621740A169E8266BC5850D96C3AEE87",
+      "FrameSHA256": "03110FA7D1969876E74C9C0D593589F96C56931F5842C8DDE4E3FE61ADB23D98",
+      "X": 512,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 6,
+      "File": "iso_hero_clerigo_walk_06.png",
+      "Source": "exec-ba2c88eb-3cb2-4761-8c0f-19aabf05fd7f.png",
+      "SourceSHA256": "FF2C9FEE3B66518D7072633577DFBE1CF1C2A98ACC3FBEDB4E551FDDA33D5755",
+      "FrameSHA256": "2C03E536C87D5F959C8232A4FF5464B3478799EEA7A971A5E4E5197075876A59",
+      "X": 1024,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 7,
+      "File": "iso_hero_clerigo_walk_07.png",
+      "Source": "exec-4e9da4e4-edd1-4b3a-9fb6-62b783f82a2c.png",
+      "SourceSHA256": "65F16151907544E3F870E9D92D0590F154C4AFEBEA7D093583B6DE28049BCDD0",
+      "FrameSHA256": "9FCDEC36341E83ABD6A1CF392B6153BC0BF9F119B3C44D034FBB8D9B5E53E7F8",
+      "X": 1536,
+      "Y": 512,
+      "Size": 512
+    }
+  ]
+}

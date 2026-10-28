@@ -107,6 +107,10 @@
         gap: 14px;
       }
 
+      #inspector-panel.collapsed {
+        display: none !important;
+      }
+
       .panel-title {
         font-size: 0.85rem;
         font-weight: 700;
@@ -342,106 +346,156 @@
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
       }
 
-      #skill-action-bar {
-        display: flex;
-        gap: 10px;
-        padding: 8px 12px;
-        border-radius: 16px;
-        pointer-events: auto;
+      /* Ragnarok Mobile Meia-Lua Combat Arc (Bottom-Right - Enlarged & Spaced) */
+      #mobile-combat-arc-container {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        width: 380px;
+        height: 380px;
+        pointer-events: none;
+        z-index: 35;
       }
 
-      .skill-btn {
-        position: relative;
-        width: 66px;
-        height: 66px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-        border: 1.5px solid rgba(251, 191, 36, 0.35);
+      .mobile-primary-btn {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #f59e0b 0%, #b45309 68%, #78350f 100%);
+        border: 3.5px solid #fef08a;
+        box-shadow: 0 0 32px rgba(245, 158, 11, 0.85), inset 0 0 16px rgba(255, 255, 255, 0.45);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        outline: none;
-        transition: transform 0.1s, border-color 0.2s, box-shadow 0.2s;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        padding: 0;
+        pointer-events: auto;
+        transition: transform 0.1s ease-out, box-shadow 0.2s;
         user-select: none;
+        z-index: 5;
       }
 
-      .skill-btn:hover {
-        border-color: #fbbf24;
-        box-shadow: 0 0 14px rgba(251, 191, 36, 0.4);
-        transform: translateY(-2px);
+      .mobile-primary-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 42px rgba(245, 158, 11, 1);
       }
 
-      .skill-btn:active {
+      .mobile-primary-btn:active {
         transform: scale(0.93);
       }
 
-      .skill-btn-ult {
-        border-color: #f59e0b;
-        box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+      .mobile-primary-icon {
+        font-size: 2.9rem;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95));
       }
 
-      .skill-key-badge {
+      .mobile-primary-label {
+        font-size: 0.78rem;
+        font-weight: 900;
+        color: #ffffff;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: -2px;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+      }
+
+      /* 4 Skill buttons placed in a spacious, non-overlapping arc */
+      .skill-arc-btn {
         position: absolute;
-        top: 3px;
-        left: 4px;
-        background: rgba(0, 0, 0, 0.65);
-        color: #fbbf24;
-        font-size: 0.65rem;
-        font-weight: 800;
-        padding: 1px 5px;
-        border-radius: 4px;
-        border: 1px solid rgba(251, 191, 36, 0.3);
-      }
-
-      .skill-icon {
-        font-size: 1.35rem;
-        margin-top: 2px;
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-      }
-
-      .skill-name {
-        font-size: 0.6rem;
-        font-weight: 600;
-        color: #f1f5f9;
-        max-width: 58px;
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+        border: 3px solid rgba(251, 191, 36, 0.65);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: auto;
+        outline: none;
+        transition: transform 0.12s ease-out, border-color 0.2s, box-shadow 0.2s;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+        padding: 0;
         overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        margin-top: 1px;
+        user-select: none;
       }
 
-      .skill-cost {
-        font-size: 0.58rem;
-        font-weight: 700;
-        color: #38bdf8;
+      .skill-arc-btn:hover {
+        transform: scale(1.08);
+        border-color: #fbbf24;
+        box-shadow: 0 0 28px rgba(251, 191, 36, 0.85);
       }
 
-      .skill-btn img.skill-img {
+      .skill-arc-btn:active {
+        transform: scale(0.92);
+      }
+
+      /* Half-moon positions with ~25px to 30px clear space between every button */
+      #skill-btn-1 {
+        bottom: 16px;
+        right: 236px;
+      }
+
+      #skill-btn-2 {
+        bottom: 125px;
+        right: 209px;
+      }
+
+      #skill-btn-3 {
+        bottom: 209px;
+        right: 125px;
+      }
+
+      #skill-btn-4 {
+        bottom: 232px;
+        right: 12px;
+        width: 96px;
+        height: 96px;
+        border-width: 3.5px;
+        border-color: #f59e0b;
+        box-shadow: 0 0 26px rgba(245, 158, 11, 0.75);
+      }
+
+      .skill-arc-btn img.skill-img {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 12px;
+        border-radius: 50%;
         z-index: 1;
         transition: transform 0.15s ease-out;
       }
 
-      .skill-btn:hover img.skill-img {
+      .skill-arc-btn:hover img.skill-img {
         transform: scale(1.08);
       }
 
-      .skill-footer-gradient {
+      .skill-arc-btn .skill-key-badge {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        background: rgba(0, 0, 0, 0.88);
+        color: #fbbf24;
+        font-size: 0.82rem;
+        font-weight: 800;
+        padding: 2px 7px;
+        border-radius: 8px;
+        border: 1.5px solid rgba(251, 191, 36, 0.6);
+        z-index: 3;
+      }
+
+      .skill-arc-btn .skill-footer-gradient {
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
-        height: 20px;
-        background: linear-gradient(to top, rgba(15, 23, 42, 0.95), transparent);
+        height: 26px;
+        background: linear-gradient(to top, rgba(15, 23, 42, 0.98), transparent);
         z-index: 2;
         display: flex;
         align-items: center;
@@ -449,15 +503,17 @@
         pointer-events: none;
       }
 
-      .skill-key-badge {
-        z-index: 3;
+      .skill-arc-btn .skill-cost {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: #38bdf8;
       }
 
-      .cooldown-overlay {
+      .skill-arc-btn .cooldown-overlay {
         position: absolute;
         inset: 0;
         background: rgba(10, 15, 29, 0.88);
-        border-radius: 12px;
+        border-radius: 50%;
         display: none;
         align-items: center;
         justify-content: center;
@@ -465,15 +521,224 @@
         z-index: 4;
       }
 
-      .cooldown-overlay.active {
+      .skill-arc-btn .cooldown-overlay.active {
         display: flex;
       }
 
-      .cooldown-text {
-        font-size: 0.95rem;
-        font-weight: 800;
+      .skill-arc-btn .cooldown-text {
+        font-size: 1.45rem;
+        font-weight: 900;
         color: #fbbf24;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+      }
+
+      /* Bottom Center Controls & Game Chat */
+      #bottom-center-zone {
+        position: absolute;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        pointer-events: none;
+        z-index: 30;
+        max-width: 580px;
+        width: 95%;
+      }
+
+      .bottom-center-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        pointer-events: auto;
+      }
+
+      .btn-auto-toggle {
+        background: linear-gradient(135deg, #10b981, #047857);
+        color: #ffffff;
+        border: 2px solid #34d399;
+        border-radius: 24px;
+        padding: 8px 20px;
+        font-size: 0.84rem;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
+        transition: all 0.15s ease-out;
+        user-select: none;
+      }
+
+      .btn-auto-toggle.inactive {
+        background: rgba(51, 65, 85, 0.85);
+        border-color: rgba(148, 163, 184, 0.4);
+        color: #94a3b8;
+        box-shadow: none;
+      }
+
+      .btn-auto-toggle:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-farm-gear {
+        background: rgba(15, 23, 42, 0.92);
+        border: 2px solid rgba(251, 191, 36, 0.5);
+        color: #fbbf24;
+        border-radius: 24px;
+        padding: 8px 18px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        transition: all 0.15s ease-out;
+        user-select: none;
+      }
+
+      .btn-farm-gear:hover {
+        border-color: #fbbf24;
+        box-shadow: 0 0 16px rgba(251, 191, 36, 0.6);
+      }
+
+      .quick-potion-chip {
+        background: rgba(15, 23, 42, 0.92);
+        border: 1.5px solid rgba(255, 255, 255, 0.22);
+        border-radius: 22px;
+        padding: 7px 14px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.1s ease-out;
+      }
+
+      .quick-potion-chip:active {
+        transform: scale(0.92);
+      }
+
+      /* Game Chat Box (Enlarged with Scroll & Input) */
+      #game-chat-box {
+        width: 100%;
+        max-width: 580px;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1.5px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        padding: 10px 14px;
+        pointer-events: auto;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+      }
+
+      #chat-messages-container {
+        height: 125px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 4px;
+        font-size: 0.74rem;
+        line-height: 1.35;
+        padding-right: 4px;
+      }
+
+      #chat-messages-container::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      #chat-messages-container::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 4px;
+      }
+
+      #chat-messages-container::-webkit-scrollbar-thumb {
+        background: rgba(251, 191, 36, 0.4);
+        border-radius: 4px;
+      }
+
+      #chat-messages-container::-webkit-scrollbar-thumb:hover {
+        background: #fbbf24;
+      }
+
+      .chat-msg {
+        display: flex;
+        gap: 6px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      .chat-tag-sys { color: #38bdf8; font-weight: 700; }
+      .chat-tag-loot { color: #fbbf24; font-weight: 700; }
+      .chat-tag-auto { color: #4ade80; font-weight: 700; }
+      .chat-tag-combat { color: #f87171; font-weight: 700; }
+      .chat-tag-user { color: #c084fc; font-weight: 700; }
+      .chat-body { color: #e2e8f0; word-break: break-word; }
+
+      .chat-input-form {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .chat-channel-badge {
+        background: rgba(168, 85, 247, 0.2);
+        color: #c084fc;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        white-space: nowrap;
+        user-select: none;
+      }
+
+      .chat-input-field {
+        flex: 1;
+        background: rgba(30, 41, 59, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #f8fafc;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        outline: none;
+        transition: border-color 0.2s, background 0.2s;
+      }
+
+      .chat-input-field:focus {
+        border-color: #38bdf8;
+        background: rgba(30, 41, 59, 0.95);
+        box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+      }
+
+      .chat-send-btn {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+
+      .chat-send-btn:hover {
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        transform: scale(1.04);
       }
 
       /* Skill Book Modal Styles */
@@ -580,100 +845,364 @@
         box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
       }
 
-      .skills-cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-        gap: 16px;
+      /* D&D 5E Grimório Modal & Slot Customization System */
+      .grimorio-modal-content {
+        max-width: 1040px;
+        width: 95%;
+        max-height: 88vh;
+        background: radial-gradient(circle at top, rgba(30, 27, 75, 0.95), rgba(15, 23, 42, 0.98));
+        border: 1.5px solid rgba(251, 191, 36, 0.45);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 158, 11, 0.15);
       }
 
-      .skill-card {
+      .modal-title-group {
         display: flex;
-        gap: 14px;
-        padding: 14px;
-        background: rgba(30, 41, 59, 0.45);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        transition: border-color 0.2s, transform 0.2s;
+        align-items: center;
+        gap: 12px;
       }
 
-      .skill-card:hover {
-        border-color: rgba(251, 191, 36, 0.5);
-        transform: translateY(-2px);
+      .grimorio-book-icon {
+        font-size: 1.8rem;
+        filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
       }
 
-      .skill-card-img {
-        width: 74px;
-        height: 74px;
-        border-radius: 12px;
-        border: 1.5px solid #fbbf24;
-        object-fit: cover;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-        flex-shrink: 0;
+      .grimorio-class-subtitle {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        margin-top: 2px;
       }
 
-      .skill-card-info {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        flex: 1;
+      .skillbook-class-name {
+        color: #fbbf24;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
-      .skill-card-title-row {
+      .grimorio-strategy-banner {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(251, 191, 36, 0.25);
+        border-radius: 10px;
+        padding: 10px 16px;
+        gap: 14px;
       }
 
-      .skill-card-title {
-        font-family: 'Cinzel', serif;
-        font-size: 0.92rem;
-        font-weight: 700;
-        color: #fbbf24;
+      .grimorio-strategy-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
       }
 
-      .skill-tier-badge {
-        font-size: 0.68rem;
+      .strategy-badge {
+        font-size: 0.7rem;
         font-weight: 700;
+        padding: 4px 8px;
+        background: rgba(168, 85, 247, 0.2);
+        color: #c084fc;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+
+      .strategy-desc {
+        font-size: 0.78rem;
+        color: #cbd5e1;
+        line-height: 1.4;
+      }
+
+      .grimorio-slots-container {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .grimorio-slot-section {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        position: relative;
+      }
+
+      .grimorio-slot-section.unlocked {
+        border-color: rgba(251, 191, 36, 0.2);
+      }
+
+      .grimorio-slot-section.locked {
+        opacity: 0.7;
+        border-color: rgba(239, 68, 68, 0.25);
+      }
+
+      .grimorio-slot-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding-bottom: 8px;
+      }
+
+      .slot-header-title-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .slot-circle-pill {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .slot-circle-pill.tier-1 {
+        background: rgba(56, 189, 248, 0.15);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+      }
+
+      .slot-circle-pill.tier-2 {
+        background: rgba(52, 211, 153, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(52, 211, 153, 0.35);
+      }
+
+      .slot-circle-pill.tier-3 {
         background: rgba(245, 158, 11, 0.15);
-        color: #f59e0b;
-        padding: 2px 7px;
-        border-radius: 4px;
+        color: #fbbf24;
         border: 1px solid rgba(245, 158, 11, 0.35);
       }
 
-      .skill-meta-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin: 4px 0;
-        font-size: 0.7rem;
-        color: #94a3b8;
+      .slot-circle-pill.tier-4 {
+        background: rgba(239, 68, 68, 0.18);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
       }
 
-      .skill-pill {
-        background: rgba(15, 23, 42, 0.7);
-        padding: 2px 7px;
-        border-radius: 4px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-      }
-
-      .skill-pill.cost {
-        color: #38bdf8;
+      .slot-header-name {
+        font-family: 'Cinzel', serif;
+        font-size: 1.02rem;
         font-weight: 700;
+        color: #f1f5f9;
       }
 
-      .skill-pill.cooldown {
-        color: #a78bfa;
+      .slot-header-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78rem;
       }
 
-      .skill-pill.type {
+      .slot-equipped-indicator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #10b981;
+        font-weight: 600;
+        background: rgba(16, 185, 129, 0.12);
+        padding: 3px 9px;
+        border-radius: 6px;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+
+      .slot-cards-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      @media (max-width: 900px) {
+        .slot-cards-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .skill-card-v2 {
+        background: rgba(30, 41, 59, 0.55);
+        border: 1.5px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 10px;
+        transition: all 0.2s ease;
+        position: relative;
+      }
+
+      .skill-card-v2:hover {
+        border-color: rgba(251, 191, 36, 0.45);
+        transform: translateY(-2px);
+        background: rgba(30, 41, 59, 0.75);
+      }
+
+      .skill-card-v2.is-equipped {
+        border-color: #10b981;
+        background: rgba(6, 78, 59, 0.25);
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+      }
+
+      .skill-v2-top {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .skill-v2-img-wrap {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        border: 1.5px solid #fbbf24;
+        background: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+
+      .skill-v2-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .skill-v2-emoji-icon {
+        font-size: 26px;
+      }
+
+      .skill-v2-header-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .skill-v2-title {
+        font-family: 'Cinzel', serif;
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .skill-card-v2.is-equipped .skill-v2-title {
         color: #34d399;
       }
 
-      .skill-card-desc {
-        font-size: 0.76rem;
+      .skill-v2-tags-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+      }
+
+      .skill-role-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+      }
+
+      .skill-role-badge.ofensivo { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+      .skill-role-badge.defensivo { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35); }
+      .skill-role-badge.sustento { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+      .skill-role-badge.controle { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35); }
+
+      .skill-scaling-badge {
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        padding: 1px 5px;
+        border-radius: 4px;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+
+      .skill-v2-meta-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        font-size: 0.68rem;
+      }
+
+      .v2-chip {
+        background: rgba(15, 23, 42, 0.7);
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: #94a3b8;
+      }
+
+      .v2-chip.cost { color: #38bdf8; font-weight: 700; }
+      .v2-chip.cd { color: #c084fc; }
+      .v2-chip.area { color: #34d399; }
+
+      .skill-v2-desc {
+        font-size: 0.74rem;
         color: #cbd5e1;
-        line-height: 1.4;
+        line-height: 1.35;
+        flex: 1;
+        background: rgba(15, 23, 42, 0.4);
+        padding: 6px 8px;
+        border-radius: 6px;
+      }
+
+      .btn-equip-skill {
+        width: 100%;
+        padding: 7px 10px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        border: none;
+      }
+
+      .btn-equip-skill.equip {
+        background: linear-gradient(135deg, #d97706, #b45309);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+      }
+
+      .btn-equip-skill.equip:hover {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+        transform: translateY(-1px);
+      }
+
+      .btn-equip-skill.active {
+        background: rgba(16, 185, 129, 0.25);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.6);
+        cursor: default;
+      }
+
+      .btn-equip-skill.locked {
+        background: rgba(51, 65, 85, 0.4);
+        color: #64748b;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: not-allowed;
       }
 
       /* Instructions badge positioned at top-center */
@@ -694,22 +1223,405 @@
         color: #38bdf8;
       }
 
-      /* Inventory Modal Styles */
-      .inventory-body {
+      /* Unified Hero & Inventory Modal Styles (Mobile MMORPG Style) */
+      .unified-hero-modal-content {
+        max-width: 980px;
+        width: 94vw;
+        max-height: 90vh;
         display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 16px 20px;
       }
 
-      .inventory-grid-container {
+      .unified-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1.5px solid rgba(251, 191, 36, 0.25);
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+      }
+
+      .modal-title-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .modal-title-icon {
+        font-size: 1.8rem;
+        filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
+      }
+
+      .modal-title-main {
+        font-family: 'Cinzel', serif;
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #fbbf24;
+        letter-spacing: 0.04em;
+        text-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
+      }
+
+      .modal-title-sub {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-weight: 600;
+      }
+
+      .modal-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .modal-currencies {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .currency-badge {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        padding: 4px 10px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .currency-badge.gold {
+        border-color: rgba(251, 191, 36, 0.4);
+        color: #fbbf24;
+      }
+
+      .currency-badge.diamond {
+        border-color: rgba(56, 189, 248, 0.4);
+        color: #38bdf8;
+      }
+
+      /* Dual Pane Body */
+      .unified-modal-body {
+        display: flex;
+        gap: 18px;
         flex: 1;
-        min-width: 320px;
+        overflow-y: auto;
+        min-height: 0;
+      }
+
+      /* LEFT PANE: Hero Showcase & Equipment */
+      .unified-hero-left-pane {
+        width: 350px;
+        min-width: 330px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.75);
+        border: 1.5px solid rgba(251, 191, 36, 0.28);
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.55);
+      }
+
+      .hero-cp-banner {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+        border: 1.5px solid #fbbf24;
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 16px rgba(251, 191, 36, 0.25);
+      }
+
+      .cp-label {
+        font-size: 0.66rem;
+        font-weight: 800;
+        color: #94a3b8;
+        letter-spacing: 0.12em;
+      }
+
+      .cp-value-display {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+      }
+
+      .cp-sword-icon {
+        font-size: 1.25rem;
+      }
+
+      .cp-number {
+        font-family: 'Cinzel', serif;
+        font-size: 1.55rem;
+        font-weight: 900;
+        color: #fbbf24;
+        text-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+        letter-spacing: 0.05em;
+      }
+
+      .hero-paperdoll-stage-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 6px 0;
+      }
+
+      .paperdoll-slots-col {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .equipment-slot {
+        width: 58px;
+        height: 58px;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.92);
+        border: 1.5px solid rgba(255, 255, 255, 0.14);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.18s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      .equipment-slot:hover {
+        border-color: #fbbf24;
+        transform: scale(1.06);
+        box-shadow: 0 0 14px rgba(251, 191, 36, 0.5);
+      }
+
+      .equipment-slot.equipped {
+        border-color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+      }
+
+      .slot-refine-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #ffffff;
+        font-size: 0.62rem;
+        font-weight: 800;
+        padding: 1px 5px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      }
+
+      .slot-placeholder-icon {
+        font-size: 1.4rem;
+        opacity: 0.5;
+      }
+
+      .slot-label {
+        font-size: 0.58rem;
+        color: #94a3b8;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-top: 2px;
+      }
+
+      .hero-center-pedestal {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 140px;
+      }
+
+      .pedestal-character-wrap {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .hero-paperdoll-avatar {
+        width: 122px;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 2px solid #fbbf24;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.75), 0 0 16px rgba(251, 191, 36, 0.35);
+        position: relative;
+        z-index: 2;
+      }
+
+      .pedestal-rock-base {
+        width: 130px;
+        height: 22px;
+        background: radial-gradient(ellipse, #334155 0%, #1e293b 70%, transparent 100%);
+        border-radius: 50%;
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.4), inset 0 2px 6px rgba(251, 191, 36, 0.35);
+        border-bottom: 2px solid rgba(251, 191, 36, 0.5);
+        margin-top: -10px;
+        z-index: 1;
+      }
+
+      .hero-pedestal-identity {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 6px;
+        text-align: center;
+      }
+
+      .hero-name-txt {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #f8fafc;
+      }
+
+      .hero-class-txt {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #fbbf24;
+      }
+
+      .hero-stats-accordion {
+        background: rgba(15, 23, 42, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 8px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .dnd-stats-mini-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+
+      .mini-stat {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 6px;
+        padding: 3px 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.72rem;
+      }
+
+      .mini-stat .lbl {
+        font-weight: 800;
+      }
+
+      .mini-stat .lbl.str { color: #f87171; }
+      .mini-stat .lbl.dex { color: #34d399; }
+      .mini-stat .lbl.con { color: #fb923c; }
+      .mini-stat .lbl.int { color: #38bdf8; }
+      .mini-stat .lbl.wis { color: #a78bfa; }
+      .mini-stat .lbl.cha { color: #facc15; }
+
+      .combat-substats-strip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding-top: 5px;
+        font-size: 0.72rem;
+        color: #cbd5e1;
+      }
+
+      /* RIGHT PANE: Submenus (Mochila, Refino, Pedras, Cartas) */
+      .unified-submenus-right-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 380px;
+      }
+
+      .submenus-tab-nav {
+        display: flex;
+        gap: 8px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 6px;
+      }
+
+      .submenu-tab-btn {
+        flex: 1;
+        padding: 9px 8px;
+        background: rgba(30, 41, 59, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #94a3b8;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+
+      .submenu-tab-btn:hover {
+        background: rgba(51, 65, 85, 0.8);
+        color: #f1f5f9;
+        border-color: rgba(251, 191, 36, 0.4);
+      }
+
+      .submenu-tab-btn.active {
+        background: linear-gradient(135deg, rgba(217, 119, 6, 0.35), rgba(180, 83, 9, 0.5));
+        border: 1.5px solid #fbbf24;
+        color: #fbbf24;
+        box-shadow: 0 0 14px rgba(251, 191, 36, 0.3);
+      }
+
+      .submenu-tab-panel {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      /* Submenu 1: Mochila Layout */
+      .mochila-panel-layout {
+        display: flex;
+        gap: 14px;
+        flex: 1;
+      }
+
+      .inventory-grid-wrap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .grid-sub-header {
+        font-size: 0.72rem;
+        color: #94a3b8;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        letter-spacing: 0.05em;
       }
 
       .inventory-slots-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
+        gap: 8px;
       }
 
       .inventory-slot {
@@ -758,7 +1670,7 @@
         position: absolute;
         bottom: 3px;
         right: 4px;
-        font-size: 0.7rem;
+        font-size: 0.68rem;
         font-weight: 700;
         background: rgba(0, 0, 0, 0.75);
         color: #f1f5f9;
@@ -773,49 +1685,49 @@
       }
 
       .inventory-inspector {
-        width: 320px;
+        width: 250px;
         background: rgba(30, 41, 59, 0.45);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
-        padding: 18px;
+        padding: 14px;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
       }
 
       .inspector-item-header {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
       }
 
       .inspector-item-icon {
-        width: 52px;
-        height: 52px;
+        width: 48px;
+        height: 48px;
         border-radius: 10px;
         background: rgba(15, 23, 42, 0.8);
         border: 1.5px solid #fbbf24;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.8rem;
+        font-size: 1.7rem;
       }
 
       .inspector-item-title-box {
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        gap: 2px;
       }
 
       .inspector-item-name {
         font-family: 'Cinzel', serif;
-        font-size: 1.05rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: #fbbf24;
       }
 
       .inspector-item-tag {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         font-weight: 700;
         text-transform: uppercase;
         color: #94a3b8;
@@ -824,12 +1736,12 @@
       .inspector-stats-list {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
         background: rgba(15, 23, 42, 0.6);
-        padding: 10px;
+        padding: 8px 10px;
         border-radius: 8px;
         border: 1px solid rgba(255, 255, 255, 0.06);
-        font-size: 0.8rem;
+        font-size: 0.76rem;
       }
 
       .inspector-stat-row {
@@ -838,9 +1750,9 @@
       }
 
       .inspector-desc {
-        font-size: 0.78rem;
+        font-size: 0.74rem;
         color: #cbd5e1;
-        line-height: 1.45;
+        line-height: 1.4;
         font-style: italic;
       }
 
@@ -852,13 +1764,13 @@
 
       .btn-action-primary {
         flex: 1;
-        padding: 10px;
+        padding: 9px;
         background: linear-gradient(135deg, #d97706, #b45309);
         border: 1.5px solid #fbbf24;
         border-radius: 8px;
         color: white;
         font-weight: 700;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         cursor: pointer;
         transition: all 0.2s;
       }
@@ -866,6 +1778,329 @@
       .btn-action-primary:hover {
         background: linear-gradient(135deg, #f59e0b, #d97706);
         box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+      }
+
+      /* Submenu 2: Refinamento Styles */
+      .refino-forge-card,
+      .pedras-socket-card,
+      .cartas-album-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .refino-forge-header,
+      .pedras-header,
+      .cartas-header {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding-bottom: 6px;
+      }
+
+      .refino-title,
+      .pedras-title,
+      .cartas-title {
+        font-family: 'Cinzel', serif;
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #fbbf24;
+      }
+
+      .refino-sub,
+      .pedras-sub,
+      .cartas-sub {
+        font-size: 0.68rem;
+        color: #94a3b8;
+      }
+
+      .refino-target-box {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: rgba(30, 41, 59, 0.6);
+        border: 1.5px solid rgba(251, 191, 36, 0.35);
+        border-radius: 10px;
+        padding: 10px 14px;
+      }
+
+      .refino-item-preview {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 2px solid #fbbf24;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+      }
+
+      .refino-item-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .refino-item-name {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #f8fafc;
+      }
+
+      .refino-tiers-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        font-size: 0.78rem;
+      }
+
+      .tier-badge.current {
+        background: #334155;
+        color: #cbd5e1;
+        padding: 1px 7px;
+        border-radius: 4px;
+      }
+
+      .tier-arrow {
+        color: #fbbf24;
+      }
+
+      .tier-badge.next {
+        background: #059669;
+        color: #ffffff;
+        padding: 1px 7px;
+        border-radius: 4px;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+      }
+
+      .refino-stats-diff {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 8px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.78rem;
+      }
+
+      .stat-diff-row {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .refino-cost-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.76rem;
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 8px;
+        padding: 8px 12px;
+      }
+
+      .cost-items {
+        display: flex;
+        gap: 12px;
+        font-weight: 700;
+      }
+
+      .cost-item.gold {
+        color: #fbbf24;
+      }
+
+      .btn-refine-action {
+        background: linear-gradient(135deg, #d97706, #b45309);
+        border: 1.5px solid #fbbf24;
+        border-radius: 8px;
+        color: white;
+        font-weight: 800;
+        font-size: 0.82rem;
+        padding: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+      }
+
+      .btn-refine-action:hover {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        box-shadow: 0 0 16px rgba(251, 191, 36, 0.6);
+        transform: translateY(-1px);
+      }
+
+      /* Submenu 3: Pedras & Gemas */
+      .pedras-sockets-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .socket-slot {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .socket-slot:hover {
+        border-color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+      }
+
+      .gem-icon {
+        font-size: 1.4rem;
+      }
+
+      .gem-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .gem-name {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #f8fafc;
+      }
+
+      .gem-effect {
+        font-size: 0.68rem;
+        color: #34d399;
+      }
+
+      .gem-bag-section,
+      .card-deck-section {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .gem-bag-title,
+      .deck-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #fbbf24;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .gem-bag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .gem-chip {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 0.72rem;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .gem-chip:hover {
+        border-color: #fbbf24;
+        background: rgba(251, 191, 36, 0.15);
+      }
+
+      /* Submenu 4: Monster Cards (Laplace M & Ragnarok Mobile) */
+      .card-slot {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1.5px solid #fbbf24;
+        border-radius: 10px;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .card-slot-tag {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #94a3b8;
+        text-transform: uppercase;
+      }
+
+      .card-equipped-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .card-symbol {
+        font-size: 1.8rem;
+      }
+
+      .card-details {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .card-name {
+        font-size: 0.85rem;
+        font-weight: 800;
+      }
+
+      .card-perk {
+        font-size: 0.72rem;
+        color: #34d399;
+      }
+
+      .monster-cards-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .monster-card-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 6px 10px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .monster-card-item:hover {
+        border-color: #fbbf24;
+        background: rgba(251, 191, 36, 0.12);
+      }
+
+      .m-card-pic {
+        font-size: 1.4rem;
+      }
+
+      .m-card-body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .m-card-title {
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: #f1f5f9;
+      }
+
+      .m-card-effect {
+        font-size: 0.66rem;
+        color: #fbbf24;
       }
 
       /* Bottom Global Experience (EXP) Bar */
@@ -987,12 +2222,11 @@
 
       .hero-avatar-box {
         position: relative;
-        width: 58px;
-        height: 58px;
+        width: 62px;
+        height: 62px;
         border-radius: 50%;
         border: 2.5px solid #fbbf24;
-        box-shadow: 0 0 14px rgba(251, 191, 36, 0.5);
-        overflow: hidden;
+        box-shadow: 0 0 16px rgba(251, 191, 36, 0.6);
         cursor: pointer;
         flex-shrink: 0;
       }
@@ -1001,20 +2235,25 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        border-radius: 50%;
       }
 
       .hero-level-badge {
         position: absolute;
-        bottom: -2px;
-        right: -2px;
+        bottom: -7px;
+        left: 50%;
+        transform: translateX(-50%);
         background: linear-gradient(135deg, #f59e0b, #b45309);
-        color: #fff;
-        font-size: 0.65rem;
-        font-weight: 800;
-        padding: 1px 5px;
-        border-radius: 6px;
-        border: 1px solid #ffffff;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+        color: #ffffff;
+        font-size: 0.78rem;
+        font-weight: 900;
+        padding: 2px 9px;
+        border-radius: 12px;
+        border: 2px solid #fef08a;
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.9), 0 3px 6px rgba(0, 0, 0, 0.8);
+        z-index: 10;
+        white-space: nowrap;
+        letter-spacing: 0.04em;
       }
 
       .hero-info-col {
@@ -1094,6 +2333,19 @@
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
       }
 
+      .hero-level-pill-tag {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #ffffff;
+        font-size: 0.72rem;
+        font-weight: 900;
+        padding: 2px 7px;
+        border-radius: 8px;
+        border: 1px solid #fef08a;
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+        letter-spacing: 0.04em;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+      }
+
       /* 2. Top-Right Location Card */
       #top-right-location-card {
         position: absolute;
@@ -1131,49 +2383,501 @@
         border-radius: 6px;
       }
 
-      /* 3. Top-Center Wave Card */
+      /* Top-Right Luxury RPG Bar */
+      .top-status-lux-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .gold-wallet-capsule {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+        border: 1.5px solid rgba(251, 191, 36, 0.5);
+        border-radius: 20px;
+        padding: 4px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 10px rgba(251, 191, 36, 0.25);
+      }
+
+      .gold-coin-icon {
+        font-size: 0.95rem;
+      }
+
+      .gold-amount-text {
+        font-family: 'Cinzel', serif;
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #fbbf24;
+        letter-spacing: 0.04em;
+        text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+      }
+
+      .lux-icon-btn {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        color: #38bdf8;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.15s ease-out;
+      }
+
+      .lux-icon-btn:hover {
+        background: rgba(56, 189, 248, 0.2);
+        border-color: #38bdf8;
+        transform: scale(1.08);
+      }
+
+      .lux-ping-pill {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 4px 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .lux-ping-text {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #34d399;
+      }
+
+      /* 3. Top-Center Stage Progression Card */
       #top-center-wave-card {
         position: absolute;
         top: 14px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 12px;
-        padding: 6px 18px;
+        gap: 6px;
+        padding: 8px 18px;
         border-radius: 14px;
         z-index: 25;
         pointer-events: auto;
-        border: 1px solid rgba(251, 191, 36, 0.35);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 41, 59, 0.90) 100%);
+        border: 1.5px solid rgba(251, 191, 36, 0.4);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 14px rgba(251, 191, 36, 0.15);
+        backdrop-filter: blur(12px);
+        min-width: 290px;
+      }
+
+      .stage-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 12px;
+      }
+
+      .stage-world-title {
+        font-family: 'Cinzel', serif;
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #f8fafc;
+        letter-spacing: 0.04em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      }
+
+      .stage-phase-badge {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: #0f172a;
+        background: linear-gradient(135deg, #fbbf24, #d97706);
+        padding: 2px 8px;
+        border-radius: 6px;
+        box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+
+      .stage-progress-track {
+        position: relative;
+        width: 100%;
+        height: 14px;
+        background: rgba(0, 0, 0, 0.65);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        border-radius: 7px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .stage-progress-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: linear-gradient(90deg, #d97706, #fbbf24, #fef08a);
+        box-shadow: 0 0 10px rgba(251, 191, 36, 0.7);
+        transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 6px;
+      }
+
+      .stage-progress-counter {
+        position: relative;
+        z-index: 2;
+        font-size: 0.68rem;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+        letter-spacing: 0.04em;
+        white-space: nowrap;
       }
 
       .btn-boss-challenge {
         background: linear-gradient(135deg, #ef4444, #b91c1c);
         color: #fff;
-        font-size: 0.72rem;
+        font-size: 0.74rem;
         font-weight: 800;
-        padding: 4px 10px;
+        padding: 5px 14px;
         border-radius: 8px;
-        border: 1px solid #f87171;
+        border: 1.5px solid #f87171;
         cursor: pointer;
         animation: pulseBoss 1.5s infinite;
+        letter-spacing: 0.04em;
+        width: 100%;
+        text-align: center;
       }
 
       @keyframes pulseBoss {
         0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
-        50% { transform: scale(1.06); box-shadow: 0 0 18px rgba(239, 68, 68, 0.9); }
+        50% { transform: scale(1.04); box-shadow: 0 0 18px rgba(239, 68, 68, 0.9); }
       }
 
-      /* 4. Bottom Mobile Dock Navigation */
-      #dock-navigation-bar {
+      .btn-expand-bag {
+        background: linear-gradient(135deg, #d97706, #b45309);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 8px;
+        border: 1px solid #fbbf24;
+        cursor: pointer;
+        transition: all 0.2s;
         display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .btn-expand-bag:hover {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        transform: translateY(-1px);
+        box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+      }
+
+      .inventory-slot.locked {
+        opacity: 0.35;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+      }
+      .inventory-slot.locked:hover {
+        opacity: 0.8;
+        border-color: #fbbf24;
+      }
+
+      .btn-action-discard {
+        background: linear-gradient(135deg, #7f1d1d, #450a0a);
+        color: #fecaca;
+        border: 1.5px solid #ef4444;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .btn-action-discard:hover {
+        background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+        color: #ffffff;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.65);
+        transform: translateY(-1px);
+      }
+
+      #boss-timer-banner {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, rgba(127, 29, 29, 0.95), rgba(69, 10, 10, 0.95));
+        border: 2px solid #ef4444;
+        border-radius: 30px;
+        padding: 6px 20px;
+        display: none;
+        align-items: center;
+        gap: 12px;
+        z-index: 40;
+        box-shadow: 0 0 25px rgba(239, 68, 68, 0.8);
+        animation: pulseBoss 1.5s infinite;
+      }
+
+      #btn-enter-portal {
+        position: absolute;
+        bottom: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #7c3aed, #4c1d95);
+        border: 2px solid #c084fc;
+        color: #fff;
+        border-radius: 30px;
+        padding: 10px 24px;
+        font-size: 0.88rem;
+        font-weight: 800;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        z-index: 40;
+        box-shadow: 0 0 25px rgba(192, 132, 252, 0.8);
+        animation: pulsePortal 2s infinite;
+      }
+
+      @keyframes pulsePortal {
+        0%, 100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 15px rgba(192, 132, 252, 0.5); }
+        50% { transform: translateX(-50%) scale(1.05); box-shadow: 0 0 30px rgba(192, 132, 252, 0.9); }
+      }
+
+      /* AAA Server & 3-Slot Character Selection Modal Styles */
+      .auth-selection-window {
+        width: 860px;
+        max-width: 95vw;
+        padding: 28px;
+        border-radius: 20px;
+        border: 2px solid rgba(251, 191, 36, 0.4);
+        background: radial-gradient(circle at top, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(251, 191, 36, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .lore-tag {
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.2em;
+        color: #fbbf24;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .auth-title {
+        font-family: 'Cinzel', serif;
+        font-size: 1.8rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        background: linear-gradient(135deg, #fef08a, #f59e0b, #d97706);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+      }
+      .auth-subtitle {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        margin: 6px 0 0 0;
+      }
+      .server-selector-bar {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 14px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+      }
+      .server-pills {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .server-pill {
+        display: flex;
+        align-items: center;
         gap: 8px;
         padding: 6px 12px;
-        border-radius: 18px;
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        color: #f1f5f9;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .server-pill.active {
+        border-color: #fbbf24;
+        background: rgba(251, 191, 36, 0.15);
+        box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+      }
+      .server-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .server-dot.green { background: #10b981; box-shadow: 0 0 6px #10b981; }
+      .server-dot.yellow { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+      .server-badge {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+      }
+      .server-badge.rec { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+      .server-badge.pvp { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+      .char-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .char-slot-card {
+        border-radius: 14px;
+        border: 1.5px solid rgba(255, 255, 255, 0.12);
+        background: rgba(15, 23, 42, 0.7);
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+        transition: all 0.2s;
+      }
+      .char-slot-card.active-card {
+        border-color: #fbbf24;
+        background: linear-gradient(180deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.25);
+      }
+      .char-slot-card:hover {
+        transform: translateY(-3px);
+      }
+      .char-slot-badge {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #94a3b8;
+        letter-spacing: 0.1em;
+      }
+      .char-slot-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 2px solid #fbbf24;
+        margin-top: 10px;
+      }
+      .char-slot-name {
+        font-family: 'Cinzel', serif;
+        font-size: 1.05rem;
+        color: #fbbf24;
+        margin: 0;
+      }
+      .char-slot-class {
+        font-size: 0.75rem;
+        color: #94a3b8;
+      }
+      .char-slot-cp {
+        font-size: 0.75rem;
+        color: #cbd5e1;
+        margin-top: 4px;
+      }
+      .char-slot-cp strong {
+        color: #f59e0b;
+      }
+      .btn-enter-world {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 0.85rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-enter-world:hover {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+      }
+      .empty-slot-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #64748b;
+        margin-top: 20px;
+      }
+      .empty-slot-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #cbd5e1;
+      }
+      .empty-slot-desc {
+        font-size: 0.72rem;
+        color: #64748b;
+        text-align: center;
+      }
+      .btn-create-char {
+        width: 100%;
+        padding: 8px;
+        border-radius: 8px;
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #f1f5f9;
+        font-weight: 700;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: auto;
+      }
+      .btn-create-char:hover {
+        border-color: #38bdf8;
+        color: #38bdf8;
+      }
+      .auth-footer {
+        display: flex;
+        justify-content: flex-end;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding-top: 12px;
+      }
+      .btn-ghost-small {
+        background: none;
+        border: none;
+        color: #64748b;
+        font-size: 0.72rem;
+        cursor: pointer;
+      }
+      .btn-ghost-small:hover {
+        color: #94a3b8;
+      }
+
+      /* 4. Right Vertical Mobile Dock Navigation (Ragnarok Mobile Style) */
+      #right-vertical-dock,
+      #dock-navigation-bar {
+        position: absolute;
+        right: 20px;
+        top: 175px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
         pointer-events: auto;
-        background: rgba(15, 23, 42, 0.92);
-        border: 1.5px solid rgba(251, 191, 36, 0.35);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        z-index: 35;
       }
 
       .dock-btn {
@@ -1181,189 +2885,77 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 2px;
-        width: 62px;
-        height: 52px;
-        border-radius: 12px;
-        background: rgba(30, 41, 59, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        gap: 3px;
+        width: 72px;
+        height: 66px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.92);
+        border: 2px solid rgba(251, 191, 36, 0.45);
         color: #cbd5e1;
-        font-size: 0.65rem;
-        font-weight: 700;
+        font-size: 0.74rem;
+        font-weight: 800;
         cursor: pointer;
         transition: all 0.15s ease-out;
         outline: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
       }
 
       .dock-btn .dock-icon {
-        font-size: 1.15rem;
+        font-size: 1.65rem;
       }
 
       .dock-btn:hover {
-        background: rgba(251, 191, 36, 0.18);
+        background: rgba(251, 191, 36, 0.25);
         border-color: #fbbf24;
         color: #fbbf24;
-        transform: translateY(-2px);
+        transform: translateX(-6px);
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.75);
       }
 
       .dock-btn:active {
         transform: scale(0.92);
       }
 
-      /* 5. Character Paperdoll Modal Styles */
-      .character-modal-body {
-        display: flex;
-        gap: 24px;
-        padding: 16px 8px;
-      }
-
-      .paperdoll-container {
+      /* Camera Zoom Capsule */
+      .lux-zoom-capsule {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-radius: 20px;
+        padding: 3px 6px;
         display: flex;
         align-items: center;
-        gap: 16px;
-        background: radial-gradient(circle, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
-        border: 1px solid rgba(251, 191, 36, 0.25);
-        border-radius: 16px;
-        padding: 18px;
+        gap: 6px;
       }
 
-      .paperdoll-slots-col {
+      .zoom-btn {
+        background: rgba(30, 41, 59, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #38bdf8;
+        font-weight: 800;
+        font-size: 0.85rem;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
         display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
-
-      .equipment-slot {
-        width: 62px;
-        height: 62px;
-        border-radius: 12px;
-        background: rgba(15, 23, 42, 0.9);
-        border: 1.5px solid rgba(255, 255, 255, 0.15);
-        display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        position: relative;
-        transition: all 0.2s;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        transition: all 0.15s;
+        outline: none;
       }
 
-      .equipment-slot:hover {
-        border-color: #fbbf24;
-        box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+      .zoom-btn:hover {
+        background: #38bdf8;
+        color: #0f172a;
+        transform: scale(1.1);
       }
 
-      .equipment-slot.equipped {
-        border-color: #38bdf8;
-        background: rgba(56, 189, 248, 0.1);
-      }
-
-      .slot-placeholder-icon {
-        font-size: 1.4rem;
-        opacity: 0.45;
-      }
-
-      .slot-label {
-        font-size: 0.6rem;
-        color: #94a3b8;
-        margin-top: 2px;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .paperdoll-hero-stage {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        position: relative;
-      }
-
-      .paperdoll-hero-img {
-        width: 140px;
-        height: 180px;
-        object-fit: cover;
-        border-radius: 16px;
-        border: 2px solid #fbbf24;
-        box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
-      }
-
-      .paperdoll-hero-badge {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-      }
-
-      .character-stats-panel {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .character-cp-card {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
-        border: 1.5px solid #fbbf24;
-        border-radius: 12px;
-        padding: 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        box-shadow: 0 0 16px rgba(251, 191, 36, 0.25);
-      }
-
-      .character-cp-title {
-        font-size: 0.72rem;
-        font-weight: 800;
-        color: #94a3b8;
-        letter-spacing: 0.1em;
-      }
-
-      .character-cp-value {
-        font-family: 'Cinzel', serif;
-        font-size: 1.6rem;
-        font-weight: 900;
-        color: #fbbf24;
-        text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-      }
-
-      .stats-grid-box,
-      .combat-substats-box {
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 10px 14px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .stats-section-title {
+      .zoom-label {
         font-size: 0.72rem;
         font-weight: 800;
         color: #fbbf24;
-        text-transform: uppercase;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        padding-bottom: 4px;
-        margin-bottom: 2px;
-      }
-
-      .dnd-stat-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.75rem;
-        padding: 3px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      }
-
-      .substat-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.75rem;
-        padding: 2px 0;
-        color: #cbd5e1;
+        min-width: 28px;
+        text-align: center;
       }
 
       /* 6. Quick Use Toast */
@@ -1390,7 +2982,7 @@
     </style>
   </head>
   <body>
-    <!-- 1. Top-Left Hero Status Card (Estilo Stickman Go) -->
+    <!-- 1. Top-Left Hero Status Card (Estilo Mobile Ragnarok / Stickman Go) -->
     <div id="hero-status-card" class="glass-panel">
       <div class="hero-avatar-box" id="hud-avatar-btn" title="Abrir Ficha de Personagem & Equipamentos [C]">
         <img id="hud-hero-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Avatar" class="hero-avatar-img" />
@@ -1398,6 +2990,7 @@
       </div>
       <div class="hero-info-col">
         <div class="hero-title-row">
+          <span id="hud-hero-level-pill" class="hero-level-pill-tag">Nv. 3</span>
           <span id="hud-hero-name" class="hero-name-label">LordAventureiro</span>
           <span class="hero-honor-tag">Cavaleiro Honrado</span>
         </div>
@@ -1418,21 +3011,53 @@
       </div>
     </div>
 
-    <!-- 2. Top-Center Wave & Boss Stage Card -->
+    <!-- 2. Top-Center Stage Progression & Boss Card + Locked Monster Target Bar -->
     <div id="top-center-wave-card" class="glass-panel">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
-        <span style="font-size: 0.65rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Progresso da Fase</span>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span id="wave-progress-text" style="font-size: 0.8rem; font-weight: 800; color: #fbbf24;">⚔️ Onda 1/5 • Monstros: 8/10</span>
-          <button id="btn-boss-challenge" class="btn-boss-challenge" style="display: inline-block;">💀 DESAFIAR CHEFÃO</button>
+      <!-- Stage & World Header -->
+      <div class="stage-header-row">
+        <span id="stage-world-title" class="stage-world-title">🌲 Mundo 1: Floresta da Forja</span>
+        <span id="stage-phase-badge" class="stage-phase-badge">Fase 1/10</span>
+      </div>
+
+      <!-- Visual Gold Progress Bar -->
+      <div class="stage-progress-track">
+        <div id="stage-progress-fill" class="stage-progress-fill" style="width: 0%"></div>
+        <span id="stage-progress-counter" class="stage-progress-counter">Monstros: 0 / 10</span>
+      </div>
+
+      <!-- Boss Retry Button: Hidden by default; only visible on Stage 10 if boss escapes / fails -->
+      <button id="btn-boss-challenge" class="btn-boss-challenge" style="display: none;">💀 DESAFIAR CHEFÃO NOVAMENTE</button>
+
+      <!-- Target Monster HUD Bar (Appears when target locked) -->
+      <div id="target-vital-row" style="display: none; align-items: center; gap: 8px; margin-top: 2px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08); width: 100%;">
+        <span id="target-level-badge" style="background: #ef4444; color: white; font-size: 0.65rem; font-weight: 800; padding: 1px 5px; border-radius: 4px;">Nv. 1</span>
+        <span id="target-name-label" style="font-size: 0.75rem; font-weight: 800; color: #f87171; white-space: nowrap;">Monstro</span>
+        <div style="flex: 1; height: 8px; background: rgba(0,0,0,0.7); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); position: relative;">
+          <div id="target-hp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #dc2626, #ef4444); transition: width 0.2s;"></div>
         </div>
+        <span id="target-hp-text" style="font-size: 0.65rem; color: #f1f5f9; font-weight: 700; white-space: nowrap;">100 / 100</span>
       </div>
     </div>
 
-    <!-- 3. Top-Right Location & Server Status Card -->
+    <!-- Active Boss Challenge Banner & Countdown -->
+    <div id="boss-timer-banner">
+      <span style="font-size: 1.2rem;">💀</span>
+      <div style="display: flex; flex-direction: column;">
+        <span id="boss-banner-name" style="font-size: 0.8rem; font-weight: 900; color: #fecaca; letter-spacing: 0.05em;">CHEFÃO DA FASE EM COMBATE</span>
+        <span id="boss-banner-timer" style="font-size: 0.75rem; font-weight: 800; color: #fef08a;">TEMPO RESTANTE: 60s</span>
+      </div>
+    </div>
+
+    <!-- Portal Prompt (Appears when boss is defeated or stage cleared) -->
+    <button id="btn-enter-portal">
+      <span>🌀</span>
+      <span id="enter-portal-label">ENTRAR NO PORTAL RÚNICO (FASE 2)</span>
+    </button>
+
+    <!-- 3. Top-Right Location & Luxury Currency Status Bar -->
     <div id="top-right-location-card">
       <div class="glass-panel zone-info-pill">
-        <span style="font-size: 0.9rem;">🌲</span>
+        <span style="font-size: 0.95rem;">🌲</span>
         <div style="display: flex; flex-direction: column;">
           <span id="zone-location-title" class="zone-title">Floresta da Forja (1)</span>
           <span style="font-size: 0.65rem; color: #94a3b8;">Canal 1 • Coords: (0, 0)</span>
@@ -1440,29 +3065,26 @@
         <span id="current-stage-badge" class="stage-badge">Fase 1/10</span>
       </div>
 
-      <div style="display: flex; gap: 8px;">
-        <div class="glass-panel metric-pill" style="color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35);" title="Ouro Acumulado">
-          <span>💰</span>
-          <span id="player-gold-text">0 Ouro</span>
+      <div class="top-status-lux-bar">
+        <div class="gold-wallet-capsule" title="Ouro do Jogador">
+          <span class="gold-coin-icon">💰</span>
+          <span id="player-gold-text" class="gold-amount-text">0</span>
+          <span class="gold-currency-label">G</span>
         </div>
-        <button id="btn-power-save" class="glass-panel metric-pill" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); cursor: pointer;" title="Modo de Economia de Bateria">
-          <span>🌙</span> Economia
+        <div class="lux-zoom-capsule" title="Zoom da Câmera (Scroll ou +/-)">
+          <button id="btn-zoom-out" class="zoom-btn" title="Afastar Câmera">−</button>
+          <span id="hud-zoom-label" class="zoom-label">16x</span>
+          <button id="btn-zoom-in" class="zoom-btn" title="Aproximar Câmera">+</button>
+        </div>
+        <button id="btn-power-save" class="lux-icon-btn" title="Modo Economia de Bateria">
+          <span id="power-save-icon">🌙</span>
         </button>
-        <div class="glass-panel metric-pill">
+        <button id="btn-toggle-inspector" class="lux-icon-btn" title="Alternar Painel de Rede e Simulação" style="padding: 0 10px; width: auto; font-size: 0.72rem; font-weight: 700; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
+          <span>⚙️</span><span>Rede</span>
+        </button>
+        <div class="lux-ping-pill" title="Latência do Servidor">
           <div id="status-dot" class="status-dot"></div>
-          <span id="connection-status">Desconectado</span>
-        </div>
-        <div class="glass-panel metric-pill">
-          <span>📶</span>
-          <span id="ping-text" style="color: #38bdf8">-- ms</span>
-        </div>
-        <div class="glass-panel metric-pill">
-          <span>⚙️</span>
-          <span id="tick-text" style="color: #a78bfa">#0</span>
-        </div>
-        <div class="glass-panel metric-pill">
-          <span>🖥️</span>
-          <span id="fps-text" style="color: #34d399">-- FPS</span>
+          <span id="ping-text" class="lux-ping-text">-- ms</span>
         </div>
       </div>
     </div>
@@ -1472,7 +3094,10 @@
 
     <!-- Controls & Inspector Panel -->
     <aside id="inspector-panel" class="glass-panel">
-      <div class="panel-title">Painel de Rede & Simulação</div>
+      <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Painel de Rede & Simulação</span>
+        <button id="btn-close-inspector" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.1rem; line-height: 1;" title="Minimizar Painel">✕</button>
+      </div>
 
       <div id="login-form" class="form-group">
         <label for="char-name">Nome do Personagem:</label>
@@ -1529,131 +3154,130 @@
       </div>
     </aside>
 
-    <!-- Mobile Virtual Joystick (Right Bottom) -->
-    <div id="virtual-joystick-zone">
+    <!-- Dynamic Floating Virtual Joystick (Appears only on touch / drag on left screen) -->
+    <div id="virtual-joystick-zone" style="display: none; position: fixed; pointer-events: none; z-index: 50; transform: translate(-50%, -50%);">
       <div class="joystick-base" id="joystick-base">
         <div class="joystick-thumb" id="joystick-thumb"></div>
       </div>
     </div>
 
-    <!-- Instructions Hint -->
-    <div id="instructions-hint" class="glass-panel">
-      🕹️ <strong>Joystick</strong> ou <strong>Clique</strong> para mover • <strong>Clique em Monstro</strong> para travar • Teclas <strong>[1, 2, 3, 4]</strong> para Magias
+    <!-- Right Vertical Navigation Dock (Ragnarok Mobile Style) -->
+    <div id="right-vertical-dock">
+      <button class="dock-btn" id="btn-dock-character" title="Ficha do Personagem & Equipamentos [C]">
+        <span class="dock-icon">👤</span>
+        <span>Herói</span>
+      </button>
+      <button class="dock-btn" id="btn-dock-inventory" title="Mochila de Itens [I]">
+        <span class="dock-icon">🎒</span>
+        <span>Mochila</span>
+      </button>
+      <button class="dock-btn" id="btn-dock-skillbook" title="Grimório de Habilidades [K]">
+        <span class="dock-icon">📖</span>
+        <span>Grimório</span>
+      </button>
+      <button class="dock-btn" id="btn-dock-farm" title="Assistente de Farm Idle [F]">
+        <span class="dock-icon">🤖</span>
+        <span>Farm</span>
+      </button>
+      <button class="dock-btn" id="btn-dock-ranking" title="Classificação e Rankings">
+        <span class="dock-icon">🏆</span>
+        <span>Rank</span>
+      </button>
     </div>
 
-    <!-- Bottom Combat & Skill Center Container -->
-    <div id="bottom-action-container">
-      <!-- Player & Target Vitals HUD -->
-      <div id="vitals-hud" class="glass-panel">
-        <!-- Player Level Badge & Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span id="player-level-badge" style="background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);">Nv. 1</span>
-            <span id="hud-player-name" style="font-size: 0.78rem; font-weight: 700; color: #f8fafc;">Jogador</span>
-          </div>
-          <span id="hud-player-cp" style="font-size: 0.72rem; font-weight: 700; color: #fbbf24;">⚔️ CP: <span id="hud-cp-val">1150</span></span>
+    <!-- Bottom Center Controls & In-Game Chat Box -->
+    <div id="bottom-center-zone">
+      <!-- Quick Action Toolbar: [AUTO], Farm Gear, Quick Potions -->
+      <div class="bottom-center-toolbar">
+        <button id="btn-toggle-auto" class="btn-auto-toggle" title="Ativar/Desativar Combate Automático">
+          <span id="auto-status-icon">⚔️</span>
+          <span id="auto-status-text">AUTO ON</span>
+        </button>
+
+        <button id="btn-open-farm-gear" class="btn-farm-gear" title="Configurar Farm Helper [F]">
+          <span>⚙️</span> Farm
+        </button>
+
+        <div id="btn-quick-hp" class="quick-potion-chip" style="color: #34d399;" title="Usar Poção de Vida">
+          <span>🧪</span> <span id="quick-hp-count">HP</span>
         </div>
-        <div class="vital-row">
-          <div class="vital-label" style="color: #34d399;">HP</div>
-          <div class="vital-bar-track">
-            <div id="player-hp-bar" class="vital-bar-fill hp-fill" style="width: 100%"></div>
-            <span id="player-hp-text" class="vital-bar-text">190 / 190</span>
-          </div>
-        </div>
-        <div class="vital-row">
-          <div id="player-resource-label" class="vital-label" style="color: #38bdf8;">MP</div>
-          <div class="vital-bar-track">
-            <div id="player-resource-bar" class="vital-bar-fill mp-fill" style="width: 100%"></div>
-            <span id="player-resource-text" class="vital-bar-text">100 / 100</span>
-          </div>
-        </div>
-        <!-- Active Target Sub-Bar (displayed when a monster is targeted) -->
-        <div id="target-vital-row" class="vital-row" style="display: none; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px; margin-top: 2px;">
-          <div style="display: flex; align-items: center; gap: 4px; width: 85px;">
-            <span id="target-level-badge" style="background: rgba(239, 68, 68, 0.4); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.62rem; font-weight: 800; padding: 1px 3px; border-radius: 3px;">Nv. 1</span>
-            <span id="target-name-label" style="color: #f87171; font-size: 0.72rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Alvo</span>
-          </div>
-          <div class="vital-bar-track">
-            <div id="target-hp-bar" class="vital-bar-fill target-hp-fill" style="width: 100%"></div>
-            <span id="target-hp-text" class="vital-bar-text">-- / --</span>
-          </div>
+        <div id="btn-quick-mp" class="quick-potion-chip" style="color: #38bdf8;" title="Usar Poção de Energia/MP">
+          <span>💧</span> <span id="quick-mp-count">MP</span>
         </div>
       </div>
 
-      <!-- Mobile Dock Navigation Bar (Stickman Go Style) -->
-      <div id="dock-navigation-bar">
-        <button class="dock-btn" id="btn-dock-character" title="Ficha do Personagem & Equipamentos [C]">
-          <span class="dock-icon">👤</span>
-          <span>Herói</span>
-        </button>
-        <button class="dock-btn" id="btn-dock-inventory" title="Mochila de Itens [I]">
-          <span class="dock-icon">🎒</span>
-          <span>Mochila</span>
-        </button>
-        <button class="dock-btn" id="btn-dock-skillbook" title="Grimório de Habilidades [K]">
-          <span class="dock-icon">📖</span>
-          <span>Grimório</span>
-        </button>
-        <button class="dock-btn" id="btn-dock-farm" title="Assistente de Farm Idle">
-          <span class="dock-icon">🤖</span>
-          <span>Farm</span>
-        </button>
-        <button class="dock-btn" id="btn-dock-ranking" title="Classificação e Rankings">
-          <span class="dock-icon">🏆</span>
-          <span>Rank</span>
-        </button>
+      <!-- In-Game Chat Box with History & Typing Input -->
+      <div id="game-chat-box">
+        <div id="chat-messages-container">
+          <div class="chat-msg"><span class="chat-tag-sys">[Sistema]</span><span class="chat-body">Bem-vindo ao MagicForge: Universe!</span></div>
+          <div class="chat-msg"><span class="chat-tag-auto">[Auto]</span><span class="chat-body">Farm Idle ativo: Caçando monstros da fase...</span></div>
+          <div class="chat-msg"><span class="chat-tag-loot">[Mundo]</span><span class="chat-body">Floresta da Forja (1) • Conectado autoritativo 20Hz.</span></div>
+        </div>
+        <form id="chat-input-form" class="chat-input-form">
+          <span class="chat-channel-badge">💬 Geral</span>
+          <input type="text" id="chat-input-field" class="chat-input-field" placeholder="Digite uma mensagem ou /help (Enter para enviar)..." maxlength="120" autocomplete="off" />
+          <button type="submit" id="chat-send-btn" class="chat-send-btn" title="Enviar Mensagem">
+            <span>Enviar</span>
+          </button>
+        </form>
       </div>
+    </div>
 
-      <!-- 4 Active Skill Buttons Bar -->
-      <div id="skill-action-bar" class="glass-panel">
-        <!-- Slot 1 -->
-        <button class="skill-btn" id="skill-btn-1" data-slot="1" title="Habilidade Slot 1">
-          <span class="skill-key-badge">1</span>
-          <img class="skill-img" id="skill-img-1" src="/assets/skills/guerreiro_1.png" alt="Slot 1" />
-          <div class="skill-footer-gradient">
-            <span class="skill-cost" id="skill-cost-1">15 EN</span>
-          </div>
-          <div class="cooldown-overlay" id="skill-cd-overlay-1">
-            <span class="cooldown-text" id="skill-cd-text-1"></span>
-          </div>
-        </button>
+    <!-- Ragnarok Mobile Half-Moon (Meia-Lua) Combat Arc (Bottom-Right) -->
+    <div id="mobile-combat-arc-container">
+      <!-- Main Attack Button (Center of the Fan) -->
+      <button class="mobile-primary-btn" id="btn-primary-attack" title="Ataque Básico Autorizado [Espaço]">
+        <span class="mobile-primary-icon">⚔️</span>
+        <span class="mobile-primary-label">Atacar</span>
+      </button>
 
-        <!-- Slot 2 -->
-        <button class="skill-btn" id="skill-btn-2" data-slot="2" title="Habilidade Slot 2">
-          <span class="skill-key-badge">2</span>
-          <img class="skill-img" id="skill-img-2" src="/assets/skills/guerreiro_2.png" alt="Slot 2" />
-          <div class="skill-footer-gradient">
-            <span class="skill-cost" id="skill-cost-2">25 EN</span>
-          </div>
-          <div class="cooldown-overlay" id="skill-cd-overlay-2">
-            <span class="cooldown-text" id="skill-cd-text-2"></span>
-          </div>
-        </button>
+      <!-- Slot 1 -->
+      <button class="skill-arc-btn" id="skill-btn-1" data-slot="1" title="Habilidade Slot 1 [1]">
+        <span class="skill-key-badge">1</span>
+        <img class="skill-img" id="skill-img-1" src="/assets/skills/guerreiro_1.png" alt="Slot 1" />
+        <div class="skill-footer-gradient">
+          <span class="skill-cost" id="skill-cost-1">15 EN</span>
+        </div>
+        <div class="cooldown-overlay" id="skill-cd-overlay-1">
+          <span class="cooldown-text" id="skill-cd-text-1"></span>
+        </div>
+      </button>
 
-        <!-- Slot 3 -->
-        <button class="skill-btn" id="skill-btn-3" data-slot="3" title="Habilidade Slot 3">
-          <span class="skill-key-badge">3</span>
-          <img class="skill-img" id="skill-img-3" src="/assets/skills/guerreiro_3.png" alt="Slot 3" />
-          <div class="skill-footer-gradient">
-            <span class="skill-cost" id="skill-cost-3">40 EN</span>
-          </div>
-          <div class="cooldown-overlay" id="skill-cd-overlay-3">
-            <span class="cooldown-text" id="skill-cd-text-3"></span>
-          </div>
-        </button>
+      <!-- Slot 2 -->
+      <button class="skill-arc-btn" id="skill-btn-2" data-slot="2" title="Habilidade Slot 2 [2]">
+        <span class="skill-key-badge">2</span>
+        <img class="skill-img" id="skill-img-2" src="/assets/skills/guerreiro_2.png" alt="Slot 2" />
+        <div class="skill-footer-gradient">
+          <span class="skill-cost" id="skill-cost-2">25 EN</span>
+        </div>
+        <div class="cooldown-overlay" id="skill-cd-overlay-2">
+          <span class="cooldown-text" id="skill-cd-text-2"></span>
+        </div>
+      </button>
 
-        <!-- Slot 4 (Ultimate) -->
-        <button class="skill-btn skill-btn-ult" id="skill-btn-4" data-slot="4" title="Habilidade Suprema">
-          <span class="skill-key-badge">4</span>
-          <img class="skill-img" id="skill-img-4" src="/assets/skills/guerreiro_4.png" alt="Slot 4" />
-          <div class="skill-footer-gradient">
-            <span class="skill-cost" id="skill-cost-4">70 EN</span>
-          </div>
-          <div class="cooldown-overlay" id="skill-cd-overlay-4">
-            <span class="cooldown-text" id="skill-cd-text-4"></span>
-          </div>
-        </button>
-      </div>
+      <!-- Slot 3 -->
+      <button class="skill-arc-btn" id="skill-btn-3" data-slot="3" title="Habilidade Slot 3 [3]">
+        <span class="skill-key-badge">3</span>
+        <img class="skill-img" id="skill-img-3" src="/assets/skills/guerreiro_3.png" alt="Slot 3" />
+        <div class="skill-footer-gradient">
+          <span class="skill-cost" id="skill-cost-3">40 EN</span>
+        </div>
+        <div class="cooldown-overlay" id="skill-cd-overlay-3">
+          <span class="cooldown-text" id="skill-cd-text-3"></span>
+        </div>
+      </button>
+
+      <!-- Slot 4 (Ultimate) -->
+      <button class="skill-arc-btn" id="skill-btn-4" data-slot="4" title="Habilidade Suprema [4]">
+        <span class="skill-key-badge">4</span>
+        <img class="skill-img" id="skill-img-4" src="/assets/skills/guerreiro_4.png" alt="Slot 4" />
+        <div class="skill-footer-gradient">
+          <span class="skill-cost" id="skill-cost-4">70 EN</span>
+        </div>
+        <div class="cooldown-overlay" id="skill-cd-overlay-4">
+          <span class="cooldown-text" id="skill-cd-text-4"></span>
+        </div>
+      </button>
     </div>
 
     <!-- Bottom Global Experience (EXP) Bar -->
@@ -1673,183 +3297,349 @@
 
     <!-- Skill Book Modal (Grimório de Habilidades & Magias D&D 5e) -->
     <div id="skillbook-modal" class="modal-backdrop" style="display: none;">
-      <div class="glass-panel modal-content">
+      <div class="glass-panel modal-content grimorio-modal-content">
         <div class="modal-header">
-          <div class="modal-title">
-            <span>📖</span> Grimório de Habilidades & Magias (D&D 5e)
+          <div class="modal-title-group">
+            <span class="grimorio-book-icon">📖</span>
+            <div>
+              <div class="modal-title">
+                Grimório de Habilidades & Magias
+              </div>
+              <div class="grimorio-class-subtitle">
+                Classe: <span id="skillbook-class-badge" class="skillbook-class-name">Guerreiro</span> • Livro de Feitiços & Técnicas (D&D 5E)
+              </div>
+            </div>
           </div>
           <button id="btn-close-skillbook" class="btn-close" title="Fechar (ESC)">✕</button>
         </div>
 
-        <!-- Class Tabs Filter -->
-        <div class="class-tabs-bar" id="skillbook-class-tabs"></div>
+        <!-- Build Strategy Banner -->
+        <div class="grimorio-strategy-banner">
+          <div class="grimorio-strategy-left">
+            <span class="strategy-badge">🔮 D&D 5E SLOTS</span>
+            <span class="strategy-desc">Cada <strong>Slot</strong> equivale a um Círculo de Magia/Técnica com <strong>3 opções especializadas</strong>. Ao equipar uma nova habilidade, ela substitui a anterior imediatamente no seu HUD e ataques!</span>
+          </div>
+        </div>
 
-        <!-- Skills Cards Grid -->
-        <div class="skills-cards-grid" id="skillbook-cards-grid"></div>
+        <!-- Container for the 4 Slot Sections -->
+        <div class="grimorio-slots-container" id="skillbook-slots-container"></div>
       </div>
     </div>
 
-    <!-- Inventory Modal (Mochila de Itens & Equipamentos) -->
+    <!-- Unified Hero & Inventory Modal (Ficha do Herói, Equipamentos, Mochila e Submenus: Refinamento, Pedras, Cartas) -->
     <div id="inventory-modal" class="modal-backdrop" style="display: none;">
-      <div class="glass-panel modal-content" style="max-width: 760px;">
-        <div class="modal-header">
-          <div class="modal-title">
-            <span>🎒</span> Mochila de Itens & Equipamentos
+      <div class="glass-panel modal-content unified-hero-modal-content">
+        <!-- Top Modal Bar -->
+        <div class="modal-header unified-modal-header">
+          <div class="modal-title-group">
+            <span class="modal-title-icon">🎒</span>
+            <div style="display: flex; flex-direction: column;">
+              <span class="modal-title-main">Ficha do Herói & Inventário</span>
+              <span class="modal-title-sub">Equipamentos • Mochila • Refinamento • Pedras • Cartas</span>
+            </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 14px;">
-            <span style="font-size: 0.85rem; color: #fbbf24; font-weight: 700;">
-              ⚔️ Poder de Combate (CP): <strong id="modal-cp-text">1150</strong>
-            </span>
-            <button id="btn-close-inventory" class="btn-close" title="Fechar (ESC ou I)">✕</button>
+          <div class="modal-header-actions">
+            <div class="modal-currencies">
+              <span class="currency-badge gold"><span class="badge-icon">💰</span> <strong id="inventory-gold-label">0 Ouro</strong></span>
+              <span class="currency-badge diamond"><span class="badge-icon">💎</span> <strong>0</strong> Diamantes</span>
+            </div>
+            <button id="btn-close-inventory" class="btn-close" title="Fechar (ESC ou I / C)">✕</button>
           </div>
         </div>
 
-        <div class="inventory-body">
-          <!-- 20 Slots Grid Container -->
-          <div class="inventory-grid-container">
-            <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between;">
-              <span>SLOTS (20)</span>
-              <span id="inventory-gold-label" style="color: #fbbf24;">0 Ouro</span>
-            </div>
-            <div class="inventory-slots-grid" id="inventory-slots-grid">
-              <!-- 20 slots dynamically injected or initialized -->
-            </div>
-          </div>
-
-          <!-- Item Details Inspector Panel -->
-          <div class="inventory-inspector" id="inventory-inspector">
-            <div class="inspector-item-header">
-              <div class="inspector-item-icon" id="inspector-icon">📦</div>
-              <div class="inspector-item-title-box">
-                <span class="inspector-item-name" id="inspector-name">Selecione um Item</span>
-                <span class="inspector-item-tag" id="inspector-tag">Mochila</span>
+        <!-- Main Body: Dual-Pane (Left: Hero & Equipment Stage, Right: Submenus & Views) -->
+        <div class="unified-modal-body">
+          <!-- LEFT PANE: Character Paperdoll Showcase & Equipment -->
+          <div class="unified-hero-left-pane">
+            <!-- Combat Power Banner (Inspired by Laplace M / Tales of Wind "CB 4276") -->
+            <div class="hero-cp-banner">
+              <span class="cp-label">PODER DE COMBATE (CP)</span>
+              <div class="cp-value-display">
+                <span class="cp-sword-icon">⚔️</span>
+                <span id="modal-cp-text" class="cp-number">1.864</span>
+                <span id="paperdoll-cp-value" style="display: none;">1.864</span>
               </div>
             </div>
 
-            <div class="inspector-stats-list" id="inspector-stats-list">
-              <span style="color: #94a3b8; font-size: 0.75rem;">Clique em um dos slots ao lado para inspecionar atributos, equipar armas/armaduras ou consumir poções.</span>
+            <!-- Pedestal Hero Stage with 6 Equipment Slots around it -->
+            <div class="hero-paperdoll-stage-box">
+              <!-- Left 3 Slots -->
+              <div class="paperdoll-slots-col left">
+                <!-- Head -->
+                <div class="equipment-slot" id="equip-slot-head" data-slot="head" title="Elmo / Cabeça">
+                  <div class="slot-refine-badge" id="refine-badge-head">+0</div>
+                  <span class="slot-placeholder-icon">🧢</span>
+                  <span class="slot-label">Elmo</span>
+                </div>
+                <!-- Chest -->
+                <div class="equipment-slot" id="equip-slot-chest" data-slot="chest" title="Peitoral / Armadura">
+                  <div class="slot-refine-badge" id="refine-badge-chest">+0</div>
+                  <span class="slot-placeholder-icon">🦺</span>
+                  <span class="slot-label">Armadura</span>
+                </div>
+                <!-- Legs -->
+                <div class="equipment-slot" id="equip-slot-legs" data-slot="legs" title="Botas / Calça">
+                  <div class="slot-refine-badge" id="refine-badge-legs">+0</div>
+                  <span class="slot-placeholder-icon">👖</span>
+                  <span class="slot-label">Botas</span>
+                </div>
+              </div>
+
+              <!-- Center Pedestal & Avatar -->
+              <div class="hero-center-pedestal">
+                <div class="pedestal-character-wrap">
+                  <img id="paperdoll-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Herói" class="hero-paperdoll-avatar" />
+                  <div class="pedestal-rock-base"></div>
+                </div>
+                <div class="hero-pedestal-identity">
+                  <span id="paperdoll-hero-name" class="hero-name-txt">LordAventureiro</span>
+                  <span id="paperdoll-hero-class" class="hero-class-txt">Guerreiro (Nv. 3)</span>
+                </div>
+              </div>
+
+              <!-- Right 3 Slots -->
+              <div class="paperdoll-slots-col right">
+                <!-- Weapon -->
+                <div class="equipment-slot" id="equip-slot-main_hand" data-slot="main_hand" title="Arma Principal">
+                  <div class="slot-refine-badge" id="refine-badge-main_hand">+0</div>
+                  <span class="slot-placeholder-icon">⚔️</span>
+                  <span class="slot-label">Arma</span>
+                </div>
+                <!-- Shield / Offhand -->
+                <div class="equipment-slot" id="equip-slot-off_hand" data-slot="off_hand" title="Escudo / Secundária">
+                  <div class="slot-refine-badge" id="refine-badge-off_hand">+0</div>
+                  <span class="slot-placeholder-icon">🛡️</span>
+                  <span class="slot-label">Escudo</span>
+                </div>
+                <!-- Relic -->
+                <div class="equipment-slot" id="equip-slot-relic" data-slot="relic" title="Relíquia / Anel">
+                  <div class="slot-refine-badge" id="refine-badge-relic">+0</div>
+                  <span class="slot-placeholder-icon">💍</span>
+                  <span class="slot-label">Relíquia</span>
+                </div>
+              </div>
             </div>
 
-            <p class="inspector-desc" id="inspector-desc">Espaço seguro para carregar espólios de batalha e artefatos forjados no Universo MagicForge.</p>
+            <!-- Left Pane Bottom: Atributos D&D e Estatísticas -->
+            <div class="hero-stats-accordion">
+              <div class="dnd-stats-mini-grid">
+                <div class="mini-stat"><span class="lbl str">FOR</span><strong id="stat-forca">16</strong></div>
+                <div class="mini-stat"><span class="lbl dex">DES</span><strong id="stat-destreza">12</strong></div>
+                <div class="mini-stat"><span class="lbl con">CON</span><strong id="stat-constituicao">15</strong></div>
+                <div class="mini-stat"><span class="lbl int">INT</span><strong id="stat-inteligencia">10</strong></div>
+                <div class="mini-stat"><span class="lbl wis">SAB</span><strong id="stat-sabedoria">12</strong></div>
+                <div class="mini-stat"><span class="lbl cha">CAR</span><strong id="stat-carisma">14</strong></div>
+              </div>
+              <div class="combat-substats-strip">
+                <span title="Vida Máxima">❤️ <strong id="paperdoll-max-hp">1.130</strong></span>
+                <span title="Dano Base">⚔️ <strong id="paperdoll-base-damage">89</strong></span>
+                <span title="Alcance de Ataque" id="paperdoll-attack-range" style="display: none;">2.5m</span>
+                <span title="Chance de Crítico">🎯 <strong id="paperdoll-crit">18%</strong></span>
+              </div>
+            </div>
+          </div>
 
-            <div class="inspector-stat-row" style="font-size: 0.75rem; color: #94a3b8;">
-              <span>Preço de Venda:</span>
-              <strong id="inspector-sell-price" style="color: #fbbf24;">--</strong>
+          <!-- RIGHT PANE: Submenus (Mochila, Refinamento, Pedras, Cartas) -->
+          <div class="unified-submenus-right-pane">
+            <!-- Submenu Tab Bar -->
+            <div class="submenus-tab-nav">
+              <button class="submenu-tab-btn active" data-tab="tab-mochila" id="tab-btn-mochila">
+                <span class="tab-emoji">🎒</span> Mochila
+              </button>
+              <button class="submenu-tab-btn" data-tab="tab-refino" id="tab-btn-refino">
+                <span class="tab-emoji">🔨</span> Refinamento
+              </button>
+              <button class="submenu-tab-btn" data-tab="tab-pedras" id="tab-btn-pedras">
+                <span class="tab-emoji">💎</span> Pedras
+              </button>
+              <button class="submenu-tab-btn" data-tab="tab-cartas" id="tab-btn-cartas">
+                <span class="tab-emoji">🃏</span> Cartas
+              </button>
             </div>
 
-            <div class="inspector-actions">
-              <button id="btn-inventory-action" class="btn-action-primary" style="display: none;">Equipar</button>
+            <!-- SUBMENU VIEW 1: MOCHILA (Sacola) -->
+            <div class="submenu-tab-panel" id="tab-mochila">
+              <div class="mochila-panel-layout">
+                <!-- Dynamic Inventory Item Grid -->
+                <div class="inventory-grid-wrap">
+                  <div class="grid-sub-header">
+                    <span id="inventory-capacity-text">CAPACIDADE: 20 / 20 SLOTS</span>
+                    <button id="btn-expand-inventory" class="btn-expand-bag" title="Expandir Mochila (+5 Slots)">➕ Expandir (+5) • <span id="expand-cost-label">10.000 G</span></button>
+                  </div>
+                  <div class="inventory-slots-grid" id="inventory-slots-grid"></div>
+                  <p id="inventory-expansion-status" role="status" aria-live="polite"></p>
+                  <div id="inventory-expansion-confirm" hidden>
+                    <p id="inventory-expansion-summary"></p>
+                    <button id="btn-confirm-expansion" type="button">Confirmar compra</button>
+                    <button id="btn-cancel-expansion" type="button">Cancelar</button>
+                  </div>
+                </div>
+
+                <!-- Inspector Card -->
+                <div class="inventory-inspector" id="inventory-inspector">
+                  <div class="inspector-item-header">
+                    <div class="inspector-item-icon" id="inspector-icon">📦</div>
+                    <div class="inspector-item-title-box">
+                      <span class="inspector-item-name" id="inspector-name">Selecione um Item</span>
+                      <span class="inspector-item-tag" id="inspector-tag">Mochila</span>
+                    </div>
+                  </div>
+
+                  <div class="inspector-stats-list" id="inspector-stats-list">
+                    <span style="color: #94a3b8; font-size: 0.75rem;">Clique em um dos slots ao lado para inspecionar atributos, equipar armas/armaduras ou consumir poções.</span>
+                  </div>
+
+                  <p class="inspector-desc" id="inspector-desc">Espaço seguro para carregar espólios de batalha e artefatos forjados no Universo MagicForge.</p>
+
+                  <div class="inspector-stat-row" style="font-size: 0.75rem; color: #94a3b8;">
+                    <span>Preço de Venda:</span>
+                    <strong id="inspector-sell-price" style="color: #fbbf24;">--</strong>
+                  </div>
+
+                  <div class="inspector-stat-row" style="font-size: 0.72rem; color: #c084fc;">
+                    <span>Reciclagem Astral:</span>
+                    <strong id="inspector-recycle-preview" style="color: #e9d5ff;">+Ouro & +Pó Arcano</strong>
+                  </div>
+
+                  <div class="inspector-actions" style="display: flex; gap: 8px; margin-top: auto;">
+                    <button id="btn-inventory-action" class="btn-action-primary" style="display: none; flex: 1;">Equipar</button>
+                    <button id="btn-inventory-discard" class="btn-action-discard" style="display: none; flex: 1;">♻️ Reciclar na Forja</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBMENU VIEW 2: REFINAMENTO (Forja de Equipamentos) -->
+            <div class="submenu-tab-panel" id="tab-refino" style="display: none;">
+              <div class="refino-forge-card">
+                <div class="refino-forge-header">
+                  <span class="refino-title">⚒️ Forja de Refinamento Celestial</span>
+                  <span class="refino-sub">Eleve o poder do seu equipamento (+1, +2, +3...) com Pedras de Refinamento</span>
+                </div>
+                <div class="refino-target-box">
+                  <div class="refino-item-preview" id="refino-item-icon">⚔️</div>
+                  <div class="refino-item-details">
+                    <span class="refino-item-name" id="refino-item-name">Arma Equipada</span>
+                    <div class="refino-tiers-row">
+                      <span class="tier-badge current" id="refino-tier-curr">+0</span>
+                      <span class="tier-arrow">➔</span>
+                      <span class="tier-badge next" id="refino-tier-next">+1</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="refino-stats-diff" id="refino-stats-diff">
+                  <div class="stat-diff-row"><span>Dano Físico Bônus:</span><strong style="color: #34d399;">+15 ➔ +25 (+10)</strong></div>
+                  <div class="stat-diff-row"><span>Vida Máxima (HP):</span><strong style="color: #34d399;">+40 ➔ +70 (+30)</strong></div>
+                  <div class="stat-diff-row"><span>Taxa de Sucesso:</span><strong id="refino-success-rate" style="color: #fbbf24;">100%</strong></div>
+                </div>
+                <div class="refino-cost-box">
+                  <span>Custo do Refinamento:</span>
+                  <div class="cost-items">
+                    <span class="cost-item">💎 1x Pedra de Refinamento</span>
+                    <span class="cost-item gold">💰 250 Ouro</span>
+                  </div>
+                </div>
+                <button id="btn-do-refine" class="btn-refine-action">🔨 APRIMORAR EQUIPAMENTO (+1)</button>
+              </div>
+            </div>
+
+            <!-- SUBMENU VIEW 3: PEDRAS (Engaste de Gemas) -->
+            <div class="submenu-tab-panel" id="tab-pedras" style="display: none;">
+              <div class="pedras-socket-card">
+                <div class="pedras-header">
+                  <span class="pedras-title">💎 Engaste de Gemas & Pedras Rúnicas</span>
+                  <span class="pedras-sub">Engaste joias nos soquetes do equipamento para destravar atributos extras</span>
+                </div>
+                <div class="pedras-sockets-grid">
+                  <div class="socket-slot" id="socket-slot-1">
+                    <span class="gem-icon">🔴</span>
+                    <div class="gem-info">
+                      <span class="gem-name">Rubi da Fúria (Nv. 1)</span>
+                      <span class="gem-effect">+15 Dano Físico e Mágico</span>
+                    </div>
+                  </div>
+                  <div class="socket-slot" id="socket-slot-2">
+                    <span class="gem-icon">🔵</span>
+                    <div class="gem-info">
+                      <span class="gem-name">Safira Mística (Nv. 1)</span>
+                      <span class="gem-effect">+40 Recurso / Mana Máxima</span>
+                    </div>
+                  </div>
+                  <div class="socket-slot" id="socket-slot-3">
+                    <span class="gem-icon">⚪</span>
+                    <div class="gem-info">
+                      <span class="gem-name">Soquete Vazio</span>
+                      <span class="gem-effect" style="color: #94a3b8;">Selecione uma gema abaixo para engastar</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="gem-bag-section">
+                  <span class="gem-bag-title">Gemas na Sacola</span>
+                  <div class="gem-bag-list" id="gem-bag-list">
+                    <div class="gem-chip" data-gem="emerald">🟢 Esmeralda (+90 HP)</div>
+                    <div class="gem-chip" data-gem="topaz">🟡 Topázio (+3% Crítico)</div>
+                    <div class="gem-chip" data-gem="amethyst">🟣 Ametista (+12 Perfuração)</div>
+                  </div>
+                </div>
+                <button id="btn-socket-gem" class="btn-refine-action">💎 ENGASTAR GEMA SELECIONADA</button>
+              </div>
+            </div>
+
+            <!-- SUBMENU VIEW 4: CARTAS (Monstros do Universo) -->
+            <div class="submenu-tab-panel" id="tab-cartas" style="display: none;">
+              <div class="cartas-album-card">
+                <div class="cartas-header">
+                  <span class="cartas-title">🃏 Cartas de Monstros & Encantamentos</span>
+                  <span class="cartas-sub">Estilo Laplace M & Ragnarok Mobile: Cartas saqueadas dos monstros com bônus únicos</span>
+                </div>
+                <div class="card-equip-preview">
+                  <div class="card-slot">
+                    <span class="card-slot-tag">Arma Principal • Carta Ativa</span>
+                    <div class="card-equipped-box">
+                      <span class="card-symbol">🃏</span>
+                      <div class="card-details">
+                        <span class="card-name" style="color: #fbbf24;">Carta Orc Guerreiro (Rara)</span>
+                        <span class="card-perk">+10% Dano Corpo-a-Corpo em Chefões</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-deck-section">
+                  <span class="deck-title">Cartas Disponíveis para Equipar</span>
+                  <div class="monster-cards-grid" id="monster-cards-grid">
+                    <div class="monster-card-item">
+                      <span class="m-card-pic">🕷️</span>
+                      <div class="m-card-body">
+                        <span class="m-card-title">Carta Aranha Venenosa</span>
+                        <span class="m-card-effect">+5% Chance de Envenenar ao golpear</span>
+                      </div>
+                    </div>
+                    <div class="monster-card-item">
+                      <span class="m-card-pic">💀</span>
+                      <div class="m-card-body">
+                        <span class="m-card-title">Carta Esqueleto Arqueiro</span>
+                        <span class="m-card-effect">+12% Dano Crítico à Distância</span>
+                      </div>
+                    </div>
+                    <div class="monster-card-item">
+                      <span class="m-card-pic">🗿</span>
+                      <div class="m-card-body">
+                        <span class="m-card-title">Carta Golem de Rocha</span>
+                        <span class="m-card-effect">+30 Armadura Física & 150 Vida</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button id="btn-socket-card" class="btn-refine-action">🃏 ENCAIXAR CARTA NO EQUIPAMENTO</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Character Paperdoll Modal (Ficha do Herói & Equipamentos) -->
-    <div id="character-modal" class="modal-backdrop" style="display: none;">
-      <div class="glass-panel modal-content" style="max-width: 820px;">
-        <div class="modal-header">
-          <div class="modal-title">
-            <span>👤</span> Ficha do Personagem & Equipamentos
-          </div>
-          <button id="btn-close-character" class="btn-close" title="Fechar (ESC ou C)">✕</button>
-        </div>
-
-        <div class="character-modal-body">
-          <!-- Left: Hero Paperdoll with 6 Slots Around Body -->
-          <div class="paperdoll-container">
-            <div class="paperdoll-slots-col left">
-              <!-- Helmet -->
-              <div class="equipment-slot" id="equip-slot-head" data-slot="head" title="Elmo / Cabeça">
-                <span class="slot-placeholder-icon">🧢</span>
-                <span class="slot-label">Elmo</span>
-              </div>
-              <!-- Armor -->
-              <div class="equipment-slot" id="equip-slot-chest" data-slot="chest" title="Peitoral / Armadura">
-                <span class="slot-placeholder-icon">🦺</span>
-                <span class="slot-label">Armadura</span>
-              </div>
-              <!-- Boots -->
-              <div class="equipment-slot" id="equip-slot-legs" data-slot="legs" title="Botas / Calça">
-                <span class="slot-placeholder-icon">👖</span>
-                <span class="slot-label">Botas</span>
-              </div>
-            </div>
-
-            <!-- Center: Hero Avatar Stage & Visual -->
-            <div class="paperdoll-hero-stage">
-              <img id="paperdoll-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Herói" class="paperdoll-hero-img" />
-              <div class="paperdoll-hero-badge">
-                <span id="paperdoll-hero-name" style="font-size: 0.85rem; font-weight: 800; color: #f8fafc;">LordAventureiro</span>
-                <span id="paperdoll-hero-class" style="color: #fbbf24; font-size: 0.72rem; font-weight: 700;">Guerreiro (Nv. 3)</span>
-              </div>
-            </div>
-
-            <div class="paperdoll-slots-col right">
-              <!-- Weapon -->
-              <div class="equipment-slot" id="equip-slot-main_hand" data-slot="main_hand" title="Arma Principal">
-                <span class="slot-placeholder-icon">⚔️</span>
-                <span class="slot-label">Arma</span>
-              </div>
-              <!-- Shield / Offhand -->
-              <div class="equipment-slot" id="equip-slot-off_hand" data-slot="off_hand" title="Escudo / Secundária">
-                <span class="slot-placeholder-icon">🛡️</span>
-                <span class="slot-label">Escudo</span>
-              </div>
-              <!-- Relic / Ring -->
-              <div class="equipment-slot" id="equip-slot-relic" data-slot="relic" title="Relíquia / Anel">
-                <span class="slot-placeholder-icon">💍</span>
-                <span class="slot-label">Relíquia</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: Attributes Sheet & Combat Power -->
-          <div class="character-stats-panel">
-            <div class="character-cp-card">
-              <span class="character-cp-title">PODER DE COMBATE (CP)</span>
-              <div class="character-cp-value" id="paperdoll-cp-value">⚔️ 1.425</div>
-            </div>
-
-            <div class="stats-grid-box">
-              <div class="stats-section-title">Atributos D&D 5e</div>
-              <div class="dnd-stat-row">
-                <span class="stat-name"><strong style="color: #f87171;">FOR</strong> (Força):</span>
-                <span class="stat-val" id="stat-forca">16</span>
-              </div>
-              <div class="dnd-stat-row">
-                <span class="stat-name"><strong style="color: #34d399;">DES</strong> (Destreza):</span>
-                <span class="stat-val" id="stat-destreza">12</span>
-              </div>
-              <div class="dnd-stat-row">
-                <span class="stat-name"><strong style="color: #fb923c;">CON</strong> (Constituição):</span>
-                <span class="stat-val" id="stat-constituicao">15</span>
-              </div>
-              <div class="dnd-stat-row">
-                <span class="stat-name"><strong style="color: #38bdf8;">INT</strong> (Inteligência):</span>
-                <span class="stat-val" id="stat-inteligencia">10</span>
-              </div>
-              <div class="dnd-stat-row">
-                <span class="stat-name"><strong style="color: #a78bfa;">SAB</strong> (Sabedoria):</span>
-                <span class="stat-val" id="stat-sabedoria">12</span>
-              </div>
-              <div class="dnd-stat-row">
-                <span class="stat-name"><strong style="color: #facc15;">CAR</strong> (Carisma):</span>
-                <span class="stat-val" id="stat-carisma">14</span>
-              </div>
-            </div>
-
-            <div class="combat-substats-box">
-              <div class="stats-section-title">Estatísticas de Batalha</div>
-              <div class="substat-row"><span>Vida Máxima:</span><strong id="paperdoll-max-hp" style="color: #34d399;">1.130</strong></div>
-              <div class="substat-row"><span>Dano Base:</span><strong id="paperdoll-base-damage" style="color: #f87171;">89</strong></div>
-              <div class="substat-row"><span>Alcance de Ataque:</span><strong id="paperdoll-attack-range">2.5m (Melee)</strong></div>
-              <div class="substat-row"><span>Chance de Crítico:</span><strong id="paperdoll-crit" style="color: #fbbf24;">18%</strong></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Hidden alias anchor for legacy compatibility -->
+    <div id="character-modal" style="display: none;"></div>
 
     <!-- Farm Helper Modal (Assistente de Farm Idle & Auto-Venda) -->
     <div id="farm-helper-modal" class="modal-backdrop" style="display: none;">
@@ -1868,6 +3658,7 @@
               <label for="slider-auto-hp">🧪 Auto-Poção de Vida (HP):</label>
               <span id="label-auto-hp" style="font-size: 0.75rem; color: #34d399; font-weight: 700;">Usar se HP &lt; 60%</span>
             </div>
+            <label><input id="chk-auto-hp-enabled" type="checkbox" disabled> Ativar auto-poção de HP</label>
             <input type="range" id="slider-auto-hp" min="20" max="90" step="5" value="60" style="margin-top: 6px;" />
             <span style="font-size: 0.68rem; color: #94a3b8;">Consome poções de HP automaticamente da mochila durante o combate contínuo.</span>
           </div>
@@ -1878,6 +3669,7 @@
               <label for="slider-auto-mp">💧 Auto-Poção de Energia / MP:</label>
               <span id="label-auto-mp" style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">Usar se Recurso &lt; 40%</span>
             </div>
+            <label><input id="chk-auto-mp-enabled" type="checkbox" disabled> Ativar auto-poção de MP</label>
             <input type="range" id="slider-auto-mp" min="20" max="80" step="5" value="40" style="margin-top: 6px;" />
           </div>
 
@@ -1900,9 +3692,23 @@
             </div>
           </div>
 
+          <label><input id="chk-auto-loot-enabled" type="checkbox" disabled> Coletar drops automaticamente</label>
           <button id="btn-save-farm-helper" class="btn-action-primary" style="width: 100%; padding: 10px;">
-            Salvar & Ativar Farm Helper
+            Salvar preferências
           </button>
+          <p id="farm-settings-status" role="status" aria-live="polite" style="font-size:12px;color:#cbd5e1;">Entre com um herói para carregar as preferências.</p>
+          <section style="padding:12px;border:1px solid #fbbf2444;border-radius:10px;">
+            <h3 style="font-size:14px;color:#fbbf24;">Vender lixo da mochila</h3>
+            <p style="font-size:12px;color:#cbd5e1;">Vende todos os itens comuns e incomuns não equipados, incluindo consumíveis e materiais dessas raridades.</p>
+            <label><input id="chk-salvage-rare" type="checkbox" disabled> Incluir também itens raros não equipados</label>
+            <button id="btn-auto-salvage" type="button" class="btn-action-primary" disabled>Vender lixo</button>
+            <div id="farm-salvage-confirm" hidden>
+              <p id="farm-salvage-summary"></p>
+              <button id="btn-confirm-salvage" type="button" class="btn-action-primary">Confirmar venda</button>
+              <button id="btn-cancel-salvage" type="button">Cancelar</button>
+            </div>
+            <p id="farm-salvage-status" role="status" aria-live="polite" style="font-size:12px;color:#cbd5e1;"></p>
+          </section>
         </div>
       </div>
     </div>
@@ -1915,6 +3721,106 @@
         <span id="quick-use-name" style="font-size: 0.78rem; font-weight: 800; color: #fbbf24;">Baú de Equipamento</span>
       </div>
       <button id="btn-quick-use-action" class="btn-action-primary" style="padding: 6px 14px; font-size: 0.72rem;">Usar</button>
+    </div>
+
+    <!-- Sala dos Forjados: slots await the authoritative character list. -->
+    <dialog id="leaderboard-dialog" aria-labelledby="leaderboard-title">
+      <header class="ranking-header"><h2 id="leaderboard-title">Hall da Fama</h2><button id="leaderboard-close" type="button" aria-label="Fechar Hall da Fama">✕</button></header>
+      <div class="ranking-tabs" role="tablist" aria-label="Categoria de ranking">
+        <button type="button" role="tab" data-ranking="COMBAT_POWER" aria-selected="true" aria-controls="leaderboard-panel">Poder de Combate</button>
+        <button type="button" role="tab" data-ranking="LEVEL" aria-selected="false" aria-controls="leaderboard-panel">Nível e Prestígio</button>
+        <button type="button" role="tab" data-ranking="STAGE" aria-selected="false" aria-controls="leaderboard-panel">Mundos e Fases</button>
+        <button type="button" role="tab" data-ranking="GOLD" aria-selected="false" aria-controls="leaderboard-panel">Ouro</button>
+      </div>
+      <section id="leaderboard-panel" role="tabpanel" aria-label="Ranking selecionado">
+        <p id="leaderboard-personal"></p>
+        <div class="ranking-table-wrap"><table><thead><tr><th>Posição</th><th>Herói</th><th>Classe</th><th>Progressão</th><th>Pontuação</th><th>Título</th></tr></thead><tbody id="leaderboard-entries"></tbody></table></div>
+        <p id="leaderboard-status" role="status" aria-live="polite"></p><button id="leaderboard-refresh" type="button">Atualizar ranking</button>
+      </section>
+    </dialog>
+    <div id="modal-auth-selection">
+      <main class="forge-auth" aria-labelledby="forge-auth-title">
+        <header class="forge-masthead">
+          <div class="forge-wordmark">MAGICFORGE<small>U N I V E R S E</small></div>
+          <span class="forge-world-tag">FORJA ANCESTRAL<br>O início da sua jornada</span>
+        </header>
+        <div class="forge-intro">
+          <span class="forge-eyebrow">A QUEDA DA BIGORNA ASTRAL</span>
+          <h1 id="forge-auth-title">Entre na<br>Forja Astral.</h1>
+          <p id="forge-intro-copy">Acesse sua conta para encontrar seus heróis e continuar sua jornada.</p>
+        </div>
+        <div id="forge-account-session" class="forge-account-session" hidden><span id="forge-session-name"></span><button id="forge-sign-out" type="button">Trocar conta</button></div>
+        <div class="forge-layout">
+          <section class="forge-roster" aria-labelledby="forge-roster-title" hidden>
+            <div class="forge-section-heading"><h2 id="forge-roster-title">Seus heróis</h2><span>03 pedestais rúnicos</span><button id="forge-refresh-slots" type="button">Atualizar heróis</button></div>
+            <div class="forge-slots" aria-describedby="forge-roster-note">
+              <article class="forge-slot" data-slot-index="0">
+                <span class="forge-slot-number">PEDESTAL 01</span>
+                <div class="forge-pedestal"><img src="/assets/ui/login/pedestal_runico_vazio.png" alt="" width="512" height="512"><span aria-hidden="true">I</span></div>
+                <h3>Destino por revelar</h3><p>Aguardando a lista<br>de heróis da conta.</p>
+                <button type="button" disabled aria-label="Pedestal 1: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button>
+              </article>
+              <article class="forge-slot" data-slot-index="1">
+                <span class="forge-slot-number">PEDESTAL 02</span>
+                <div class="forge-pedestal"><img src="/assets/ui/login/pedestal_runico_vazio.png" alt="" width="512" height="512"><span aria-hidden="true">II</span></div>
+                <h3>Destino por revelar</h3><p>Aguardando a lista<br>de heróis da conta.</p>
+                <button type="button" disabled aria-label="Pedestal 2: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button>
+              </article>
+              <article class="forge-slot" data-slot-index="2">
+                <span class="forge-slot-number">PEDESTAL 03</span>
+                <div class="forge-pedestal"><img src="/assets/ui/login/pedestal_runico_vazio.png" alt="" width="512" height="512"><span aria-hidden="true">III</span></div>
+                <h3>Destino por revelar</h3><p>Aguardando a lista<br>de heróis da conta.</p>
+                <button type="button" disabled aria-label="Pedestal 3: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button>
+              </article>
+            </div>
+            <p class="forge-roster-note" id="forge-roster-note">Identifique sua conta para revelar seus três pedestais. Escolha um herói para entrar ou um pedestal vazio para criar.</p>
+          </section>
+          <section class="forge-entry" aria-labelledby="forge-entry-title">
+            <span class="forge-eyebrow">FORJA ANCESTRAL</span>
+            <h2 id="forge-entry-title">Acesse sua conta</h2>
+            <p id="forge-entry-copy">Seus heróis estarão esperando na Sala dos Forjados.</p>
+            <form id="forge-account-form">
+              <label for="forge-account-name">Nome da conta</label>
+              <input id="forge-account-name" name="accountUsername" type="text" required autocomplete="username" placeholder="Sua conta de aventureiro">
+              <label for="forge-account-password">Senha</label>
+              <input id="forge-account-password" name="password" type="password" required autocomplete="current-password" placeholder="Sua senha">
+              <div id="forge-register-fields" hidden>
+                <label for="forge-password-confirm">Confirmar senha</label>
+                <input id="forge-password-confirm" type="password" autocomplete="new-password" placeholder="Repita sua senha">
+                <label for="forge-account-email">Email</label>
+                <input id="forge-account-email" type="email" autocomplete="email" required disabled placeholder="voce@exemplo.com">
+              </div>
+              <button type="submit" disabled>ENTRAR</button>
+              <button id="forge-toggle-register" type="button">Criar uma nova conta</button>
+            </form>
+            <section id="forge-social-login" class="forge-social-login" aria-labelledby="forge-social-title">
+              <h3 id="forge-social-title">Outras formas de entrar</h3>
+              <div class="forge-social-buttons">
+                <button type="button" data-auth-provider="GOOGLE" disabled>Google</button>
+                <button type="button" data-auth-provider="APPLE" disabled>Apple</button>
+                <button type="button" data-auth-provider="DISCORD" disabled>Discord</button>
+                <button type="button" data-auth-provider="GUEST" disabled>Convidado · neste navegador</button>
+              </div>
+              <p id="forge-social-note">Google, Apple e Discord ainda não estão disponíveis.</p>
+            </section>
+            <form id="forge-entry-form" hidden aria-labelledby="forge-create-title">
+              <h3 id="forge-create-title">Criar novo herói</h3>
+              <label for="forge-hero-name">Nome do herói</label>
+              <input id="forge-hero-name" name="heroName" type="text" minlength="3" maxlength="20" required autocomplete="off" placeholder="De 3 a 20 caracteres">
+              <label for="forge-hero-class">Classe</label>
+              <select id="forge-hero-class" name="heroClass" required aria-describedby="forge-class-note"></select>
+              <div class="forge-class-preview">
+                <img id="forge-preview-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Retrato da classe Guerreiro" width="44" height="44">
+                <div><span id="forge-preview-class">Guerreiro</span><small id="forge-class-note">Classe inicial para novos heróis</small></div>
+              </div>
+              <button type="submit">CRIAR HERÓI</button>
+              <button id="forge-cancel-create" type="button">Cancelar criação</button>
+            </form>
+          </section>
+        </div>
+        <p id="forge-auth-status" class="forge-auth-status" role="status" aria-live="polite">O acesso por conta e senha ainda não está disponível.</p>
+        <footer class="forge-footer"><span>Sete classes. Mundos fragmentados. Uma nova lenda.</span><button id="btn-replay-story" type="button">📜 Rever história</button><button id="btn-auth-switch-dev" type="button" hidden>Abrir painel de rede</button></footer>
+      </main>
     </div>
 
     <script type="module" src="/src/main.ts"></script>

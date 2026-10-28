@@ -152,3 +152,191 @@ Todos os 5 monstros abaixo já estão ativos no servidor autoritativo ([`server/
 | **Piso de Pedra da Arena** | `tile_arena_stone.jpg` | <img src="./Art/Isometric/tile_arena_stone.jpg" width="140" /> |
 | **Grama de Fantasia** | `tile_fantasy_grass.jpg` | <img src="./Art/Isometric/tile_fantasy_grass.jpg" width="140" /> |
 
+---
+
+## 7. Abertura Cinemática & Storytelling Inicial (Antes da Escolha de Personagem)
+
+Para engajar o jogador e criar conteúdo para vídeos no YouTube, o jogo conta com uma introdução cinemática de 40 a 60 segundos com arte estática, efeito parallax (Ken Burns) e narração com voz grave. Pode ser pulada (*Skip*) a qualquer momento.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as Jogador
+    participant Intro as Cinemática (6 Cenas)
+    participant Audio as Narração (Voz Grave)
+    participant Select as Tela de Heróis (3 Pedestais)
+    
+    Player->>Intro: Abre o Jogo / Primeiro Acesso
+    Intro->>Audio: Toca som de martelo na forja (Cena 1)
+    Intro->>Audio: Apresenta os 6 Elementos Primordiais (Cena 2)
+    Intro->>Audio: Apresenta Malakor diante da Bigorna (Cena 3)
+    Intro->>Audio: O Golpe Profano & Quebra da Forja (Cena 4)
+    Intro->>Audio: Estilhaços caindo sobre o mundo (Cena 5)
+    Intro->>Select: Transição: "Quem é você, Forjado?" (Cena 6)
+```
+
+### Roteiro das 6 Cenas da Abertura:
+* **Cena 1 — A Bigorna Primordial (Tela escura, som ritmado de marteladas pesadas no metal):**
+  > *"Antes dos reinos, antes dos deuses terem nome, havia um som. Um martelo. Uma bigorna. E seis chamas que ainda não sabiam o que queriam ser."*
+* **Cena 2 — Os 6 Elementos surgem um a um (Fogo, Água, Natureza, Terra, Luz, Sombra):**
+  > *"Com elas, o mundo foi forjado. E alguém precisava guardar a forja."*
+* **Cena 3 — Malakor, mortal, diante da MagicForge:**
+  > *"Escolheram um homem. Um ferreiro. O melhor que já existiu... e o mais faminto."*
+* **Cena 4 — O Golpe. Rachadura. Feixe de luz branca ofuscante:**
+  > *"Malakor quis todas as chamas para si. Ergueu o martelo profano. E a Bigorna... quebrou."*
+* **Cena 5 — Estilhaços caindo como estrelas cadentes sobre a floresta:**
+  > *"Os estilhaços caíram sobre os planos dimensionais. Os monstros beberam a escória. E em algum lugar, uma alma acordou com uma fagulha que não era sua."*
+* **Cena 6 — Transição épica para a Sala dos Pedestais:**
+  > *"Quem é você, Forjado?"*
+
+---
+
+## 8. Tela de Seleção de Classe: Falas de Apresentação (Hover no Pedestal)
+
+Ao passar o cursor ou tocar no pedestal de cada classe, uma fala de apresentação é reproduzida (áudio + balão dourado translúcido):
+
+| Classe | Atributo Principal | Citação de Personalidade do Herói |
+| :--- | :---: | :--- |
+| **Guerreiro** | FOR / CHA | *"A Ordem da Bigorna caiu. Eu não. Meu escudo ainda sustenta o mundo."* |
+| **Clérigo** | SAB | *"A luz sagrada vaza pelas rachaduras da forja. Alguém precisa costurá-las."* |
+| **Bárbaro** | FOR / CON | *"Bebi o magma primordial. Ele ainda ruge e queima dentro das minhas veias."* |
+| **Monge** | DEX | *"Meu corpo é a bigorna. Cada soco desferido, uma lição de equilíbrio."* |
+| **Bruxo** | CHA | *"Ele quebrou o mundo. Eu só colhi o que sobrou... e o que sussurra debaixo do abismo."* |
+| **Mago** | INT | *"O fogo derrete a matéria. O gelo a tempera. O resto é mero detalhe arcano."* |
+| **Arqueiro** | DEX | *"A floresta virou cristal sob a fumaça de Malakor. Eu enxergo tudo de longe."* |
+
+---
+
+## 9. O Vilão Malakor: Personalidade, Falas de Mundo & Os 4 Encontros
+
+Malakor não é um monstro histérico: seu tom é **calmo, paternal, cansado e sutilmente irônico**. Ele trata o herói não como um inimigo jurado, mas como um discípulo teimoso que não compreende a grandiosidade de sua obra.
+
+### 9.1 Mensagens de Mundo (Chat Global & Texto Flutuante no Céu)
+Disparam em marcos de nível ou eventos globais:
+* **Nv. 5:** *"Mais um Forjado desperto. A Bigorna sempre escolhe os mais teimosos."*
+* **Nv. 10:** *"Você mata slimes com orgulho. Pobres criaturas... elas só carregavam a escória que deixei cair."*
+* **Nv. 20:** *"Continue forjando suas armas. Cada fagulha que você purifica é um fardo a menos para o meu martelo."*
+* **Nv. 29 (Pré-Chefe):** *"O Chefe que você enfrenta usa uma coroa feita do meu primeiro erro. Seja compassivo."*
+* **Primeira Morte do Jogador:** *"Isso... foi mais rápido do que eu esperava. Levante-se e tente de novo. A eternidade pode esperar."*
+* **Retorno Offline (Idle Return):** *"Você descansou. O cosmos, não. A forja continua rachada, Forjado."*
+
+### 9.2 Os 4 Encontros de Campanha com Malakor
+1. **Ato I (Pós-Chefe Goblin — Fase 10/Mundo 1): A Projeção Espectral.**
+   - Malakor surge como uma silhueta de fumaça cinzenta e aplaude pausadamente:
+   > *"Impressionante. Ele era só um ladrão tolo com uma coroa quente. Mas você... você possui a têmpera certa."*
+   *(Desaparece sem atacar, deixando o Portal Rúnico se acender).*
+2. **Ato II (Meio do Mundo 2 — Picos Gelados): O Eco Menor (Mini-Boss com 10% de Força).**
+   - Um reflexo de escória ataca o jogador em combate rápido. Ao ser derrotado, dissolve-se em cinzas com uma risada baixa:
+   > *"Ótimo. Você aprendeu a quebrar uma sombra. Agora tente quebrar a bigorna viva."*
+   *(Deixa um drop mítico garantido).*
+3. **Ato II (Fim do Mundo 2 — Fase 10): O Fugitivo.**
+   - Batalha intensa. Ao atingir 30% de HP, Malakor invoca um redemoinho vulcânico de fumaça e salta para a fenda:
+   > *"Não fujo por medo, Forjado. Mas por conveniência. Nos vemos na Forja Primordial."*
+4. **Ato III (Fase 10/Mundo 3 — A Cratera da MagicForge): O Trono dos 6 Elementos.**
+   - Malakor empunha o Martelo Negro com os 6 Elementos cintilando na armadura de obsidiana.
+   - **O Encerramento Narrativo do Loop Infinito (Prestige / Reborn):**
+   Ao ser derrotado, a Bigorna não se conserta automaticamente — ela exige ser martelada novamente pelo próprio herói:
+   > *"Você me venceu. Mas a Forja ainda clama por um ferreiro. Eu era apenas o martelo, Forjado... Quem segura o martelo agora é você."*
+   *(Dispara o ritual de Transcendência Astral / Reborn I..IV, reiniciando o ciclo com +10 atributos e bônus permanentes).*
+
+---
+
+## 10. Bestiário Vivo: Falas Ambientais dos Monstros em Combate
+
+Durante a batalha idle, monstros têm 10% de chance de emitir balões curtos de fala sobre suas cabeças, trazendo dinamismo e humor:
+
+* **Slime da Floresta (`mob_3`):**
+  - *"blub... brilhante... engoli... brilhante..."*
+  - *"*(a fagulha cósmica pulsa dentro do gel translúcido como um coração assustado)*"*
+* **Goblin Lanceiro (`mob_1`):**
+  - *"A lança é minha! Eu achei! Foi a terra rachada que me deu!"*
+  - *"O Grande Chefe avisou que você vinha! Disse que você é nanico!"*
+* **Goblin Arqueiro (`mob_2`):**
+  - *"Uma flecha só... na ponta do seu nariz!"*
+  - *"Errei?! Não me olha assim, a fumaça entrou no meu olho!"*
+* **Lobo Selvagem (`mob_4`):**
+  - *"*(rosnado rouco — seus olhos fixam a fumaça de Malakor, não você)*"*
+  - **Ao morrer:** *"*(a fumaça cinzenta escapa do focinho como um suspiro de alívio)*"*
+* **Chefe Goblin (`mob_5` — Grimgor):**
+  - **Entrada (100% HP):** *"EU SOU O REI DESTE BOSQUE! A COROA DE FOGO ME ESCOLHEU!"*
+  - **Metade da Vida (50% HP):** *"A coroa... ela queima meu crânio... mas o poder é meu!"*
+  - **Morte (0% HP):** *"Ele... ele prometeu que bastava segurar o fogo... só segurar..."* *(Planta a revelação de que os chefes são meras cobaias corrompidas por Malakor).*
+
+---
+
+## 11. NPCs Resgatados: Evolução do Hub & Desbloqueio de Sistemas
+
+A cada mundo ou fase superada, um NPC é resgatado e passa a habitar o Altar Central, destravando funcionalidades do jogo:
+
+| NPC Resgatado | Onde é Salvo | Sistema que Desbloqueia | Fala Emblemática |
+| :--- | :---: | :---: | :--- |
+| **Bria, a Aprendiz de Ferreira** | Pós-Chefe Mundo 1 (Bosque) | **Bigorna Portátil (Gacha de Equipamentos)** | *"Meu antigo mestre se chamava Malakor... Por favor, não conte a ninguém que eu disse isso."* |
+| **Tobias, o Cartógrafo Cego** | Início do Mundo 2 (Jotunheim) | **Mapa Rúnico dos Portais (Fases 1 a 10)** | *"Não preciso de olhos para ver os mundos. A Forja canta através das fendas, cada portal em um tom."* |
+| **Irmã Ysolde, a Arquivista** | Meio do Mundo 2 | **Grimório Rúnico (Skill Slots & Árvore D&D)** | *"As habilidades não são inventadas. São fragmentos de memórias dos deuses antes do cataclismo."* |
+| **O Guardião Mudo (Golem)** | Fim do Mundo 2 | **Álbum Cósmico & Gacha de Cartas** | *(Permanece silencioso até o Ato III, onde sussurra uma única revelação crucial).* |
+| **Bria (Revelação Endgame)** | Ato III (Cratera) | **Forja de Relíquias Ancestrais** | *"O martelo com que Malakor quebrou o cosmos... fui eu quem forjei para ele. Eu acreditava no sonho dele."* |
+
+---
+
+## 12. Arquitetura dos 2 Sistemas de Gacha & Economia de Mercado Livre
+
+Para monetização sustentável e competição acirrada entre jogadores (*Rankings de CP e Torneios*), o sistema apoia-se em **2 Gachas Independentes** integrados a um **Mercado Livre (Auction House)**:
+
+```mermaid
+graph LR
+    A[Fagulhas de Forja & Gemas Cósmicas] --> B[Gacha 1: Bigorna Portátil]
+    A --> C[Gacha 2: Álbum Cósmico]
+    
+    B -->|Tiros de Equipamentos| D[Armas, Armaduras & Acessórios]
+    C -->|Tiros de Cartas| E[Cartas de Monstros & Bosses]
+    
+    D --> F[Refinamento +1..+15 & Engaste]
+    E --> G[Álbum Permanente + Bônus 2x Ativo]
+    
+    D -.->|Itens Raros / Épicos Não-Ligados| H[🏛️ Mercado Livre de Jogadores]
+    E -.->|Cartas Excedentes| H
+    H -->|Ouro / Moeda de Troca| I[Economia Player-to-Player]
+```
+
+### 12.1 Gacha 1: Bigorna Portátil de Bria (Equipamentos & Relíquias)
+* **Moeda:** Minérios Celestiais (dropados de Bosses e disponíveis via compra).
+* **Pool de Recompensas:** Armas e Armaduras de tiers **Incomum (Verde)**, **Raro (Azul)**, **Épico (Roxo)** e **Ancestral (Dourado)** com stats D&D 5E sorteados.
+* **Mecânica de Pity:** A cada 50 invocações, garantia de 1 item Épico da classe do jogador.
+* **Comércio:** Equipamentos obtidos no Gacha sem refino são **"Desvinculados" (Tradable)** e podem ser vendidos no Mercado Livre por Ouro.
+
+### 12.2 Gacha 2: Álbum Cósmico de Cartas (Atributos & Modificadores de Build)
+* **Moeda:** Selos Rúnicos Arcanos.
+* **Pool de Recompensas:** Cartas de Monstros (Slime, Goblin, Orc, Esqueleto) e Cartas Raras de Chefes (Grimgor, Frostbite, Ignis, Malakor).
+* **Efeito:** Cartas duplicadas concedem **Fragmentos de Despertar** para subir estrelas (1★ a 5★) das cartas já possuídas no Álbum.
+* **Comércio:** Cartas lacradas em pergaminhos podem ser comercializadas livremente entre jogadores.
+
+---
+
+## 13. Prompts de Dublagem & Vozes IA (ElevenLabs / Edge-TTS)
+
+Para produção rápida de dublagens com máxima qualidade e consistência sonora:
+
+### 1. Malakor, o Arquifalsário Cinzento
+* **Voz / Estilo ElevenLabs:** *Deep, raspy, calm baritone, middle-aged male, slow cadence, slightly tired and philosophical, whisper of reverb.*
+* **Prompt de Tom:** *"Speak as a legendary master blacksmith who broke the world not out of malice, but out of cold perfectionism. Never raise your voice. Treat the listener with gentle, condescending pity."*
+
+### 2. O Narrador Cósmico (Abertura e Transições)
+* **Voz / Estilo ElevenLabs:** *Epic documentary narrator, deep warm bass, ancient storyteller, echoing resonance.*
+* **Prompt de Tom:** *"Solemn, mythic, deliberate pacing with dramatic pauses after mentions of the anvil and the hammer."*
+
+### 3. Bria, a Aprendiz
+* **Voz / Estilo ElevenLabs:** *Young female, 20s, nervous, skilled hands, carrying deep unspoken guilt.*
+* **Prompt de Tom:** *"Soft-spoken, hesitant when mentioning Malakor, passionate and energetic when talking about metallurgy and forge hammers."*
+
+---
+
+## 14. Roteiro dos 6 Vídeos de Lore para o YouTube (3 a 5 Minutos)
+
+1. **Episódio 1 — A Bigorna Quebrada:** A gênese do universo, o trabalho divino dos 6 elementos e o som da forja que regia o cosmos.
+2. **Episódio 2 — Malakor, o Primeiro Ferreiro:** A biografia de Malakor, sua ascensão como guardião e a loucura da busca pelo poder absoluto.
+3. **Episódio 3 — Os Sete Forjados:** Apresentação visual e filosófica de cada uma das 7 classes e a fagulha que cada herói herdou.
+4. **Episódio 4 — A Tragédia do Rei Goblin:** A história comovente de Grimgor e a coroa incandescente que o escravizou.
+5. **Episódio 5 — O Segredo de Bria:** As origens do martelo profano e as pistas escondidas no Altar Central.
+6. **Episódio 6 — O Eco e o Trono:** O confronto final na cratera e a revelação de que reforjar o mundo é um dever perpétuo dos heróis.
+
+

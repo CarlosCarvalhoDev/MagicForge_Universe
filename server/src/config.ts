@@ -16,7 +16,7 @@ export const SERVER_CONFIG = {
   },
 
   // Visibility / Snapshot radius (units)
-  VISIBILITY_RADIUS: 50.0,
+  VISIBILITY_RADIUS: 120.0,
 
   // QoS / Heartbeat
   PING_INTERVAL_MS: 5000,

@@ -1,0 +1,93 @@
+import { setupInventoryExpansion } from '../src/ui/InventoryExpansion';
+import { setupLeaderboard } from '../src/ui/Leaderboard';
+import { setupCinematicIntro } from '../src/ui/CinematicIntro';
+import { setupBossNarrative } from '../src/ui/BossNarrative';
+import { FloatingDialogue } from '../src/ui/FloatingDialogue';
+import { INTRO_SCENES } from '../src/ui/NarrativeContent';
+import type { LeaderboardCategory, LeaderboardEntryPayload, S2CExpandInventoryResultPayload } from '@magicforge/shared';
+import '../src/ui/progression.css';
+import '../src/ui/narrative.css';
+
+const source = new DOMParser().parseFromString(await (await fetch('/index.html')).text(), 'text/html');
+for (const id of ['leaderboard-dialog', 'btn-expand-inventory', 'inventory-expansion-status', 'inventory-expansion-confirm']) document.body.append(document.importNode(source.getElementById(id)!, true));
+const output = document.createElement('pre'); output.id = 'progression-test-result'; output.style.cssText = 'white-space:pre-wrap;padding:20px;'; document.body.prepend(output);
+const click = (id: string) => document.getElementById(id)!.click();
+const text = (id: string) => document.getElementById(id)!.textContent || '';
+const passed: string[] = [];
+function check(condition: boolean, label: string) { if (!condition) throw new Error(label); passed.push(label); }
+let ready = true, sends = 0; const applied: S2CExpandInventoryResultPayload[] = [];
+const requests: LeaderboardCategory[] = [];
+const expansion = setupInventoryExpansion({ isReady: () => ready, send: () => sends++, apply: data => applied.push(data) });
+const ranking = setupLeaderboard({ isReady: () => ready, request: (category, limit) => { if (limit !== 20) throw new Error('limit'); requests.push(category); } });
+const store = new Map<string, string>();
+const cinematic = setupCinematicIntro({ autoStart: false, storage: { getItem: key => store.get(key) || null, setItem: (key, value) => { store.set(key, value); } } });
+const boss = setupBossNarrative();
+const entry: LeaderboardEntryPayload = { rank: 1, characterId: 'a', name: 'AstralMage', classType: 'MAGO' as any, level: 10, rebornCount: 2, combatPower: 10490, currentWorld: 2, currentStage: 10, gold: 2000000, honorTitle: 'Iluminado Astral' };
+const mine = { ...entry, rank: 99, characterId: 'me', name: 'Meu Herói', rebornCount: 0 };
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+try {
+  expansion.setContext({ maxSlots: 20, gold: 100000, level: 1, reborn: 0 }); click('btn-expand-inventory');
+  check(sends === 0 && text('inventory-expansion-status').includes('15'), 'Expansão respeita nível mínimo sem enviar compra');
+  expansion.setContext({ maxSlots: 20, gold: 100000, level: 20, reborn: 0 }); click('btn-expand-inventory'); click('btn-cancel-expansion');
+  check(sends === 0, 'Cancelar preserva ouro e capacidade');
+  click('btn-expand-inventory'); click('btn-confirm-expansion'); click('btn-confirm-expansion');
+  check(sends === 1 && applied.length === 0, 'Compra única aguarda resposta, sem saldo otimista');
+  expansion.onResult({ success: true, newMaxSlots: 25, goldSpent: 10000, remainingGold: 90000, nextExpansionCost: 50000, nextExpansionMinLevel: 25, message: 'Expansão confirmada.' });
+  check(applied[0].newMaxSlots === 25 && applied[0].remainingGold === 90000 && text('expand-cost-label').includes('50.000'), 'Capacidade, saldo e próxima cotação vêm do servidor');
+  expansion.setContext({ maxSlots: 25, gold: 100, level: 30, reborn: 0 }); click('btn-expand-inventory');
+  check(sends === 1 && text('inventory-expansion-status').includes('50.000'), 'Saldo insuficiente impede envio');
+  expansion.setContext({ maxSlots: 25, gold: 100000, level: 30, reborn: 0 }); click('btn-expand-inventory'); click('btn-confirm-expansion');
+  expansion.onResult({ success: false, newMaxSlots: 25, goldSpent: 0, remainingGold: 100000, nextExpansionCost: 55000, nextExpansionMinLevel: 25, message: 'Compra rejeitada pelo servidor.' });
+  check(applied.at(-1)!.newMaxSlots === 25 && applied.at(-1)!.remainingGold === 100000 && text('expand-cost-label').includes('55.000'), 'Falha preserva capacidade/saldo e substitui prévia pela cotação recebida');
+  click('btn-expand-inventory'); expansion.setContext({ maxSlots: 25, gold: 90000, level: 30, reborn: 0 });
+  check(document.getElementById('inventory-expansion-confirm')!.hidden, 'Mudança de saldo invalida confirmação anterior');
+  expansion.setContext({ maxSlots: 45, gold: 20000000, level: 50, reborn: 0 }); click('btn-expand-inventory');
+  check(text('inventory-expansion-status').includes('Reborn 1'), 'Última expansão exige Reborn');
+  expansion.setContext({ maxSlots: 45, gold: 20000000, level: 1, reborn: 1 }); click('btn-expand-inventory');
+  check(!document.getElementById('inventory-expansion-confirm')!.hidden, 'Reborn permite expansão após reiniciar nível'); click('btn-cancel-expansion');
+  expansion.setContext({ maxSlots: 50, gold: 20000000, level: 50, reborn: 1 });
+  check((document.getElementById('btn-expand-inventory') as HTMLButtonElement).disabled, 'Capacidade máxima bloqueia nova compra');
+  ranking.open(); check(requests[0] === 'COMBAT_POWER', 'Hall consulta Top 20 real ao abrir');
+  ranking.onUpdate({ category: 'COMBAT_POWER', entries: [entry], myRank: 99, myEntry: mine, timestamp: Date.now() });
+  check(text('leaderboard-personal').includes('#99') && text('leaderboard-entries').includes('Iluminado Astral'), 'Posição fora do Top 20 e título honorífico visíveis');
+  document.querySelector<HTMLButtonElement>('[data-ranking="LEVEL"]')!.click();
+  ranking.onUpdate({ category: 'COMBAT_POWER', entries: [entry], timestamp: Date.now() });
+  check(text('leaderboard-entries') === '', 'Resposta atrasada de outra categoria é ignorada');
+  ranking.onUpdate({ category: 'LEVEL', entries: [entry, { ...mine, name: '<img src=x onerror=alert(1)>', level: 50 }], myRank: 99, myEntry: mine, timestamp: Date.now() });
+  check(text('leaderboard-entries').indexOf('AstralMage') < text('leaderboard-entries').indexOf('<img') && !document.querySelector('#leaderboard-entries img'), 'Ordenação Reborn do servidor preservada e nomes tratados como texto');
+  for (const category of ['STAGE', 'GOLD'] as LeaderboardCategory[]) {
+    document.querySelector<HTMLButtonElement>('[data-ranking="' + category + '"]')!.click();
+    ranking.onUpdate({ category, entries: [entry], myRank: 1, myEntry: entry, timestamp: Date.now() });
+    check(text('leaderboard-entries').includes(category === 'STAGE' ? 'Mundo 2 · Fase 10' : '2.000.000 ouro'), 'Exibição autoritativa de ' + category);
+  }
+  ranking.onUpdate({ category: 'GOLD', entries: [], timestamp: Date.now() });
+  check(text('leaderboard-status').includes('Nenhum'), 'Ranking vazio possui mensagem própria'); click('leaderboard-close');
+  check(INTRO_SCENES.length === 6 && INTRO_SCENES.reduce((sum, scene) => sum + scene.duration, 0) >= 40000, 'Introdução contém seis cenas e duração planejada');
+  cinematic.open(); check(cinematic.isOpen() && text('cinematic-progress').includes('1 / 6'), 'Introdução abre na primeira cena');
+  for (let scene = 2; scene <= 6; scene++) { click('cinematic-next'); await sleep(530); check(text('cinematic-progress').includes(scene + ' / 6'), 'Transição para cena ' + scene); }
+  click('cinematic-next'); check(!cinematic.isOpen() && store.get('magicforge_intro_seen_v1') === 'true', 'Finalização registra introdução vista');
+  cinematic.open(); click('cinematic-next'); click('cinematic-skip'); await sleep(550);
+  check(!cinematic.isOpen(), 'Pular durante transição cancela timers');
+  cinematic.open(); document.getElementById('cinematic-intro')!.dispatchEvent(new Event('cancel', { cancelable: true }));
+  check(!cinematic.isOpen(), 'Escape encerra introdução e libera navegação');
+  const bubbles = new FloatingDialogue(() => 0);
+  const slime = { id: 's', name: 'Slime Puro', type: 'MONSTER', currentHp: 100 };
+  bubbles.observe([slime], 0); check(Boolean(bubbles.current(250)), 'Spawn elegível pode gerar fala');
+  bubbles.observe([slime], 13000); check(!bubbles.current(13000), 'Snapshot repetido não repete sorteio');
+  bubbles.observe([{ ...slime, currentHp: 90 }], 13001); check(Boolean(bubbles.current(13251)), 'Dano após cooldown pode gerar fala');
+  bubbles.observe([{ ...slime, currentHp: 0 }], 13500); check(!bubbles.current(13500), 'Fala desaparece ao morrer');
+  boss.onBossEvent({ eventType: 'SPAWN', bossId: 'boss', bossName: 'Grimgor' });
+  check(document.querySelector('.boss-story-banner')!.textContent!.includes('REI DESTE BOSQUE'), 'Chefe apresenta fala de entrada');
+  boss.onBossEvent({ eventType: 'TICK', currentHp: 50, maxHp: 100 });
+  check(document.querySelector('.boss-story-banner')!.textContent!.includes('crânio'), 'Chefe troca fala ao atingir metade da vida'); boss.reset();
+  expansion.setContext({ maxSlots: 20, gold: 100000, level: 20, reborn: 0 }); click('btn-expand-inventory'); click('btn-confirm-expansion'); ranking.open();
+  await sleep(12100);
+  check(text('inventory-expansion-status').includes('Sem confirmação') && !(document.getElementById('btn-expand-inventory') as HTMLButtonElement).disabled, 'Timeout de compra não inventa sucesso nem repete envio');
+  check(text('leaderboard-status').includes('Tente novamente') && !(document.getElementById('leaderboard-refresh') as HTMLButtonElement).disabled, 'Timeout do ranking libera atualização manual');
+  ready = false; ranking.onDisconnected(); expansion.onDisconnected(); ranking.open();
+  check(!ranking.isOpen() && (document.getElementById('btn-expand-inventory') as HTMLButtonElement).disabled, 'Desconexão fecha ranking e bloqueia compras');
+  output.textContent = 'PASS ' + passed.length + '/' + passed.length + '\nTransporte simulado · nenhuma alteração no banco\n' + passed.join('\n'); output.dataset.result = 'pass';
+  // Optional review buttons keep previews distinct from production rankings.
+  const review = document.createElement('button'); review.textContent = 'Prévia Hall da Fama (dados simulados)'; review.id = 'review-ranking';
+  review.onclick = () => { ready = true; ranking.open(); ranking.onUpdate({ category: requests.at(-1)!, entries: [entry, { ...mine, rank: 2 }], myRank: 2, myEntry: { ...mine, rank: 2 }, timestamp: Date.now() }); }; document.body.append(review);
+} catch (error) { output.textContent = 'FAIL após ' + passed.length + ': ' + error; output.dataset.result = 'fail'; console.error(error); }

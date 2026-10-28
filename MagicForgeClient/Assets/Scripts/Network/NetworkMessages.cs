@@ -18,6 +18,8 @@ namespace MagicForge.Network
         C2S_MOVE_INPUT = 0x20,
         S2C_WORLD_SNAPSHOT = 0x21,
         S2C_POSITION_CORRECTION = 0x22,
+        C2S_ENTER_PORTAL = 0x23,
+        S2C_STAGE_UPDATE = 0x24,
 
         // Combat & Actions (0x30 - 0x3F)
         C2S_ATTACK_TARGET = 0x30,
@@ -25,6 +27,12 @@ namespace MagicForge.Network
         S2C_ENTITY_STAT_UPDATE = 0x32,
         C2S_CAST_SKILL = 0x33,
         S2C_SKILL_CAST_EVENT = 0x34,
+        C2S_CHALLENGE_BOSS = 0x35,
+        S2C_BOSS_EVENT = 0x36,
+        C2S_REQUEST_CHARACTER_LIST = 0x39,
+        S2C_CHARACTER_LIST = 0x3A,
+        C2S_CREATE_CHARACTER_SLOT = 0x3B,
+        C2S_SELECT_CHARACTER_SLOT = 0x3C,
 
         // Items, Drops & Inventory (0x40 - 0x4F)
         S2C_ITEM_DROP_SPAWN = 0x40,
@@ -32,10 +40,39 @@ namespace MagicForge.Network
         C2S_LOOT_ITEM = 0x42,
         S2C_INVENTORY_UPDATE = 0x43,
         C2S_USE_ITEM = 0x44,
+        C2S_EXPAND_INVENTORY = 0x46,
+        C2S_REFINE_EQUIPMENT = 0x48,
+        S2C_REFINE_RESULT = 0x49,
+        C2S_SOCKET_GEM = 0x4A,
+        S2C_SOCKET_RESULT = 0x4B,
+        C2S_EQUIP_CARD = 0x4C,
+        S2C_CARDS_UPDATE = 0x4D,
+        C2S_REQUEST_CARD_ALBUM = 0x4E,
+        S2C_EXPAND_INVENTORY_RESULT = 0x4F,
 
         // Level, Progression & EXP (0x50 - 0x5F)
         S2C_PLAYER_EXP_UPDATE = 0x50,
         S2C_PLAYER_LEVEL_UP = 0x51,
+        C2S_PERFORM_REBORN = 0x52,
+        S2C_REBORN_RESULT = 0x53,
+
+        // Account Authentication & Security (0x70 - 0x7F)
+        C2S_AUTH_LOGIN = 0x70,
+        C2S_AUTH_REGISTER = 0x71,
+        C2S_AUTH_SOCIAL = 0x72,
+        C2S_AUTH_CLAIM_LEGACY = 0x73,
+        S2C_AUTH_SUCCESS = 0x74,
+        S2C_AUTH_ERROR = 0x75,
+
+        // Idle Farm Helper & Bag Automation (0x80 - 0x8F)
+        C2S_UPDATE_FARM_SETTINGS = 0x80,
+        S2C_FARM_SETTINGS_UPDATE = 0x81,
+        C2S_AUTO_SALVAGE = 0x82,
+        S2C_AUTO_SALVAGE_RESULT = 0x83,
+
+        // Rankings & Leaderboards (0x86 - 0x8F)
+        C2S_REQUEST_LEADERBOARD = 0x86,
+        S2C_LEADERBOARD_UPDATE = 0x87,
 
         // Heartbeat (0xF0 - 0xFF)
         C2S_PING = 0xF0,
@@ -239,5 +276,211 @@ namespace MagicForge.Network
         public int newMaxHp;
         public int newMaxResource;
         public int totalCombatPower;
+    }
+
+    [Serializable]
+    public class StageUpdateDTO
+    {
+        public int world;
+        public int stage;
+        public string worldName;
+        public int stageKills;
+        public int killsRequired;
+        public bool isBossStage;
+        public bool bossAvailable;
+        public bool portalOpen;
+        public Vector3DTO portalPosition;
+        public string message;
+    }
+
+    [Serializable]
+    public class BossEventDTO
+    {
+        public string eventType;
+        public string bossId;
+        public string bossName;
+        public int maxHp;
+        public int currentHp;
+        public int remainingTimeSec;
+        public int timeLimitSec;
+        public int newStage;
+        public int newWorld;
+        public string message;
+    }
+
+    [Serializable]
+    public class RebornResultDTO
+    {
+        public bool success;
+        public int rebornCount;
+        public int newLevel;
+        public int totalCombatPower;
+        public CharacterAttributesDTO newAttributes;
+        public string honorTitle;
+        public string message;
+    }
+
+    [Serializable]
+    public class RefineResultDTO
+    {
+        public bool success;
+        public int slotIndex;
+        public int oldRefineLevel;
+        public int newRefineLevel;
+        public bool isLevelUp;
+        public bool isLevelDown;
+        public string message;
+        public int totalCombatPower;
+        public int gold;
+    }
+
+    [Serializable]
+    public class SocketResultDTO
+    {
+        public bool success;
+        public int equipmentSlotIndex;
+        public int socketIndex;
+        public string gemItemId;
+        public string message;
+        public int totalCombatPower;
+    }
+
+    [Serializable]
+    public class CardAlbumEntryDTO
+    {
+        public string cardId;
+        public string name;
+        public string rarity;
+        public string icon;
+        public string image;
+        public int count;
+        public bool isEquipped;
+        public int equippedSlot;
+        public string activeEffectText;
+    }
+
+    [Serializable]
+    public class CardsUpdateDTO
+    {
+        public CardAlbumEntryDTO[] cards;
+        public string equippedWeaponCardId;
+        public string equippedArmorCardId;
+        public string message;
+        public int totalCombatPower;
+    }
+
+    [Serializable]
+    public class CharacterSlotSummaryDTO
+    {
+        public int slotIndex;
+        public bool isEmpty;
+        public string id;
+        public string name;
+        public string classType;
+        public int level;
+        public int currentWorld;
+        public int currentStage;
+        public int combatPower;
+        public int currentHp;
+        public int maxHp;
+        public int gold;
+        public int rebornCount;
+        public string slot1Skill;
+        public string slot2Skill;
+        public string slot3Skill;
+        public string slot4Skill;
+    }
+
+    [Serializable]
+    public class CharacterListDTO
+    {
+        public string accountId;
+        public string accountUsername;
+        public CharacterSlotSummaryDTO[] slots;
+        public string message;
+    }
+
+    [Serializable]
+    public class AuthSuccessDTO
+    {
+        public string accountId;
+        public string accountUsername;
+        public string provider;
+        public bool isActivated;
+        public string message;
+    }
+
+    [Serializable]
+    public class AuthErrorDTO
+    {
+        public string errorCode;
+        public string errorMessage;
+    }
+
+    [Serializable]
+    public class FarmHelperSettingsDTO
+    {
+        public bool autoHpPotionEnabled;
+        public int autoHpPotionThreshold;
+        public bool autoMpPotionEnabled;
+        public int autoMpPotionThreshold;
+        public bool autoSellCommon;
+        public bool autoSellUncommon;
+        public bool autoSellRare;
+        public bool autoLootEnabled;
+    }
+
+    [Serializable]
+    public class FarmSettingsUpdateDTO
+    {
+        public FarmHelperSettingsDTO settings;
+        public string message;
+    }
+
+    [Serializable]
+    public class AutoSalvageResultDTO
+    {
+        public int itemsSold;
+        public int goldEarned;
+        public int newGoldTotal;
+        public string message;
+    }
+
+    [Serializable]
+    public class ExpandInventoryResultDTO
+    {
+        public bool success;
+        public int newMaxSlots;
+        public int goldSpent;
+        public int remainingGold;
+        public int nextExpansionCost;
+        public int nextExpansionMinLevel;
+        public string message;
+    }
+
+    [Serializable]
+    public class LeaderboardEntryDTO
+    {
+        public int rank;
+        public string characterId;
+        public string name;
+        public string classType;
+        public int level;
+        public int rebornCount;
+        public int combatPower;
+        public int currentWorld;
+        public int currentStage;
+        public int gold;
+        public string honorTitle;
+    }
+
+    [Serializable]
+    public class LeaderboardUpdateDTO
+    {
+        public string category;
+        public LeaderboardEntryDTO[] entries;
+        public int myRank;
+        public LeaderboardEntryDTO myEntry;
+        public long timestamp;
     }
 }

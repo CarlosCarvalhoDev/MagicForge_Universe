@@ -1,5 +1,7 @@
 import { ItemRarity, RARITY_COLORS, S2CItemDropSpawnPayload, Vector3, distance } from '@magicforge/shared';
 import { InterpolatedEntity } from '../interpolation/SnapshotBuffer';
+import { HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground } from './HeroAnimations';
+import { FloatingDialogue } from '../ui/FloatingDialogue';
 
 export interface FloatingText {
   id: string;
@@ -23,25 +25,33 @@ export interface ActiveItemDrop {
 }
 
 export class GameRenderer {
+  private dialogues = new FloatingDialogue();
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private floatingTexts: FloatingText[] = [];
   public activeDrops = new Map<string, ActiveItemDrop>();
 
-  // World to screen mapping
-  public zoom: number = 8.5; // pixels per world unit
+  // World to screen mapping (Scaled up for bold hero & monster presence)
+  public zoom: number = 16.0; // pixels per world unit
+  public minZoom: number = 8.0;
+  public maxZoom: number = 26.0;
   public cameraOffset = { x: 0, y: 0 };
   public showRawGhost: boolean = true;
   public selectedTargetId: string | null = null;
 
+  public setZoom(targetZoom: number): void {
+    this.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, Math.round(targetZoom * 10) / 10));
+  }
+
   // Sprite animation assets & Chroma-Key cache
-  private guerreiroSheets: Record<string, { img: HTMLImageElement; cols: number; rows: number; frames: number; fps: number }> = {};
+  private heroSheets: Record<string, Record<string, HeroSheetSpec & { img: HTMLImageElement }>> = {};
   private heroIsoSprites: Record<string, HTMLImageElement> = {};
   private monsterIsoSprites: Record<string, HTMLImageElement> = {};
   private arenaStoneTile: HTMLImageElement | null = null;
   private fantasyGrassTile: HTMLImageElement | null = null;
   private cleanedImageCache = new Map<string, HTMLCanvasElement>();
-  private entityAnimOverrides = new Map<string, { action: 'attack' | 'hit' | 'death'; startTime: number; durationMs: number }>();
+  private animationClock = new HeroAnimationClock();
+  private entityFacingLeft = new Map<string, boolean>();
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -49,35 +59,37 @@ export class GameRenderer {
     if (!context) throw new Error('Could not get 2D canvas context');
     this.ctx = context;
 
-    this.loadGuerreiroSpriteSheets();
+    this.loadHeroSpriteSheets();
     this.loadIsometricSprites();
     this.loadFloorTiles();
   }
 
+  private runicPortalImg: HTMLImageElement | null = null;
+
   private loadFloorTiles(): void {
+    const forest = new Image();
+    forest.src = '/assets/environment/tile_mundo_1_floresta.jpg';
+    this.fantasyGrassTile = forest;
+
     const stone = new Image();
     stone.src = '/assets/isometric/tile_arena_stone.jpg';
     this.arenaStoneTile = stone;
 
-    const grass = new Image();
-    grass.src = '/assets/isometric/tile_fantasy_grass.jpg';
-    this.fantasyGrassTile = grass;
+    const portal = new Image();
+    portal.src = '/assets/environment/portal_runico.png';
+    this.runicPortalImg = portal;
   }
 
-  private loadGuerreiroSpriteSheets(): void {
-    const basePath = '/assets/isometric/animations/heroes/guerreiro';
-    const specs: Record<string, { file: string; cols: number; rows: number; frames: number; fps: number }> = {
-      idle: { file: `${basePath}/iso_hero_guerreiro_idle_sheet.png`, cols: 2, rows: 2, frames: 4, fps: 5 },
-      walk: { file: `${basePath}/iso_hero_guerreiro_walk_sheet.png`, cols: 3, rows: 2, frames: 6, fps: 9 },
-      attack: { file: `${basePath}/iso_hero_guerreiro_attack_sheet.png`, cols: 3, rows: 2, frames: 6, fps: 11 },
-      hit: { file: `${basePath}/iso_hero_guerreiro_hit_sheet.png`, cols: 2, rows: 1, frames: 2, fps: 10 },
-      death: { file: `${basePath}/iso_hero_guerreiro_death_sheet.png`, cols: 2, rows: 2, frames: 4, fps: 7 },
-    };
+  private loadHeroSpriteSheets(): void {
+    const classConfigs = HERO_SHEETS;
 
-    for (const [key, spec] of Object.entries(specs)) {
-      const img = new Image();
-      img.src = spec.file;
-      this.guerreiroSheets[key] = { img, cols: spec.cols, rows: spec.rows, frames: spec.frames, fps: spec.fps };
+    for (const [className, specs] of Object.entries(classConfigs)) {
+      this.heroSheets[className] = {};
+      for (const [key, spec] of Object.entries(specs)) {
+        const img = new Image();
+        img.src = spec.file;
+        this.heroSheets[className][key] = { ...spec, img };
+      }
     }
   }
 
@@ -105,6 +117,12 @@ export class GameRenderer {
       'Lobo Selvagem': '/assets/isometric/iso_mob_lobo_selvagem.jpg',
       'Chefe Goblin': '/assets/isometric/iso_boss_chefe_goblin.jpg',
       Malakor: '/assets/isometric/iso_boss_malakor.jpg',
+      Grimgor: '/assets/isometric/iso_boss_grimgor.png',
+      'Grimgor, o Senhor Rúnico da Floresta': '/assets/isometric/iso_boss_grimgor.png',
+      Frostbite: '/assets/isometric/iso_boss_frostbite.png',
+      'Frostbite, a Matriarca dos Lobos Gélidos': '/assets/isometric/iso_boss_frostbite.png',
+      Ignis: '/assets/isometric/iso_boss_ignis.png',
+      'Ignis, o Titã da Forja Vulcânica': '/assets/isometric/iso_boss_ignis.png',
     };
 
     for (const [key, src] of Object.entries(mobMap)) {
@@ -132,17 +150,7 @@ export class GameRenderer {
     const imgData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
     const d = imgData.data;
 
-    for (let i = 0; i < d.length; i += 4) {
-      const r = d[i];
-      const g = d[i + 1];
-      const b = d[i + 2];
-      const maxChannel = Math.max(r, g, b);
-      if (maxChannel < 16) {
-        d[i + 3] = 0; // Transparent pure black
-      } else if (maxChannel < 32) {
-        d[i + 3] = Math.floor(((maxChannel - 16) / 16) * 255); // Soft anti-aliased edge
-      }
-    }
+    keyDarkBackground(d);
 
     offCtx.putImageData(imgData, 0, 0);
     this.cleanedImageCache.set(img.src, offCanvas);
@@ -150,12 +158,7 @@ export class GameRenderer {
   }
 
   public triggerEntityAnimation(entityId: string, action: 'attack' | 'hit' | 'death'): void {
-    const durationMs = action === 'attack' ? 545 : action === 'hit' ? 240 : 1200;
-    this.entityAnimOverrides.set(entityId, {
-      action,
-      startTime: performance.now(),
-      durationMs,
-    });
+    this.animationClock.trigger(entityId, action, performance.now());
   }
 
   public resize(width: number, height: number): void {
@@ -225,13 +228,16 @@ export class GameRenderer {
     });
   }
 
+  public resetNarrative(): void { this.dialogues.reset(); }
+
   public render(entities: InterpolatedEntity[], myPlayerId: string | null): void {
     const { ctx, canvas } = this;
     const width = canvas.width;
     const height = canvas.height;
     const now = performance.now();
+    this.dialogues.observe(entities, now);
 
-    // Center camera on my player if available
+    // Center camera on my player (keeps the character dead-center in the viewport)
     const myPlayer = entities.find((e) => e.id === myPlayerId);
     if (myPlayer) {
       this.cameraOffset.x = myPlayer.position.x;
@@ -247,6 +253,10 @@ export class GameRenderer {
 
     // 2. Draw Seamless Floor Tilesets (tile_fantasy_grass & tile_arena_stone), Grid & Boundaries
     this.drawArenaGrid(screenCenterX, screenCenterY);
+
+    const visibleIds = new Set(entities.map(entity => entity.id));
+    this.animationClock.retain(visibleIds);
+    for (const id of this.entityFacingLeft.keys()) if (!visibleIds.has(id)) this.entityFacingLeft.delete(id);
 
     // 3. Draw Entities (Monsters first, then Players on top)
     const sortedEntities = [...entities].sort((a, b) => {
@@ -269,7 +279,7 @@ export class GameRenderer {
         const rawScreenY = screenCenterY + (ent.rawPosition.z - this.cameraOffset.y) * this.zoom;
 
         ctx.beginPath();
-        ctx.arc(rawScreenX, rawScreenY, 14, 0, Math.PI * 2);
+        ctx.arc(rawScreenX, rawScreenY, 18, 0, Math.PI * 2);
         ctx.fillStyle = isMe ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)';
         ctx.strokeStyle = isMe ? 'rgba(52, 211, 153, 0.4)' : 'rgba(239, 68, 68, 0.4)';
         ctx.lineWidth = 1;
@@ -279,16 +289,16 @@ export class GameRenderer {
         ctx.setLineDash([]);
       }
 
-      // Draw Drop Shadow
+      // Draw Drop Shadow (sized for bold presence)
       ctx.beginPath();
-      ctx.ellipse(screenX, screenY + 14, isMonster ? (ent.maxHp > 200 ? 22 : 16) : 18, 7, 0, 0, Math.PI * 2);
+      ctx.ellipse(screenX, screenY + 22, isMonster ? (ent.maxHp > 200 ? 46 : 32) : 34, 12, 0, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
       ctx.fill();
 
       // Draw Target Reticle
       if (isSelected) {
         ctx.beginPath();
-        ctx.arc(screenX, screenY, 28, 0, Math.PI * 2);
+        ctx.arc(screenX, screenY, 56, 0, Math.PI * 2);
         ctx.strokeStyle = '#f59e0b';
         ctx.lineWidth = 2.5;
         ctx.setLineDash([4, 4]);
@@ -296,102 +306,91 @@ export class GameRenderer {
         ctx.setLineDash([]);
       }
 
-      const facingLeft = ent.headingYaw > 180 && ent.headingYaw < 360;
+      const sinYaw = Math.sin((ent.headingYaw * Math.PI) / 180);
+      let facingLeft = this.entityFacingLeft.get(ent.id) ?? false;
+      if (sinYaw < -0.15) {
+        facingLeft = true;
+        this.entityFacingLeft.set(ent.id, true);
+      } else if (sinYaw > 0.15) {
+        facingLeft = false;
+        this.entityFacingLeft.set(ent.id, false);
+      }
 
       if (!isMonster) {
-        // --- RENDER HERO SPRITE (Guerreiro Sprite Sheets or Isometric Class Sprite) ---
+        // --- RENDER HERO SPRITE (Heroic Figures scaled bold & prominent) ---
         const heroClass = ent.classType || 'GUERREIRO';
         let drewSheet = false;
+        const classSheets = this.heroSheets[heroClass];
 
-        if (heroClass === 'GUERREIRO') {
-          let actionKey: 'idle' | 'walk' | 'attack' | 'hit' | 'death' = ent.isMoving ? 'walk' : 'idle';
-          let override = this.entityAnimOverrides.get(ent.id);
-
-          if (ent.currentHp <= 0) {
-            actionKey = 'death';
-          } else if (override) {
-            if (now - override.startTime < override.durationMs) {
-              actionKey = override.action;
-            } else {
-              this.entityAnimOverrides.delete(ent.id);
-            }
-          }
-
-          const sheetSpec = this.guerreiroSheets[actionKey];
+        if (classSheets) {
+          const playback = this.animationClock.sample(ent.id, ent.isMoving, ent.currentHp, HERO_SHEETS[heroClass], now);
+          const sheetSpec = classSheets[playback.action];
           const cleanSheet = sheetSpec ? this.getTransparentCanvas(sheetSpec.img) : null;
 
-          if (sheetSpec && cleanSheet) {
-            const cellW = Math.floor(cleanSheet.width / sheetSpec.cols);
-            const cellH = Math.floor(cleanSheet.height / sheetSpec.rows);
-            let frameIndex = 0;
-
-            if (actionKey === 'idle' || actionKey === 'walk') {
-              frameIndex = Math.floor((now / 1000) * sheetSpec.fps) % sheetSpec.frames;
-            } else if (override) {
-              const elapsed = Math.max(0, now - override.startTime);
-              const progress = Math.min(0.999, elapsed / override.durationMs);
-              frameIndex = Math.floor(progress * sheetSpec.frames);
-            } else if (actionKey === 'death') {
-              frameIndex = sheetSpec.frames - 1;
-            }
+          if (sheetSpec && cleanSheet && cleanSheet.width % sheetSpec.cols === 0 && cleanSheet.height % sheetSpec.rows === 0) {
+            const cellW = cleanSheet.width / sheetSpec.cols;
+            const cellH = cleanSheet.height / sheetSpec.rows;
+            const frameIndex = playback.frame;
 
             const col = frameIndex % sheetSpec.cols;
             const row = Math.floor(frameIndex / sheetSpec.cols);
             const sx = col * cellW;
             const sy = row * cellH;
 
-            const drawSize = 68;
+            // Scaled hero drawSize to 160px for prominent heroic scale
+            const drawSize = 160;
             ctx.save();
             ctx.translate(screenX, screenY);
             if (facingLeft) {
               ctx.scale(-1, 1);
             }
-            ctx.drawImage(cleanSheet, sx, sy, cellW, cellH, -drawSize / 2, -drawSize + 18, drawSize, drawSize);
+            ctx.drawImage(cleanSheet, sx, sy, cellW, cellH, -drawSize / 2, -drawSize + 36, drawSize, drawSize);
             ctx.restore();
             drewSheet = true;
           }
         }
 
         if (!drewSheet) {
-          // Render static isometric sprite for the other 6 classes (with chroma-key transparency & walking bob)
+          // Render static isometric sprite for the other classes (with chroma-key transparency & walking bob)
           const isoImg = this.heroIsoSprites[heroClass] || this.heroIsoSprites['GUERREIRO'];
           const cleanHero = isoImg ? this.getTransparentCanvas(isoImg) : null;
 
           if (cleanHero) {
-            const drawSize = 64;
-            const bobY = ent.isMoving ? Math.abs(Math.sin(now * 0.012)) * -5 : Math.sin(now * 0.004) * -1.5;
+            // Scaled static hero drawSize to 150px
+            const drawSize = 150;
+            const bobY = ent.isMoving ? Math.abs(Math.sin(now * 0.012)) * -6 : Math.sin(now * 0.004) * -2;
             ctx.save();
             ctx.translate(screenX, screenY + bobY);
             if (facingLeft) {
               ctx.scale(-1, 1);
             }
-            ctx.drawImage(cleanHero, -drawSize / 2, -drawSize + 18, drawSize, drawSize);
+            ctx.drawImage(cleanHero, -drawSize / 2, -drawSize + 36, drawSize, drawSize);
             ctx.restore();
           } else {
             ctx.beginPath();
-            ctx.arc(screenX, screenY, 15, 0, Math.PI * 2);
+            ctx.arc(screenX, screenY, 28, 0, Math.PI * 2);
             ctx.fillStyle = isMe ? '#10b981' : '#38bdf8';
             ctx.fill();
           }
         }
       } else {
-        // --- RENDER MONSTER ISOMETRIC SPRITE (Chroma-Keyed Full Figure) ---
+        // --- RENDER MONSTER ISOMETRIC SPRITE (Prominent Figures scaled to 135px / 210px for Boss) ---
         const isBoss = ent.maxHp > 200;
         const mobSprite = this.monsterIsoSprites[ent.name];
         const cleanMob = mobSprite ? this.getTransparentCanvas(mobSprite) : null;
 
         if (cleanMob) {
-          const drawSize = isBoss ? 82 : 56;
-          const bobY = ent.isMoving ? Math.abs(Math.sin(now * 0.011)) * -4 : Math.sin(now * 0.003) * -1.5;
+          const drawSize = isBoss ? 210 : 135;
+          const bobY = ent.isMoving ? Math.abs(Math.sin(now * 0.011)) * -5 : Math.sin(now * 0.003) * -2;
           ctx.save();
           ctx.translate(screenX, screenY + bobY);
           if (facingLeft) {
             ctx.scale(-1, 1);
           }
-          ctx.drawImage(cleanMob, -drawSize / 2, -drawSize + 18, drawSize, drawSize);
+          ctx.drawImage(cleanMob, -drawSize / 2, -drawSize + 30, drawSize, drawSize);
           ctx.restore();
         } else {
-          const radius = isBoss ? 22 : 16;
+          const radius = isBoss ? 38 : 26;
           ctx.beginPath();
           ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
           ctx.fillStyle = isBoss ? '#7f1d1d' : '#991b1b';
@@ -404,7 +403,7 @@ export class GameRenderer {
 
       // Draw Orientation Arrow
       const rad = (ent.headingYaw * Math.PI) / 180;
-      const lineLen = isMonster ? 18 : 22;
+      const lineLen = isMonster ? 30 : 34;
       ctx.beginPath();
       ctx.moveTo(screenX, screenY);
       ctx.lineTo(screenX + Math.sin(rad) * lineLen, screenY + Math.cos(rad) * lineLen);
@@ -412,50 +411,57 @@ export class GameRenderer {
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Draw Name & Class Badge
+      // Calculate head top offset with generous breathing room above the scaled-up sprites
+      const spriteHeadTop = isMonster ? (ent.maxHp > 200 ? -175 : -112) : -135;
+      const nameY = screenY + spriteHeadTop - 32;
+      const classY = screenY + spriteHeadTop - 16;
+      const hpBarY = screenY + spriteHeadTop - 4;
+
+      // Draw Name & Class Badge (above head)
       ctx.fillStyle = '#f8fafc';
       ctx.font = isMe ? 'bold 12px Inter, sans-serif' : '11px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'alphabetic';
       const levelTag = ent.level ? `[Nv. ${ent.level}] ` : '';
       const displayName = isMe ? `⭐ ${levelTag}${ent.name}` : `${levelTag}${ent.name}`;
-      ctx.fillText(displayName, screenX, screenY - 38);
+      ctx.fillText(displayName, screenX, nameY);
 
       if (ent.classType) {
         ctx.fillStyle = '#fbbf24';
         ctx.font = 'bold 9px Inter, sans-serif';
-        ctx.fillText(`[${ent.classType}]`, screenX, screenY - 27);
+        ctx.fillText(`[${ent.classType}]`, screenX, classY);
       }
 
-      // Draw Health Bar
-      const barWidth = 42;
-      const barHeight = 5;
+      // Draw Health Bar (spaced cleanly above head)
+      const barWidth = 54;
+      const barHeight = 6;
       const hpPercent = Math.max(0, Math.min(1, ent.currentHp / ent.maxHp));
 
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-      ctx.fillRect(screenX - barWidth / 2, screenY + 16, barWidth, barHeight);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.fillRect(screenX - barWidth / 2, hpBarY, barWidth, barHeight);
 
       ctx.fillStyle = hpPercent > 0.5 ? '#22c55e' : hpPercent > 0.2 ? '#eab308' : '#ef4444';
-      ctx.fillRect(screenX - barWidth / 2, screenY + 16, barWidth * hpPercent, barHeight);
+      ctx.fillRect(screenX - barWidth / 2, hpBarY, barWidth * hpPercent, barHeight);
 
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.lineWidth = 1;
-      ctx.strokeRect(screenX - barWidth / 2, screenY + 16, barWidth, barHeight);
+      ctx.strokeRect(screenX - barWidth / 2, hpBarY, barWidth, barHeight);
 
       // Draw Resource Bar (Mana / Energia)
       if (ent.currentResource !== undefined && ent.maxResource) {
         const resPercent = Math.max(0, Math.min(1, ent.currentResource / ent.maxResource));
         const resColor = ent.resourceType === 'Energia' ? '#facc15' : '#38bdf8';
+        const resBarY = hpBarY + 5;
 
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-        ctx.fillRect(screenX - barWidth / 2, screenY + 22, barWidth, 3);
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+        ctx.fillRect(screenX - barWidth / 2, resBarY, barWidth, 3);
 
         ctx.fillStyle = resColor;
-        ctx.fillRect(screenX - barWidth / 2, screenY + 22, barWidth * resPercent, 3);
+        ctx.fillRect(screenX - barWidth / 2, resBarY, barWidth * resPercent, 3);
 
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
         ctx.lineWidth = 1;
-        ctx.strokeRect(screenX - barWidth / 2, screenY + 22, barWidth, 3);
+        ctx.strokeRect(screenX - barWidth / 2, resBarY, barWidth, 3);
       }
     }
 
@@ -464,115 +470,145 @@ export class GameRenderer {
 
     // 5. Draw Floating Combat Text
     this.renderFloatingText(screenCenterX, screenCenterY);
+    const dialogue = this.dialogues.current(now);
+    const speaker = dialogue ? entities.find(entity => entity.id === dialogue.entityId) : undefined;
+    if (speaker) {
+      const x = screenCenterX + (speaker.position.x - this.cameraOffset.x) * this.zoom;
+      const y = screenCenterY + (speaker.position.z - this.cameraOffset.y) * this.zoom - (speaker.maxHp > 200 ? 225 : 162);
+      if (x > -250 && x < width + 250 && y > -80 && y < height + 80) this.dialogues.draw(ctx, x, y, now);
+    }
   }
 
   private drawArenaGrid(cx: number, cy: number): void {
     const { ctx } = this;
-    const mapBounds = 60; // -60 to 60 units
-    const minScreenX = cx - (mapBounds + this.cameraOffset.x) * this.zoom;
-    const maxScreenX = cx + (mapBounds - this.cameraOffset.x) * this.zoom;
-    const minScreenY = cy - (mapBounds + this.cameraOffset.y) * this.zoom;
-    const maxScreenY = cy + (mapBounds - this.cameraOffset.y) * this.zoom;
-    const arenaWidth = maxScreenX - minScreenX;
-    const arenaHeight = maxScreenY - minScreenY;
+    const arenaWorldSize = 120; // 120m x 120m single grand stage
+    const minX = -arenaWorldSize / 2;
+    const minZ = -arenaWorldSize / 2;
 
-    // 1. Render Seamless Fantasy Grass Tile across the outer arena
+    const mapScreenX = cx + (minX - this.cameraOffset.x) * this.zoom;
+    const mapScreenY = cy + (minZ - this.cameraOffset.y) * this.zoom;
+    const mapScreenW = arenaWorldSize * this.zoom;
+    const mapScreenH = arenaWorldSize * this.zoom;
+
+    // 1. Render Single Grand Stage Environment (Mundo 1: Floresta da Forja) - ONE single map, not tiled!
     if (this.fantasyGrassTile && this.fantasyGrassTile.complete && this.fantasyGrassTile.naturalWidth > 0) {
-      const tileScreenSize = 18 * this.zoom; // 18 world units per tile repeat
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(minScreenX, minScreenY, arenaWidth, arenaHeight);
-      ctx.clip();
+      ctx.drawImage(this.fantasyGrassTile, mapScreenX, mapScreenY, mapScreenW, mapScreenH);
 
-      for (let wx = -mapBounds; wx < mapBounds; wx += 18) {
-        for (let wz = -mapBounds; wz < mapBounds; wz += 18) {
-          const tx = cx + (wx - this.cameraOffset.x) * this.zoom;
-          const ty = cy + (wz - this.cameraOffset.y) * this.zoom;
-          ctx.drawImage(this.fantasyGrassTile, tx, ty, tileScreenSize + 1, tileScreenSize + 1);
-        }
-      }
+      // Soft edge vignette around the boundaries of the arena
+      const edgeFade = 50;
+      const gradL = ctx.createLinearGradient(mapScreenX, 0, mapScreenX + edgeFade, 0);
+      gradL.addColorStop(0, 'rgba(10, 15, 29, 0.95)');
+      gradL.addColorStop(1, 'rgba(10, 15, 29, 0)');
+      ctx.fillStyle = gradL;
+      ctx.fillRect(mapScreenX, mapScreenY, edgeFade, mapScreenH);
 
-      // Darken slightly so UI and glowing spells pop
-      ctx.fillStyle = 'rgba(10, 15, 29, 0.38)';
-      ctx.fillRect(minScreenX, minScreenY, arenaWidth, arenaHeight);
-      ctx.restore();
+      const gradR = ctx.createLinearGradient(mapScreenX + mapScreenW - edgeFade, 0, mapScreenX + mapScreenW, 0);
+      gradR.addColorStop(0, 'rgba(10, 15, 29, 0)');
+      gradR.addColorStop(1, 'rgba(10, 15, 29, 0.95)');
+      ctx.fillStyle = gradR;
+      ctx.fillRect(mapScreenX + mapScreenW - edgeFade, mapScreenY, edgeFade, mapScreenH);
+
+      const gradT = ctx.createLinearGradient(0, mapScreenY, 0, mapScreenY + edgeFade);
+      gradT.addColorStop(0, 'rgba(10, 15, 29, 0.95)');
+      gradT.addColorStop(1, 'rgba(10, 15, 29, 0)');
+      ctx.fillStyle = gradT;
+      ctx.fillRect(mapScreenX, mapScreenY, mapScreenW, edgeFade);
+
+      const gradB = ctx.createLinearGradient(0, mapScreenY + mapScreenH - edgeFade, 0, mapScreenY + mapScreenH);
+      gradB.addColorStop(0, 'rgba(10, 15, 29, 0)');
+      gradB.addColorStop(1, 'rgba(10, 15, 29, 0.95)');
+      ctx.fillStyle = gradB;
+      ctx.fillRect(mapScreenX, mapScreenY + mapScreenH - edgeFade, mapScreenW, edgeFade);
+
+      // Soft ambient vignette for UI readability
+      ctx.fillStyle = 'rgba(10, 15, 29, 0.12)';
+      ctx.fillRect(mapScreenX, mapScreenY, mapScreenW, mapScreenH);
     }
 
-    // 2. Render Seamless Arena Stone Tile in the central combat plaza (-24 to +24 world units)
-    if (this.arenaStoneTile && this.arenaStoneTile.complete && this.arenaStoneTile.naturalWidth > 0) {
-      const plazaBounds = 24;
-      const pMinX = cx - (plazaBounds + this.cameraOffset.x) * this.zoom;
-      const pMaxX = cx + (plazaBounds - this.cameraOffset.x) * this.zoom;
-      const pMinY = cy - (plazaBounds + this.cameraOffset.y) * this.zoom;
-      const pMaxY = cy + (plazaBounds - this.cameraOffset.y) * this.zoom;
-      const tileScreenSize = 12 * this.zoom;
+    // 2. Ornate Arena Border & Corner Runes
+    ctx.save();
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(mapScreenX, mapScreenY, mapScreenW, mapScreenH);
 
-      ctx.save();
+    const corners = [
+      [mapScreenX, mapScreenY],
+      [mapScreenX + mapScreenW, mapScreenY],
+      [mapScreenX, mapScreenY + mapScreenH],
+      [mapScreenX + mapScreenW, mapScreenY + mapScreenH],
+    ];
+    ctx.font = '14px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const [cornX, cornY] of corners) {
       ctx.beginPath();
-      ctx.rect(pMinX, pMinY, pMaxX - pMinX, pMaxY - pMinY);
-      ctx.clip();
-
-      for (let wx = -plazaBounds; wx < plazaBounds; wx += 12) {
-        for (let wz = -plazaBounds; wz < plazaBounds; wz += 12) {
-          const tx = cx + (wx - this.cameraOffset.x) * this.zoom;
-          const ty = cy + (wz - this.cameraOffset.y) * this.zoom;
-          ctx.drawImage(this.arenaStoneTile, tx, ty, tileScreenSize + 1, tileScreenSize + 1);
-        }
-      }
-
-      ctx.fillStyle = 'rgba(10, 15, 29, 0.28)';
-      ctx.fillRect(pMinX, pMinY, pMaxX - pMinX, pMaxY - pMinY);
-      ctx.restore();
-
-      // Plaza stone border
-      ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
+      ctx.arc(cornX, cornY, 12, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+      ctx.fill();
+      ctx.strokeStyle = '#fbbf24';
       ctx.lineWidth = 2;
-      ctx.strokeRect(pMinX, pMinY, pMaxX - pMinX, pMaxY - pMinY);
-    }
-
-    // Outer Boundary Box with double line and glow
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 2.5;
-    ctx.strokeRect(minScreenX, minScreenY, arenaWidth, arenaHeight);
-
-    ctx.strokeStyle = 'rgba(59, 130, 246, 0.2)';
-    ctx.lineWidth = 8;
-    ctx.strokeRect(minScreenX, minScreenY, arenaWidth, arenaHeight);
-
-    // Subtle grid lines every 10 units
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-    ctx.lineWidth = 1;
-    for (let u = -mapBounds; u <= mapBounds; u += 10) {
-      const gx = cx + (u - this.cameraOffset.x) * this.zoom;
-      const gy = cy + (u - this.cameraOffset.y) * this.zoom;
-
-      ctx.beginPath();
-      ctx.moveTo(gx, minScreenY);
-      ctx.lineTo(gx, maxScreenY);
       ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(minScreenX, gy);
-      ctx.lineTo(maxScreenX, gy);
-      ctx.stroke();
+      ctx.fillStyle = '#fef08a';
+      ctx.fillText('ᚱ', cornX, cornY);
     }
+    ctx.restore();
 
-    // Center Spawn Altar / Runic Circle (World 0,0)
+    // 3. Subtle Arena Combat Boundary (circle around center)
+    const combatRadius = 50;
     const altarScreenX = cx + (0 - this.cameraOffset.x) * this.zoom;
     const altarScreenY = cy + (0 - this.cameraOffset.y) * this.zoom;
 
     ctx.beginPath();
-    ctx.arc(altarScreenX, altarScreenY, 6 * this.zoom, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
+    ctx.arc(altarScreenX, altarScreenY, combatRadius * this.zoom, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
     ctx.lineWidth = 2;
+    ctx.setLineDash([8, 8]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 4. Center Spawn Altar / Runic Circle (World 0,0 - located on the central stone path)
+    ctx.beginPath();
+    ctx.arc(altarScreenX, altarScreenY, 7 * this.zoom, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.55)';
+    ctx.lineWidth = 2.5;
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(altarScreenX, altarScreenY, 2 * this.zoom, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(251, 191, 36, 0.1)';
+    ctx.arc(altarScreenX, altarScreenY, 3 * this.zoom, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.15)';
     ctx.fill();
-    ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
+
+    // 5. Draw Runic Stage Portal (at diagonal coordinates 20, 20)
+    if (this.runicPortalImg && this.runicPortalImg.complete && this.runicPortalImg.naturalWidth > 0) {
+      const portalWorldX = 20;
+      const portalWorldZ = 20;
+      const pScreenX = cx + (portalWorldX - this.cameraOffset.x) * this.zoom;
+      const pScreenY = cy + (portalWorldZ - this.cameraOffset.y) * this.zoom;
+
+      const portalSize = 72;
+      const pulse = Math.sin(performance.now() * 0.0035) * 6;
+
+      ctx.save();
+      ctx.shadowColor = '#c084fc';
+      ctx.shadowBlur = 20 + pulse;
+      ctx.drawImage(
+        this.runicPortalImg,
+        pScreenX - (portalSize + pulse) / 2,
+        pScreenY - (portalSize + pulse) / 2 - 16,
+        portalSize + pulse,
+        portalSize + pulse
+      );
+      ctx.restore();
+
+      // Portal title tag
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.fillStyle = '#facc15';
+      ctx.textAlign = 'center';
+      ctx.fillText('🌀 PORTAL RÚNICO (FASE 2)', pScreenX, pScreenY - 48);
+    }
   }
 
   private renderFloatingText(cx: number, cy: number): void {
@@ -652,11 +688,39 @@ export class GameRenderer {
     return nearest;
   }
 
+  public getDropAtScreenPos(screenX: number, screenY: number, hitRadius = 28): ActiveItemDrop | null {
+    const cx = this.canvas.width / 2;
+    const cy = this.canvas.height / 2;
+    let closestDrop: ActiveItemDrop | null = null;
+    let closestDistSq = hitRadius * hitRadius;
+
+    for (const drop of this.activeDrops.values()) {
+      const sx = cx + (drop.position.x - this.cameraOffset.x) * this.zoom;
+      const sy = cy + (drop.position.z - this.cameraOffset.y) * this.zoom;
+      const dx = screenX - sx;
+      const dy = screenY - sy;
+      const distSq = dx * dx + dy * dy;
+      if (distSq <= closestDistSq) {
+        closestDistSq = distSq;
+        closestDrop = drop;
+      }
+    }
+
+    return closestDrop;
+  }
+
   private renderItemDrops(cx: number, cy: number): void {
     const { ctx } = this;
     const now = performance.now();
 
-    for (const drop of this.activeDrops.values()) {
+    const sortedDrops = Array.from(this.activeDrops.values()).sort((a, b) => {
+      const distA = Math.hypot(a.position.x - this.cameraOffset.x, a.position.z - this.cameraOffset.y);
+      const distB = Math.hypot(b.position.x - this.cameraOffset.x, b.position.z - this.cameraOffset.y);
+      return distA - distB;
+    });
+
+    let labeledCount = 0;
+    for (const drop of sortedDrops) {
       const sx = cx + (drop.position.x - this.cameraOffset.x) * this.zoom;
       const sy = cy + (drop.position.z - this.cameraOffset.y) * this.zoom;
 
@@ -698,10 +762,10 @@ export class GameRenderer {
       ctx.fill();
 
       // 3. Loot Icon (Floating glowing bag/chest)
-      const iconY = sy - 14 + bobOffset;
+      const iconY = sy - 20 + bobOffset;
       ctx.fillStyle = drop.itemId === 'gold' ? '#fbbf24' : '#f8fafc';
       ctx.beginPath();
-      ctx.arc(sx, iconY, 7, 0, Math.PI * 2);
+      ctx.arc(sx, iconY, 8, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = rarityColor;
       ctx.lineWidth = 2;
@@ -714,24 +778,28 @@ export class GameRenderer {
       ctx.textBaseline = 'middle';
       ctx.fillText(drop.itemId === 'gold' ? '💰' : '📦', sx, iconY);
 
-      // 4. Floating Name Badge
-      const textY = iconY - 12;
-      const labelText = drop.quantity > 1 ? `${drop.name} (${drop.quantity})` : drop.name;
-      ctx.font = 'bold 11px Inter, sans-serif';
-      const textMetrics = ctx.measureText(labelText);
-      const bgWidth = textMetrics.width + 12;
-      const bgHeight = 16;
+      // 4. Floating Name Badge (rendered for the closest 6 drops to avoid text clutter)
+      const distToCam = Math.hypot(drop.position.x - this.cameraOffset.x, drop.position.z - this.cameraOffset.y);
+      if (distToCam < 16.0 && labeledCount < 6) {
+        labeledCount++;
+        const textY = iconY - 16;
+        const labelText = drop.quantity > 1 ? `${drop.name} (${drop.quantity})` : drop.name;
+        ctx.font = 'bold 11px Inter, sans-serif';
+        const textMetrics = ctx.measureText(labelText);
+        const bgWidth = textMetrics.width + 14;
+        const bgHeight = 18;
 
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-      ctx.fillRect(sx - bgWidth / 2, textY - 11, bgWidth, bgHeight);
-      ctx.strokeStyle = rarityColor;
-      ctx.lineWidth = 1;
-      ctx.strokeRect(sx - bgWidth / 2, textY - 11, bgWidth, bgHeight);
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.fillRect(sx - bgWidth / 2, textY - 12, bgWidth, bgHeight);
+        ctx.strokeStyle = rarityColor;
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(sx - bgWidth / 2, textY - 12, bgWidth, bgHeight);
 
-      ctx.fillStyle = rarityTheme.text;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(labelText, sx, textY - 3);
+        ctx.fillStyle = rarityTheme.text;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(labelText, sx, textY - 3);
+      }
 
       ctx.restore();
     }

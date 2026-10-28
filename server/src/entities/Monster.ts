@@ -25,7 +25,7 @@ export interface LootDropEntry {
 export class Monster extends Entity {
   public spawnPosition: Vector3;
   public state: MonsterState = MonsterState.IDLE;
-  public aggroRadius: number = 14.0;
+  public aggroRadius: number = 9.0;
   public attackRange: number = 2.2;
   public attackIntervalSec: number = 1.6;
   public attackDamage: number = 15;
@@ -34,7 +34,10 @@ export class Monster extends Entity {
   public attackCooldown: number = 0;
   public targetPlayer: Entity | null = null;
   public respawnTimer: number = 0;
-  public readonly respawnDelaySec: number = 6.0;
+  public respawnDelaySec: number = 6.5; // Respawn mais lento e natural
+  private wanderTimer: number = 0;
+  private wanderIntervalSec: number = 4.0;
+  private wanderTarget: Vector3 | null = null;
   public lootTable: LootDropEntry[] = [];
   public expReward: number = 35;
 
@@ -42,6 +45,7 @@ export class Monster extends Entity {
     super(id, EntityType.MONSTER, name, spawnPos, maxHp);
     this.spawnPosition = cloneVector3(spawnPos);
     this.attackDamage = damage;
+    this.wanderIntervalSec = 2.0 + Math.random() * 4.0;
     this.configureDefaultLoot();
   }
 
@@ -51,31 +55,48 @@ export class Monster extends Entity {
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 5, maxQty: 12 },
         { itemId: 'essence_slime', dropChance: 0.8, minQty: 1, maxQty: 2 },
+        { itemId: 'stone_forge_common', dropChance: 0.35, minQty: 1, maxQty: 2 },
+        { itemId: 'arcane_dust', dropChance: 0.3, minQty: 1, maxQty: 2 },
         { itemId: 'potion_hp_minor', dropChance: 0.35, minQty: 1, maxQty: 1 },
+        { itemId: 'card_slime', dropChance: 0.15, minQty: 1, maxQty: 1 },
       ];
     } else if (this.name.includes('Lobo')) {
       this.expReward = 50;
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 8, maxQty: 18 },
         { itemId: 'wolf_fang', dropChance: 0.75, minQty: 1, maxQty: 2 },
+        { itemId: 'stone_forge_common', dropChance: 0.4, minQty: 1, maxQty: 2 },
         { itemId: 'armor_chainmail', dropChance: 0.15, minQty: 1, maxQty: 1 },
+        { itemId: 'card_wolf', dropChance: 0.15, minQty: 1, maxQty: 1 },
       ];
-    } else if (this.name.includes('Arqueiro')) {
+    } else if (this.name.includes('Arqueiro') || this.name.includes('Esqueleto')) {
       this.expReward = 40;
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 10, maxQty: 20 },
         { itemId: 'essence_goblin', dropChance: 0.7, minQty: 1, maxQty: 2 },
+        { itemId: 'stone_forge_common', dropChance: 0.35, minQty: 1, maxQty: 2 },
         { itemId: 'potion_mp_minor', dropChance: 0.4, minQty: 1, maxQty: 1 },
         { itemId: 'bow_hunting', dropChance: 0.12, minQty: 1, maxQty: 1 },
+        { itemId: 'card_skeleton', dropChance: 0.15, minQty: 1, maxQty: 1 },
       ];
-    } else if (this.name.includes('Chefe')) {
-      this.expReward = 250;
+    } else if (this.name.includes('Chefe') || this.name.includes('Chefão') || this.name.includes('Grimgor') || this.name.includes('Frostbite') || this.name.includes('Ignis')) {
+      this.expReward = 450;
+      const bossCardId = this.name.includes('Frostbite') ? 'card_boss_frostbite' : (this.name.includes('Ignis') ? 'card_boss_ignis' : 'card_boss_grimgor');
       this.lootTable = [
-        { itemId: 'gold', dropChance: 1.0, minQty: 60, maxQty: 120 },
-        { itemId: 'potion_hp_major', dropChance: 1.0, minQty: 1, maxQty: 2 },
-        { itemId: 'rune_fragment', dropChance: 0.85, minQty: 1, maxQty: 3 },
-        { itemId: 'shield_iron_buckler', dropChance: 0.45, minQty: 1, maxQty: 1 },
-        { itemId: 'relic_ancient_forge', dropChance: 0.3, minQty: 1, maxQty: 1 }, // Lendário!
+        { itemId: 'gold', dropChance: 1.0, minQty: 200, maxQty: 500 },
+        { itemId: 'stone_forge_rare', dropChance: 1.0, minQty: 3, maxQty: 5 },
+        { itemId: 'stone_forge_mystic', dropChance: 0.75, minQty: 1, maxQty: 2 },
+        { itemId: 'arcane_dust', dropChance: 1.0, minQty: 15, maxQty: 30 },
+        { itemId: 'gem_ruby_str', dropChance: 0.5, minQty: 1, maxQty: 1 },
+        { itemId: 'gem_sapphire_int', dropChance: 0.5, minQty: 1, maxQty: 1 },
+        { itemId: 'gem_emerald_dex', dropChance: 0.5, minQty: 1, maxQty: 1 },
+        { itemId: 'gem_topaz_con', dropChance: 0.5, minQty: 1, maxQty: 1 },
+        { itemId: 'potion_hp_major', dropChance: 1.0, minQty: 3, maxQty: 5 },
+        { itemId: 'rune_fragment', dropChance: 1.0, minQty: 2, maxQty: 6 },
+        { itemId: 'sword_runic_bastard', dropChance: 0.3, minQty: 1, maxQty: 1 },
+        { itemId: 'staff_void_astral', dropChance: 0.3, minQty: 1, maxQty: 1 },
+        { itemId: 'relic_ancient_forge', dropChance: 0.4, minQty: 1, maxQty: 1 },
+        { itemId: bossCardId, dropChance: 1.0, minQty: 1, maxQty: 1 },
       ];
     } else {
       // Goblin Lanceiro / padrão
@@ -83,9 +104,12 @@ export class Monster extends Entity {
       this.lootTable = [
         { itemId: 'gold', dropChance: 1.0, minQty: 6, maxQty: 15 },
         { itemId: 'essence_goblin', dropChance: 0.65, minQty: 1, maxQty: 2 },
+        { itemId: 'stone_forge_common', dropChance: 0.35, minQty: 1, maxQty: 2 },
+        { itemId: 'arcane_dust', dropChance: 0.35, minQty: 1, maxQty: 2 },
         { itemId: 'potion_hp_minor', dropChance: 0.35, minQty: 1, maxQty: 1 },
         { itemId: 'ore_iron_arcane', dropChance: 0.25, minQty: 1, maxQty: 2 },
         { itemId: 'sword_iron_broadsword', dropChance: 0.1, minQty: 1, maxQty: 1 },
+        { itemId: 'card_goblin', dropChance: 0.15, minQty: 1, maxQty: 1 },
       ];
     }
   }
@@ -120,8 +144,41 @@ export class Monster extends Entity {
     // AI Logic
     switch (this.state) {
       case MonsterState.IDLE:
-        this.velocity = createVector3(0, 0, 0);
-        this.isMoving = false;
+        this.wanderTimer += deltaTimeSec;
+        if (this.wanderTimer >= this.wanderIntervalSec) {
+          this.wanderTimer = 0;
+          this.wanderIntervalSec = 3.5 + Math.random() * 4.5;
+          if (Math.random() < 0.6) {
+            // Escolhe um ponto aleatório para passear até 10m de seu spawn
+            const angle = Math.random() * Math.PI * 2;
+            const r = 3 + Math.random() * 8;
+            this.wanderTarget = createVector3(
+              this.spawnPosition.x + Math.cos(angle) * r,
+              0,
+              this.spawnPosition.z + Math.sin(angle) * r
+            );
+          } else {
+            this.wanderTarget = null;
+          }
+        }
+
+        if (this.wanderTarget) {
+          const d = distance(this.position, this.wanderTarget);
+          if (d <= 0.6) {
+            this.wanderTarget = null;
+            this.velocity = createVector3(0, 0, 0);
+            this.isMoving = false;
+          } else {
+            // Passeio calmo a 40% da velocidade de corrida
+            const origSpeed = this.speed;
+            this.speed = origSpeed * 0.45;
+            this.moveTowards(this.wanderTarget, deltaTimeSec);
+            this.speed = origSpeed;
+          }
+        } else {
+          this.velocity = createVector3(0, 0, 0);
+          this.isMoving = false;
+        }
         break;
 
       case MonsterState.CHASING:
@@ -212,9 +269,23 @@ export class Monster extends Entity {
     this.isMoving = true;
   }
 
-  public respawn(): void {
+  public respawn(newPosition?: Vector3): void {
     this.isDead = false;
     this.currentHp = this.maxHp;
+    this.wanderTimer = 0;
+    this.wanderTarget = null;
+    if (newPosition) {
+      this.spawnPosition = cloneVector3(newPosition);
+    } else {
+      // Renasce distribuído amplamente pelo mapa (12m a 38m do centro)
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 12 + Math.random() * 26;
+      this.spawnPosition = createVector3(
+        Math.round(Math.cos(angle) * radius * 10) / 10,
+        0,
+        Math.round(Math.sin(angle) * radius * 10) / 10
+      );
+    }
     this.position = cloneVector3(this.spawnPosition);
     this.velocity = createVector3(0, 0, 0);
     this.isMoving = false;

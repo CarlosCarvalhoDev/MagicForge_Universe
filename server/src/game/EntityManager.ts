@@ -27,6 +27,15 @@ export class EntityManager {
     this.monsters.set(monster.id, monster);
   }
 
+  public removeMonster(monsterId: string): Monster | undefined {
+    const monster = this.monsters.get(monsterId);
+    if (monster) {
+      this.monsters.delete(monsterId);
+      this.entities.delete(monsterId);
+    }
+    return monster;
+  }
+
   public getEntity(id: string): Entity | undefined {
     return this.entities.get(id);
   }

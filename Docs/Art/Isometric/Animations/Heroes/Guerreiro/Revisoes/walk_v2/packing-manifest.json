@@ -1,0 +1,69 @@
+{
+  "Sheet": "iso_hero_guerreiro_walk_sheet.png",
+  "Columns": 3,
+  "Rows": 2,
+  "CellSize": 512,
+  "SheetSHA256": "DBFDE98CA58E998E1A2586715287B81C1600462A3D06D82D82EF79E3A93194B7",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_guerreiro_walk_00.png",
+      "Source": "exec-61e518d3-88b3-48ef-b675-5090d74493e0.png",
+      "SourceSHA256": "81C7FB5F1E44F48513B00CD01B9AC18AB1F44639BEBB126E0F068F210549E100",
+      "FrameSHA256": "CAB284ACA944116459363AF44337751A3A269BEB4B4592516CBF5245B185D5A4",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 1,
+      "File": "iso_hero_guerreiro_walk_01.png",
+      "Source": "exec-29b02331-2803-42e4-bb95-f63e5f468557.png",
+      "SourceSHA256": "649D8CA82BE84B215DF00F877C230AF10B15A81A0A7635E14BC34A7581FB1AAE",
+      "FrameSHA256": "5A1B1E7A24603B79E34D66B2ACAE37E4EC929D0E64562BB28C82AF6ED2D24A62",
+      "X": 512,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 2,
+      "File": "iso_hero_guerreiro_walk_02.png",
+      "Source": "exec-fcfd3c36-a131-4a03-b0ea-455dff194069.png",
+      "SourceSHA256": "40AAF125107A86AD26C53B8DFEC0395E3A4AC31E4AB25D23BA42B8B50BBF279F",
+      "FrameSHA256": "2A63F32788CB7400B6917785624E159EACA8671D80BD5EB57DA408F9B9820401",
+      "X": 1024,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 3,
+      "File": "iso_hero_guerreiro_walk_03.png",
+      "Source": "exec-fa0ca529-1f92-483d-a139-7999f88fca6e.png",
+      "SourceSHA256": "7AB95A5D169E944AC4CFC72DA698BB22362C3166E4BE3747C694DF124664056D",
+      "FrameSHA256": "683133DA851906046C74C0BCC41EE89E32F61BDE028345CB26EC1AA7B2A91D0F",
+      "X": 0,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 4,
+      "File": "iso_hero_guerreiro_walk_04.png",
+      "Source": "exec-5c89d954-6ca3-4481-a53a-5a2cc1335a15.png",
+      "SourceSHA256": "27C77EEC3FF8CA0BC246699153A69ED251403E1835A45EED6D1493BBEDA5DB8A",
+      "FrameSHA256": "1D523B9F75A7672BF746F96707FADCA229839624EF30F41900D942F6A3A8C773",
+      "X": 512,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 5,
+      "File": "iso_hero_guerreiro_walk_05.png",
+      "Source": "exec-a6deacab-1c40-4482-81f2-6af48e656fad.png",
+      "SourceSHA256": "50C72E7B29DE256A6766193B8AB4FCCFC8733A0BE12BF71DEA19EA2555FFD238",
+      "FrameSHA256": "1D31D4F5AD9ED23440272890A14793545697C882463FCFDBF17D4755FB297D60",
+      "X": 1024,
+      "Y": 512,
+      "Size": 512
+    }
+  ]
+}

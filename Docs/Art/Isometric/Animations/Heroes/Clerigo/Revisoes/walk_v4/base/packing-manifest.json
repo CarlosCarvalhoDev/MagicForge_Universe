@@ -1,0 +1,19 @@
+{
+  "Sheet": "iso_hero_clerigo_walk_base_se_sheet.png",
+  "Columns": 1,
+  "Rows": 1,
+  "CellSize": 512,
+  "SheetSHA256": "A614194355EB5DB95628FB14759D746369904BDAC7E0060A5522EFBB048E5EE2",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_clerigo_walk_base_se_00.png",
+      "Source": "exec-9f1c7d58-48db-4b26-93f2-118654c6d49e.png",
+      "SourceSHA256": "2942874F1A2F340E2624AAAD88497D5415211BE7F5B4C60BCFAD63FFE691B93F",
+      "FrameSHA256": "3182C9BC87CB44ABF3F2571735FE4E05DE5FAFFC78268845277C744C5CC98FF2",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    }
+  ]
+}

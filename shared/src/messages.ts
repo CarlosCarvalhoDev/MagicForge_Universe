@@ -32,6 +32,10 @@ export interface S2CLoginSuccessPayload {
   currentXp: number;
   xpToNextLevel: number;
   gold: number;
+  rebornCount?: number;
+  honorTitle?: string;
+  currentWorld?: number;
+  currentStage?: number;
   serverTickRate: number; // e.g. 20
   tickIntervalMs: number; // e.g. 50
 }
@@ -123,6 +127,16 @@ export interface S2CSkillCastEventPayload {
   casterMaxResource: number;
 }
 
+export interface C2SEquipSkillPayload {
+  slot: number; // 1, 2, 3, 4
+  skillId: string;
+}
+
+export interface S2CSkillsUpdatePayload {
+  equippedSkills: Record<number, string>;
+  message?: string;
+}
+
 // ==========================================
 // Items, Drops & Inventory Payloads
 // ==========================================
@@ -151,12 +165,15 @@ export interface InventoryItemPayload {
   itemId: string;
   quantity: number;
   isEquipped: boolean;
+  refineLevel?: number;
+  sockets?: Array<{ socketIndex: number; gemId: string }>;
 }
 
 export interface S2CInventoryUpdatePayload {
   slots: InventoryItemPayload[];
   gold: number;
   totalCombatPower: number;
+  maxSlots?: number;
   lootMessage?: string;
 }
 
@@ -166,6 +183,121 @@ export interface C2SUseItemPayload {
 
 export interface C2SSellItemPayload {
   slotIndex: number;
+}
+
+export interface C2SExpandInventoryPayload {}
+
+export interface C2SDiscardItemPayload {
+  slotIndex: number;
+}
+
+// --- SUBMENU 2: REFINAMENTO DE EQUIPAMENTOS (+1 A +15) ---
+export interface C2SRefineEquipmentPayload {
+  slotIndex: number;
+}
+
+export interface S2CRefineResultPayload {
+  success: boolean;
+  slotIndex: number;
+  oldRefineLevel: number;
+  newRefineLevel: number;
+  isLevelUp: boolean;
+  isLevelDown: boolean;
+  message: string;
+  totalCombatPower: number;
+  gold: number;
+}
+
+// --- SUBMENU 3: ENGASTE DE GEMAS (SOCKETS) ---
+export interface C2SSocketGemPayload {
+  equipmentSlotIndex: number;
+  socketIndex: number;
+  gemItemId: string;
+}
+
+export interface S2CSocketResultPayload {
+  success: boolean;
+  equipmentSlotIndex: number;
+  socketIndex: number;
+  gemItemId?: string;
+  message: string;
+  totalCombatPower: number;
+}
+
+// --- SUBMENU 4: ÁLBUM DE CARTAS DE MONSTROS ---
+export interface CardAlbumEntryPayload {
+  cardId: string;
+  name: string;
+  rarity: string;
+  icon: string;
+  image?: string;
+  count: number;
+  isEquipped: boolean;
+  equippedSlot: number;
+  statsBonus: Partial<CharacterAttributes> & { maxHp?: number; maxResource?: number };
+  activeEffectText: string;
+}
+
+export interface C2SEquipCardPayload {
+  cardId: string;
+  targetSlot: 'ARMA' | 'ARMADURA';
+  isEquip: boolean;
+}
+
+export interface S2CCardsUpdatePayload {
+  cards: CardAlbumEntryPayload[];
+  equippedWeaponCardId?: string;
+  equippedArmorCardId?: string;
+  message?: string;
+  totalCombatPower: number;
+}
+
+export interface C2SRequestCardAlbumPayload {}
+
+export interface C2SChallengeBossPayload {}
+
+export interface S2CBossEventPayload {
+  eventType: 'SPAWN' | 'TICK' | 'TIMEOUT' | 'DEFEAT' | 'VICTORY';
+  bossId?: string;
+  bossName?: string;
+  maxHp?: number;
+  currentHp?: number;
+  remainingTimeSec?: number;
+  timeLimitSec?: number;
+  newStage?: number;
+  newWorld?: number;
+  message?: string;
+}
+
+export interface C2SEnterPortalPayload {}
+
+export interface S2CStageUpdatePayload {
+  world: number;
+  stage: number;
+  worldName: string;
+  stageKills: number;
+  killsRequired: number;
+  isBossStage: boolean;
+  bossAvailable: boolean;
+  portalOpen: boolean;
+  portalPosition?: Vector3;
+  message?: string;
+}
+
+// ==========================================
+// Chat Payloads
+// ==========================================
+export interface C2SChatMessagePayload {
+  message: string;
+  channel?: 'general' | 'party' | 'guild' | 'system';
+}
+
+export interface S2CChatMessagePayload {
+  senderId?: string;
+  senderName: string;
+  message: string;
+  channel: 'general' | 'party' | 'guild' | 'system';
+  timestamp?: number;
 }
 
 // ==========================================
@@ -187,6 +319,20 @@ export interface S2CPlayerLevelUpPayload {
   newMaxHp: number;
   newMaxResource: number;
   totalCombatPower: number;
+  rebornCount?: number;
+  honorTitle?: string;
+}
+
+export interface C2SPerformRebornPayload {}
+
+export interface S2CRebornResultPayload {
+  success: boolean;
+  rebornCount: number;
+  newLevel: number;
+  totalCombatPower: number;
+  newAttributes: CharacterAttributes;
+  honorTitle: string;
+  message: string;
 }
 
 // ==========================================
@@ -200,3 +346,189 @@ export interface S2CPongPayload {
   clientSendTime: number;
   serverReceiveTime: number;
 }
+
+// ==========================================
+// Account & Multi-Character Slots Payloads (D&D 5E Pedestais)
+// ==========================================
+export interface C2SRequestCharacterListPayload {
+  accountUsername: string;
+}
+
+export interface CharacterSlotSummary {
+  slotIndex: number; // 0, 1 ou 2
+  isEmpty: boolean;
+  id?: string;
+  name?: string;
+  classType?: CharacterClass;
+  level?: number;
+  currentWorld?: number;
+  currentStage?: number;
+  combatPower?: number;
+  currentHp?: number;
+  maxHp?: number;
+  gold?: number;
+  rebornCount?: number;
+  slot1Skill?: string;
+  slot2Skill?: string;
+  slot3Skill?: string;
+  slot4Skill?: string;
+}
+
+export interface S2CCharacterListPayload {
+  accountId: string;
+  accountUsername: string;
+  slots: CharacterSlotSummary[]; // Sempre exatamente 3 posições (índices 0, 1 e 2)
+  message?: string;
+}
+
+export interface C2SCreateCharacterSlotPayload {
+  slotIndex: number; // 0, 1 ou 2
+  characterName: string;
+  classType: CharacterClass;
+}
+
+export interface C2SSelectCharacterSlotPayload {
+  slotIndex: number; // 0, 1 ou 2
+}
+
+export interface S2CCharacterActionErrorPayload {
+  errorCode: 'INVALID_SLOT' | 'SLOT_OCCUPIED' | 'NAME_TAKEN' | 'INVALID_NAME' | 'CHARACTER_NOT_FOUND' | 'UNAUTHENTICATED';
+  errorMessage: string;
+  slotIndex?: number;
+}
+
+// ==========================================
+// Account Authentication & Security Payloads (0x70 - 0x75)
+// ==========================================
+export type SocialAuthProvider = 'GOOGLE' | 'APPLE' | 'DISCORD' | 'FACEBOOK' | 'GUEST';
+
+export interface C2SAuthLoginPayload {
+  username: string;
+  password?: string;
+}
+
+export interface C2SAuthRegisterPayload {
+  username: string;
+  password?: string;
+  email?: string;
+}
+
+export interface C2SAuthSocialPayload {
+  provider: SocialAuthProvider;
+  token?: string;
+  email?: string;
+  displayName?: string;
+}
+
+export interface C2SAuthClaimLegacyPayload {
+  username: string;
+  verifyHeroName: string;
+  verifyHeroClass: CharacterClass;
+  newPassword: string;
+  adminKey?: string;
+}
+
+export interface S2CAuthSuccessPayload {
+  accountId: string;
+  accountUsername: string;
+  provider: string;
+  isActivated: boolean;
+  message?: string;
+}
+
+export interface S2CAuthErrorPayload {
+  errorCode:
+    | 'INVALID_CREDENTIALS'
+    | 'USER_NOT_FOUND'
+    | 'USER_EXISTS'
+    | 'INVALID_PASSWORD'
+    | 'INVALID_EMAIL'
+    | 'LEGACY_ACCOUNT_UNCLAIMED'
+    | 'LEGACY_CLAIM_FAILED'
+    | 'UNAUTHENTICATED'
+    | 'SOCIAL_AUTH_FAILED';
+  errorMessage: string;
+}
+
+// ==========================================
+// Idle Farm Helper & Bag Automation Payloads (0x80 - 0x8F)
+// ==========================================
+export interface FarmHelperSettingsPayload {
+  autoHpPotionEnabled: boolean;
+  autoHpPotionThreshold: number; // 20 a 90 (%)
+  autoMpPotionEnabled: boolean;
+  autoMpPotionThreshold: number; // 20 a 80 (%)
+  autoSellCommon: boolean;
+  autoSellUncommon: boolean;
+  autoSellRare: boolean;
+  autoLootEnabled: boolean;
+}
+
+export interface C2SUpdateFarmSettingsPayload {
+  settings: Partial<FarmHelperSettingsPayload>;
+}
+
+export interface S2CFarmSettingsUpdatePayload {
+  settings: FarmHelperSettingsPayload;
+  message?: string;
+}
+
+export interface C2SAutoSalvagePayload {
+  includeRare?: boolean;
+}
+
+export interface S2CAutoSalvageResultPayload {
+  itemsSold: number;
+  goldEarned: number;
+  newGoldTotal: number;
+  message: string;
+}
+
+// ==========================================
+// Inventory Expansion Payloads (0x84 - 0x85)
+// ==========================================
+export interface C2SExpandInventoryPayload {}
+
+export interface S2CExpandInventoryResultPayload {
+  success: boolean;
+  newMaxSlots: number;
+  goldSpent: number;
+  remainingGold: number;
+  nextExpansionCost?: number;
+  nextExpansionMinLevel?: number;
+  message: string;
+}
+
+// ==========================================
+// Leaderboards & Rankings Payloads (0x86 - 0x87)
+// ==========================================
+export type LeaderboardCategory = 'COMBAT_POWER' | 'LEVEL' | 'STAGE' | 'GOLD';
+
+export interface LeaderboardEntryPayload {
+  rank: number;
+  characterId: string;
+  name: string;
+  classType: CharacterClass;
+  level: number;
+  rebornCount: number;
+  combatPower: number;
+  currentWorld: number;
+  currentStage: number;
+  gold: number;
+  honorTitle?: string;
+}
+
+export interface C2SRequestLeaderboardPayload {
+  category: LeaderboardCategory;
+  limit?: number;
+}
+
+export interface S2CLeaderboardUpdatePayload {
+  category: LeaderboardCategory;
+  entries: LeaderboardEntryPayload[];
+  myRank?: number;
+  myEntry?: LeaderboardEntryPayload;
+  timestamp: number;
+}
+
+

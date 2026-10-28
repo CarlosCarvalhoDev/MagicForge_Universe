@@ -140,11 +140,32 @@ export interface EntitySnapshotState {
 }
 
 /**
- * MMORPG Leveling Curve formula
+ * MMORPG Leveling Curve formula (Progressão Calibrada D&D 5E / Idle MMORPG)
+ * - Níveis 1-9: Progressão inicial para aprendizado e tutoriais
+ * - Níveis 10-50: Desacelera exponencialmente para exigir dedicação idle consistente
  */
 export function getXpForNextLevel(level: number): number {
-  if (level <= 1) return 150;
-  return Math.round(150 * Math.pow(level, 1.55));
+  if (level <= 1) return 250;
+  if (level < 10) return Math.round(250 * Math.pow(level, 1.75));
+  return Math.round(250 * Math.pow(level, 2.3));
+}
+
+/**
+ * Título de Honra e Prestígio com base no grau de Transcendência (Reborn)
+ */
+export function getHonorTitle(rebornCount: number): string {
+  switch (rebornCount) {
+    case 0:
+      return 'Cavaleiro da Forja';
+    case 1:
+      return 'Ascendente Astral I';
+    case 2:
+      return 'Semideus da Forja II';
+    case 3:
+      return 'Avatar Cósmico III';
+    default:
+      return `Titã Primordial (Grau ${rebornCount})`;
+  }
 }
 
 /**

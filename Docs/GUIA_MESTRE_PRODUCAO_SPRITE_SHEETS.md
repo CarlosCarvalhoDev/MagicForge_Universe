@@ -32,6 +32,14 @@
 
 ## 3. Diretórios de Destino (Já Criados no Repositório)
 
+### Exceção aprovada — caminhada do Clérigo (27/10/2026)
+
+A caminhada V4.1 do Clérigo, aprovada pelo usuário e integrada em Web/Unity/Docs, usa **8 quadros a 12 FPS**, em **4×2 células de 512×512**, folha **2048×1024**. O ciclo continua com aproximadamente 667 ms, como os 6 quadros a 9 FPS anteriores. Essa exceção não altera automaticamente os padrões das demais classes ou ações. V2 e V3 foram reprovadas e permanecem arquivadas; Unity Play Mode ainda precisa de validação manual.
+
+As revisões e o histórico estão em `Docs/Art/Isometric/Animations/Heroes/Clerigo/Revisoes/`. `Build-SpriteSheet.ps1` monta frames já desenhados com redução proporcional uniforme, sem sintetizar poses. A validação estrutural usa `Test-ClericWalkStructure.ps1`. O inventário de 282 frames abaixo descreve o plano original; a exceção experimental acrescenta dois quadros ao pacote existente.
+
+O importador legado `Import-SpriteSheets.ps1` ainda presume grade 3×2 para hero walk. **Não o executar sobre esta folha 4×2**, pois ele recortaria a grade errada e recriaria identificadores de fatias. Os metadados desta revisão foram atualizados preservando GUID e os seis spriteIDs/fileIDs existentes, acrescentando somente duas fatias. A avaliação visual permanece separada da checagem de importação.
+
 Toda a árvore de pastas abaixo já está criada e pronta para receber os pacotes `.png`:
 
 1. **Unity 3D (`Sprite Mode: Multiple`, `textureType: 8`):**

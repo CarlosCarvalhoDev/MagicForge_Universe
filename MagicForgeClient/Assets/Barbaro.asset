@@ -16,6 +16,33 @@ MonoBehaviour:
   classDescription: Berserker tribal imbuido pelo magma da Forja. Dano explosivo corpo-a-corpo baseado em Forca (STR) e alta Constituicao.
   classIcon: {fileID: 21300000, guid: a10000033a6524c489205bd51885cc03, type: 3}
   isometricWorldSprite: {fileID: 21300000, guid: ad888c3716e16d45171c14a73d67cb54, type: 3}
+  idleFrames:
+  - {fileID: 21300000, guid: 70dfdbfabba34b1c80289ad51a8d2637, type: 3}
+  - {fileID: 21300002, guid: 70dfdbfabba34b1c80289ad51a8d2637, type: 3}
+  - {fileID: 21300004, guid: 70dfdbfabba34b1c80289ad51a8d2637, type: 3}
+  - {fileID: 21300006, guid: 70dfdbfabba34b1c80289ad51a8d2637, type: 3}
+  walkFrames:
+  - {fileID: 21300000, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300002, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300004, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300006, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300008, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300010, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  attackFrames:
+  - {fileID: 21300000, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300002, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300004, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300006, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300008, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300010, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  hitFrames:
+  - {fileID: 21300000, guid: 4964b172422349458b1f5ee904ecec62, type: 3}
+  - {fileID: 21300002, guid: 4964b172422349458b1f5ee904ecec62, type: 3}
+  deathFrames:
+  - {fileID: 21300000, guid: 2d1483fe54f34c8980c6883f9ecfa07e, type: 3}
+  - {fileID: 21300002, guid: 2d1483fe54f34c8980c6883f9ecfa07e, type: 3}
+  - {fileID: 21300004, guid: 2d1483fe54f34c8980c6883f9ecfa07e, type: 3}
+  - {fileID: 21300006, guid: 2d1483fe54f34c8980c6883f9ecfa07e, type: 3}
   defaultElement: 1
   mainStat: 0
   isRanged: 0

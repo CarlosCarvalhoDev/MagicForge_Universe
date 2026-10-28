@@ -14,6 +14,11 @@ import {
   EntitySnapshotState,
   InventoryItemPayload,
   ITEMS_DATABASE,
+  getDefaultSkillsForClass,
+  getHonorTitle,
+  CardAlbumEntryPayload,
+  CARDS_DATABASE,
+  FarmHelperSettingsPayload,
 } from '@magicforge/shared';
 import { Entity } from './Entity';
 import { SERVER_CONFIG } from '../config';
@@ -24,6 +29,7 @@ export class Player extends Entity {
   public attributes: CharacterAttributes;
   public level: number = 1;
   public currentXp: number = 0;
+  public cards: CardAlbumEntryPayload[] = [];
   public speed: number;
   public attackRange: number;
   public attackIntervalSec: number;
@@ -34,8 +40,27 @@ export class Player extends Entity {
 
   // Inventory & Database
   public dbCharacterId: string = '';
+  public slotIndex: number = 0;
+  public rebornCount: number = 0;
+  public currentWorld: number = 1;
+  public currentStage: number = 1;
   public gold: number = 0;
+  public maxInventorySlots: number = 20;
   public inventory: InventoryItemPayload[] = [];
+
+  // Farm Helper (Idle Automation)
+  public farmSettings: FarmHelperSettingsPayload = {
+    autoHpPotionEnabled: true,
+    autoHpPotionThreshold: 60,
+    autoMpPotionEnabled: true,
+    autoMpPotionThreshold: 40,
+    autoSellCommon: false,
+    autoSellUncommon: false,
+    autoSellRare: false,
+    autoLootEnabled: true,
+  };
+  public potionHpCooldownSec: number = 0;
+  public potionMpCooldownSec: number = 0;
 
   // Resource & Skills
   public currentResource: number;
@@ -43,6 +68,7 @@ export class Player extends Entity {
   public readonly resourceType: 'Mana' | 'Energia';
   public resourceRegenPerSec: number = 8.0;
   public skillCooldowns = new Map<number, number>(); // slot -> remaining seconds
+  public equippedSkills: Record<number, string>;
 
   public targetDestination: Vector3 | null = null;
   public moveDirection: Vector3 | null = null;
@@ -65,6 +91,9 @@ export class Player extends Entity {
     this.attackRange = classDef.attackRange;
     this.attackIntervalSec = classDef.attackIntervalSec;
 
+    // Loadout inicial de habilidades (Slot 1, 2, 3, 4)
+    this.equippedSkills = getDefaultSkillsForClass(classType);
+
     // Resource allocation based on class (Mana for casters, Energia for martials)
     const isCaster = classType === CharacterClass.MAGO || classType === CharacterClass.CLERIGO || classType === CharacterClass.BRUXO;
     this.resourceType = isCaster ? 'Mana' : 'Energia';
@@ -72,30 +101,94 @@ export class Player extends Entity {
     this.currentResource = this.maxResource;
   }
 
+  public getEquippedSkill(slot: number): string {
+    return this.equippedSkills[slot] || `${this.classType.toLowerCase()}_${slot}`;
+  }
+
+  public setEquippedSkill(slot: number, skillId: string): void {
+    this.equippedSkills[slot] = skillId;
+  }
+
+  public get HonorTitle(): string {
+    return getHonorTitle(this.rebornCount);
+  }
+
   public recalculateStatsFromEquipment(): void {
     const nextAttrs: CharacterAttributes = { ...this.baseAttributes };
+    let extraHpFromGear = 0;
+    let extraResourceFromGear = 0;
 
+    // 1. Bônus permanente transcendental por grau de Reborn (+10 em todos os atributos D&D 5E por Reborn)
+    const rebornBonus = this.rebornCount * 10;
+    nextAttrs.forca += rebornBonus;
+    nextAttrs.destreza += rebornBonus;
+    nextAttrs.constituicao += rebornBonus;
+    nextAttrs.inteligencia += rebornBonus;
+    nextAttrs.sabedoria += rebornBonus;
+    nextAttrs.carisma += rebornBonus;
+
+    // 2. Bônus de Equipamentos com Escalonamento de Refino (+8% por nível de +1 a +15) e Gemas Engastadas
     for (const slot of this.inventory) {
       if (slot.isEquipped) {
         const itemDef = ITEMS_DATABASE[slot.itemId];
+        const refMultiplier = 1.0 + (slot.refineLevel || 0) * 0.08;
+
         if (itemDef && itemDef.statsBonus) {
-          if (itemDef.statsBonus.forca) nextAttrs.forca += itemDef.statsBonus.forca;
-          if (itemDef.statsBonus.destreza) nextAttrs.destreza += itemDef.statsBonus.destreza;
-          if (itemDef.statsBonus.constituicao) nextAttrs.constituicao += itemDef.statsBonus.constituicao;
-          if (itemDef.statsBonus.inteligencia) nextAttrs.inteligencia += itemDef.statsBonus.inteligencia;
-          if (itemDef.statsBonus.sabedoria) nextAttrs.sabedoria += itemDef.statsBonus.sabedoria;
-          if (itemDef.statsBonus.carisma) nextAttrs.carisma += itemDef.statsBonus.carisma;
+          if (itemDef.statsBonus.forca) nextAttrs.forca += Math.round(itemDef.statsBonus.forca * refMultiplier);
+          if (itemDef.statsBonus.destreza) nextAttrs.destreza += Math.round(itemDef.statsBonus.destreza * refMultiplier);
+          if (itemDef.statsBonus.constituicao) nextAttrs.constituicao += Math.round(itemDef.statsBonus.constituicao * refMultiplier);
+          if (itemDef.statsBonus.inteligencia) nextAttrs.inteligencia += Math.round(itemDef.statsBonus.inteligencia * refMultiplier);
+          if (itemDef.statsBonus.sabedoria) nextAttrs.sabedoria += Math.round(itemDef.statsBonus.sabedoria * refMultiplier);
+          if (itemDef.statsBonus.carisma) nextAttrs.carisma += Math.round(itemDef.statsBonus.carisma * refMultiplier);
+          if (itemDef.statsBonus.maxHp) extraHpFromGear += Math.round(itemDef.statsBonus.maxHp * refMultiplier);
+          if (itemDef.statsBonus.maxResource) extraResourceFromGear += Math.round(itemDef.statsBonus.maxResource * refMultiplier);
+        }
+
+        // Bônus de Gemas Engastadas no Item
+        if (slot.sockets && slot.sockets.length > 0) {
+          for (const s of slot.sockets) {
+            const gemDef = ITEMS_DATABASE[s.gemId];
+            if (gemDef && gemDef.statsBonus) {
+              if (gemDef.statsBonus.forca) nextAttrs.forca += gemDef.statsBonus.forca;
+              if (gemDef.statsBonus.destreza) nextAttrs.destreza += gemDef.statsBonus.destreza;
+              if (gemDef.statsBonus.constituicao) nextAttrs.constituicao += gemDef.statsBonus.constituicao;
+              if (gemDef.statsBonus.inteligencia) nextAttrs.inteligencia += gemDef.statsBonus.inteligencia;
+              if (gemDef.statsBonus.sabedoria) nextAttrs.sabedoria += gemDef.statsBonus.sabedoria;
+              if (gemDef.statsBonus.carisma) nextAttrs.carisma += gemDef.statsBonus.carisma;
+              if (gemDef.statsBonus.maxHp) extraHpFromGear += gemDef.statsBonus.maxHp;
+              if (gemDef.statsBonus.maxResource) extraResourceFromGear += gemDef.statsBonus.maxResource;
+            }
+          }
         }
       }
     }
 
+    // 3. Bônus do Álbum de Cartas de Monstros (Passivo de Coleção + Bônus Duplo se Equipada)
+    for (const card of this.cards) {
+      const cardDef = CARDS_DATABASE[card.cardId];
+      if (cardDef && cardDef.statsBonus) {
+        const cardMultiplier = card.isEquipped ? 2.0 : 1.0;
+        if (cardDef.statsBonus.forca) nextAttrs.forca += Math.round(cardDef.statsBonus.forca * cardMultiplier);
+        if (cardDef.statsBonus.destreza) nextAttrs.destreza += Math.round(cardDef.statsBonus.destreza * cardMultiplier);
+        if (cardDef.statsBonus.constituicao) nextAttrs.constituicao += Math.round(cardDef.statsBonus.constituicao * cardMultiplier);
+        if (cardDef.statsBonus.inteligencia) nextAttrs.inteligencia += Math.round(cardDef.statsBonus.inteligencia * cardMultiplier);
+        if (cardDef.statsBonus.sabedoria) nextAttrs.sabedoria += Math.round(cardDef.statsBonus.sabedoria * cardMultiplier);
+        if (cardDef.statsBonus.carisma) nextAttrs.carisma += Math.round(cardDef.statsBonus.carisma * cardMultiplier);
+        if (cardDef.statsBonus.maxHp) extraHpFromGear += Math.round(cardDef.statsBonus.maxHp * cardMultiplier);
+        if (cardDef.statsBonus.maxResource) extraResourceFromGear += Math.round(cardDef.statsBonus.maxResource * cardMultiplier);
+      }
+    }
+
     this.attributes = nextAttrs;
-    this.maxHp = this.attributes.constituicao * 35 + 450 + (this.level - 1) * 60;
+    // Bônus de HP com bônus fixo transcendental (+500 HP por Reborn) e bônus de equipamentos/gemas/cartas
+    this.maxHp = this.attributes.constituicao * 35 + 450 + (this.level - 1) * 60 + this.rebornCount * 500 + extraHpFromGear;
     this.currentHp = Math.min(this.currentHp, this.maxHp);
 
     const isCaster = this.classType === CharacterClass.MAGO || this.classType === CharacterClass.CLERIGO || this.classType === CharacterClass.BRUXO;
     if (isCaster) {
-      this.maxResource = 100 + (this.attributes.inteligencia || this.attributes.sabedoria || 10) * 8;
+      this.maxResource = 100 + (this.attributes.inteligencia || this.attributes.sabedoria || 10) * 8 + this.rebornCount * 50 + extraResourceFromGear;
+    } else {
+      this.maxResource = 100 + extraResourceFromGear;
     }
   }
 
@@ -134,14 +227,37 @@ export class Player extends Entity {
         break;
     }
 
-    return modifier * 3 + this.level * 5;
+    const rawDamage = modifier * 3 + this.level * 5;
+    // Multiplicador Transcendental: +15% de poder por Reborn!
+    const rebornMultiplier = 1.0 + this.rebornCount * 0.15;
+    return Math.round(rawDamage * rebornMultiplier);
   }
 
   public get CombatPower(): number {
     const { forca, destreza, constituicao, inteligencia, sabedoria, carisma } = this.attributes;
     const cpStats = (forca + destreza + constituicao + inteligencia + sabedoria + carisma) * 15;
     const cpLevel = this.level * 100;
-    return cpStats + cpLevel;
+    const cpReborn = this.rebornCount * 3500;
+
+    // Bônus de CP por Refinamento e Gemas
+    let cpRefine = 0;
+    let cpGems = 0;
+    for (const slot of this.inventory) {
+      if (slot.isEquipped) {
+        cpRefine += (slot.refineLevel || 0) * 120;
+        if (slot.sockets) {
+          cpGems += slot.sockets.length * 200;
+        }
+      }
+    }
+
+    // Bônus de CP por Cartas Colecionadas
+    let cpCards = 0;
+    for (const card of this.cards) {
+      cpCards += 150 + (card.isEquipped ? 300 : 0);
+    }
+
+    return cpStats + cpLevel + cpReborn + cpRefine + cpGems + cpCards;
   }
 
   public setMoveDestination(destination: Vector3, inputSeq: number): void {
@@ -205,6 +321,14 @@ export class Player extends Entity {
     // Passive Resource Regeneration (Mana / Energia)
     if (this.currentResource < this.maxResource) {
       this.currentResource = Math.min(this.maxResource, this.currentResource + this.resourceRegenPerSec * deltaTimeSec);
+    }
+
+    // Tick Farm Helper Potion Cooldowns
+    if (this.potionHpCooldownSec > 0) {
+      this.potionHpCooldownSec = Math.max(0, this.potionHpCooldownSec - deltaTimeSec);
+    }
+    if (this.potionMpCooldownSec > 0) {
+      this.potionMpCooldownSec = Math.max(0, this.potionMpCooldownSec - deltaTimeSec);
     }
 
     // Authoritative Continuous Direction Movement (Mobile Virtual Joystick)
@@ -288,7 +412,7 @@ export class Player extends Entity {
     this.currentXp += amount;
     let levelsGained = 0;
 
-    while (this.currentXp >= this.xpToNextLevel) {
+    while (this.currentXp >= this.xpToNextLevel && this.level < 50) {
       this.currentXp -= this.xpToNextLevel;
       this.level += 1;
       levelsGained += 1;
@@ -308,6 +432,10 @@ export class Player extends Entity {
       this.currentResource = this.maxResource;
 
       console.log(`[Player] "${this.name}" subiu para o NÍVEL ${this.level}! CP: ${this.CombatPower}`);
+    }
+
+    if (this.level >= 50 && this.currentXp > this.xpToNextLevel) {
+      this.currentXp = this.xpToNextLevel;
     }
 
     return {

@@ -5,6 +5,8 @@ export class Connection {
   public readonly id: string;
   public readonly socket: WebSocket;
   public playerId: string | null = null;
+  public accountId: string | null = null;
+  public accountUsername: string | null = null;
   public isAuthenticated: boolean = false;
   public lastPingTime: number = Date.now();
   public latencyMs: number = 0;

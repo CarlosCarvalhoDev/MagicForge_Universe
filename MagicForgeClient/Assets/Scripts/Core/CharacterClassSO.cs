@@ -20,6 +20,8 @@ namespace MagicForge.Core
         [Header("Sprite Sheets de Animação Isométrica (Multiple Slices)")]
         public Sprite[] idleFrames;
         public Sprite[] walkFrames;
+        [Min(1f), Tooltip("FPS da caminhada. Padrão: 6 quadros a 9 FPS; Clérigo v2: 8 quadros a 12 FPS.")]
+        public float walkFps = 9f;
         public Sprite[] attackFrames;
         public Sprite[] hitFrames;
         public Sprite[] deathFrames;
