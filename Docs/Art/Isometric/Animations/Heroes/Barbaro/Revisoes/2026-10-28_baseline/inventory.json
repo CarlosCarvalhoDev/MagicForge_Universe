@@ -1,0 +1,552 @@
+[
+  {
+    "SHA256": "9AFDFC2D70ED6627E0BED8825D26DB8B4B2D284A79AF36100458E53B98C778CD",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_attack_sheet.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_attack_sheet.png"
+  },
+  {
+    "SHA256": "CCB7DBE2C6C6215A2BCFC0ACC59A1C0D4347F9A01E145EFF5943AC38CDCA0F61",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_death_sheet.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_death_sheet.png"
+  },
+  {
+    "SHA256": "1CCD18BE9CC44DBBD92A74189BCC791B257FC3F1FBDAD00C6FD4FEE05C7E609C",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_hit_sheet.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_hit_sheet.png"
+  },
+  {
+    "SHA256": "FD97DAAFC741CDC5941E55A7E658B35B8BBFA4A6C2F210189472D8043AEDDA29",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_idle_sheet.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_idle_sheet.png"
+  },
+  {
+    "SHA256": "10D09150FE7C89D524B2473510BFC6EC20951A4EAB0E756A9B156AB58738611D",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_walk_sheet.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_walk_sheet.png"
+  },
+  {
+    "SHA256": "B58A9E71981382975D0B86E96B3A649476D833C32E74941A62FC1B86DE5B940E",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_00.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_00.png"
+  },
+  {
+    "SHA256": "F0644EE3755F5C8E07176A8A12A0FC8FBD9A5BB7154073D6607D749F3148D82A",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_01.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_01.png"
+  },
+  {
+    "SHA256": "2A888BD2D7A897FA971EC1354BFD114DF6ECC6BA02E68326683C23587FC19EE1",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_02.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_02.png"
+  },
+  {
+    "SHA256": "1CB30B227D1CC3C4A299B1C763C0EA58A94DEAEC69E1DCB3FCA9F50746ED78C0",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_03.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_03.png"
+  },
+  {
+    "SHA256": "94B960273CEED16101B4733E0AF329655796B34825CBFB0829E37072FA579FB0",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_04.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_04.png"
+  },
+  {
+    "SHA256": "EDBD1A6BB83F052F761A73F5F43CD64361AA97A5504C3976A79EC8D6896475BD",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_05.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_05.png"
+  },
+  {
+    "SHA256": "9BA330D7F0DC9FFF017016FE76D3C59FA90970EB8941D289E51B30C3D8FFEF1E",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_00.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_00.png"
+  },
+  {
+    "SHA256": "16882B0C23B4A9675B8BB26BF1D782B6CB517C895A5F84F58FAD6942F6EC426A",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_01.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_01.png"
+  },
+  {
+    "SHA256": "1A837EAD34D59685CA1A506CAA652C12C5D49F2E373C033872820F7B6E4E1974",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_02.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_02.png"
+  },
+  {
+    "SHA256": "43A4FEDDB41AF722EC8FF0DFBE7061E9C0ECD366F9F710A2B6594BDFFB6D49AF",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_03.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_03.png"
+  },
+  {
+    "SHA256": "3EC6CA1BDF04E4325E00A49D4123C7985B6DE0A3637C8158D2E498CF54CBEA9B",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_00.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_00.png"
+  },
+  {
+    "SHA256": "A859BDB56778D8F115924BD068EA625307856BC6E61D0FC27E00EFFDC92CC41B",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_01.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_01.png"
+  },
+  {
+    "SHA256": "1E1280B2517C4F5D1B1512B5C794C7714536073CCE3521EFA162E0A112845155",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_00.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_00.png"
+  },
+  {
+    "SHA256": "BF1F4C8E7FB9844005F43F7A56067D74403B59AA8B6A001A17B1028C42ABC8AB",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_01.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_01.png"
+  },
+  {
+    "SHA256": "7EACB3E62496F7DA6B9BF6100028E469362D5DCFC664E75DD6EA5146F479EAE3",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_02.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_02.png"
+  },
+  {
+    "SHA256": "9E55F45D1AE7BCBD7769553D82F6B534A2E101DB7BC0FB1F1A8AF4C290DC63EC",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_03.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_03.png"
+  },
+  {
+    "SHA256": "097C00C6741B7BB54A1DF005CC8897471329B87FA866247B060D3201E3C6B10E",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_00.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_00.png"
+  },
+  {
+    "SHA256": "2382B4F8468B2D1E83D46A2B507446E4EED28D233BB4F389350FDAED9CFF9916",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_01.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_01.png"
+  },
+  {
+    "SHA256": "6DD8CD19619A83B20982133F13B29AFF2749E79998DC5423CC7E543A0743CABA",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_02.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_02.png"
+  },
+  {
+    "SHA256": "2CEEA04E79D10AA7E0EA86E7B007CFDA160C993CC7072F49AF07DC3268833BB4",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_03.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_03.png"
+  },
+  {
+    "SHA256": "1D04432CA192C13720479060173F890214330DE4BBDBA44C85E8A8304E93C2B3",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_04.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_04.png"
+  },
+  {
+    "SHA256": "B95FE6EE5595DE3376EE8B936912ECC2069954186DC77CF680204E6D70C8DBB3",
+    "Path": "E:\\MagicForge_Universe\\Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_05.png",
+    "RelativePath": "Docs\\Art\\Isometric\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_05.png"
+  },
+  {
+    "SHA256": "9AFDFC2D70ED6627E0BED8825D26DB8B4B2D284A79AF36100458E53B98C778CD",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_attack_sheet.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_attack_sheet.png"
+  },
+  {
+    "SHA256": "CCB7DBE2C6C6215A2BCFC0ACC59A1C0D4347F9A01E145EFF5943AC38CDCA0F61",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_death_sheet.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_death_sheet.png"
+  },
+  {
+    "SHA256": "1CCD18BE9CC44DBBD92A74189BCC791B257FC3F1FBDAD00C6FD4FEE05C7E609C",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_hit_sheet.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_hit_sheet.png"
+  },
+  {
+    "SHA256": "FD97DAAFC741CDC5941E55A7E658B35B8BBFA4A6C2F210189472D8043AEDDA29",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_idle_sheet.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_idle_sheet.png"
+  },
+  {
+    "SHA256": "10D09150FE7C89D524B2473510BFC6EC20951A4EAB0E756A9B156AB58738611D",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_walk_sheet.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\iso_hero_barbaro_walk_sheet.png"
+  },
+  {
+    "SHA256": "B58A9E71981382975D0B86E96B3A649476D833C32E74941A62FC1B86DE5B940E",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_00.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_00.png"
+  },
+  {
+    "SHA256": "F0644EE3755F5C8E07176A8A12A0FC8FBD9A5BB7154073D6607D749F3148D82A",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_01.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_01.png"
+  },
+  {
+    "SHA256": "2A888BD2D7A897FA971EC1354BFD114DF6ECC6BA02E68326683C23587FC19EE1",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_02.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_02.png"
+  },
+  {
+    "SHA256": "1CB30B227D1CC3C4A299B1C763C0EA58A94DEAEC69E1DCB3FCA9F50746ED78C0",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_03.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_03.png"
+  },
+  {
+    "SHA256": "94B960273CEED16101B4733E0AF329655796B34825CBFB0829E37072FA579FB0",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_04.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_04.png"
+  },
+  {
+    "SHA256": "EDBD1A6BB83F052F761A73F5F43CD64361AA97A5504C3976A79EC8D6896475BD",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_05.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_attack_05.png"
+  },
+  {
+    "SHA256": "9BA330D7F0DC9FFF017016FE76D3C59FA90970EB8941D289E51B30C3D8FFEF1E",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_death_00.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_death_00.png"
+  },
+  {
+    "SHA256": "16882B0C23B4A9675B8BB26BF1D782B6CB517C895A5F84F58FAD6942F6EC426A",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_death_01.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_death_01.png"
+  },
+  {
+    "SHA256": "1A837EAD34D59685CA1A506CAA652C12C5D49F2E373C033872820F7B6E4E1974",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_death_02.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_death_02.png"
+  },
+  {
+    "SHA256": "43A4FEDDB41AF722EC8FF0DFBE7061E9C0ECD366F9F710A2B6594BDFFB6D49AF",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_death_03.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_death_03.png"
+  },
+  {
+    "SHA256": "3EC6CA1BDF04E4325E00A49D4123C7985B6DE0A3637C8158D2E498CF54CBEA9B",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_hit_00.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_hit_00.png"
+  },
+  {
+    "SHA256": "A859BDB56778D8F115924BD068EA625307856BC6E61D0FC27E00EFFDC92CC41B",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_hit_01.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_hit_01.png"
+  },
+  {
+    "SHA256": "1E1280B2517C4F5D1B1512B5C794C7714536073CCE3521EFA162E0A112845155",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_idle_00.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_idle_00.png"
+  },
+  {
+    "SHA256": "BF1F4C8E7FB9844005F43F7A56067D74403B59AA8B6A001A17B1028C42ABC8AB",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_idle_01.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_idle_01.png"
+  },
+  {
+    "SHA256": "7EACB3E62496F7DA6B9BF6100028E469362D5DCFC664E75DD6EA5146F479EAE3",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_idle_02.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_idle_02.png"
+  },
+  {
+    "SHA256": "9E55F45D1AE7BCBD7769553D82F6B534A2E101DB7BC0FB1F1A8AF4C290DC63EC",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_idle_03.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_idle_03.png"
+  },
+  {
+    "SHA256": "097C00C6741B7BB54A1DF005CC8897471329B87FA866247B060D3201E3C6B10E",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_00.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_00.png"
+  },
+  {
+    "SHA256": "2382B4F8468B2D1E83D46A2B507446E4EED28D233BB4F389350FDAED9CFF9916",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_01.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_01.png"
+  },
+  {
+    "SHA256": "6DD8CD19619A83B20982133F13B29AFF2749E79998DC5423CC7E543A0743CABA",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_02.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_02.png"
+  },
+  {
+    "SHA256": "2CEEA04E79D10AA7E0EA86E7B007CFDA160C993CC7072F49AF07DC3268833BB4",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_03.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_03.png"
+  },
+  {
+    "SHA256": "1D04432CA192C13720479060173F890214330DE4BBDBA44C85E8A8304E93C2B3",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_04.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_04.png"
+  },
+  {
+    "SHA256": "B95FE6EE5595DE3376EE8B936912ECC2069954186DC77CF680204E6D70C8DBB3",
+    "Path": "E:\\MagicForge_Universe\\client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_05.png",
+    "RelativePath": "client\\public\\assets\\isometric\\animations\\heroes\\barbaro\\frames_individuais\\iso_hero_barbaro_walk_05.png"
+  },
+  {
+    "SHA256": "48453CA5B79C264040A4E153397370D13BDE1B19A784FBCA4CA3C3C2AE66AC4B",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais.meta"
+  },
+  {
+    "SHA256": "9AFDFC2D70ED6627E0BED8825D26DB8B4B2D284A79AF36100458E53B98C778CD",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_attack_sheet.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_attack_sheet.png"
+  },
+  {
+    "SHA256": "E515C2DFC64826D41CEE53247F074B63AE805EA27C377903DBAA70DDCE4ED189",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_attack_sheet.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_attack_sheet.png.meta"
+  },
+  {
+    "SHA256": "CCB7DBE2C6C6215A2BCFC0ACC59A1C0D4347F9A01E145EFF5943AC38CDCA0F61",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_death_sheet.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_death_sheet.png"
+  },
+  {
+    "SHA256": "D976D2D7488DDCE0F99A6E543A087D69B3ED9C1DD794B2673087D6CB00FAEF7E",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_death_sheet.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_death_sheet.png.meta"
+  },
+  {
+    "SHA256": "1CCD18BE9CC44DBBD92A74189BCC791B257FC3F1FBDAD00C6FD4FEE05C7E609C",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_hit_sheet.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_hit_sheet.png"
+  },
+  {
+    "SHA256": "87B08EBD13351945C7CCB5B5D764F0C33522EECD70C636FF95EA819A003A21CC",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_hit_sheet.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_hit_sheet.png.meta"
+  },
+  {
+    "SHA256": "FD97DAAFC741CDC5941E55A7E658B35B8BBFA4A6C2F210189472D8043AEDDA29",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_idle_sheet.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_idle_sheet.png"
+  },
+  {
+    "SHA256": "4CCABC1AE2DFAF5335202BA8A123AE5935AEB03D348ACC3582F78222661821E7",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_idle_sheet.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_idle_sheet.png.meta"
+  },
+  {
+    "SHA256": "10D09150FE7C89D524B2473510BFC6EC20951A4EAB0E756A9B156AB58738611D",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_walk_sheet.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_walk_sheet.png"
+  },
+  {
+    "SHA256": "12600257D6FF63435B850CC7EC5082A91C4FC0AA44C5EA14F11415BCA10E52F9",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_walk_sheet.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\iso_hero_barbaro_walk_sheet.png.meta"
+  },
+  {
+    "SHA256": "B58A9E71981382975D0B86E96B3A649476D833C32E74941A62FC1B86DE5B940E",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_00.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_00.png"
+  },
+  {
+    "SHA256": "E10347BBC189B6AB40C52123A071B1ED925F4EE1AECC19C0479E36A166D00AE7",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_00.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_00.png.meta"
+  },
+  {
+    "SHA256": "F0644EE3755F5C8E07176A8A12A0FC8FBD9A5BB7154073D6607D749F3148D82A",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_01.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_01.png"
+  },
+  {
+    "SHA256": "AE41A5A70B2B3D151B8DADB3270A4C95E9F620888398C3E995C28887C5E4D637",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_01.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_01.png.meta"
+  },
+  {
+    "SHA256": "2A888BD2D7A897FA971EC1354BFD114DF6ECC6BA02E68326683C23587FC19EE1",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_02.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_02.png"
+  },
+  {
+    "SHA256": "F6828775DCC73BB6EB53F0656826F715238C931094D037E3FE89CCE7C5CB3186",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_02.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_02.png.meta"
+  },
+  {
+    "SHA256": "1CB30B227D1CC3C4A299B1C763C0EA58A94DEAEC69E1DCB3FCA9F50746ED78C0",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_03.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_03.png"
+  },
+  {
+    "SHA256": "F2C5DEBA7AC22420EBED4C348ECD9AAEEE7234DE8B4D393576C2CA73B39D9350",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_03.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_03.png.meta"
+  },
+  {
+    "SHA256": "94B960273CEED16101B4733E0AF329655796B34825CBFB0829E37072FA579FB0",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_04.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_04.png"
+  },
+  {
+    "SHA256": "1655110FAE101E340D66763CD9A0E213F80A1AB12E7DE63629B9B9C4F91E2071",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_04.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_04.png.meta"
+  },
+  {
+    "SHA256": "EDBD1A6BB83F052F761A73F5F43CD64361AA97A5504C3976A79EC8D6896475BD",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_05.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_05.png"
+  },
+  {
+    "SHA256": "088CF0858EA5C2A0011AF8B59C502456586F23C7EDC0EFC0528738F60B7B1287",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_05.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_attack_05.png.meta"
+  },
+  {
+    "SHA256": "9BA330D7F0DC9FFF017016FE76D3C59FA90970EB8941D289E51B30C3D8FFEF1E",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_00.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_00.png"
+  },
+  {
+    "SHA256": "6FB64D68852E80F80B693195853A5AB94826E41AA9B6FAD66A8862F003F91D93",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_00.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_00.png.meta"
+  },
+  {
+    "SHA256": "16882B0C23B4A9675B8BB26BF1D782B6CB517C895A5F84F58FAD6942F6EC426A",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_01.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_01.png"
+  },
+  {
+    "SHA256": "A39DDB4831C21F613D5EF9654B376F472661D3E360517D136EAB7C82028E868F",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_01.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_01.png.meta"
+  },
+  {
+    "SHA256": "1A837EAD34D59685CA1A506CAA652C12C5D49F2E373C033872820F7B6E4E1974",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_02.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_02.png"
+  },
+  {
+    "SHA256": "5FE834A847690BBE6416BF9ABE8E87FAB76C1C4CB13EC63F36CE487382D49D48",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_02.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_02.png.meta"
+  },
+  {
+    "SHA256": "43A4FEDDB41AF722EC8FF0DFBE7061E9C0ECD366F9F710A2B6594BDFFB6D49AF",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_03.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_03.png"
+  },
+  {
+    "SHA256": "658B6D43B0921E0ECC4F8FE695D89C3A0833317DAA6470D767E1DEA98D440B6D",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_03.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_death_03.png.meta"
+  },
+  {
+    "SHA256": "3EC6CA1BDF04E4325E00A49D4123C7985B6DE0A3637C8158D2E498CF54CBEA9B",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_00.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_00.png"
+  },
+  {
+    "SHA256": "97EA585820751944E884214B4471DB2E6E5CFAFD6A2B61602A521FEA8B510396",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_00.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_00.png.meta"
+  },
+  {
+    "SHA256": "A859BDB56778D8F115924BD068EA625307856BC6E61D0FC27E00EFFDC92CC41B",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_01.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_01.png"
+  },
+  {
+    "SHA256": "0D3CDE8E2A6986675DA18748E49861BA3025110D3CA3FD54176D6088E751555C",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_01.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_hit_01.png.meta"
+  },
+  {
+    "SHA256": "1E1280B2517C4F5D1B1512B5C794C7714536073CCE3521EFA162E0A112845155",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_00.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_00.png"
+  },
+  {
+    "SHA256": "9CCC2722F3328EB515D3B2A131D11F2D6E867880809FC9B50239595DCDE77D37",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_00.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_00.png.meta"
+  },
+  {
+    "SHA256": "BF1F4C8E7FB9844005F43F7A56067D74403B59AA8B6A001A17B1028C42ABC8AB",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_01.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_01.png"
+  },
+  {
+    "SHA256": "7BE0A2DB5715D8D42972D5F65BFFF971D9C7325176E243C0FBCB9A3B4EB8E4B0",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_01.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_01.png.meta"
+  },
+  {
+    "SHA256": "7EACB3E62496F7DA6B9BF6100028E469362D5DCFC664E75DD6EA5146F479EAE3",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_02.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_02.png"
+  },
+  {
+    "SHA256": "BD5972B37C2D1AB9761ECFD14B8DFAB5033B05208B26370DDDFA32596F5EE5A0",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_02.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_02.png.meta"
+  },
+  {
+    "SHA256": "9E55F45D1AE7BCBD7769553D82F6B534A2E101DB7BC0FB1F1A8AF4C290DC63EC",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_03.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_03.png"
+  },
+  {
+    "SHA256": "55444F1A505B311B39F036FDB0A51EF70C609DC910786CFA884A61BE372FD518",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_03.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_idle_03.png.meta"
+  },
+  {
+    "SHA256": "097C00C6741B7BB54A1DF005CC8897471329B87FA866247B060D3201E3C6B10E",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_00.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_00.png"
+  },
+  {
+    "SHA256": "21C12C950659DE78C01E33D814A048490804078AC054C84C5AD94D5FFA8F52FC",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_00.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_00.png.meta"
+  },
+  {
+    "SHA256": "2382B4F8468B2D1E83D46A2B507446E4EED28D233BB4F389350FDAED9CFF9916",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_01.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_01.png"
+  },
+  {
+    "SHA256": "8EF207CF48D136613D36E5157A943CD49AF0880788B6A89046D1ECD12BD272FB",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_01.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_01.png.meta"
+  },
+  {
+    "SHA256": "6DD8CD19619A83B20982133F13B29AFF2749E79998DC5423CC7E543A0743CABA",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_02.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_02.png"
+  },
+  {
+    "SHA256": "EBB4CC3AC18945AAE5B1E7EB1DC13DD7C4F24A4C32BD09915A3FE882B7AB5D9B",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_02.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_02.png.meta"
+  },
+  {
+    "SHA256": "2CEEA04E79D10AA7E0EA86E7B007CFDA160C993CC7072F49AF07DC3268833BB4",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_03.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_03.png"
+  },
+  {
+    "SHA256": "3C386FCAE58EFB2FE2E71B7C7367E956BB3EE093BB1D7B4F7AD06C8B7E19CB50",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_03.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_03.png.meta"
+  },
+  {
+    "SHA256": "1D04432CA192C13720479060173F890214330DE4BBDBA44C85E8A8304E93C2B3",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_04.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_04.png"
+  },
+  {
+    "SHA256": "D42D415CADBCCC902238B64CB5E3B4AB65E23A8B25E887185DBB688C20F186FC",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_04.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_04.png.meta"
+  },
+  {
+    "SHA256": "B95FE6EE5595DE3376EE8B936912ECC2069954186DC77CF680204E6D70C8DBB3",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_05.png",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_05.png"
+  },
+  {
+    "SHA256": "A083373877A3AA83E1B69BA8FB58B7D0BC1F36B768D70CEAC1DF096F3F3F5A76",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_05.png.meta",
+    "RelativePath": "MagicForgeClient\\Assets\\Textures\\Sprites\\Animations\\Heroes\\Barbaro\\frames_individuais\\iso_hero_barbaro_walk_05.png.meta"
+  },
+  {
+    "SHA256": "BE627EC7D702DB26E14A9B2826B7614D8F6C5718A38E6CC1FA0C8F1ECC9A45BA",
+    "Path": "E:\\MagicForge_Universe\\MagicForgeClient\\Assets\\Barbaro.asset",
+    "RelativePath": "MagicForgeClient\\Assets\\Barbaro.asset"
+  }
+]

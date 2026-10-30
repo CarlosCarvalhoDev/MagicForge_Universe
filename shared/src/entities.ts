@@ -137,6 +137,7 @@ export interface EntitySnapshotState {
   targetId?: string | null;
   classType?: CharacterClass;
   level?: number;
+  monsterType?: string;
 }
 
 /**

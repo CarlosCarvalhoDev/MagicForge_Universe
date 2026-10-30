@@ -4,6 +4,7 @@ const action = document.getElementById('action') as HTMLSelectElement;
 const walkVersion = document.getElementById('walk-version') as HTMLSelectElement;
 const warriorVersion = document.getElementById('warrior-version') as HTMLSelectElement;
 const view = document.getElementById('view') as HTMLSelectElement;
+const barbarianVersion = document.getElementById('barbarian-version') as HTMLSelectElement;
 const walkVersions: Record<string, HeroSheetSpec> = {
   candidate: { file: '/assets/isometric/review/clerigo_walk_v4_1_sheet.png', cols: 4, rows: 2, frames: 8, fps: 12 },
   frontal: { file: '/assets/isometric/review/clerigo_walk_v3_sheet.png', cols: 4, rows: 2, frames: 8, fps: 12 },
@@ -11,11 +12,20 @@ const walkVersions: Record<string, HeroSheetSpec> = {
   previous: { file: '/assets/isometric/review/clerigo_walk_v1_sheet.png', cols: 3, rows: 2, frames: 6, fps: 9 },
 };
 const warriorWalkVersions: Record<string, HeroSheetSpec> = {
-  candidate: { file: '/assets/isometric/review/guerreiro_walk_v2_sheet.png', cols: 3, rows: 2, frames: 6, fps: 9 },
+  candidate: { file: '/assets/isometric/review/guerreiro_walk_v3_sheet.png', cols: 3, rows: 2, frames: 6, fps: 9 },
+  previous: { file: '/assets/isometric/review/guerreiro_walk_v2_sheet.png', cols: 3, rows: 2, frames: 6, fps: 9 },
+  runtime: HERO_SHEETS.GUERREIRO.walk,
   baseline: { file: '/assets/isometric/review/guerreiro_walk_baseline_sheet.png', cols: 3, rows: 2, frames: 6, fps: 9 },
 };
-const comparisons: Record<string, HeroSheetSpec> = { rejected: walkVersions.rejected, warriorBaseline: warriorWalkVersions.baseline };
+const barbarianWalkVersions: Record<string, HeroSheetSpec> = {
+  candidate: { file: '/assets/isometric/review/barbaro_walk_v2_sheet.png', cols: 3, rows: 2, frames: 6, fps: 9 },
+  repair: { file: '/assets/isometric/review/barbaro_walk_v3_sheet.png', cols: 3, rows: 2, frames: 6, fps: 9 },
+  runtime: HERO_SHEETS.BARBARO.walk,
+  baseline: { file: '/assets/isometric/review/barbaro_walk_baseline_sheet.png', cols: 3, rows: 2, frames: 6, fps: 9 },
+};
+const comparisons: Record<string, HeroSheetSpec> = { rejected: walkVersions.rejected, warriorBaseline: warriorWalkVersions.baseline, barbarianBaseline: barbarianWalkVersions.baseline };
 function selectedSheet(className: string): HeroSheetSpec {
+  if (className === 'BARBARO' && action.value === 'walk') return barbarianWalkVersions[barbarianVersion.value];
   if (className === 'GUERREIRO' && action.value === 'walk') return warriorWalkVersions[warriorVersion.value];
   if (className === 'CLERIGO' && action.value === 'walk' && walkVersions[walkVersion.value]) return walkVersions[walkVersion.value];
   return HERO_SHEETS[className][action.value as HeroAction];
@@ -27,7 +37,7 @@ const alpha = document.getElementById('alpha') as HTMLSelectElement;
 const guides = document.getElementById('guides') as HTMLInputElement;
 const status = document.getElementById('review-status')!;
 const images = new Map<string, { raw: HTMLCanvasElement; keyed: HTMLCanvasElement }>();
-const labels: Record<string, string> = { GUERREIRO: 'Guerreiro', CLERIGO: 'Clérigo', BARBARO: 'Bárbaro' };
+const labels: Record<string, string> = { GUERREIRO: 'Guerreiro', CLERIGO: 'Clérigo', BARBARO: 'Bárbaro', ARQUEIRO: 'Arqueiro' };
 let running = false;
 let elapsed = 0;
 let last = performance.now();
@@ -35,11 +45,13 @@ let fixedFrame: number | null = null;
 let loaded = 0;
 let failures = 0;
 const panels = [
+  { className: 'ARQUEIRO', fixedVersion: '' },
   { className: 'GUERREIRO', fixedVersion: '' },
   { className: 'CLERIGO', fixedVersion: '' },
   { className: 'BARBARO', fixedVersion: '' },
   { className: 'CLERIGO', fixedVersion: 'rejected' },
   { className: 'GUERREIRO', fixedVersion: 'warriorBaseline' },
+  { className: 'BARBARO', fixedVersion: 'barbarianBaseline' },
 ].map(({ className, fixedVersion }) => {
   const article = document.createElement('article');
   const title = document.createElement('h2'); title.textContent = labels[className]; article.append(title);
@@ -51,24 +63,35 @@ const panels = [
   document.getElementById('classes')!.append(article);
   return { className, fixedVersion, title, article, info, canvas, frames, stage, buttons: [] as HTMLButtonElement[] };
 });
+const archerReference = document.createElement('article'); archerReference.hidden = true;
+const referenceTitle = document.createElement('h2'); referenceTitle.textContent = 'Arqueiro · referência estática preservada';
+const referenceNote = document.createElement('p'); referenceNote.textContent = 'Sprite original do jogo. Esta imagem é uma referência de identidade, não uma animação.';
+const referenceImage = document.createElement('img'); referenceImage.src = '/assets/isometric/iso_hero_arqueiro.jpg'; referenceImage.alt = 'Sprite estático original do Arqueiro'; referenceImage.style.cssText = 'display:block;width:100%;height:auto';
+archerReference.append(referenceTitle, referenceNote, referenceImage); document.getElementById('classes')!.append(archerReference);
 function panelSheet(panel: typeof panels[number]) {
+  if (panel.fixedVersion === 'warriorBaseline' && action.value === 'walk' && ['candidate', 'runtime'].includes(warriorVersion.value)) return warriorWalkVersions.previous;
   return panel.fixedVersion && action.value === 'walk' ? comparisons[panel.fixedVersion] : selectedSheet(panel.className);
 }
 function updateView() {
-  const comparison = view.value !== 'classes' && action.value === 'walk';
-  const focusClass = view.value === 'warrior' ? 'GUERREIRO' : 'CLERIGO';
-  document.getElementById('cleric-version-control')!.hidden = view.value === 'warrior';
-  document.getElementById('warrior-version-control')!.hidden = view.value === 'cleric';
+  const archerOnly = view.value === 'archer';
+  const comparison = !archerOnly && view.value !== 'classes' && action.value === 'walk';
+  const focusClass = view.value === 'barbarian' ? 'BARBARO' : view.value === 'warrior' ? 'GUERREIRO' : 'CLERIGO';
+  document.getElementById('cleric-version-control')!.hidden = !['cleric', 'classes'].includes(view.value);
+  document.getElementById('warrior-version-control')!.hidden = !['warrior', 'classes'].includes(view.value);
+  document.getElementById('barbarian-version-control')!.hidden = !['barbarian', 'classes'].includes(view.value);
   for (const panel of panels) {
-    panel.article.hidden = comparison ? panel.className !== focusClass : Boolean(panel.fixedVersion);
-    panel.title.textContent = panel.fixedVersion === 'warriorBaseline' ? 'Guerreiro · versão anterior preservada' : panel.fixedVersion ? 'Clérigo · V2 reprovada'
+    panel.article.hidden = archerOnly ? panel.className !== 'ARQUEIRO' : comparison ? panel.className !== focusClass : Boolean(panel.fixedVersion);
+    panel.title.textContent = panel.fixedVersion === 'barbarianBaseline' ? 'Bárbaro · versão anterior arquivada' : panel.fixedVersion === 'warriorBaseline' ? (['candidate', 'runtime'].includes(warriorVersion.value) ? 'Guerreiro · V2 · passada com chute' : 'Guerreiro · baseline arquivado') : panel.fixedVersion ? 'Clérigo · V2 reprovada'
+      : panel.className === 'ARQUEIRO' ? 'Arqueiro · V1 aprovada · folhas em uso'
+      : panel.className === 'BARBARO' && action.value === 'walk' ? `Bárbaro · ${barbarianVersion.selectedOptions[0].textContent}`
       : panel.className === 'GUERREIRO' && action.value === 'walk' ? `Guerreiro · ${warriorVersion.selectedOptions[0].textContent}`
       : panel.className === 'CLERIGO' && action.value === 'walk' ? `Clérigo · ${walkVersion.selectedOptions[0].textContent}` : labels[panel.className];
   }
-  document.getElementById('classes')!.classList.toggle('compare', comparison);
+  archerReference.hidden = !archerOnly;
+  document.getElementById('classes')!.classList.toggle('compare', comparison || archerOnly);
 }
 
-const allSheets = [...Object.values(HERO_SHEETS).flatMap(sheetSet => Object.values(sheetSet)), ...Object.values(walkVersions), ...Object.values(warriorWalkVersions)];
+const allSheets = [...Object.values(HERO_SHEETS).flatMap(sheetSet => Object.values(sheetSet)), ...Object.values(walkVersions), ...Object.values(warriorWalkVersions), ...Object.values(barbarianWalkVersions)];
 function updateStatus() { status.textContent = `${loaded} de ${allSheets.length} folhas/versões carregadas${failures ? ` · ${failures} falha(s)` : ''}.`; }
 for (const spec of allSheets) {
   const img = new Image();
@@ -112,7 +135,7 @@ function rebuildFrames() {
     panel.frames.style.gridTemplateColumns = `repeat(${spec.cols}, minmax(0, 1fr))`;
     for (let frame = 0; frame < spec.frames; frame++) {
       const button = document.createElement('button'); button.type = 'button'; button.className = 'stage';
-      button.setAttribute('aria-label', `${panel.fixedVersion === 'warriorBaseline' ? 'Guerreiro anterior' : panel.fixedVersion ? 'Clérigo V2' : labels[panel.className]}, quadro ${frame + 1}`);
+      button.setAttribute('aria-label', `${panel.fixedVersion === 'barbarianBaseline' ? 'Bárbaro anterior' : panel.fixedVersion === 'warriorBaseline' ? 'Guerreiro anterior' : panel.fixedVersion ? 'Clérigo V2' : labels[panel.className]}, quadro ${frame + 1}`);
       const canvas = document.createElement('canvas'); canvas.width = canvas.height = 128;
       draw(canvas, panel.className, frame, false, spec); const label = document.createElement('span'); label.textContent = `${frame + 1}`;
       button.append(canvas, label); button.onclick = () => { fixedFrame = frame; elapsed = frame / spec.fps * 1000; running = false; syncPlay(); };
@@ -130,6 +153,7 @@ action.onchange = () => { elapsed = 0; fixedFrame = null; rebuildFrames(); updat
 view.onchange = updateView;
 walkVersion.onchange = () => { elapsed = 0; fixedFrame = null; rebuildFrames(); updateView(); };
 warriorVersion.onchange = () => { elapsed = 0; fixedFrame = null; rebuildFrames(); updateView(); };
+barbarianVersion.onchange = () => { elapsed = 0; fixedFrame = null; rebuildFrames(); updateView(); };
 alpha.onchange = rebuildFrames;
 function applyBackground() {
   for (const stage of document.querySelectorAll<HTMLElement>('.stage')) {

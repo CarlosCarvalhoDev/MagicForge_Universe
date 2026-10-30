@@ -1,0 +1,17 @@
+{
+  "appId": "com.magicforge.universe",
+  "appName": "MagicForge: Universe",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "cleartext": true,
+    "allowNavigation": [
+      "192.168.1.12",
+      "*"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
+

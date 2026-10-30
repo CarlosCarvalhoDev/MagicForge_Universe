@@ -1,0 +1,14 @@
+[
+  {
+    "Entry": "1 Magic/8.png",
+    "Output": "heal.png",
+    "SHA256": "C43602BD4A4AB608A476D67A7B77C550C9CAF179AB2C52B86744B14D768637AE",
+    "Archive": "pixel-magic-effects.zip"
+  },
+  {
+    "Entry": "1 Magic/4_2.png",
+    "Output": "impact.png",
+    "SHA256": "BFFBCA754A05FAE01BB8313BFAD27C9DDE7031B7497A6319080778F66E95859A",
+    "Archive": "pixel-magic-effects.zip"
+  }
+]

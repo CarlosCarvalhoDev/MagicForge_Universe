@@ -1,0 +1,74 @@
+[
+  {
+    "id": "guerreiro_truque_1",
+    "status": "Golpe Firme: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; efeito de conjuração.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_truque_2",
+    "status": "Golpe Dilacerante: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; status decorativo por 4 s.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_truque_3",
+    "status": "Corte de Ruptura: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; status decorativo por 4 s.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv1_1",
+    "status": "Retomar o Fôlego: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; efeito de conjuração.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv1_2",
+    "status": "Postura Ofensiva: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; status decorativo por 4 s.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv1_3",
+    "status": "Escudo Desarmador: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; status decorativo por 4 s.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv2_1",
+    "status": "Redemoinho de Aço: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; efeito de conjuração.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv2_2",
+    "status": "Baluarte Inquebrável: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; status decorativo por 4 s.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv2_3",
+    "status": "Golpe Colossal: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; efeito de conjuração.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv3_1",
+    "status": "Avatar da Guerra: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; status decorativo por 4 s.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv3_2",
+    "status": "Lâmina do Julgamento: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; efeito de conjuração.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  },
+  {
+    "id": "guerreiro_nv3_3",
+    "status": "Última Resistência Imortal: prévia visual com evento de exemplo. Sem dano, cura, custo ou progressão; status decorativo por 4 s.",
+    "hp": "160 / 160",
+    "kills": "0 / 6 alvos derrotados"
+  }
+]

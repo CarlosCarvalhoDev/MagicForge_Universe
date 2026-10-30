@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MagicForge · Clareira dos Forjados</title><link rel="stylesheet" href="/src/pixel/pixel-arena.css"></head>
+<body>
+  <main class="arena-shell">
+    <header class="topbar"><a href="/" class="brand">MAGICFORGE <span>UNIVERSE</span></a><div class="location"><small>MUNDO 01 · PRÉVIA PIXEL ART</small><h1>Clareira dos Forjados</h1></div><a class="button subtle" href="/">Entrar na minha conta ↗</a></header>
+    <section class="vfx-lab" aria-label="Prévia de biomas"><label for="preview-world">Cenário de treino</label><select id="preview-world"><option value="1">Mundo 1 · Floresta da Forja</option><option value="2">Mundo 2 · Picos de Jotunheim</option></select><label><input id="preview-portal" type="checkbox"> Mostrar portal · exemplo visual</label><small>Troca somente a arte; inimigos e regras do treino não mudam.</small></section>
+    <section class="viewport" aria-label="Arena de treino">
+      <canvas id="pixel-arena" aria-label="Arena pixel art: use WASD ou setas para andar e espaço para atacar" tabindex="0"></canvas>
+      <div class="hero-card"><div class="portrait" aria-hidden="true"></div><div><strong>Espadachim</strong><small>Ordem da Bigorna</small><div class="health"><span id="health-fill"></span></div><output id="hp">160 / 160</output></div></div>
+      <aside class="quest"><small>PRIMEIROS PASSOS</small><h2>Proteja a clareira</h2><p>Explore os caminhos e enfrente slimes e orcs.</p><output id="kills">0 / 6 alvos derrotados</output></aside>
+      <div class="scene-label"><span class="live-dot"></span>Treino local · progresso não salvo</div>
+      <div id="loading" role="status">Preparando a clareira…</div>
+      <div id="result" class="result" hidden><h2 id="result-title"></h2><p id="result-message"></p><button id="restart-result" class="button">Voltar à clareira</button></div>
+      <div class="touch-pad" aria-label="Movimento por toque"><button data-direction="up" aria-label="Andar para cima">↑</button><button data-direction="left" aria-label="Andar para esquerda">←</button><button data-direction="down" aria-label="Andar para baixo">↓</button><button data-direction="right" aria-label="Andar para direita">→</button></div>
+    </section>
+    <footer class="actionbar"><p>Clique no chão ou use <kbd>W A S D</kbd> para andar <span>·</span> <kbd>ESPAÇO</kbd> atacar</p><div class="actions"><button id="attack" class="button primary">⚔ Atacar</button><button id="auto" class="button" aria-pressed="false">Auto: desligado</button><button id="restart" class="button subtle">Recomeçar</button></div><small>Espadachim · Slimes · Orcs<br>Arte e animações CraftPix</small></footer>
+    <section class="vfx-lab" aria-label="Prévia de efeitos"><div><strong>Prévia de VFX do Guerreiro</strong><small>Somente visual · não aplica dano, cura ou buffs</small></div><div class="vfx-buttons"><button class="button" data-fx="slash">Corte</button><button class="button" data-fx="heal">Cura</button><button class="button" data-fx="whirlwind">Redemoinho</button><button class="button" data-fx="avatar">Avatar</button><button class="button" data-fx="shield">Escudo · prévia</button><button class="button" data-fx="levelUp">Level up</button></div><label><input id="vfx-loop" type="checkbox"> Repetir prévia selecionada</label><output id="vfx-status" role="status">Selecione um efeito para conferir.</output></section>
+    <section class="vfx-lab" aria-label="Doze habilidades do Guerreiro"><div><strong>As 12 opções do Grimório</strong><small>Evento de exemplo · não valida cálculos ou rede</small></div><label for="warrior-preview-skill">Habilidade</label><select id="warrior-preview-skill"></select><button id="preview-warrior-skill" class="button">Visualizar habilidade</button></section>
+    <button id="break-preview-shield" class="button subtle">Quebrar escudo · prévia visual</button>
+  </main>
+  <script type="module" src="/src/pixel/pixel-arena.ts"></script>
+</body></html>

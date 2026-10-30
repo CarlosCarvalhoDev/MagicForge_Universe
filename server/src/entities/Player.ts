@@ -114,6 +114,20 @@ export class Player extends Entity {
   }
 
   public recalculateStatsFromEquipment(): void {
+    const classDef = CLASS_DEFINITIONS[this.classType] || CLASS_DEFINITIONS[CharacterClass.GUERREIRO];
+    const growth = CLASS_STAT_GROWTH[this.classType] || {};
+    const levelMult = Math.max(0, this.level - 1);
+
+    // Atributos base da classe + evolução natural por nível
+    this.baseAttributes = {
+      forca: classDef.baseStats.forca + (growth.forca || 0) * levelMult,
+      destreza: classDef.baseStats.destreza + (growth.destreza || 0) * levelMult,
+      constituicao: classDef.baseStats.constituicao + (growth.constituicao || 0) * levelMult,
+      inteligencia: classDef.baseStats.inteligencia + (growth.inteligencia || 0) * levelMult,
+      sabedoria: classDef.baseStats.sabedoria + (growth.sabedoria || 0) * levelMult,
+      carisma: classDef.baseStats.carisma + (growth.carisma || 0) * levelMult,
+    };
+
     const nextAttrs: CharacterAttributes = { ...this.baseAttributes };
     let extraHpFromGear = 0;
     let extraResourceFromGear = 0;
@@ -195,6 +209,7 @@ export class Player extends Entity {
   public respawn(): void {
     this.isDead = false;
     this.deathTimer = 0;
+    this.clearAllStatuses();
     this.currentHp = this.maxHp;
     this.currentResource = this.maxResource;
     this.position = createVector3(0, 0, 0); // Retorna seguro ao Altar Rúnico Central (0, 0)
@@ -228,9 +243,9 @@ export class Player extends Entity {
     }
 
     const rawDamage = modifier * 3 + this.level * 5;
-    // Multiplicador Transcendental: +15% de poder por Reborn!
+    // Multiplicador Transcendental: +15% de poder por Reborn e bônus de Buff Ativo (Avatar da Guerra)
     const rebornMultiplier = 1.0 + this.rebornCount * 0.15;
-    return Math.round(rawDamage * rebornMultiplier);
+    return Math.round(rawDamage * rebornMultiplier * this.getDamageMultiplier());
   }
 
   public get CombatPower(): number {
@@ -298,10 +313,15 @@ export class Player extends Entity {
       return;
     }
 
-    // Regeneração passiva constante de HP (25 HP/segundo para alta sobrevivência em testes)
-    if (this.currentHp < this.maxHp) {
-      this.currentHp = Math.min(this.maxHp, this.currentHp + 25 * deltaTimeSec);
+    // Se estiver atordoado, interrompe movimento
+    if (this.isStunned()) {
+      this.velocity = createVector3(0, 0, 0);
+      this.isMoving = false;
+      return;
     }
+
+    // Sem autocura passiva chumbada: a sobrevivência depende exclusivamente dos atributos da classe/nível,
+    // equipamentos, habilidades de cura/sustento e poções consumíveis.
 
     // Tick basic attack cooldown
     if (this.attackTimer > 0) {

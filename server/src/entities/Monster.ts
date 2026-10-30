@@ -5,6 +5,7 @@ import {
   Vector3,
   cloneVector3,
   createVector3,
+  EntitySnapshotState,
 } from '@magicforge/shared';
 import { Entity } from './Entity';
 
@@ -35,16 +36,20 @@ export class Monster extends Entity {
   public targetPlayer: Entity | null = null;
   public respawnTimer: number = 0;
   public respawnDelaySec: number = 6.5; // Respawn mais lento e natural
+  public autoRespawns: boolean = true;
+  public isBoss: boolean = false;
+  public monsterType: string = 'melee';
   private wanderTimer: number = 0;
   private wanderIntervalSec: number = 4.0;
   private wanderTarget: Vector3 | null = null;
   public lootTable: LootDropEntry[] = [];
   public expReward: number = 35;
 
-  constructor(id: string, name: string, spawnPos: Vector3, maxHp = 100, damage = 15) {
+  constructor(id: string, name: string, spawnPos: Vector3, maxHp = 100, damage = 15, monsterType = 'melee') {
     super(id, EntityType.MONSTER, name, spawnPos, maxHp);
     this.spawnPosition = cloneVector3(spawnPos);
     this.attackDamage = damage;
+    this.monsterType = monsterType;
     this.wanderIntervalSec = 2.0 + Math.random() * 4.0;
     this.configureDefaultLoot();
   }
@@ -79,24 +84,52 @@ export class Monster extends Entity {
         { itemId: 'bow_hunting', dropChance: 0.12, minQty: 1, maxQty: 1 },
         { itemId: 'card_skeleton', dropChance: 0.15, minQty: 1, maxQty: 1 },
       ];
-    } else if (this.name.includes('Chefe') || this.name.includes('Chefão') || this.name.includes('Grimgor') || this.name.includes('Frostbite') || this.name.includes('Ignis')) {
-      this.expReward = 450;
-      const bossCardId = this.name.includes('Frostbite') ? 'card_boss_frostbite' : (this.name.includes('Ignis') ? 'card_boss_ignis' : 'card_boss_grimgor');
+    } else if (this.name.includes('Grimgor') || this.name.includes('Frostbite') || this.name.includes('Ignis') || this.name.includes('Lorde Titânico') || this.name.includes('Chefão')) {
+      this.isBoss = true;
+      this.autoRespawns = false;
+      const isFrostbite = this.name.includes('Frostbite');
+      const isIgnis = this.name.includes('Ignis');
+      const bossCardId = isFrostbite ? 'card_boss_frostbite' : (isIgnis ? 'card_boss_ignis' : 'card_boss_grimgor');
+      this.expReward = isFrostbite ? 3800 : (isIgnis ? 9000 : 1500);
       this.lootTable = [
-        { itemId: 'gold', dropChance: 1.0, minQty: 200, maxQty: 500 },
-        { itemId: 'stone_forge_rare', dropChance: 1.0, minQty: 3, maxQty: 5 },
-        { itemId: 'stone_forge_mystic', dropChance: 0.75, minQty: 1, maxQty: 2 },
-        { itemId: 'arcane_dust', dropChance: 1.0, minQty: 15, maxQty: 30 },
-        { itemId: 'gem_ruby_str', dropChance: 0.5, minQty: 1, maxQty: 1 },
-        { itemId: 'gem_sapphire_int', dropChance: 0.5, minQty: 1, maxQty: 1 },
-        { itemId: 'gem_emerald_dex', dropChance: 0.5, minQty: 1, maxQty: 1 },
-        { itemId: 'gem_topaz_con', dropChance: 0.5, minQty: 1, maxQty: 1 },
-        { itemId: 'potion_hp_major', dropChance: 1.0, minQty: 3, maxQty: 5 },
-        { itemId: 'rune_fragment', dropChance: 1.0, minQty: 2, maxQty: 6 },
-        { itemId: 'sword_runic_bastard', dropChance: 0.3, minQty: 1, maxQty: 1 },
-        { itemId: 'staff_void_astral', dropChance: 0.3, minQty: 1, maxQty: 1 },
-        { itemId: 'relic_ancient_forge', dropChance: 0.4, minQty: 1, maxQty: 1 },
+        { itemId: 'gold', dropChance: 1.0, minQty: isFrostbite ? 500 : 200, maxQty: isFrostbite ? 1200 : 500 },
+        { itemId: 'stone_forge_rare', dropChance: 1.0, minQty: 3, maxQty: 6 },
+        { itemId: 'stone_forge_mystic', dropChance: 0.85, minQty: 1, maxQty: 3 },
+        { itemId: 'arcane_dust', dropChance: 1.0, minQty: 20, maxQty: 40 },
+        { itemId: 'gem_ruby_str', dropChance: 0.6, minQty: 1, maxQty: 2 },
+        { itemId: 'gem_sapphire_int', dropChance: 0.6, minQty: 1, maxQty: 2 },
+        { itemId: 'gem_emerald_dex', dropChance: 0.6, minQty: 1, maxQty: 2 },
+        { itemId: 'gem_topaz_con', dropChance: 0.6, minQty: 1, maxQty: 2 },
+        { itemId: 'potion_hp_major', dropChance: 1.0, minQty: 4, maxQty: 8 },
+        { itemId: 'rune_fragment', dropChance: 1.0, minQty: 3, maxQty: 8 },
+        { itemId: 'sword_runic_bastard', dropChance: 0.4, minQty: 1, maxQty: 1 },
+        { itemId: 'staff_void_astral', dropChance: 0.35, minQty: 1, maxQty: 1 },
+        { itemId: 'relic_ancient_forge', dropChance: 0.5, minQty: 1, maxQty: 1 },
         { itemId: bossCardId, dropChance: 1.0, minQty: 1, maxQty: 1 },
+      ];
+    } else if (this.name.includes('Chefe Yetin') || this.name.includes('Chefe Goblin') || this.name.includes('Chefe')) {
+      // Mini-Chefes de Santuário Externo
+      this.expReward = this.name.includes('Yetin') ? 280 : 180;
+      this.lootTable = [
+        { itemId: 'gold', dropChance: 1.0, minQty: 40, maxQty: 100 },
+        { itemId: 'stone_forge_rare', dropChance: 0.75, minQty: 1, maxQty: 2 },
+        { itemId: 'stone_forge_common', dropChance: 1.0, minQty: 2, maxQty: 4 },
+        { itemId: 'arcane_dust', dropChance: 0.8, minQty: 5, maxQty: 10 },
+        { itemId: 'potion_hp_minor', dropChance: 0.8, minQty: 2, maxQty: 3 },
+        { itemId: 'gem_topaz_con', dropChance: 0.25, minQty: 1, maxQty: 1 },
+        { itemId: this.name.includes('Yetin') ? 'card_wolf' : 'card_goblin', dropChance: 0.35, minQty: 1, maxQty: 1 },
+      ];
+    } else if (this.name.includes('Gelo') || this.name.includes('Glacial') || this.name.includes('Jotunheim')) {
+      // Monstros Normais de Mundo 2 (Jotunheim)
+      this.expReward = 65;
+      this.lootTable = [
+        { itemId: 'gold', dropChance: 1.0, minQty: 14, maxQty: 30 },
+        { itemId: 'stone_forge_common', dropChance: 0.5, minQty: 1, maxQty: 3 },
+        { itemId: 'arcane_dust', dropChance: 0.45, minQty: 1, maxQty: 3 },
+        { itemId: 'potion_hp_minor', dropChance: 0.4, minQty: 1, maxQty: 2 },
+        { itemId: 'ore_iron_arcane', dropChance: 0.35, minQty: 1, maxQty: 2 },
+        { itemId: 'armor_chainmail', dropChance: 0.15, minQty: 1, maxQty: 1 },
+        { itemId: 'card_orc', dropChance: 0.18, minQty: 1, maxQty: 1 },
       ];
     } else {
       // Goblin Lanceiro / padrão
@@ -128,12 +161,20 @@ export class Monster extends Entity {
   }
 
   public override update(deltaTimeSec: number): void {
-    // If dead, tick respawn timer
+    // If dead, tick respawn timer (only if monster autoRespawns)
     if (this.isDead) {
+      if (!this.autoRespawns) return;
       this.respawnTimer += deltaTimeSec;
       if (this.respawnTimer >= this.respawnDelaySec) {
         this.respawn();
       }
+      return;
+    }
+
+    // Se estiver atordoado, interrompe movimento e ações
+    if (this.isStunned()) {
+      this.velocity = createVector3(0, 0, 0);
+      this.isMoving = false;
       return;
     }
 
@@ -270,6 +311,7 @@ export class Monster extends Entity {
   }
 
   public respawn(newPosition?: Vector3): void {
+    if (!this.autoRespawns) return;
     this.isDead = false;
     this.currentHp = this.maxHp;
     this.wanderTimer = 0;
@@ -293,5 +335,11 @@ export class Monster extends Entity {
     this.targetPlayer = null;
     this.targetId = null;
     this.respawnTimer = 0;
+  }
+
+  public override toSnapshotState(): EntitySnapshotState {
+    const base = super.toSnapshotState();
+    base.monsterType = this.monsterType;
+    return base;
   }
 }

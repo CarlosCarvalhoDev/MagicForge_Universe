@@ -1,0 +1,34 @@
+[
+  {
+    "Path": "client/public/assets/isometric/iso_hero_arqueiro.jpg",
+    "SHA256": "E93C38606AED6DCF061C02890BC423F861260BC8955699B576144F25FEB5AC7A"
+  },
+  {
+    "Path": "client/public/assets/portraits/ARQUEIRO.jpg",
+    "SHA256": "49FAA61B31E0C0884C3D4F77FB6FCFA34EB57EBFFD737CCB3B991D7F7D98D3E3"
+  },
+  {
+    "Path": "Docs/Art/Isometric/iso_hero_arqueiro.jpg",
+    "SHA256": "E93C38606AED6DCF061C02890BC423F861260BC8955699B576144F25FEB5AC7A"
+  },
+  {
+    "Path": "MagicForgeClient/Assets/Textures/Sprites/iso_hero_arqueiro.jpg",
+    "SHA256": "E93C38606AED6DCF061C02890BC423F861260BC8955699B576144F25FEB5AC7A"
+  },
+  {
+    "Path": "MagicForgeClient/Assets/Textures/Sprites/iso_hero_arqueiro.jpg.meta",
+    "SHA256": "1E4D96C6F52F6460A060CFA463CBFC12C0B7A4A43FC6241249DF86D2971C9FAB"
+  },
+  {
+    "Path": "MagicForgeClient/Assets/Arqueiro.asset",
+    "SHA256": "07697DF562F032D6C7CB1159BEBECF3791C7C1EDC39563FBEF7CEAC36EB8C340"
+  },
+  {
+    "Path": "MagicForgeClient/Assets/Arqueiro.asset.meta",
+    "SHA256": "8A2040CA28893C69EA7483BBFFC4790C5E13153E3FDFC6F722A6EB66E9B947DC"
+  },
+  {
+    "Path": "MagicForgeClient/Assets/Textures/Sprites/Animations/Heroes/Arqueiro.meta",
+    "SHA256": "0B97FA5C3B805813751F4E412BDD28D95224D84082375DC630FD89E1EC2A13DB"
+  }
+]

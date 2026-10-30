@@ -29,6 +29,8 @@ import {
 import { ClientNetwork } from './network/ClientNetwork';
 import { SnapshotBuffer, InterpolatedEntity } from './interpolation/SnapshotBuffer';
 import { GameRenderer } from './renderer/GameRenderer';
+import { combatTriggersAttack, SkillRejectionEchoFilter } from './renderer/WarriorPresentation';
+import { worldAppearance } from './renderer/WorldPresentation';
 import { setupAuthSelection } from './ui/AuthSelection';
 import { getGuestCredential } from './ui/GuestSession';
 import { setupFarmHelper } from './ui/FarmHelper';
@@ -264,6 +266,13 @@ const btnCloseSkillbook = document.getElementById('btn-close-skillbook') as HTML
 const skillbookClassBadge = document.getElementById('skillbook-class-badge') as HTMLSpanElement | null;
 const skillbookSlotsContainer = document.getElementById('skillbook-slots-container') as HTMLDivElement | null;
 
+const SLOT_CONFIGS = [
+  { slot: 1, circleName: '1º Círculo — Habilidades Iniciais', unlockLevel: 1, tierClass: 'tier-1' },
+  { slot: 2, circleName: '2º Círculo — Técnicas de 1º Grau', unlockLevel: 10, tierClass: 'tier-2' },
+  { slot: 3, circleName: '3º Círculo — Técnicas Avançadas', unlockLevel: 25, tierClass: 'tier-3' },
+  { slot: 4, circleName: '4º Círculo — Habilidade Suprema (Ultimate)', unlockLevel: 50, tierClass: 'tier-4' },
+];
+
 function updateEquippedSkillsUI() {
   const currentClass = myPlayerClass || (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
   const defaults = getDefaultSkillsForClass(currentClass);
@@ -271,13 +280,16 @@ function updateEquippedSkillsUI() {
   for (let slot = 1; slot <= 4; slot++) {
     const skillId = playerEquippedSkills[slot] || defaults[slot];
     const s = SKILLS_DATABASE[skillId] || SKILLS_DATABASE[`${currentClass.toLowerCase()}_${slot}`];
+    const slotCfg = SLOT_CONFIGS.find((c) => c.slot === slot);
+    const unlockLvl = slotCfg ? slotCfg.unlockLevel : s ? s.unlockLevel : 1;
+    const isSlotUnlocked = playerLevel >= unlockLvl;
     const slotUI = skillSlots[slot];
+
     if (slotUI && s) {
       slotUI.definition = s;
       slotUI.img.src = `/assets/skills/${s.skillId}.png`;
       slotUI.img.alt = s.name;
       slotUI.img.onerror = () => {
-        // Fallback display se o arquivo de asset ainda não existir no disco
         slotUI.img.style.display = 'none';
         let fallback = slotUI.button.querySelector('.skill-emoji-fallback') as HTMLSpanElement;
         if (!fallback) {
@@ -295,9 +307,26 @@ function updateEquippedSkillsUI() {
         if (fallback) fallback.remove();
       };
 
-      slotUI.cost.textContent = `${s.cost} ${s.resourceType === 'Energia' ? 'EN' : 'MP'}`;
-      slotUI.cost.style.color = s.resourceType === 'Energia' ? '#facc15' : '#38bdf8';
-      slotUI.button.title = `[Slot ${s.slot} • ${s.tierName || `Tier ${s.tier}`}] ${s.name}\nCusto: ${s.cost} ${s.resourceType} • Recarga: ${s.cooldownSec}s • Alcance: ${s.range}m\n${s.description}`;
+      let lockOverlay = slotUI.button.querySelector('.slot-lock-overlay') as HTMLDivElement | null;
+
+      if (!isSlotUnlocked) {
+        slotUI.button.classList.add('slot-locked');
+        if (!lockOverlay) {
+          lockOverlay = document.createElement('div');
+          lockOverlay.className = 'slot-lock-overlay';
+          slotUI.button.appendChild(lockOverlay);
+        }
+        lockOverlay.innerHTML = `<span class="lock-icon">🔒</span><span class="lock-lvl">Nv.${unlockLvl}</span>`;
+        slotUI.cost.textContent = `Nv.${unlockLvl}`;
+        slotUI.cost.style.color = '#94a3b8';
+        slotUI.button.title = `🔒 Slot ${slot} Bloqueado (Libera no Nível ${unlockLvl})\nToque para abrir o Grimório e ver as 3 opções deste slot.`;
+      } else {
+        slotUI.button.classList.remove('slot-locked');
+        if (lockOverlay) lockOverlay.remove();
+        slotUI.cost.textContent = `${s.cost} ${s.resourceType === 'Energia' ? 'EN' : 'MP'}`;
+        slotUI.cost.style.color = s.resourceType === 'Energia' ? '#facc15' : '#38bdf8';
+        slotUI.button.title = `[Slot ${s.slot} • ${s.tierName || `Tier ${s.tier}`}] ${s.name}\nCusto: ${s.cost} ${s.resourceType} • Recarga: ${s.cooldownSec}s • Alcance: ${s.range}m\n${s.description}`;
+      }
     }
   }
 
@@ -333,13 +362,6 @@ if (skillbookModal) {
   });
 }
 
-const SLOT_CONFIGS = [
-  { slot: 1, circleName: 'Truque (Cantrip - Círculo 0)', unlockLevel: 10, tierClass: 'tier-1' },
-  { slot: 2, circleName: '1º Círculo de Magia / Técnica', unlockLevel: 20, tierClass: 'tier-2' },
-  { slot: 3, circleName: '2º Círculo de Magia / Técnica', unlockLevel: 35, tierClass: 'tier-3' },
-  { slot: 4, circleName: '3º Círculo / Técnica Suprema (Ultimate)', unlockLevel: 50, tierClass: 'tier-4' },
-];
-
 function renderGrimorioSkills(classType: CharacterClass) {
   if (!skillbookSlotsContainer) return;
   skillbookSlotsContainer.innerHTML = '';
@@ -367,10 +389,10 @@ function renderGrimorioSkills(classType: CharacterClass) {
         <span class="slot-header-name">${cfg.circleName}</span>
       </div>
       <div class="slot-header-status">
-        <span style="color: ${isUnlocked ? '#38bdf8' : '#f87171'}; font-weight: 600;">
-          ${isUnlocked ? `✓ Desbloqueado (Nv. ${playerLevel})` : `🔒 Requer Nível ${cfg.unlockLevel}`}
+        <span style="color: ${isUnlocked ? '#34d399' : '#f87171'}; font-weight: 700;">
+          ${isUnlocked ? `✓ Slot Liberado • Escolha 1 das 3` : `🔒 Slot libera no Nível ${cfg.unlockLevel}`}
         </span>
-        ${equippedSkill ? `<span class="slot-equipped-indicator">Equipada: <strong>${equippedSkill.name}</strong></span>` : ''}
+        ${isUnlocked && equippedSkill ? `<span class="slot-equipped-indicator">Ativa: <strong>${equippedSkill.name}</strong></span>` : ''}
       </div>
     `;
     slotSection.appendChild(header);
@@ -382,8 +404,8 @@ function renderGrimorioSkills(classType: CharacterClass) {
     cardsRow.className = 'slot-cards-row';
 
     slotSkills.forEach((s) => {
-      const isEquipped = equippedSkillId === s.skillId;
-      const canEquip = playerLevel >= s.unlockLevel;
+      const isEquipped = isUnlocked && equippedSkillId === s.skillId;
+      const canEquip = isUnlocked;
 
       let role = 'Ofensivo';
       let roleClass = 'ofensivo';
@@ -422,7 +444,7 @@ function renderGrimorioSkills(classType: CharacterClass) {
         </div>
         <p class="skill-v2-desc">${s.description}</p>
         <button class="btn-equip-skill ${isEquipped ? 'active' : canEquip ? 'equip' : 'locked'}" ${isEquipped || !canEquip ? 'disabled' : ''}>
-          ${isEquipped ? '✓ EQUIPADA NO SLOT' : canEquip ? '⚔️ EQUIPAR NESTE SLOT' : `🔒 REQUER NÍVEL ${s.unlockLevel}`}
+          ${isEquipped ? `✓ SELECIONADA NO SLOT ${cfg.slot}` : canEquip ? `⚔️ SELECIONAR PARA O SLOT ${cfg.slot}` : `🔒 LIBERA COM O SLOT (NV. ${cfg.unlockLevel})`}
         </button>
       `;
 
@@ -1864,6 +1886,7 @@ network.onConnectionStateChange = (connected) => {
     inventoryExpansion?.onDisconnected();
     bossNarrative.reset();
     renderer.resetNarrative();
+    renderer.setStagePresentation({ world: 1 });
     if (statusDot) statusDot.classList.remove('online');
     if (connectionStatus) connectionStatus.textContent = 'Reconectando em 1.2s...';
     btnConnect.textContent = 'Reconectando...';
@@ -1882,7 +1905,7 @@ network.onSnapshot = (snapshot) => {
 
 network.onCombatEvent = (event) => {
   bossNarrative.onCombatEvent(event);
-  renderer.triggerEntityAnimation(event.attackerId, 'attack');
+  if (combatTriggersAttack(event.damageSource)) renderer.triggerEntityAnimation(event.attackerId, 'attack');
   if (event.isTargetDead) {
     renderer.triggerEntityAnimation(event.targetId, 'death');
   } else if (!event.isDodged && event.damage > 0) {
@@ -1897,8 +1920,9 @@ network.onCombatEvent = (event) => {
 };
 
 network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
+  if (!renderer.acceptSkillCast(event)) return;
   renderer.triggerEntityAnimation(event.casterId, 'attack');
-  if (event.targetId && !event.isHeal) {
+  if (event.targetId && !event.isHeal && event.affectedEntityIds.includes(event.targetId)) {
     renderer.triggerEntityAnimation(event.targetId, 'hit');
   }
 
@@ -1910,21 +1934,43 @@ network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
   }
 
   const entities = snapshotBuffer.getInterpolatedEntities();
-  let effectPos = { x: 0, y: 0, z: 0 };
+  renderer.playSkillVfx(event, entities);
+  if (event.targetResults) {
+    for (const result of event.targetResults) {
+      if (result.isDead) renderer.triggerEntityAnimation(result.targetId, 'death');
+      else if (result.effectiveDamage > 0) renderer.triggerEntityAnimation(result.targetId, 'hit');
+      if (result.effectiveDamage > 0) renderer.addSkillEffectText(result.impactPosition, event.skillName, result.effectiveDamage, false, result.isCritical);
+      if (result.effectiveHeal > 0) renderer.addSkillEffectText(result.impactPosition, event.skillName, result.effectiveHeal, true, result.isCritical);
+    }
+    return;
+  }
+  let effectPos = event.targetPosition;
 
   if (event.targetPosition) {
     effectPos = event.targetPosition;
-  } else if (event.targetId) {
+  } else if (event.targetId && event.affectedEntityIds.includes(event.targetId)) {
     const target = entities.find((e) => e.id === event.targetId);
     if (target) effectPos = target.position;
   }
 
-  if (effectPos.x === 0 && effectPos.z === 0) {
+  if (!effectPos) {
     const caster = entities.find((e) => e.id === event.casterId);
     if (caster) effectPos = caster.position;
   }
 
-  renderer.addSkillEffectText(effectPos, event.skillName, event.damageOrHeal, event.isHeal, event.isCritical);
+  if (effectPos) renderer.addSkillEffectText(effectPos, event.skillName, event.damageOrHeal, event.isHeal, event.isCritical);
+};
+
+const skillRejectionEcho = new SkillRejectionEchoFilter();
+network.onSkillCastRejected = (event) => {
+  if (event.casterId !== network.myPlayerId) return;
+  if (event.reasonCode === 'ON_COOLDOWN' && event.cooldownRemainingSec !== undefined) cooldownMap.set(event.slot, performance.now() + event.cooldownRemainingSec * 1000);
+  skillRejectionEcho.record(event.message, performance.now());
+  addChatMessage('Habilidades', event.message, 'sys');
+};
+
+network.onCombatStatusEvent = (event) => {
+  renderer.applyCombatStatus(event, snapshotBuffer.getInterpolatedEntities());
 };
 
 network.onItemDropSpawn = (payload) => {
@@ -1995,11 +2041,14 @@ network.onBossEvent = (payload) => {
 };
 
 network.onStageUpdate = (payload) => {
+  renderer.setStagePresentation(payload);
+  const biomeIcon = document.getElementById('zone-biome-icon');
+  if (biomeIcon) biomeIcon.textContent = worldAppearance(payload.world).icon;
   if (currentStageBadge) {
     currentStageBadge.textContent = `Fase ${payload.stage}/10`;
   }
   if (stageWorldTitle) {
-    stageWorldTitle.textContent = `🌲 ${payload.worldName}`;
+    stageWorldTitle.textContent = `${worldAppearance(payload.world).icon} ${payload.worldName}`;
   }
   if (stagePhaseBadge) {
     stagePhaseBadge.textContent = payload.isBossStage ? `Fase 10/10 [CHEFÃO]` : `Fase ${payload.stage}/10`;
@@ -2046,6 +2095,7 @@ network.onStageUpdate = (payload) => {
 };
 
 network.onChatMessage = (payload) => {
+  if (skillRejectionEcho.suppress(payload.senderId, payload.message, performance.now())) return;
   addChatMessage(payload.senderName, payload.message, /^Malakor\b/i.test(payload.senderName) ? 'malak' : payload.channel === 'system' ? 'sys' : 'combat');
 };
 
@@ -2129,6 +2179,7 @@ network.onSkillsUpdate = (payload: S2CSkillsUpdatePayload) => {
 };
 
 network.onPlayerExpUpdate = (payload) => {
+  const prevLevel = playerLevel;
   playerLevel = payload.level;
   refreshExpansionContext();
   playerCurrentXp = payload.currentXp;
@@ -2138,6 +2189,9 @@ network.onPlayerExpUpdate = (payload) => {
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
+  if (playerLevel !== prevLevel) {
+    updateEquippedSkillsUI();
+  }
 
   const entities = snapshotBuffer.getInterpolatedEntities();
   const myPlayer = entities.find((e) => e.id === network.myPlayerId);
@@ -2233,14 +2287,22 @@ network.onRebornResult = (payload) => {
 function castSkill(slot: number) {
   if (!network.isConnected || !network.myPlayerId) return;
 
+  const slotCfg = SLOT_CONFIGS.find((c) => c.slot === slot);
+  const slotUI = skillSlots[slot];
+  if (!slotUI || !slotUI.definition) return;
+
+  const unlockLvl = slotCfg ? slotCfg.unlockLevel : slotUI.definition.unlockLevel;
+  if (playerLevel < unlockLvl) {
+    addChatMessage('Grimório', `🔒 O Slot ${slot} libera no Nível ${unlockLvl}! Abra o Grimório para planejar sua build.`, 'sys');
+    openSkillbook();
+    return;
+  }
+
   const now = performance.now();
   const cdEnd = cooldownMap.get(slot);
   if (cdEnd && cdEnd > now) {
     return;
   }
-
-  const slotUI = skillSlots[slot];
-  if (!slotUI || !slotUI.definition) return;
 
   const skillDef = slotUI.definition;
   let targetId: string | undefined = undefined;
@@ -2692,13 +2754,16 @@ function gameLoop() {
           } else {
             network.sendMoveDirection({ x: 0, y: 0, z: 0 }, myPlayer.position);
 
-            // Try casting ready skills 4 -> 3 -> 2 -> 1
+            // Try casting ready unlocked skills 4 -> 3 -> 2 -> 1
             let castedSkill = false;
             for (let slot = 4; slot >= 1; slot--) {
+              const slotCfg = SLOT_CONFIGS.find((c) => c.slot === slot);
               const cd = cooldownMap.get(slot);
               const slotUI = skillSlots[slot];
               if ((!cd || cd <= now) && slotUI && slotUI.definition) {
                 const def = slotUI.definition;
+                const unlockLvl = slotCfg ? slotCfg.unlockLevel : def.unlockLevel;
+                if (playerLevel < unlockLvl) continue;
                 const currentRes = myPlayer.currentResource ?? 100;
                 if (currentRes >= def.cost) {
                   castSkill(slot);

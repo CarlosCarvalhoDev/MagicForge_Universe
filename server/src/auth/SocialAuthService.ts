@@ -1,4 +1,5 @@
 import { SocialAuthProvider } from '@magicforge/shared';
+import { SERVER_CONFIG } from '../config';
 
 export interface VerifiedSocialProfile {
   provider: SocialAuthProvider;
@@ -44,8 +45,14 @@ export class SocialAuthService {
 
     const cleanToken = token.trim();
 
-    // 2. Mock Seguro para Testes Automatizados Locais (apenas tokens com prefixo específico)
+    // 2. Mock Seguro para Testes Automatizados Locais (apenas com flag explícita de ambiente)
     if (cleanToken.startsWith('mock_test_token_')) {
+      if (!SERVER_CONFIG.AUTH.ALLOW_MOCK_SOCIAL_AUTH) {
+        return {
+          success: false,
+          error: 'Tokens simulados de teste não são permitidos neste ambiente.',
+        };
+      }
       const id = cleanToken.replace('mock_test_token_', '');
       return {
         success: true,
@@ -72,6 +79,7 @@ export class SocialAuthService {
 
         const data = (await response.json()) as {
           sub: string;
+          aud?: string;
           email?: string;
           name?: string;
           picture?: string;
@@ -80,6 +88,16 @@ export class SocialAuthService {
 
         if (!data.sub) {
           return { success: false, error: 'Identificador de usuário ausente no token do Google.' };
+        }
+
+        // Validação autoritativa do Audience (aud / Client ID) contra as credenciais oficiais
+        if (SERVER_CONFIG.AUTH.GOOGLE_CLIENT_IDS.length > 0) {
+          if (!data.aud || !SERVER_CONFIG.AUTH.GOOGLE_CLIENT_IDS.includes(data.aud)) {
+            return {
+              success: false,
+              error: 'Token do Google emitido para uma aplicação não autorizada (Audience inválido).',
+            };
+          }
         }
 
         return {
@@ -96,28 +114,44 @@ export class SocialAuthService {
 
       // 4. Validação Real Discord (Bearer Access Token via Discord API v10)
       if (cleanProvider === 'DISCORD') {
-        const response = await fetch('https://discord.com/api/v10/users/@me', {
+        // Validação de autorização e aplicação via /oauth2/@me
+        const oauthResp = await fetch('https://discord.com/api/v10/oauth2/@me', {
           headers: {
             Authorization: `Bearer ${cleanToken}`,
           },
         });
 
-        if (!response.ok) {
+        if (!oauthResp.ok) {
           return {
             success: false,
             error: 'Token do Discord inválido ou não autorizado.',
           };
         }
 
-        const data = (await response.json()) as {
-          id: string;
-          username: string;
-          global_name?: string;
-          email?: string;
-          avatar?: string;
+        const oauthData = (await oauthResp.json()) as {
+          application?: { id: string; name: string };
+          user?: {
+            id: string;
+            username: string;
+            global_name?: string;
+            email?: string;
+            avatar?: string;
+          };
         };
 
-        if (!data.id) {
+        // Validação de Client ID / Application ID do Discord
+        if (SERVER_CONFIG.AUTH.DISCORD_CLIENT_IDS.length > 0) {
+          const appId = oauthData.application?.id;
+          if (!appId || !SERVER_CONFIG.AUTH.DISCORD_CLIENT_IDS.includes(appId)) {
+            return {
+              success: false,
+              error: 'Token do Discord emitido para aplicação não autorizada.',
+            };
+          }
+        }
+
+        const user = oauthData.user;
+        if (!user || !user.id) {
           return { success: false, error: 'Identificador de usuário ausente no Discord.' };
         }
 
@@ -125,10 +159,10 @@ export class SocialAuthService {
           success: true,
           profile: {
             provider: 'DISCORD',
-            providerUserId: data.id,
-            email: data.email,
-            displayName: data.global_name || data.username,
-            avatarUrl: data.avatar ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` : undefined,
+            providerUserId: user.id,
+            email: user.email,
+            displayName: user.global_name || user.username,
+            avatarUrl: user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : undefined,
           },
         };
       }
@@ -155,6 +189,22 @@ export class SocialAuthService {
 
         if (!data.id) {
           return { success: false, error: 'Identificador ausente na resposta do Facebook.' };
+        }
+
+        // Validação do App ID se configurado
+        if (SERVER_CONFIG.AUTH.FACEBOOK_APP_IDS.length > 0) {
+          const appResp = await fetch(
+            `https://graph.facebook.com/app?access_token=${encodeURIComponent(cleanToken)}`
+          );
+          if (appResp.ok) {
+            const appData = (await appResp.json()) as { id?: string };
+            if (!appData.id || !SERVER_CONFIG.AUTH.FACEBOOK_APP_IDS.includes(appData.id)) {
+              return {
+                success: false,
+                error: 'Token do Facebook não pertence ao aplicativo MagicForge.',
+              };
+            }
+          }
         }
 
         return {

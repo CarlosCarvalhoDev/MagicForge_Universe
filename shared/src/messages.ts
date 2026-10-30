@@ -87,6 +87,8 @@ export interface C2SAttackTargetPayload {
   targetEntityId: string;
 }
 
+export type CombatDamageSource = 'BASIC_ATTACK' | 'SKILL' | 'STATUS_TICK' | 'REFLECTION';
+
 export interface S2CCombatEventPayload {
   attackerId: string;
   targetId: string;
@@ -96,6 +98,7 @@ export interface S2CCombatEventPayload {
   targetRemainingHp: number;
   targetMaxHp: number;
   isTargetDead: boolean;
+  damageSource?: CombatDamageSource;
 }
 
 export interface S2CEntityStatUpdatePayload {
@@ -112,17 +115,112 @@ export interface C2SCastSkillPayload {
   targetPosition?: Vector3;
 }
 
+export type SkillCategory = 'SINGLE_TARGET' | 'AOE_SELF' | 'AOE_TARGET' | 'AOE_LINE' | 'SELF_HEAL' | 'SELF_BUFF';
+export type SkillGeometryType = 'POINT' | 'CIRCLE_SELF' | 'CIRCLE_TARGET' | 'LINE';
+
+export interface SkillTargetResultPayload {
+  targetId: string;
+  impactPosition: Vector3;
+  effectiveDamage: number;
+  effectiveHeal: number;
+  shieldGranted?: number;
+  remainingHp: number;
+  maxHp: number;
+  isDead: boolean;
+  isCritical: boolean;
+}
+
+export type CombatStatusType =
+  | 'BLEED'
+  | 'ARMOR_BREAK'
+  | 'ATTACK_SPEED_BUFF'
+  | 'STUN'
+  | 'SHIELD'
+  | 'DAMAGE_BUFF'
+  | 'DEATH_IMMUNITY';
+
+export type CombatStatusEventReason =
+  | 'APPLIED'
+  | 'REFRESHED'
+  | 'TICK'
+  | 'EXPIRED'
+  | 'BROKEN'
+  | 'CLEARED_ON_DEATH'
+  | 'CLEARED_ON_DISCONNECT';
+
+export interface CombatStatusStatePayload {
+  statusId: string;
+  type: CombatStatusType;
+  skillId: string;
+  sourceEntityId: string;
+  targetEntityId: string;
+  durationSec: number;
+  remainingSec: number;
+  expiresAtTick: number;
+  magnitude: number;
+  remainingAbsorption?: number;
+  maxAbsorption?: number;
+  reflectRatio?: number;
+}
+
+export interface CombatStatusTransitionPayload {
+  event: CombatStatusEventReason;
+  serverTick: number;
+  status: CombatStatusStatePayload;
+  tickDamage?: number;
+  targetRemainingHp?: number;
+  isTargetDead?: boolean;
+}
+
+export type SkillCastRejectCode =
+  | 'CASTER_DEAD'
+  | 'CASTER_STUNNED'
+  | 'INVALID_SLOT'
+  | 'INVALID_SKILL'
+  | 'WRONG_CLASS'
+  | 'LEVEL_LOCKED'
+  | 'ON_COOLDOWN'
+  | 'INSUFFICIENT_RESOURCE'
+  | 'INVALID_TARGET'
+  | 'TARGET_DEAD'
+  | 'INVALID_POSITION'
+  | 'OUT_OF_RANGE'
+  | 'NO_VALID_TARGET';
+
+export interface S2CSkillCastRejectedPayload {
+  casterId: string;
+  slot: number;
+  skillId?: string;
+  reasonCode: SkillCastRejectCode;
+  message: string;
+  serverTick: number;
+  cooldownRemainingSec?: number;
+  casterCurrentResource: number;
+  casterMaxResource: number;
+}
+
 export interface S2CSkillCastEventPayload {
+  castId?: string;
+  serverTick?: number;
   casterId: string;
   skillId: string;
   slot: number;
   skillName: string;
+  category?: SkillCategory;
+  geometry?: SkillGeometryType;
+  originPosition?: Vector3;
   targetId?: string;
   targetPosition?: Vector3;
+  headingYaw?: number;
+  radius?: number;
+  lineLength?: number;
+  lineWidth?: number;
   damageOrHeal: number;
   isHeal: boolean;
   isCritical: boolean;
   affectedEntityIds: string[];
+  targetResults?: SkillTargetResultPayload[];
+  appliedStatuses?: CombatStatusStatePayload[];
   casterCurrentResource: number; // remaining mana/energy
   casterMaxResource: number;
 }
@@ -530,5 +628,73 @@ export interface S2CLeaderboardUpdatePayload {
   myEntry?: LeaderboardEntryPayload;
   timestamp: number;
 }
+
+// ==========================================
+// Daily Dungeons & Boss Rush Payloads (0x88 - 0x8E)
+// ==========================================
+export type DungeonType = 'BOSS_RUSH' | 'GOLD_TREASURY';
+
+export type DungeonEventStatus = 
+  | 'START' 
+  | 'WAVE_START' 
+  | 'WAVE_CLEAR' 
+  | 'VICTORY' 
+  | 'DEFEAT' 
+  | 'TIMEOUT' 
+  | 'LEFT';
+
+export interface DungeonRewardItem {
+  itemId: string;
+  quantity: number;
+}
+
+export interface DailyDungeonInfoPayload {
+  ticketsRemaining: number;
+  maxDailyFreeTickets: number;
+  extraTicketsBoughtToday: number;
+  maxExtraTicketsPerDay: number;
+  extraTicketCostGold: number;
+  highestBossRushWave: number;
+  fastestBossRushTimeSec: number;
+  totalDungeonsCleared: number;
+  resetDate: string;
+  isDungeonActive: boolean;
+  activeDungeonType?: DungeonType;
+}
+
+export interface C2SEnterDungeonPayload {
+  dungeonType: DungeonType;
+}
+
+export interface S2CDungeonEventPayload {
+  status: DungeonEventStatus;
+  dungeonType: DungeonType;
+  currentWave: number;
+  maxWaves: number;
+  timeLimitSec: number;
+  remainingTimeSec: number;
+  bossEntityId?: string;
+  bossName?: string;
+  bossMaxHp?: number;
+  bossCurrentHp?: number;
+  totalDamageDealt?: number;
+  goldEarned?: number;
+  expEarned?: number;
+  itemRewards?: DungeonRewardItem[];
+  message: string;
+}
+
+export interface C2SBuyDungeonTicketPayload {}
+
+export interface S2CBuyDungeonTicketResultPayload {
+  success: boolean;
+  ticketsRemaining: number;
+  extraTicketsBoughtToday: number;
+  goldSpent: number;
+  remainingGold: number;
+  message: string;
+}
+
+export interface C2SLeaveDungeonPayload {}
 
 

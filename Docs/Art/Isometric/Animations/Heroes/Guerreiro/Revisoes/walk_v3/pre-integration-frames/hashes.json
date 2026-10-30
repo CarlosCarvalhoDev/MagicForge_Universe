@@ -1,0 +1,62 @@
+[
+  {
+    "SHA256": "FDA7BC6108D0257CA1ABFB2425EFBF27E2CFF1222124C40BF50D16A066BDE5A8",
+    "File": "iso_hero_guerreiro_walk_01.png",
+    "Destination": "web"
+  },
+  {
+    "SHA256": "13710E4C14C18982E6847BA4B292F580830AD5195A1151F068A81E17F616736A",
+    "File": "iso_hero_guerreiro_walk_02.png",
+    "Destination": "web"
+  },
+  {
+    "SHA256": "F0ECA20685A40C314296C406BCD6BC86D84BB507124544AD6589BFB42162D1A6",
+    "File": "iso_hero_guerreiro_walk_03.png",
+    "Destination": "web"
+  },
+  {
+    "SHA256": "FC15AF4D58C206F14E1FAEA69D05DBDFA2FC435AD6FDDA0770427B853F04706D",
+    "File": "iso_hero_guerreiro_walk_04.png",
+    "Destination": "web"
+  },
+  {
+    "SHA256": "5B37438A51E6487AAF310D2CD10466F1CEEBF7908B0EFB32E4E3F8D5D3B5857E",
+    "File": "iso_hero_guerreiro_walk_05.png",
+    "Destination": "web"
+  },
+  {
+    "SHA256": "B3D9C3611555C83C464D0260FDC6CF655DB73F05CAB5DAD8FA6D0E34EC0DA870",
+    "File": "iso_hero_guerreiro_walk_06.png",
+    "Destination": "web"
+  },
+  {
+    "SHA256": "FDA7BC6108D0257CA1ABFB2425EFBF27E2CFF1222124C40BF50D16A066BDE5A8",
+    "File": "iso_hero_guerreiro_walk_01.png",
+    "Destination": "docs"
+  },
+  {
+    "SHA256": "13710E4C14C18982E6847BA4B292F580830AD5195A1151F068A81E17F616736A",
+    "File": "iso_hero_guerreiro_walk_02.png",
+    "Destination": "docs"
+  },
+  {
+    "SHA256": "F0ECA20685A40C314296C406BCD6BC86D84BB507124544AD6589BFB42162D1A6",
+    "File": "iso_hero_guerreiro_walk_03.png",
+    "Destination": "docs"
+  },
+  {
+    "SHA256": "FC15AF4D58C206F14E1FAEA69D05DBDFA2FC435AD6FDDA0770427B853F04706D",
+    "File": "iso_hero_guerreiro_walk_04.png",
+    "Destination": "docs"
+  },
+  {
+    "SHA256": "5B37438A51E6487AAF310D2CD10466F1CEEBF7908B0EFB32E4E3F8D5D3B5857E",
+    "File": "iso_hero_guerreiro_walk_05.png",
+    "Destination": "docs"
+  },
+  {
+    "SHA256": "B3D9C3611555C83C464D0260FDC6CF655DB73F05CAB5DAD8FA6D0E34EC0DA870",
+    "File": "iso_hero_guerreiro_walk_06.png",
+    "Destination": "docs"
+  }
+]

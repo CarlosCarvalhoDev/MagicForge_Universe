@@ -15,6 +15,8 @@ import {
   FarmHelperSettingsPayload,
   LeaderboardCategory,
   LeaderboardEntryPayload,
+  DailyDungeonInfoPayload,
+  DungeonType,
 } from '@magicforge/shared';
 import { Player } from '../entities/Player';
 import { VerifiedSocialProfile } from '../auth/SocialAuthService';
@@ -250,6 +252,21 @@ export class DatabaseManager {
         created_at INTEGER NOT NULL,
         FOREIGN KEY (character_id) REFERENCES characters (id) ON DELETE CASCADE,
         UNIQUE(character_id, card_id)
+      );
+    `);
+
+    // Tabela de Desafios & Masmorras Diárias
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS daily_dungeon_records (
+        character_id TEXT PRIMARY KEY,
+        last_reset_date TEXT NOT NULL,
+        tickets_remaining INTEGER NOT NULL DEFAULT 3,
+        extra_tickets_bought INTEGER NOT NULL DEFAULT 0,
+        highest_boss_rush_wave INTEGER NOT NULL DEFAULT 0,
+        fastest_boss_rush_time_sec INTEGER NOT NULL DEFAULT 0,
+        total_dungeons_cleared INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL,
+        FOREIGN KEY (character_id) REFERENCES characters (id) ON DELETE CASCADE
       );
     `);
 
@@ -730,10 +747,11 @@ export class DatabaseManager {
     player.currentStage = existing.current_stage ?? 1;
     player.gold = existing.gold || 0;
     player.maxInventorySlots = existing.max_inventory_slots || 20;
-    if (existing.slot1_skill) player.equippedSkills[1] = existing.slot1_skill;
-    if (existing.slot2_skill) player.equippedSkills[2] = existing.slot2_skill;
-    if (existing.slot3_skill) player.equippedSkills[3] = existing.slot3_skill;
-    if (existing.slot4_skill) player.equippedSkills[4] = existing.slot4_skill;
+    const defaultSkills = player.equippedSkills;
+    player.equippedSkills[1] = existing.slot1_skill || defaultSkills[1];
+    player.equippedSkills[2] = existing.slot2_skill || defaultSkills[2];
+    player.equippedSkills[3] = existing.slot3_skill || defaultSkills[3];
+    player.equippedSkills[4] = existing.slot4_skill || defaultSkills[4];
     player.level = existing.level || 1;
     player.currentXp = existing.experience || 0;
     player.currentHp = Math.min(existing.max_hp, existing.current_hp);
@@ -759,7 +777,7 @@ export class DatabaseManager {
       autoLootEnabled: existing.auto_loot !== undefined ? Boolean(existing.auto_loot) : true,
     };
     player.recalculateStatsFromEquipment();
-    player.currentHp = player.maxHp;
+    player.currentHp = existing.current_hp > 0 ? Math.min(player.maxHp, existing.current_hp) : player.maxHp;
     player.isDead = false;
     return player;
   }
@@ -807,8 +825,8 @@ export class DatabaseManager {
         id, account_id, slot_index, reborn_count, current_world, current_stage, name, class_type, level, experience, gold,
         current_hp, max_hp, pos_x, pos_y, pos_z,
         forca, destreza, constituicao, inteligencia, sabedoria, carisma,
-        combat_power, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        combat_power, slot1_skill, slot2_skill, slot3_skill, slot4_skill, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       charId,
       accountId,
@@ -833,6 +851,10 @@ export class DatabaseManager {
       player.attributes.sabedoria,
       player.attributes.carisma,
       player.CombatPower,
+      player.equippedSkills[1],
+      player.equippedSkills[2],
+      player.equippedSkills[3],
+      player.equippedSkills[4],
       now,
       now
     );
@@ -907,6 +929,10 @@ export class DatabaseManager {
           sabedoria = ?,
           carisma = ?,
           combat_power = ?,
+          slot1_skill = ?,
+          slot2_skill = ?,
+          slot3_skill = ?,
+          slot4_skill = ?,
           auto_hp_enabled = ?,
           auto_hp_threshold = ?,
           auto_mp_enabled = ?,
@@ -937,6 +963,10 @@ export class DatabaseManager {
         player.attributes.sabedoria,
         player.attributes.carisma,
         player.CombatPower,
+        player.equippedSkills[1] || null,
+        player.equippedSkills[2] || null,
+        player.equippedSkills[3] || null,
+        player.equippedSkills[4] || null,
         player.farmSettings.autoHpPotionEnabled ? 1 : 0,
         player.farmSettings.autoHpPotionThreshold,
         player.farmSettings.autoMpPotionEnabled ? 1 : 0,
@@ -1513,5 +1543,183 @@ export class DatabaseManager {
       case 4: return 'Semideus Primordial';
       default: return rebornCount > 4 ? `Divindade Astral +${rebornCount}` : 'Aventureiro';
     }
+  }
+
+  public static readonly DAILY_DUNGEON_CONSTANTS = {
+    MAX_FREE_TICKETS: 3,
+    MAX_EXTRA_TICKETS: 2,
+    EXTRA_TICKET_COST_GOLD: 50_000,
+  } as const;
+
+  /**
+   * Obtém as informações diárias de masmorras do personagem com reset automático baseado na data UTC
+   */
+  public getDailyDungeonInfo(characterId: string, isDungeonActive = false, activeDungeonType?: DungeonType): DailyDungeonInfoPayload {
+    const today = new Date().toISOString().split('T')[0];
+    const now = Date.now();
+
+    const stmt = this.db.prepare('SELECT * FROM daily_dungeon_records WHERE character_id = ?');
+    let row = stmt.get(characterId) as {
+      character_id: string;
+      last_reset_date: string;
+      tickets_remaining: number;
+      extra_tickets_bought: number;
+      highest_boss_rush_wave: number;
+      fastest_boss_rush_time_sec: number;
+      total_dungeons_cleared: number;
+      updated_at: number;
+    } | undefined;
+
+    if (!row) {
+      // Cria registro inicial para hoje
+      const insertStmt = this.db.prepare(`
+        INSERT INTO daily_dungeon_records 
+        (character_id, last_reset_date, tickets_remaining, extra_tickets_bought, highest_boss_rush_wave, fastest_boss_rush_time_sec, total_dungeons_cleared, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      insertStmt.run(
+        characterId,
+        today,
+        DatabaseManager.DAILY_DUNGEON_CONSTANTS.MAX_FREE_TICKETS,
+        0,
+        0,
+        0,
+        0,
+        now
+      );
+      row = {
+        character_id: characterId,
+        last_reset_date: today,
+        tickets_remaining: DatabaseManager.DAILY_DUNGEON_CONSTANTS.MAX_FREE_TICKETS,
+        extra_tickets_bought: 0,
+        highest_boss_rush_wave: 0,
+        fastest_boss_rush_time_sec: 0,
+        total_dungeons_cleared: 0,
+        updated_at: now,
+      };
+    } else if (row.last_reset_date !== today) {
+      // Novo dia! Reseta ingressos gratuitos e contador de ingressos extras
+      const updateStmt = this.db.prepare(`
+        UPDATE daily_dungeon_records
+        SET last_reset_date = ?, tickets_remaining = ?, extra_tickets_bought = 0, updated_at = ?
+        WHERE character_id = ?
+      `);
+      updateStmt.run(today, DatabaseManager.DAILY_DUNGEON_CONSTANTS.MAX_FREE_TICKETS, now, characterId);
+      row.last_reset_date = today;
+      row.tickets_remaining = DatabaseManager.DAILY_DUNGEON_CONSTANTS.MAX_FREE_TICKETS;
+      row.extra_tickets_bought = 0;
+      row.updated_at = now;
+    }
+
+    return {
+      ticketsRemaining: row.tickets_remaining,
+      maxDailyFreeTickets: DatabaseManager.DAILY_DUNGEON_CONSTANTS.MAX_FREE_TICKETS,
+      extraTicketsBoughtToday: row.extra_tickets_bought,
+      maxExtraTicketsPerDay: DatabaseManager.DAILY_DUNGEON_CONSTANTS.MAX_EXTRA_TICKETS,
+      extraTicketCostGold: DatabaseManager.DAILY_DUNGEON_CONSTANTS.EXTRA_TICKET_COST_GOLD,
+      highestBossRushWave: row.highest_boss_rush_wave,
+      fastestBossRushTimeSec: row.fastest_boss_rush_time_sec,
+      totalDungeonsCleared: row.total_dungeons_cleared,
+      resetDate: row.last_reset_date,
+      isDungeonActive,
+      activeDungeonType,
+    };
+  }
+
+  /**
+   * Consome 1 ingresso de masmorra diária
+   */
+  public consumeDailyDungeonTicket(characterId: string): boolean {
+    const info = this.getDailyDungeonInfo(characterId);
+    if (info.ticketsRemaining <= 0) {
+      return false;
+    }
+
+    const stmt = this.db.prepare(`
+      UPDATE daily_dungeon_records
+      SET tickets_remaining = tickets_remaining - 1, updated_at = ?
+      WHERE character_id = ?
+    `);
+    stmt.run(Date.now(), characterId);
+    return true;
+  }
+
+  /**
+   * Compra ingresso extra com ouro (Gold Sink)
+   */
+  public buyExtraDungeonTicket(characterId: string): {
+    success: boolean;
+    ticketsRemaining: number;
+    extraTicketsBoughtToday: number;
+    goldSpent: number;
+    remainingGold: number;
+    message: string;
+  } {
+    const info = this.getDailyDungeonInfo(characterId);
+    if (info.extraTicketsBoughtToday >= DatabaseManager.DAILY_DUNGEON_CONSTANTS.MAX_EXTRA_TICKETS) {
+      const char = this.getCharacterById(characterId);
+      return {
+        success: false,
+        ticketsRemaining: info.ticketsRemaining,
+        extraTicketsBoughtToday: info.extraTicketsBoughtToday,
+        goldSpent: 0,
+        remainingGold: char?.gold || 0,
+        message: `Limite diário de ingressos extras atingido (${DatabaseManager.DAILY_DUNGEON_CONSTANTS.MAX_EXTRA_TICKETS} por dia). Volte amanhã!`,
+      };
+    }
+
+    const cost = DatabaseManager.DAILY_DUNGEON_CONSTANTS.EXTRA_TICKET_COST_GOLD;
+    const char = this.getCharacterById(characterId);
+    if (!char || char.gold < cost) {
+      return {
+        success: false,
+        ticketsRemaining: info.ticketsRemaining,
+        extraTicketsBoughtToday: info.extraTicketsBoughtToday,
+        goldSpent: 0,
+        remainingGold: char?.gold || 0,
+        message: `Ouro insuficiente! Necessário ${cost.toLocaleString('pt-BR')} Ouro para comprar um ingresso extra (Saldo: ${(char?.gold || 0).toLocaleString('pt-BR')}).`,
+      };
+    }
+
+    // Deduz o ouro do personagem
+    const newGold = char.gold - cost;
+    this.db.prepare('UPDATE characters SET gold = ?, updated_at = ? WHERE id = ?').run(newGold, Date.now(), characterId);
+
+    // Incrementa ingressos
+    const newTickets = info.ticketsRemaining + 1;
+    const newExtraBought = info.extraTicketsBoughtToday + 1;
+    this.db.prepare(`
+      UPDATE daily_dungeon_records
+      SET tickets_remaining = ?, extra_tickets_bought = ?, updated_at = ?
+      WHERE character_id = ?
+    `).run(newTickets, newExtraBought, Date.now(), characterId);
+
+    return {
+      success: true,
+      ticketsRemaining: newTickets,
+      extraTicketsBoughtToday: newExtraBought,
+      goldSpent: cost,
+      remainingGold: newGold,
+      message: `🎟️ Ingresso extra de masmorra adquirido com sucesso! (-${cost.toLocaleString('pt-BR')} Ouro)`,
+    };
+  }
+
+  /**
+   * Grava a conclusão de masmorra e atualiza os recordes
+   */
+  public recordDungeonClear(characterId: string, wavesCleared: number, clearTimeSec: number): void {
+    const info = this.getDailyDungeonInfo(characterId);
+    const newHighestWave = Math.max(info.highestBossRushWave, wavesCleared);
+    let newFastestTime = info.fastestBossRushTimeSec;
+    if (wavesCleared >= 4 && (newFastestTime === 0 || clearTimeSec < newFastestTime)) {
+      newFastestTime = clearTimeSec;
+    }
+    const newTotalCleared = info.totalDungeonsCleared + (wavesCleared >= 3 ? 1 : 0);
+
+    this.db.prepare(`
+      UPDATE daily_dungeon_records
+      SET highest_boss_rush_wave = ?, fastest_boss_rush_time_sec = ?, total_dungeons_cleared = ?, updated_at = ?
+      WHERE character_id = ?
+    `).run(newHighestWave, newFastestTime, newTotalCleared, Date.now(), characterId);
   }
 }

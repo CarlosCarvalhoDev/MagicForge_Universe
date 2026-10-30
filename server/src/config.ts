@@ -21,4 +21,21 @@ export const SERVER_CONFIG = {
   // QoS / Heartbeat
   PING_INTERVAL_MS: 5000,
   CLIENT_TIMEOUT_MS: 15000,
+
+  // OAuth & Social Authentication Security
+  AUTH: {
+    ALLOW_MOCK_SOCIAL_AUTH: process.env.ALLOW_MOCK_SOCIAL_AUTH === 'true' || process.env.NODE_ENV === 'test',
+    GOOGLE_CLIENT_IDS: (process.env.GOOGLE_CLIENT_IDS || process.env.GOOGLE_CLIENT_ID || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+    DISCORD_CLIENT_IDS: (process.env.DISCORD_CLIENT_IDS || process.env.DISCORD_CLIENT_ID || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+    FACEBOOK_APP_IDS: (process.env.FACEBOOK_APP_IDS || process.env.FACEBOOK_APP_ID || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+  },
 } as const;

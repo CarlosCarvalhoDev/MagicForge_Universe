@@ -1,0 +1,25 @@
+{
+  "name": "MagicForge: Universe",
+  "short_name": "MagicForge",
+  "description": "MagicForge: Universe - MMORPG Isométrico Mobile & Web",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "icons": [
+    {
+      "src": "/assets/portraits/GUERREIRO.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/portraits/GUERREIRO.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

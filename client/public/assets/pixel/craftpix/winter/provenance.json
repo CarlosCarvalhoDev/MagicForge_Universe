@@ -1,0 +1,26 @@
+[
+  {
+    "Output": "winter/Snow_tree1.png",
+    "Archive": "trees.zip",
+    "Entry": "PNG/Assets_separately/Trees/Snow_tree1.png",
+    "SHA256": "582C6263067886E635CE489DC3ED4DE42A4894B12A81372020C06B1D37251346"
+  },
+  {
+    "Output": "winter/Snow_tree2.png",
+    "Archive": "trees.zip",
+    "Entry": "PNG/Assets_separately/Trees/Snow_tree2.png",
+    "SHA256": "153B28D9CEB5BEF808205726EF71D6C8D85D50598CADA2A792E5C643B687A774"
+  },
+  {
+    "Output": "winter/Rokc3_snow_shadow1.png",
+    "Archive": "rocks-stones.zip",
+    "Entry": "PNG/Objects_separately/Rokc3_snow_shadow1.png",
+    "SHA256": "6379697DAFE8A4588A73AA89D98E369876C2001A79CCF404DA4F94C0B3DBE118"
+  },
+  {
+    "Output": "winter/Rokc3_snow_shadow3.png",
+    "Archive": "rocks-stones.zip",
+    "Entry": "PNG/Objects_separately/Rokc3_snow_shadow3.png",
+    "SHA256": "7939CB20B1C5707C988322DC4D9EB36FFAC54CBFB846E116C46D7F3E63DBC374"
+  }
+]

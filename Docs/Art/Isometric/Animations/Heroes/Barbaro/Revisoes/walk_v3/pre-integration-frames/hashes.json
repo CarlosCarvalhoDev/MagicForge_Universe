@@ -1,0 +1,17 @@
+[
+  {
+    "File": "docs-walk_01.png",
+    "Destination": "docs",
+    "SHA256": "2382B4F8468B2D1E83D46A2B507446E4EED28D233BB4F389350FDAED9CFF9916"
+  },
+  {
+    "File": "web-walk_01.png",
+    "Destination": "web",
+    "SHA256": "2382B4F8468B2D1E83D46A2B507446E4EED28D233BB4F389350FDAED9CFF9916"
+  },
+  {
+    "File": "unity-walk_01.png",
+    "Destination": "unity",
+    "SHA256": "2382B4F8468B2D1E83D46A2B507446E4EED28D233BB4F389350FDAED9CFF9916"
+  }
+]

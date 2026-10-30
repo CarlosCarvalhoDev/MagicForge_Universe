@@ -40,12 +40,13 @@ const gameLoop = new GameLoop((deltaTimeSec) => {
 // 4. Initialize Network Layer (WebSockets)
 const network = new ServerNetwork(httpServer, world);
 
-// 5. Start Server
-httpServer.listen(SERVER_CONFIG.PORT, () => {
-  console.log(`[Server] HTTP & WebSocket listening on port :${SERVER_CONFIG.PORT}`);
+// 5. Start Server (bind 0.0.0.0 for LAN / Mobile access)
+httpServer.listen(SERVER_CONFIG.PORT, '0.0.0.0', () => {
+  console.log(`[Server] HTTP & WebSocket listening on 0.0.0.0:${SERVER_CONFIG.PORT}`);
   console.log(`[Server] Tick Rate: ${SERVER_CONFIG.TICK_RATE}Hz | Delta Time: ${SERVER_CONFIG.TICK_DELTA_TIME_SEC}s`);
   console.log(`[Server] Health Check available at http://localhost:${SERVER_CONFIG.PORT}/health`);
-  console.log(`[Server] WebSocket endpoint: ws://localhost:${SERVER_CONFIG.PORT}`);
+  console.log(`[Server] WebSocket endpoint (Local): ws://localhost:${SERVER_CONFIG.PORT}`);
+  console.log(`[Server] WebSocket endpoint (Mobile/LAN): ws://192.168.1.12:${SERVER_CONFIG.PORT}`);
 
   // Start authoritative loop
   gameLoop.start();

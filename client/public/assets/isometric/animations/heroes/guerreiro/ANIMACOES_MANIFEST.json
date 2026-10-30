@@ -17,6 +17,8 @@
     },
     "walk": {
       "filename": "iso_hero_guerreiro_walk_sheet.png",
+      "revision": "walk_v3",
+      "background": "transparent RGBA",
       "frames": 6,
       "columns": 3,
       "rows": 2,

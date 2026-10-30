@@ -28,6 +28,8 @@ import {
   S2CPongPayload,
   S2CPositionCorrectionPayload,
   S2CSkillCastEventPayload,
+  S2CSkillCastRejectedPayload,
+  CombatStatusTransitionPayload,
   S2CSkillsUpdatePayload,
   S2CWorldSnapshotPayload,
   S2CBossEventPayload,
@@ -59,6 +61,11 @@ import {
   S2CLeaderboardUpdatePayload,
   LeaderboardCategory,
   LeaderboardEntryPayload,
+  C2SEnterDungeonPayload,
+  S2CDungeonEventPayload,
+  S2CBuyDungeonTicketResultPayload,
+  DailyDungeonInfoPayload,
+  DungeonType,
   Vector3,
 } from '@magicforge/shared';
 
@@ -85,12 +92,17 @@ export class ClientNetwork {
   public onAutoSalvageResult: MessageListener<S2CAutoSalvageResultPayload> | null = null;
   public onExpandInventoryResult: MessageListener<S2CExpandInventoryResultPayload> | null = null;
   public onLeaderboardUpdate: MessageListener<S2CLeaderboardUpdatePayload> | null = null;
+  public onDungeonInfo: MessageListener<DailyDungeonInfoPayload> | null = null;
+  public onDungeonEvent: MessageListener<S2CDungeonEventPayload> | null = null;
+  public onBuyDungeonTicketResult: MessageListener<S2CBuyDungeonTicketResultPayload> | null = null;
   public onLoginSuccess: MessageListener<S2CLoginSuccessPayload> | null = null;
   public onCharacterList: MessageListener<S2CCharacterListPayload> | null = null;
   public onCharacterActionError: MessageListener<S2CCharacterActionErrorPayload> | null = null;
   public onSnapshot: MessageListener<S2CWorldSnapshotPayload> | null = null;
   public onCombatEvent: MessageListener<S2CCombatEventPayload> | null = null;
   public onSkillCastEvent: MessageListener<S2CSkillCastEventPayload> | null = null;
+  public onSkillCastRejected: MessageListener<S2CSkillCastRejectedPayload> | null = null;
+  public onCombatStatusEvent: MessageListener<CombatStatusTransitionPayload> | null = null;
   public onPositionCorrection: MessageListener<S2CPositionCorrectionPayload> | null = null;
   public onItemDropSpawn: MessageListener<S2CItemDropSpawnPayload> | null = null;
   public onItemDropDespawn: MessageListener<S2CItemDropDespawnPayload> | null = null;
@@ -111,8 +123,17 @@ export class ClientNetwork {
   private reconnectTimeoutId: number | null = null;
   public autoReconnect: boolean = true;
 
-  constructor(serverUrl = 'ws://localhost:3000') {
-    this.serverUrl = serverUrl;
+  constructor(serverUrl?: string) {
+    if (serverUrl) {
+      this.serverUrl = serverUrl;
+    } else if (import.meta.env?.VITE_SERVER_URL) {
+      this.serverUrl = import.meta.env.VITE_SERVER_URL;
+    } else if (typeof window !== 'undefined' && window.location?.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      this.serverUrl = `${protocol}//${window.location.hostname}:3000`;
+    } else {
+      this.serverUrl = 'ws://192.168.1.12:3000';
+    }
   }
 
   public connect(): void {
@@ -408,6 +429,23 @@ export class ClientNetwork {
     this.send(Opcode.C2S_REQUEST_LEADERBOARD, payload);
   }
 
+  public sendRequestDungeonInfo(): void {
+    this.send(Opcode.C2S_REQUEST_DUNGEON_INFO, {});
+  }
+
+  public sendEnterDungeon(dungeonType: DungeonType = 'BOSS_RUSH'): void {
+    const payload: C2SEnterDungeonPayload = { dungeonType };
+    this.send(Opcode.C2S_ENTER_DUNGEON, payload);
+  }
+
+  public sendBuyDungeonTicket(): void {
+    this.send(Opcode.C2S_BUY_DUNGEON_TICKET, {});
+  }
+
+  public sendLeaveDungeon(): void {
+    this.send(Opcode.C2S_LEAVE_DUNGEON, {});
+  }
+
   private startPingHeartbeat(): void {
     this.stopPingHeartbeat();
     this.pingIntervalId = window.setInterval(() => {
@@ -448,6 +486,16 @@ export class ClientNetwork {
 
         case Opcode.S2C_SKILL_CAST_EVENT: {
           this.onSkillCastEvent?.(packet.data as S2CSkillCastEventPayload);
+          break;
+        }
+
+        case Opcode.S2C_SKILL_CAST_REJECTED: {
+          this.onSkillCastRejected?.(packet.data as S2CSkillCastRejectedPayload);
+          break;
+        }
+
+        case Opcode.S2C_COMBAT_STATUS_EVENT: {
+          this.onCombatStatusEvent?.(packet.data as CombatStatusTransitionPayload);
           break;
         }
 
@@ -564,6 +612,21 @@ export class ClientNetwork {
 
         case Opcode.S2C_LEADERBOARD_UPDATE: {
           this.onLeaderboardUpdate?.(packet.data as S2CLeaderboardUpdatePayload);
+          break;
+        }
+
+        case Opcode.S2C_DUNGEON_INFO: {
+          this.onDungeonInfo?.(packet.data as DailyDungeonInfoPayload);
+          break;
+        }
+
+        case Opcode.S2C_DUNGEON_EVENT: {
+          this.onDungeonEvent?.(packet.data as S2CDungeonEventPayload);
+          break;
+        }
+
+        case Opcode.S2C_BUY_DUNGEON_TICKET_RESULT: {
+          this.onBuyDungeonTicketResult?.(packet.data as S2CBuyDungeonTicketResultPayload);
           break;
         }
 

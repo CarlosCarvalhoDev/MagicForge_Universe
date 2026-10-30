@@ -1,0 +1,69 @@
+{
+  "Sheet": "iso_hero_barbaro_walk_sheet.png",
+  "Columns": 3,
+  "Rows": 2,
+  "CellSize": 512,
+  "SheetSHA256": "705C3FE5A7EA81B360F4EBBA09BD59304F8060211E65D3371413B6A934D0D378",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_barbaro_walk_00.png",
+      "Source": "iso_hero_barbaro_walk_00.png",
+      "SourceSHA256": "097C00C6741B7BB54A1DF005CC8897471329B87FA866247B060D3201E3C6B10E",
+      "FrameSHA256": "097C00C6741B7BB54A1DF005CC8897471329B87FA866247B060D3201E3C6B10E",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 1,
+      "File": "iso_hero_barbaro_walk_01.png",
+      "Source": "repaired-frame-01.png",
+      "SourceSHA256": "3904E8B20E04C832C8C51272DE42C12E91724262767EDEFC39285D15D14C9905",
+      "FrameSHA256": "3904E8B20E04C832C8C51272DE42C12E91724262767EDEFC39285D15D14C9905",
+      "X": 512,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 2,
+      "File": "iso_hero_barbaro_walk_02.png",
+      "Source": "iso_hero_barbaro_walk_02.png",
+      "SourceSHA256": "6DD8CD19619A83B20982133F13B29AFF2749E79998DC5423CC7E543A0743CABA",
+      "FrameSHA256": "6DD8CD19619A83B20982133F13B29AFF2749E79998DC5423CC7E543A0743CABA",
+      "X": 1024,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 3,
+      "File": "iso_hero_barbaro_walk_03.png",
+      "Source": "iso_hero_barbaro_walk_03.png",
+      "SourceSHA256": "2CEEA04E79D10AA7E0EA86E7B007CFDA160C993CC7072F49AF07DC3268833BB4",
+      "FrameSHA256": "2CEEA04E79D10AA7E0EA86E7B007CFDA160C993CC7072F49AF07DC3268833BB4",
+      "X": 0,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 4,
+      "File": "iso_hero_barbaro_walk_04.png",
+      "Source": "iso_hero_barbaro_walk_04.png",
+      "SourceSHA256": "1D04432CA192C13720479060173F890214330DE4BBDBA44C85E8A8304E93C2B3",
+      "FrameSHA256": "1D04432CA192C13720479060173F890214330DE4BBDBA44C85E8A8304E93C2B3",
+      "X": 512,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 5,
+      "File": "iso_hero_barbaro_walk_05.png",
+      "Source": "iso_hero_barbaro_walk_05.png",
+      "SourceSHA256": "B95FE6EE5595DE3376EE8B936912ECC2069954186DC77CF680204E6D70C8DBB3",
+      "FrameSHA256": "B95FE6EE5595DE3376EE8B936912ECC2069954186DC77CF680204E6D70C8DBB3",
+      "X": 1024,
+      "Y": 512,
+      "Size": 512
+    }
+  ]
+}

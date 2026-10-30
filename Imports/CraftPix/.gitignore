@@ -1,0 +1,3 @@
+# Vendor source archives stay local; distribute the game, not the asset library.
+*.zip
+extracted/
