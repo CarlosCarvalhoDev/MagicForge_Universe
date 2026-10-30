@@ -22,6 +22,7 @@ import {
   C2SUpdateFarmSettingsPayload,
   C2SAutoSalvagePayload,
   C2SRequestLeaderboardPayload,
+  C2SEnterDungeonPayload,
   NetworkMessage,
   Opcode,
   S2CLoginSuccessPayload,
@@ -163,6 +164,23 @@ export class PacketHandler {
       // --- Rankings & Leaderboards ---
       case Opcode.C2S_REQUEST_LEADERBOARD:
         this.world.handleRequestLeaderboard(connection, message.data as C2SRequestLeaderboardPayload);
+        break;
+
+      // --- Daily Dungeons & Boss Rush ---
+      case Opcode.C2S_REQUEST_DUNGEON_INFO:
+        this.handleRequestDungeonInfo(connection);
+        break;
+
+      case Opcode.C2S_ENTER_DUNGEON:
+        this.handleEnterDungeon(connection, message.data as C2SEnterDungeonPayload);
+        break;
+
+      case Opcode.C2S_BUY_DUNGEON_TICKET:
+        this.handleBuyDungeonTicket(connection);
+        break;
+
+      case Opcode.C2S_LEAVE_DUNGEON:
+        this.handleLeaveDungeon(connection);
         break;
 
       case Opcode.C2S_PING:
@@ -359,5 +377,33 @@ export class PacketHandler {
     const player = this.world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
     this.world.sendPlayerCardAlbum(player);
+  }
+
+  private handleRequestDungeonInfo(connection: Connection): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const player = this.world.entityManager.getPlayer(connection.playerId);
+    if (!player) return;
+    this.world.handleRequestDungeonInfo(player);
+  }
+
+  private handleEnterDungeon(connection: Connection, payload: C2SEnterDungeonPayload): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const player = this.world.entityManager.getPlayer(connection.playerId);
+    if (!player || player.isDead) return;
+    this.world.handleEnterDungeon(player, payload);
+  }
+
+  private handleBuyDungeonTicket(connection: Connection): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const player = this.world.entityManager.getPlayer(connection.playerId);
+    if (!player || player.isDead) return;
+    this.world.handleBuyDungeonTicket(player);
+  }
+
+  private handleLeaveDungeon(connection: Connection): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const player = this.world.entityManager.getPlayer(connection.playerId);
+    if (!player) return;
+    this.world.handleLeaveDungeon(player);
   }
 }

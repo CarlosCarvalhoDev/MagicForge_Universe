@@ -2,7 +2,14 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#090d16" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MagicForge" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/assets/portraits/GUERREIRO.jpg" />
     <title>MagicForge: Universe - MMORPG Network & Interpolation Client</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -3113,6 +3120,547 @@
         from { transform: translateX(50px); opacity: 0; }
         to { transform: translateX(0); opacity: 1; }
       }
+
+      /* =====================================================
+         HUD SKILL SLOT LOCKED VISUAL STATE
+         ===================================================== */
+      .skill-arc-btn.slot-locked {
+        border-color: rgba(148, 163, 184, 0.35) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65) !important;
+      }
+
+      .skill-arc-btn.slot-locked img.skill-img,
+      .skill-arc-btn.slot-locked .skill-emoji-fallback {
+        filter: grayscale(100%) brightness(0.32);
+        opacity: 0.45;
+      }
+
+      .slot-lock-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(9, 13, 22, 0.68);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 4;
+        pointer-events: none;
+        gap: 1px;
+      }
+
+      .slot-lock-overlay .lock-icon {
+        font-size: 1.05rem;
+        line-height: 1;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+      }
+
+      .slot-lock-overlay .lock-lvl {
+        font-size: 0.62rem;
+        font-weight: 900;
+        color: #fbbf24;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+        letter-spacing: 0.02em;
+      }
+
+      /* =====================================================
+         RESPONSIVIDADE MOBILE COMPLETA (HUD & MODAIS)
+         ===================================================== */
+      @media (max-width: 960px), (max-height: 560px) {
+        /* 1. Top-Left Hero Card Compacto */
+        #hero-status-card {
+          top: 6px;
+          left: 6px;
+          padding: 4px 8px;
+          gap: 6px;
+          border-radius: 10px;
+        }
+
+        .hero-avatar-box {
+          width: 36px;
+          height: 36px;
+          border-width: 1.5px;
+        }
+
+        .hero-level-badge,
+        .hero-honor-tag {
+          display: none !important;
+        }
+
+        .hero-name-label {
+          font-size: 0.68rem;
+          max-width: 85px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .hero-level-pill-tag {
+          font-size: 0.58rem;
+          padding: 1px 5px;
+        }
+
+        .hero-cp-tag {
+          font-size: 0.6rem;
+        }
+
+        .hero-cp-number {
+          font-size: 0.82rem;
+        }
+
+        .hero-vitals-bars {
+          width: 95px;
+          gap: 2px;
+        }
+
+        .mini-bar-track {
+          height: 7px;
+        }
+
+        .mini-bar-text {
+          font-size: 0.48rem;
+        }
+
+        /* 2. Top-Center Wave/Stage Card Compacto */
+        #top-center-wave-card {
+          top: 6px;
+          min-width: 160px;
+          max-width: 215px;
+          padding: 4px 8px;
+          gap: 3px;
+          border-radius: 10px;
+        }
+
+        .stage-header-row {
+          gap: 6px;
+        }
+
+        .stage-world-title {
+          font-size: 0.62rem;
+          max-width: 118px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .stage-phase-badge {
+          font-size: 0.56rem;
+          padding: 1px 5px;
+        }
+
+        .stage-progress-track {
+          height: 10px;
+        }
+
+        .stage-progress-counter {
+          font-size: 0.54rem;
+        }
+
+        .btn-boss-challenge {
+          font-size: 0.6rem;
+          padding: 3px 8px;
+        }
+
+        /* 3. Top-Right Currency & Zoom Compacto (sem pill de zona duplicado) */
+        #top-right-location-card {
+          top: 6px;
+          right: 6px;
+          gap: 4px;
+        }
+
+        .zone-info-pill,
+        #btn-toggle-inspector {
+          display: none !important;
+        }
+
+        .top-status-lux-bar {
+          gap: 4px;
+        }
+
+        .gold-wallet-capsule {
+          padding: 2px 7px;
+          gap: 4px;
+        }
+
+        .gold-coin-icon {
+          font-size: 0.75rem;
+        }
+
+        .gold-amount-text {
+          font-size: 0.7rem;
+        }
+
+        .lux-zoom-capsule {
+          padding: 2px 4px;
+          gap: 3px;
+        }
+
+        .zoom-btn {
+          width: 20px;
+          height: 20px;
+          font-size: 0.72rem;
+        }
+
+        .zoom-label {
+          font-size: 0.6rem;
+          min-width: 22px;
+        }
+
+        .lux-icon-btn {
+          width: 24px;
+          height: 24px;
+          font-size: 0.7rem;
+        }
+
+        .lux-ping-pill {
+          padding: 2px 6px;
+          gap: 4px;
+        }
+
+        .lux-ping-text {
+          font-size: 0.58rem;
+        }
+
+        /* 4. Barra de Menus (Herói, Mochila, Grimório, Farm, Rank) compacta no topo-direito */
+        #right-vertical-dock,
+        #dock-navigation-bar {
+          top: 36px;
+          right: 6px;
+          flex-direction: row;
+          gap: 4px;
+        }
+
+        .dock-btn {
+          width: 40px;
+          height: 36px;
+          border-radius: 8px;
+          font-size: 0.52rem;
+          gap: 1px;
+          border-width: 1.5px;
+        }
+
+        .dock-btn .dock-icon {
+          font-size: 0.98rem;
+        }
+
+        .dock-btn:hover {
+          transform: translateY(-2px);
+        }
+
+        /* 5. Arco de Combate Meia-Lua Proporcional (Canto Inferior Direito) */
+        #mobile-combat-arc-container {
+          width: 192px;
+          height: 192px;
+          bottom: 16px;
+          right: 6px;
+        }
+
+        .mobile-primary-btn {
+          width: 66px;
+          height: 66px;
+          bottom: 2px;
+          right: 2px;
+          border-width: 2.5px;
+        }
+
+        .mobile-primary-icon {
+          font-size: 1.65rem;
+        }
+
+        .mobile-primary-label {
+          font-size: 0.54rem;
+        }
+
+        .skill-arc-btn {
+          width: 46px;
+          height: 46px;
+          border-width: 2px;
+        }
+
+        #skill-btn-1 {
+          bottom: 4px;
+          right: 122px;
+        }
+
+        #skill-btn-2 {
+          bottom: 60px;
+          right: 108px;
+        }
+
+        #skill-btn-3 {
+          bottom: 108px;
+          right: 60px;
+        }
+
+        #skill-btn-4 {
+          bottom: 122px;
+          right: 4px;
+          width: 50px;
+          height: 50px;
+          border-width: 2.5px;
+        }
+
+        .skill-arc-btn .skill-key-badge {
+          font-size: 0.52rem;
+          padding: 1px 4px;
+          top: 1px;
+          left: 2px;
+          border-radius: 5px;
+        }
+
+        .skill-arc-btn .skill-footer-gradient {
+          height: 14px;
+        }
+
+        .skill-arc-btn .skill-cost {
+          font-size: 0.5rem;
+        }
+
+        .skill-arc-btn .cooldown-text {
+          font-size: 0.85rem;
+        }
+
+        .slot-lock-overlay .lock-icon {
+          font-size: 0.8rem;
+        }
+
+        .slot-lock-overlay .lock-lvl {
+          font-size: 0.48rem;
+        }
+
+        /* 6. Zona Inferior Esquerda: Auto, Poções e Chat Compacto */
+        #bottom-center-zone {
+          bottom: 16px;
+          left: 6px;
+          transform: none;
+          width: calc(100vw - 208px);
+          max-width: 280px;
+          align-items: flex-start;
+          gap: 4px;
+        }
+
+        .bottom-center-toolbar {
+          gap: 5px;
+          flex-wrap: wrap;
+        }
+
+        .btn-auto-toggle {
+          padding: 4px 10px;
+          font-size: 0.64rem;
+          gap: 4px;
+        }
+
+        .btn-farm-gear {
+          padding: 4px 8px;
+          font-size: 0.64rem;
+          gap: 4px;
+        }
+
+        .quick-potion-chip {
+          padding: 3px 7px;
+          font-size: 0.62rem;
+          gap: 4px;
+        }
+
+        #game-chat-box {
+          padding: 5px 8px;
+          border-radius: 9px;
+          width: 100%;
+        }
+
+        #chat-messages-container {
+          height: 40px;
+          font-size: 0.6rem;
+          line-height: 1.25;
+          gap: 2px;
+        }
+
+        .chat-input-form {
+          margin-top: 4px;
+          padding-top: 4px;
+          gap: 4px;
+        }
+
+        .chat-channel-badge {
+          display: none;
+        }
+
+        .chat-input-field {
+          padding: 3px 7px;
+          font-size: 0.65rem;
+          border-radius: 6px;
+        }
+
+        .chat-send-btn {
+          padding: 3px 8px;
+          font-size: 0.62rem;
+          border-radius: 6px;
+        }
+
+        #exp-bar-container {
+          height: 12px;
+        }
+
+        .exp-bar-text {
+          font-size: 0.54rem;
+        }
+
+        /* 7. Modais Responsivos (Grimório, Inventário/Ficha, Farm, Ranking) */
+        .modal-content,
+        .grimorio-modal-content,
+        .unified-hero-modal-content {
+          width: 96vw !important;
+          max-width: 96vw !important;
+          max-height: 92vh !important;
+          padding: 10px 12px !important;
+          border-radius: 12px;
+          gap: 8px;
+        }
+
+        .modal-header,
+        .unified-modal-header {
+          padding-bottom: 6px;
+          margin-bottom: 6px;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+
+        .modal-title,
+        .modal-title-main {
+          font-size: 0.92rem;
+        }
+
+        .modal-title-sub,
+        .grimorio-class-subtitle {
+          font-size: 0.64rem;
+        }
+
+        .grimorio-book-icon,
+        .modal-title-icon {
+          font-size: 1.25rem;
+        }
+
+        .grimorio-strategy-banner {
+          padding: 6px 10px;
+          gap: 8px;
+        }
+
+        .strategy-desc {
+          font-size: 0.66rem;
+        }
+
+        .grimorio-slots-container {
+          gap: 10px;
+        }
+
+        .grimorio-slot-section {
+          padding: 8px 10px;
+          gap: 8px;
+        }
+
+        .grimorio-slot-header {
+          flex-wrap: wrap;
+          gap: 4px;
+          padding-bottom: 5px;
+        }
+
+        .slot-header-name {
+          font-size: 0.82rem;
+        }
+
+        .slot-header-status {
+          font-size: 0.68rem;
+          flex-wrap: wrap;
+        }
+
+        .skill-card-v2 {
+          padding: 8px;
+          gap: 6px;
+        }
+
+        .skill-v2-img-wrap {
+          width: 40px;
+          height: 40px;
+        }
+
+        .skill-v2-title {
+          font-size: 0.8rem;
+        }
+
+        .skill-v2-desc {
+          font-size: 0.66rem;
+          padding: 4px 6px;
+        }
+
+        .btn-equip-skill {
+          padding: 6px 8px;
+          font-size: 0.68rem;
+        }
+
+        /* Ficha do Herói e Mochila em coluna única rolável no mobile */
+        .unified-modal-body {
+          flex-direction: column;
+          overflow-y: auto;
+          gap: 10px;
+        }
+
+        .unified-hero-left-pane,
+        .unified-submenus-right-pane {
+          width: 100% !important;
+          min-width: 0 !important;
+          padding: 10px;
+        }
+
+        .hero-paperdoll-avatar {
+          width: 90px;
+          height: 118px;
+        }
+
+        .equipment-slot {
+          width: 48px;
+          height: 48px;
+        }
+
+        .mochila-panel-layout {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .inventory-inspector {
+          width: 100% !important;
+        }
+
+        .submenus-tab-nav {
+          overflow-x: auto;
+          gap: 4px;
+        }
+
+        .submenu-tab-btn {
+          padding: 6px 8px;
+          font-size: 0.68rem;
+        }
+      }
+
+      /* Em telas muito estreitas (Celular em pé / Portrait <= 620px),
+         move o card de Fase para baixo do card do Herói para zero sobreposição */
+      @media (max-width: 620px) {
+        #top-center-wave-card {
+          top: 66px;
+          left: 6px;
+          transform: none;
+          min-width: 155px;
+          max-width: 185px;
+          align-items: flex-start;
+        }
+
+        #bottom-center-zone {
+          width: calc(100vw - 204px);
+        }
+
+        #chat-messages-container {
+          height: 32px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -3191,7 +3739,7 @@
     <!-- 3. Top-Right Location & Luxury Currency Status Bar -->
     <div id="top-right-location-card">
       <div class="glass-panel zone-info-pill">
-        <span style="font-size: 0.95rem;">🌲</span>
+        <span id="zone-biome-icon" style="font-size: 0.95rem;">🌲</span>
         <div style="display: flex; flex-direction: column;">
           <span id="zone-location-title" class="zone-title">Floresta da Forja (1)</span>
           <span style="font-size: 0.65rem; color: #94a3b8;">Canal 1 • Coords: (0, 0)</span>
@@ -3227,7 +3775,7 @@
     <canvas id="game-canvas"></canvas>
 
     <!-- Controls & Inspector Panel -->
-    <aside id="inspector-panel" class="glass-panel">
+    <aside id="inspector-panel" class="glass-panel collapsed">
       <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
         <span>Painel de Rede & Simulação</span>
         <button id="btn-close-inspector" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.1rem; line-height: 1;" title="Minimizar Painel">✕</button>
@@ -3242,11 +3790,11 @@
           <option value="GUERREIRO" selected>Guerreiro (Melee - STR+CHA)</option>
           <option value="CLERIGO">Clérigo (Ranged - WIS)</option>
           <option value="BARBARO">Bárbaro (Melee - STR)</option>
-          <option value="MONGE">Monge (Melee - DEX)</option>
           <option value="ARQUEIRO">Arqueiro (Ranged - DEX)</option>
-          <option value="MAGO">Mago (Ranged - INT)</option>
-          <option value="BRUXO">Bruxo (Ranged - CHA)</option>
           <option value="DEMONOLOGO">Demonólogo (Ranged - CHA+CON)</option>
+          <option value="MONGE" disabled>🔒 Monge (Em Breve)</option>
+          <option value="MAGO" disabled>🔒 Mago (Em Breve)</option>
+          <option value="BRUXO" disabled>🔒 Bruxo (Em Breve)</option>
         </select>
 
         <div id="class-preview-card" style="display: flex; align-items: center; gap: 10px; margin-top: 6px; padding: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 8px;">

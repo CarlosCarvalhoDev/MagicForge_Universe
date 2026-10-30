@@ -1,0 +1,49 @@
+{
+  "Sheet": "iso_hero_arqueiro_death_sheet.png",
+  "Columns": 2,
+  "Rows": 2,
+  "CellSize": 512,
+  "SheetSHA256": "D436CDDE278F25772D426077FE7E6CA26F7E27285D173520EB659FB7A7E33F93",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_arqueiro_death_00.png",
+      "Source": "source_00.png",
+      "SourceSHA256": "F1A53B45226703B25915091E013BDA7FDAB5C790262600556AC5A72F929A0848",
+      "FrameSHA256": "DE466F2D162107AFA1DDF73F29B5DB4742BB4E03206556FBB549AA07892ADFD3",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 1,
+      "File": "iso_hero_arqueiro_death_01.png",
+      "Source": "source_01.png",
+      "SourceSHA256": "B2549997D0A9F5419685C1EF841D78739D7CC2430712B0C8DDE95A72D0A59587",
+      "FrameSHA256": "DD5C9E96F477D9AB33AFFBDE2FC07A9D09C84F41829394F62005A375C7EB45FC",
+      "X": 512,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 2,
+      "File": "iso_hero_arqueiro_death_02.png",
+      "Source": "source_02.png",
+      "SourceSHA256": "4BD7154B049D9B423D90FF11F15E1F737DBA0B65CA8683590BF809EB3F46708A",
+      "FrameSHA256": "95C036A144C4E49B756C922AC4A0F01521240B0E331FABC4071DAC59AAB778F4",
+      "X": 0,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 3,
+      "File": "iso_hero_arqueiro_death_03.png",
+      "Source": "source_03.png",
+      "SourceSHA256": "D5C6A8B56B19E4993AAAA1907202E7B678EDDC701480DDCA264C89C0EC896FCD",
+      "FrameSHA256": "5D1CAF70CDCAE5014C411B59FA2AF3377908D8B6EE34A6E518C920AEF06512F4",
+      "X": 512,
+      "Y": 512,
+      "Size": 512
+    }
+  ]
+}

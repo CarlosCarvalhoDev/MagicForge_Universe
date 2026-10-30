@@ -16,7 +16,7 @@ namespace MagicForge.Network
     public class UnityNetworkClient : MonoBehaviour
     {
         [Header("Configuração do Servidor")]
-        public string serverUrl = "ws://localhost:3000";
+        public string serverUrl = "ws://192.168.1.12:3000";
         public string characterName = "GuerreiroMobile";
         public string characterClass = "GUERREIRO";
 
@@ -119,6 +119,31 @@ namespace MagicForge.Network
             if (!isConnected) return;
             var useReq = new UseItemRequestDTO { slotIndex = slotIndex };
             await SendPacket(Opcode.C2S_USE_ITEM, JsonUtility.ToJson(useReq));
+        }
+
+        public async void SendRequestDungeonInfo()
+        {
+            if (!isConnected) return;
+            await SendPacket(Opcode.C2S_REQUEST_DUNGEON_INFO, "{}");
+        }
+
+        public async void SendEnterDungeon(string dungeonType = "BOSS_RUSH")
+        {
+            if (!isConnected) return;
+            var req = new EnterDungeonDTO { dungeonType = dungeonType };
+            await SendPacket(Opcode.C2S_ENTER_DUNGEON, JsonUtility.ToJson(req));
+        }
+
+        public async void SendBuyDungeonTicket()
+        {
+            if (!isConnected) return;
+            await SendPacket(Opcode.C2S_BUY_DUNGEON_TICKET, "{}");
+        }
+
+        public async void SendLeaveDungeon()
+        {
+            if (!isConnected) return;
+            await SendPacket(Opcode.C2S_LEAVE_DUNGEON, "{}");
         }
 
         private async Task SendPacket(Opcode op, string jsonData)

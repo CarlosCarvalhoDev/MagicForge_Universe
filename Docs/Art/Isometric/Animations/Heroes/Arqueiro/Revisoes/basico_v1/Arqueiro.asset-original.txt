@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4517576ec6e8144e8eb1f2bf85a1210, type: 3}
+  m_Name: Arqueiro
+  m_EditorClassIdentifier: Assembly-CSharp::MagicForge.Core.CharacterClassSO
+  className: Arqueiro
+  classDescription: Patrulheiro e atirador de elite dos bosques cristalizados. Maior alcance de ataque (12m) e critico elevado por Destreza (DEX).
+  classIcon: {fileID: 21300000, guid: a10000073a6524c489205bd51885cc07, type: 3}
+  isometricWorldSprite: {fileID: 21300000, guid: b5f686bec0aa8f9d64fedf1e04d51c74, type: 3}
+  defaultElement: 3
+  mainStat: 1
+  isRanged: 1
+  attackRange: 12
+  attackIntervalSec: 1.1
+  baseSpeed: 5.2
+  baseForca: 10
+  baseDestreza: 18
+  baseConstituicao: 12
+  baseInteligencia: 10
+  baseSabedoria: 10
+  baseCarisma: 8
+  ganhoForcaPorLevel: 1
+  ganhoDestrezaPorLevel: 3
+  ganhoConstituicaoPorLevel: 1
+  ganhoInteligenciaPorLevel: 0
+  ganhoSabedoriaPorLevel: 1
+  ganhoCarismaPorLevel: 0
+  isTier1: 1
+  evolutionOptionA: {fileID: 0}
+  evolutionOptionB: {fileID: 0}

@@ -1,0 +1,134 @@
+[
+  {
+    "SHA256": "3B9B0C84067367993353E6B4E26337D4D4DA7C51CAC0DA56A272DDC3BA68561D",
+    "Output": "hero/Swordsman_lvl3_Idle_without_shadow.png",
+    "Archive": "swordsman-1-3.zip",
+    "Entry": "PNG/Swordsman_lvl3/Without_shadow/Swordsman_lvl3_Idle_without_shadow.png"
+  },
+  {
+    "SHA256": "0D844619897587D916CA4B32D1AD26017E8D554E53340EF2A5156FA6E90D09CF",
+    "Output": "hero/Swordsman_lvl3_Death_without_shadow.png",
+    "Archive": "swordsman-1-3.zip",
+    "Entry": "PNG/Swordsman_lvl3/Without_shadow/Swordsman_lvl3_Death_without_shadow.png"
+  },
+  {
+    "SHA256": "A4F30CA47D4714BA65470254266664D716537703827FAAF658E25E65AC1BE5FB",
+    "Output": "hero/Swordsman_lvl3_attack_without_shadow.png",
+    "Archive": "swordsman-1-3.zip",
+    "Entry": "PNG/Swordsman_lvl3/Without_shadow/Swordsman_lvl3_attack_without_shadow.png"
+  },
+  {
+    "SHA256": "82CF7B1123F53B2169B844FD9BC78A18CCC05026C3F4315CE22A2599EE26299D",
+    "Output": "hero/Swordsman_lvl3_Hurt_without_shadow.png",
+    "Archive": "swordsman-1-3.zip",
+    "Entry": "PNG/Swordsman_lvl3/Without_shadow/Swordsman_lvl3_Hurt_without_shadow.png"
+  },
+  {
+    "SHA256": "B08C6DA8609BA8B9C5740449C8F2B7293668909ADB59B8EA6A8C23513E025F0B",
+    "Output": "hero/Swordsman_lvl3_Walk_without_shadow.png",
+    "Archive": "swordsman-1-3.zip",
+    "Entry": "PNG/Swordsman_lvl3/Without_shadow/Swordsman_lvl3_Walk_without_shadow.png"
+  },
+  {
+    "SHA256": "219B0F75C1C51262C9C5ED2A4723F74A3B1453FE274052C616D53F3D943363B3",
+    "Output": "slime/Slime1_Death_without_shadow.png",
+    "Archive": "slime-mobs.zip",
+    "Entry": "PNG/Slime1/Without_shadow/Slime1_Death_without_shadow.png"
+  },
+  {
+    "SHA256": "9109A9768A51B62BCD037A24AB49B3F8C8DA5EC8D211DDD783F7C8621DC01F31",
+    "Output": "slime/Slime1_Attack_without_shadow.png",
+    "Archive": "slime-mobs.zip",
+    "Entry": "PNG/Slime1/Without_shadow/Slime1_Attack_without_shadow.png"
+  },
+  {
+    "SHA256": "268327DC54FABB3DF7EA4DE5ABCAF5B947F05998A4C58D53275C9CA3FB20717C",
+    "Output": "slime/Slime1_Hurt_without_shadow.png",
+    "Archive": "slime-mobs.zip",
+    "Entry": "PNG/Slime1/Without_shadow/Slime1_Hurt_without_shadow.png"
+  },
+  {
+    "SHA256": "9ABD7C14EA5DAF81D486AC31A888A60A6F2B52668787EC2801D42BDC30CC2C02",
+    "Output": "slime/Slime1_Walk_without_shadow.png",
+    "Archive": "slime-mobs.zip",
+    "Entry": "PNG/Slime1/Without_shadow/Slime1_Walk_without_shadow.png"
+  },
+  {
+    "SHA256": "EA072BB3D91E70FE7FB7B2E151F0C901FFAEFAF5EE86B9C9A100DD7845FB18E9",
+    "Output": "slime/Slime1_Idle_without_shadow.png",
+    "Archive": "slime-mobs.zip",
+    "Entry": "PNG/Slime1/Without_shadow/Slime1_Idle_without_shadow.png"
+  },
+  {
+    "SHA256": "DD32BEAAA53FBB16045B71FD93789E526EE01204DCFAB9FE71FCCBC525742557",
+    "Output": "orc/orc1_walk_without_shadow.png",
+    "Archive": "orc.zip",
+    "Entry": "PNG/Orc1/Without_shadow/orc1_walk_without_shadow.png"
+  },
+  {
+    "SHA256": "8EB3FAE1D8D73E3CFD7364307BB2E1E251C048D195561993191AEAA03EDAC2D8",
+    "Output": "orc/orc1_hurt_without_shadow.png",
+    "Archive": "orc.zip",
+    "Entry": "PNG/Orc1/Without_shadow/orc1_hurt_without_shadow.png"
+  },
+  {
+    "SHA256": "6CDB9C9D2852BFA311ADB316D17AB3D212A33BE9EE40418B02506191303B51BF",
+    "Output": "orc/orc1_attack_without_shadow.png",
+    "Archive": "orc.zip",
+    "Entry": "PNG/Orc1/Without_shadow/orc1_attack_without_shadow.png"
+  },
+  {
+    "SHA256": "23C09E446DEA29897F85962E95A1640B0FB09EC7CA033C4354788BC44AE0F245",
+    "Output": "orc/orc1_idle_without_shadow.png",
+    "Archive": "orc.zip",
+    "Entry": "PNG/Orc1/Without_shadow/orc1_idle_without_shadow.png"
+  },
+  {
+    "SHA256": "3EC59F9BC14A37CB27A8120C344558F3DB77623539F46828816EF0C08840D60D",
+    "Output": "orc/orc1_death_without_shadow.png",
+    "Archive": "orc.zip",
+    "Entry": "PNG/Orc1/Without_shadow/orc1_death_without_shadow.png"
+  },
+  {
+    "SHA256": "67D169FCA12EBBD6366F93D0F81B97BE4EC9E3D41790420861B7A7E7078AB348",
+    "Output": "tiles/Road1_ground.png",
+    "Archive": "paths-roads.zip",
+    "Entry": "PNG_Tiled/Road1_ground.png"
+  },
+  {
+    "SHA256": "D931A1DAAFBD64F81CAAE5547C5CBF05163F3C02D83B2385D289031F41BAEA44",
+    "Output": "tiles/Ground_grass.png",
+    "Archive": "paths-roads.zip",
+    "Entry": "PNG_Tiled/Ground_grass.png"
+  },
+  {
+    "SHA256": "1A758BFFFC65F30A116C23E332B84F924C0D3D67FC99B002CDA06D709BB42919",
+    "Output": "trees/Moss_tree1.png",
+    "Archive": "trees.zip",
+    "Entry": "PNG/Assets_separately/Trees/Moss_tree1.png"
+  },
+  {
+    "SHA256": "6A7B68916009962D8096D57C3A0C82F0536CD8A82C217E4270B944689E1D2034",
+    "Output": "trees/Tree1.png",
+    "Archive": "trees.zip",
+    "Entry": "PNG/Assets_separately/Trees/Tree1.png"
+  },
+  {
+    "SHA256": "9501927DA6BB89BAB2CC30C371CE1BB25F3698C3F55676015612D54D7FD9164D",
+    "Output": "rocks/Rock1_1.png",
+    "Archive": "rocks-stones.zip",
+    "Entry": "PNG/Objects_separately/Rock1_1.png"
+  },
+  {
+    "SHA256": "ABAF6A615E57EDCD8E11420CB08746D56C4F5537551EC353349467D287D658B0",
+    "Output": "rocks/Rock1_3.png",
+    "Archive": "rocks-stones.zip",
+    "Entry": "PNG/Objects_separately/Rock1_3.png"
+  },
+  {
+    "SHA256": "734A7CDA1247A5A6075A3DF21A3290A95D15465534C2C4D6F6EEE83E56810C2D",
+    "Output": "crystals/Blue_crystal1.png",
+    "Archive": "crystals.zip",
+    "Entry": "PNG/Assets/Blue_crystal1.png"
+  }
+]

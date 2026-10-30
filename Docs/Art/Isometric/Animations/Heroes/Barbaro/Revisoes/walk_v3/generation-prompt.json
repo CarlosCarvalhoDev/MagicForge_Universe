@@ -1,0 +1,7 @@
+{
+  "tool": "image_gen.imagegen (integrated)",
+  "editTarget": "original walk_01",
+  "prompt": "PRECISE LOCAL REPAIR. IMAGE 1 is the edit TARGET: barbarian walk frame with missing axe blade. IMAGE 2 is a reference ONLY for the axe blade design. Restore ONLY the missing broad dark-metal orange glowing magma axe BLADE at image LEFT end of the red shaft in IMAGE1. Keep original axe shaft, grip, two hands, pommel and ALL character pixels/pose unchanged, especially both legs, hips, knees, boots, torso, face, scale and registration. Do NOT redraw the gait, move feet, open legs sideways, rotate body or change armor. The leftmost small metal piece in IMAGE1 is the top of the axe head: extend the blade down-left from that attachment using IMAGE2's broad curved steel blade with orange magma cracks, making it proportionate and fully contained in left free space. This is inpainting of the absent weapon region only. Match source cel-shaded style. Single complete character, same square framing, same head/feet positions as IMAGE1. Actual transparent RGBA background, no ground/shadow/text, no new glow on character. Do not borrow the leg pose from IMAGE2. Preserve IMAGE1's leg silhouette exactly.",
+  "source": "C:\\Users\\cv_de\\.codex\\generated_images\\01a17e58-e961-7972-ac5e-a5db9ac4f0a5\\exec-c10c0774-3491-4b74-8b6e-67a059930e72.png",
+  "note": "Only frame 2 replaced; the other five frames are original. Original legacy opaque black format retained when packing."
+}

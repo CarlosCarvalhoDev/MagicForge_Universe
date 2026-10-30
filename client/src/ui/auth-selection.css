@@ -91,14 +91,27 @@
   .forge-slot h3 { font-size: 12px; }
 }
 @media (max-width: 700px) {
-  #modal-auth-selection { padding: 20px 16px; }
+  #modal-auth-selection { padding: 14px 12px; }
   .forge-layout { grid-template-columns: 1fr; }
-  .forge-entry { grid-row: 1; }
+  .forge-entry { grid-row: 1; padding: 16px; }
   .forge-world-tag { font-size: 10px; text-align: right; }
-  .forge-intro { padding-top: 28px; }
-  .forge-slot { padding-top: 14px; }
+  .forge-intro { padding: 14px 0 12px; }
+  .forge-intro h1 { font-size: clamp(22px, 5vw, 30px); margin: 8px 0; }
+  .forge-slot { padding-top: 12px; }
   .forge-slot p { min-height: 36px; }
   .forge-section-heading { margin-top: 10px; }
+}
+@media (max-height: 560px) {
+  #modal-auth-selection { padding: 10px 14px; }
+  .forge-masthead { padding-bottom: 8px; }
+  .forge-intro { padding: 8px 0; }
+  .forge-intro h1 { font-size: 20px; margin: 4px 0; }
+  .forge-intro p { font-size: 12px; line-height: 1.4; }
+  .forge-entry { padding: 14px; }
+  .forge-pedestal { max-width: 110px; margin-top: 4px; }
+  .forge-slot { padding: 10px 8px; }
+  .forge-slot p { margin: 4px 0 8px; min-height: 32px; font-size: 10px; }
+  .forge-footer { margin-top: 14px; padding: 10px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   #modal-auth-selection *, #modal-auth-selection *::before, #modal-auth-selection *::after { animation: none !important; transition: none !important; }

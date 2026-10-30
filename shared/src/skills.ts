@@ -30,14 +30,14 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
   // =========================================================================
   // 1. GUERREIRO (STR / CON | Recurso: Energia)
   // =========================================================================
-  // Slot 1: Truques (Círculo 0 • Desbloqueio: Nv. 10)
+  // Slot 1: Truques (Círculo 0 • Desbloqueio: Nv. 1)
   'guerreiro_truque_1': {
     skillId: 'guerreiro_truque_1',
     slot: 1,
     choiceIndex: 1,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Golpe Firme',
     classType: CharacterClass.GUERREIRO,
     cost: 10,
@@ -56,7 +56,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Golpe Dilacerante',
     classType: CharacterClass.GUERREIRO,
     cost: 12,
@@ -75,7 +75,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Corte de Ruptura',
     classType: CharacterClass.GUERREIRO,
     cost: 15,
@@ -89,14 +89,14 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     iconEmoji: '🛡️',
   },
 
-  // Slot 2: Magias de 1º Círculo (Desbloqueio: Nv. 20)
+  // Slot 2: Magias de 1º Círculo (Desbloqueio: Nv. 10)
   'guerreiro_nv1_1': {
     skillId: 'guerreiro_nv1_1',
     slot: 2,
     choiceIndex: 1,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Retomar o Fôlego',
     classType: CharacterClass.GUERREIRO,
     cost: 20,
@@ -115,7 +115,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Postura Ofensiva',
     classType: CharacterClass.GUERREIRO,
     cost: 22,
@@ -134,7 +134,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Escudo Desarmador',
     classType: CharacterClass.GUERREIRO,
     cost: 25,
@@ -148,14 +148,14 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     iconEmoji: '💥',
   },
 
-  // Slot 3: Magias de 2º Círculo (Desbloqueio: Nv. 35)
+  // Slot 3: Magias de 2º Círculo (Desbloqueio: Nv. 25)
   'guerreiro_nv2_1': {
     skillId: 'guerreiro_nv2_1',
     slot: 3,
     choiceIndex: 1,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Redemoinho de Aço',
     classType: CharacterClass.GUERREIRO,
     cost: 35,
@@ -175,7 +175,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Baluarte Inquebrável',
     classType: CharacterClass.GUERREIRO,
     cost: 40,
@@ -194,7 +194,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Golpe Colossal',
     classType: CharacterClass.GUERREIRO,
     cost: 38,
@@ -279,7 +279,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Cutilada Selvagem',
     classType: CharacterClass.BARBARO,
     cost: 10,
@@ -298,7 +298,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Pisotão Sísmico',
     classType: CharacterClass.BARBARO,
     cost: 12,
@@ -317,7 +317,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Mordida Voraz',
     classType: CharacterClass.BARBARO,
     cost: 14,
@@ -337,7 +337,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Fúria Primitiva',
     classType: CharacterClass.BARBARO,
     cost: 20,
@@ -356,7 +356,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Rugido Desmoralizador',
     classType: CharacterClass.BARBARO,
     cost: 22,
@@ -376,7 +376,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Carga do Juggernaut',
     classType: CharacterClass.BARBARO,
     cost: 24,
@@ -396,7 +396,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Banho de Sangue',
     classType: CharacterClass.BARBARO,
     cost: 35,
@@ -416,7 +416,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Pele Rochosa Ancestral',
     classType: CharacterClass.BARBARO,
     cost: 38,
@@ -435,7 +435,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Salto dos Titãs',
     classType: CharacterClass.BARBARO,
     cost: 36,
@@ -519,7 +519,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Palma de Chi',
     classType: CharacterClass.MONGE,
     cost: 10,
@@ -538,7 +538,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Chute do Vendaval',
     classType: CharacterClass.MONGE,
     cost: 12,
@@ -557,7 +557,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Golpe no Ponto Vital',
     classType: CharacterClass.MONGE,
     cost: 14,
@@ -577,7 +577,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Rajada de Golpes',
     classType: CharacterClass.MONGE,
     cost: 20,
@@ -596,7 +596,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Passo do Vento Evasivo',
     classType: CharacterClass.MONGE,
     cost: 22,
@@ -615,7 +615,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Cura do Lótus Celestial',
     classType: CharacterClass.MONGE,
     cost: 25,
@@ -635,7 +635,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Golpe Atordoante Celestial',
     classType: CharacterClass.MONGE,
     cost: 35,
@@ -654,7 +654,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Sopro do Dragão de Chi',
     classType: CharacterClass.MONGE,
     cost: 38,
@@ -674,7 +674,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Dança das Sombras Ilusórias',
     classType: CharacterClass.MONGE,
     cost: 36,
@@ -758,7 +758,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Tiro Certeiro',
     classType: CharacterClass.ARQUEIRO,
     cost: 10,
@@ -777,7 +777,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Flecha Venenosa',
     classType: CharacterClass.ARQUEIRO,
     cost: 12,
@@ -796,7 +796,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Tiro Desacelerador',
     classType: CharacterClass.ARQUEIRO,
     cost: 14,
@@ -816,7 +816,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Marca do Caçador',
     classType: CharacterClass.ARQUEIRO,
     cost: 20,
@@ -835,7 +835,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Rajada Tripla',
     classType: CharacterClass.ARQUEIRO,
     cost: 22,
@@ -854,7 +854,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Armadilha de Espinhos',
     classType: CharacterClass.ARQUEIRO,
     cost: 24,
@@ -874,7 +874,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Chuva de Flechas',
     classType: CharacterClass.ARQUEIRO,
     cost: 35,
@@ -894,7 +894,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Flecha Espectral Perfuradora',
     classType: CharacterClass.ARQUEIRO,
     cost: 38,
@@ -914,7 +914,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Manto da Furtividade',
     classType: CharacterClass.ARQUEIRO,
     cost: 36,
@@ -997,7 +997,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Dardo de Fogo',
     classType: CharacterClass.MAGO,
     cost: 10,
@@ -1016,7 +1016,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Raio de Gelo',
     classType: CharacterClass.MAGO,
     cost: 12,
@@ -1035,7 +1035,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Toque Chocante',
     classType: CharacterClass.MAGO,
     cost: 14,
@@ -1056,7 +1056,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Mísseis Arcanos',
     classType: CharacterClass.MAGO,
     cost: 20,
@@ -1075,7 +1075,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Escudo Arcano Espelhado',
     classType: CharacterClass.MAGO,
     cost: 22,
@@ -1094,7 +1094,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Orbe de Chamas Devoradoras',
     classType: CharacterClass.MAGO,
     cost: 25,
@@ -1115,7 +1115,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Nevasca Glacial',
     classType: CharacterClass.MAGO,
     cost: 35,
@@ -1135,7 +1135,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Relâmpago em Cadeia',
     classType: CharacterClass.MAGO,
     cost: 38,
@@ -1155,7 +1155,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Mente Acelerada (Haste)',
     classType: CharacterClass.MAGO,
     cost: 36,
@@ -1239,7 +1239,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Rajada Mística',
     classType: CharacterClass.BRUXO,
     cost: 10,
@@ -1258,7 +1258,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Toque Necrótico Drenante',
     classType: CharacterClass.BRUXO,
     cost: 12,
@@ -1277,7 +1277,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Orbe de Praga Sombria',
     classType: CharacterClass.BRUXO,
     cost: 14,
@@ -1297,7 +1297,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Maldição de Bruxaria',
     classType: CharacterClass.BRUXO,
     cost: 20,
@@ -1316,7 +1316,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Armadura Gélida de Agathys',
     classType: CharacterClass.BRUXO,
     cost: 22,
@@ -1335,7 +1335,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Tentáculos de Hadar',
     classType: CharacterClass.BRUXO,
     cost: 24,
@@ -1356,7 +1356,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Fome Voraz de Hadar',
     classType: CharacterClass.BRUXO,
     cost: 35,
@@ -1376,7 +1376,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Toque Vampírico da Alma',
     classType: CharacterClass.BRUXO,
     cost: 38,
@@ -1395,7 +1395,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Salto das Brumas Etéreas',
     classType: CharacterClass.BRUXO,
     cost: 36,
@@ -1480,7 +1480,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Chama Sagrada',
     classType: CharacterClass.CLERIGO,
     cost: 10,
@@ -1499,7 +1499,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Tributo aos Mortos',
     classType: CharacterClass.CLERIGO,
     cost: 12,
@@ -1518,7 +1518,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 1,
     tierName: 'Truque (Círculo 0)',
-    unlockLevel: 10,
+    unlockLevel: 1,
     name: 'Golpe Orientador',
     classType: CharacterClass.CLERIGO,
     cost: 14,
@@ -1538,7 +1538,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Palavra de Cura',
     classType: CharacterClass.CLERIGO,
     cost: 20,
@@ -1557,7 +1557,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Bênção da Batalha (Bless)',
     classType: CharacterClass.CLERIGO,
     cost: 22,
@@ -1576,7 +1576,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 2,
     tierName: '1º Círculo',
-    unlockLevel: 20,
+    unlockLevel: 10,
     name: 'Raio Guia Fulgurante',
     classType: CharacterClass.CLERIGO,
     cost: 25,
@@ -1596,7 +1596,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 1,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Espíritos Guardiões',
     classType: CharacterClass.CLERIGO,
     cost: 35,
@@ -1616,7 +1616,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 2,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Arma Espiritual Flutuante',
     classType: CharacterClass.CLERIGO,
     cost: 38,
@@ -1635,7 +1635,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     choiceIndex: 3,
     tier: 3,
     tierName: '2º Círculo',
-    unlockLevel: 35,
+    unlockLevel: 25,
     name: 'Santuário Consagrado',
     classType: CharacterClass.CLERIGO,
     cost: 36,
@@ -2008,7 +2008,52 @@ export function getDefaultSkillsForClass(classType: CharacterClass): Record<numb
 /**
  * Calcula o dano ou cura de uma habilidade com base nos atributos do personagem (D&D 5E)
  */
-export function calculateSkillPower(skill: SkillDefinition, stats: CharacterAttributes, level: number): number {
+export function calculateSkillPower(
+  skill: SkillDefinition,
+  stats: CharacterAttributes,
+  level: number,
+  maxHp?: number
+): number {
+  if (skill.classType === CharacterClass.GUERREIRO) {
+    switch (skill.skillId) {
+      case 'guerreiro_truque_1':
+      case 'guerreiro_1':
+        return Math.round(stats.forca * 1.35 + level * 4);
+      case 'guerreiro_truque_2':
+        return Math.round(stats.forca * 1.10 + level * 4);
+      case 'guerreiro_truque_3':
+        return Math.round(stats.forca * 1.25 + level * 4);
+      case 'guerreiro_nv1_1':
+      case 'guerreiro_2':
+        // Second Wind D&D 5e: 1.6x STR + 2x Nível
+        return Math.round(stats.forca * 1.60 + level * 2);
+      case 'guerreiro_nv1_2':
+        return Math.round(stats.forca * 1.60 + level * 4);
+      case 'guerreiro_nv1_3':
+        return Math.round(stats.forca * 1.40 + stats.constituicao * 0.50 + level * 4);
+      case 'guerreiro_nv2_1':
+      case 'guerreiro_3':
+        return Math.round(stats.forca * 2.30 + level * 4);
+      case 'guerreiro_nv2_2': {
+        // Baluarte Inquebrável: Absorve 30% do HP Máximo
+        const resolvedMaxHp = maxHp ?? (stats.constituicao * 35 + 450 + Math.max(0, level - 1) * 60);
+        return Math.round(resolvedMaxHp * 0.30);
+      }
+      case 'guerreiro_nv2_3':
+        return Math.round(stats.forca * 2.60 + level * 4);
+      case 'guerreiro_nv3_1':
+      case 'guerreiro_4':
+        return Math.round(stats.forca * 3.60 + stats.constituicao * 1.50 + level * 4);
+      case 'guerreiro_nv3_2':
+        return Math.round(stats.forca * 4.40 + level * 4);
+      case 'guerreiro_nv3_3': {
+        // Última Resistência Imortal: Cura 40% do HP Máximo
+        const resolvedMaxHp = maxHp ?? (stats.constituicao * 35 + 450 + Math.max(0, level - 1) * 60);
+        return Math.round(resolvedMaxHp * 0.40);
+      }
+    }
+  }
+
   let modifier = 0;
   switch (skill.classType) {
     case CharacterClass.GUERREIRO:
@@ -2039,6 +2084,6 @@ export function calculateSkillPower(skill: SkillDefinition, stats: CharacterAttr
   const multipliers = [0, 1.4, 1.8, 2.4, 4.2];
   const mult = multipliers[skill.slot] || 1.5;
 
-  const baseRoll = Math.floor(Math.random() * 8) + 4; // Rolagem de dados d8 D&D
+  const baseRoll = 6; // Rolagem média determinística d8 D&D
   return Math.round(baseRoll + modifier * mult + level * 4);
 }

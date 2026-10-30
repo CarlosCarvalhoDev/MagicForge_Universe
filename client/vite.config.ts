@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, 'index.html'),
         animationReview: path.resolve(__dirname, 'animation-review.html'),
+        pixelArena: path.resolve(__dirname, 'pixel-arena.html'),
       },
     },
   },
@@ -16,6 +17,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,
     port: 5173,
     open: false,
   },

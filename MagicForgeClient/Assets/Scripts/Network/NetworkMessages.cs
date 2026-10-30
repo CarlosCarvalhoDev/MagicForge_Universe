@@ -74,6 +74,15 @@ namespace MagicForge.Network
         C2S_REQUEST_LEADERBOARD = 0x86,
         S2C_LEADERBOARD_UPDATE = 0x87,
 
+        // Daily Dungeons & Boss Rush (0x88 - 0x8E)
+        C2S_REQUEST_DUNGEON_INFO = 0x88,
+        S2C_DUNGEON_INFO = 0x89,
+        C2S_ENTER_DUNGEON = 0x8A,
+        S2C_DUNGEON_EVENT = 0x8B,
+        C2S_BUY_DUNGEON_TICKET = 0x8C,
+        S2C_BUY_DUNGEON_TICKET_RESULT = 0x8D,
+        C2S_LEAVE_DUNGEON = 0x8E,
+
         // Heartbeat (0xF0 - 0xFF)
         C2S_PING = 0xF0,
         S2C_PONG = 0xF1,
@@ -482,5 +491,65 @@ namespace MagicForge.Network
         public int myRank;
         public LeaderboardEntryDTO myEntry;
         public long timestamp;
+    }
+
+    [Serializable]
+    public class DungeonRewardItemDTO
+    {
+        public string itemId;
+        public int quantity;
+    }
+
+    [Serializable]
+    public class DailyDungeonInfoDTO
+    {
+        public int ticketsRemaining;
+        public int maxDailyFreeTickets;
+        public int extraTicketsBoughtToday;
+        public int maxExtraTicketsPerDay;
+        public int extraTicketCostGold;
+        public int highestBossRushWave;
+        public int fastestBossRushTimeSec;
+        public int totalDungeonsCleared;
+        public string resetDate;
+        public bool isDungeonActive;
+        public string activeDungeonType;
+    }
+
+    [Serializable]
+    public class EnterDungeonDTO
+    {
+        public string dungeonType;
+    }
+
+    [Serializable]
+    public class DungeonEventDTO
+    {
+        public string status;
+        public string dungeonType;
+        public int currentWave;
+        public int maxWaves;
+        public int timeLimitSec;
+        public int remainingTimeSec;
+        public string bossEntityId;
+        public string bossName;
+        public int bossMaxHp;
+        public int bossCurrentHp;
+        public int totalDamageDealt;
+        public int goldEarned;
+        public int expEarned;
+        public DungeonRewardItemDTO[] itemRewards;
+        public string message;
+    }
+
+    [Serializable]
+    public class BuyDungeonTicketResultDTO
+    {
+        public bool success;
+        public int ticketsRemaining;
+        public int extraTicketsBoughtToday;
+        public int goldSpent;
+        public int remainingGold;
+        public string message;
     }
 }

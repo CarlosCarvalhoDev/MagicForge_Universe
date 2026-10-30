@@ -1,0 +1,29 @@
+{
+  "Sheet": "iso_hero_arqueiro_hit_sheet.png",
+  "Columns": 2,
+  "Rows": 1,
+  "CellSize": 512,
+  "SheetSHA256": "FF1D0D2ACD4DB2763436F1DA809E756418B6EDB8A98BCA51E7A2707F3EA8A21B",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_arqueiro_hit_00.png",
+      "Source": "source_00.png",
+      "SourceSHA256": "A2F3EF2C7A79551235394423421F8FBFC7E6B39134E3C06C5F8BA24954937955",
+      "FrameSHA256": "E56B9B213C8611E593D482546F583C742A24848394FEC6571493118E43069A70",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 1,
+      "File": "iso_hero_arqueiro_hit_01.png",
+      "Source": "source_01.png",
+      "SourceSHA256": "F91C4AF1BA5737FE6A752004F98B42BE0AE6ECB61358F2DCA79F6EF7E2DDD0EE",
+      "FrameSHA256": "B968B8C18C48B20F756A4F4F162AF16BE23BC53C5125B03AADE30A3D687F6028",
+      "X": 512,
+      "Y": 0,
+      "Size": 512
+    }
+  ]
+}

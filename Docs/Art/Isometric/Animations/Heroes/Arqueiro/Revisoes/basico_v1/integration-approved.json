@@ -1,0 +1,70 @@
+{
+  "Version": "basico_v1",
+  "Date": "2026-10-28",
+  "ClassAssetSHA256": "FC858D356559CF86C9512F3BDD1AB1787D2DD502C6E3E0D4C4BB94EA59C95D72",
+  "Actions": [
+    {
+      "Sheet": "iso_hero_arqueiro_idle_sheet.png",
+      "Action": "idle",
+      "FileIDs": [
+        "21300000",
+        "21300002",
+        "21300004",
+        "21300006"
+      ],
+      "SHA256": "EEFCB6CC9B9B69AE25EA725151BDE4EBC06F75A78389CBAAC2B57C7C2C90BC5A",
+      "GUID": "079f47574d9949df963d0a2716ca3ccb"
+    },
+    {
+      "Sheet": "iso_hero_arqueiro_walk_sheet.png",
+      "Action": "walk",
+      "FileIDs": [
+        "21300000",
+        "21300002",
+        "21300004",
+        "21300006",
+        "21300008",
+        "21300010"
+      ],
+      "SHA256": "9F2477124A93C2ECD328642618962671C2652E6EA9278C6BAB0B8DB62309C92E",
+      "GUID": "51950d3a21dc4a8dbed30742608f7cce"
+    },
+    {
+      "Sheet": "iso_hero_arqueiro_attack_sheet.png",
+      "Action": "attack",
+      "FileIDs": [
+        "21300000",
+        "21300002",
+        "21300004",
+        "21300006",
+        "21300008",
+        "21300010"
+      ],
+      "SHA256": "BEC26B5FE052E1663A24431951D26A0EF6EC474303D33CD3BC5313BA001B3F97",
+      "GUID": "d05a6aaf08a14cfbad5b1c9b9965f6fc"
+    },
+    {
+      "Sheet": "iso_hero_arqueiro_hit_sheet.png",
+      "Action": "hit",
+      "FileIDs": [
+        "21300000",
+        "21300002"
+      ],
+      "SHA256": "FF1D0D2ACD4DB2763436F1DA809E756418B6EDB8A98BCA51E7A2707F3EA8A21B",
+      "GUID": "73a73096127448a894250c0d123481d2"
+    },
+    {
+      "Sheet": "iso_hero_arqueiro_death_sheet.png",
+      "Action": "death",
+      "FileIDs": [
+        "21300000",
+        "21300002",
+        "21300004",
+        "21300006"
+      ],
+      "SHA256": "D436CDDE278F25772D426077FE7E6CA26F7E27285D173520EB659FB7A7E33F93",
+      "GUID": "8896b16865d34eee99f22205ebf3f084"
+    }
+  ],
+  "Approval": "User: esta bom"
+}

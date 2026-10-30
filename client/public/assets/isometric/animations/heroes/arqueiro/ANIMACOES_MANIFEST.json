@@ -1,0 +1,47 @@
+[
+  {
+    "Sheet": "iso_hero_arqueiro_idle_sheet.png",
+    "Columns": 2,
+    "Action": "idle",
+    "FPS": 5,
+    "Rows": 2,
+    "Frames": 4,
+    "SHA256": "EEFCB6CC9B9B69AE25EA725151BDE4EBC06F75A78389CBAAC2B57C7C2C90BC5A"
+  },
+  {
+    "Sheet": "iso_hero_arqueiro_walk_sheet.png",
+    "Columns": 3,
+    "Action": "walk",
+    "FPS": 9,
+    "Rows": 2,
+    "Frames": 6,
+    "SHA256": "9F2477124A93C2ECD328642618962671C2652E6EA9278C6BAB0B8DB62309C92E"
+  },
+  {
+    "Sheet": "iso_hero_arqueiro_attack_sheet.png",
+    "Columns": 3,
+    "Action": "attack",
+    "FPS": 11,
+    "Rows": 2,
+    "Frames": 6,
+    "SHA256": "BEC26B5FE052E1663A24431951D26A0EF6EC474303D33CD3BC5313BA001B3F97"
+  },
+  {
+    "Sheet": "iso_hero_arqueiro_hit_sheet.png",
+    "Columns": 2,
+    "Action": "hit",
+    "FPS": 10,
+    "Rows": 1,
+    "Frames": 2,
+    "SHA256": "FF1D0D2ACD4DB2763436F1DA809E756418B6EDB8A98BCA51E7A2707F3EA8A21B"
+  },
+  {
+    "Sheet": "iso_hero_arqueiro_death_sheet.png",
+    "Columns": 2,
+    "Action": "death",
+    "FPS": 7,
+    "Rows": 2,
+    "Frames": 4,
+    "SHA256": "D436CDDE278F25772D426077FE7E6CA26F7E27285D173520EB659FB7A7E33F93"
+  }
+]

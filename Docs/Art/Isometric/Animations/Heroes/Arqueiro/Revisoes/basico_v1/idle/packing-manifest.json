@@ -1,0 +1,49 @@
+{
+  "Sheet": "iso_hero_arqueiro_idle_sheet.png",
+  "Columns": 2,
+  "Rows": 2,
+  "CellSize": 512,
+  "SheetSHA256": "EEFCB6CC9B9B69AE25EA725151BDE4EBC06F75A78389CBAAC2B57C7C2C90BC5A",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_arqueiro_idle_00.png",
+      "Source": "source_00.png",
+      "SourceSHA256": "A4457CC002AC3245989678E13CC9BD99F537D42F1C1F5ADA2D0C0ECF19CE5186",
+      "FrameSHA256": "D36B7CA710F48F674FFEB104F39BD7C00189B7C4303C131C99DE208998AE0D8F",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 1,
+      "File": "iso_hero_arqueiro_idle_01.png",
+      "Source": "source_01.png",
+      "SourceSHA256": "2F309474BBF275B984379C7A3851F80AA2E5C4546687C3C141D28F61B60D8AD4",
+      "FrameSHA256": "7BD8CEFC23E2E576A5C995D6E764C18D66CA494625B9FAE0AECD73E594188C35",
+      "X": 512,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 2,
+      "File": "iso_hero_arqueiro_idle_02.png",
+      "Source": "source_02.png",
+      "SourceSHA256": "528D9704E30276E9236754A2A6C39BA57A70AA5B83D5B1A0F4233A9AD9A26B16",
+      "FrameSHA256": "EBF6C8E6F61E31E15702655F04328EF9C0217E57C138C70E97C000DC4FCAC9FB",
+      "X": 0,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 3,
+      "File": "iso_hero_arqueiro_idle_03.png",
+      "Source": "source_03.png",
+      "SourceSHA256": "D9B94D3FE1EBF09C192162DFBF9062D689FBB3400DCC7B8E4E7FA5E081ECACBF",
+      "FrameSHA256": "D2AD571222CD971B55EA298213EB66A056BB21E20708B8A7A0F74757A16F35FB",
+      "X": 512,
+      "Y": 512,
+      "Size": 512
+    }
+  ]
+}

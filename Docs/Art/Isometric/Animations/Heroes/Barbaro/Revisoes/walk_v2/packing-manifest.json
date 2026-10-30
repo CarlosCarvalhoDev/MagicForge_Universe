@@ -1,0 +1,69 @@
+{
+  "Sheet": "iso_hero_barbaro_walk_sheet.png",
+  "Columns": 3,
+  "Rows": 2,
+  "CellSize": 512,
+  "SheetSHA256": "9E8630316D23F09755003583B6D253BE0029DA70C41F502DD6EA939A3145AFB1",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_barbaro_walk_00.png",
+      "Source": "source_00.png",
+      "SourceSHA256": "6DB87D1DB2877888006789CE534ACBC3A280F8DB49A93CD9B3561840D731368F",
+      "FrameSHA256": "0BDC9F8E108810ECD9C1AA0756FA9A0B00497E9ECC5D1A19A02ACA52F04D200F",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 1,
+      "File": "iso_hero_barbaro_walk_01.png",
+      "Source": "source_01.png",
+      "SourceSHA256": "4BE0EB9B9E59A2D38AA942FC673EB61E7A51232D7F3657AE1A1ADDA1E79A04A0",
+      "FrameSHA256": "75F456775514D001115BB75D01FF924650D03E0D2DCFA6702E801FFD0BA11779",
+      "X": 512,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 2,
+      "File": "iso_hero_barbaro_walk_02.png",
+      "Source": "source_02.png",
+      "SourceSHA256": "3A12E556E03BE18DD19D8EF05C221A5F57504B57C0F3E29128D1EEF0FD39B130",
+      "FrameSHA256": "04A61AE61338D11C54A1571BD88FEC7D003E6FC16617CC42C6F6E2419326C24C",
+      "X": 1024,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 3,
+      "File": "iso_hero_barbaro_walk_03.png",
+      "Source": "source_03.png",
+      "SourceSHA256": "65D3380DF245AA70C76373B8A22B1B576E3CC89DC1D14D397B84627B9891911A",
+      "FrameSHA256": "51DA6AFC5CF62AA1F6FA5FF25312369B1F670297CF0C5DC158BC39A48E15E913",
+      "X": 0,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 4,
+      "File": "iso_hero_barbaro_walk_04.png",
+      "Source": "source_04.png",
+      "SourceSHA256": "2045FE9C0697DF9F93C33A43C6825801E10DAAE59D1AE7C7E78377D53049FD07",
+      "FrameSHA256": "813F0C7EA1E167BD355969EB47000A8D10A467A40B1AD23B7E389978F935BDEB",
+      "X": 512,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 5,
+      "File": "iso_hero_barbaro_walk_05.png",
+      "Source": "source_05.png",
+      "SourceSHA256": "4626766D8676D53EDB87241F57BB174B59C57C4981FBAC7117CA1776DBA24F1A",
+      "FrameSHA256": "BAE437336C63A2915C21F1BBA3A00B8E90152C4B77D71A35D55E05CE92E700ED",
+      "X": 1024,
+      "Y": 512,
+      "Size": 512
+    }
+  ]
+}

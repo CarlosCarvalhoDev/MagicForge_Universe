@@ -308,6 +308,11 @@ export function setupAuthSelection(transport: AuthTransport) {
       nameInput.reportValidity();
       return;
     }
+    const allowedClasses = [CharacterClass.GUERREIRO, CharacterClass.CLERIGO, CharacterClass.BARBARO, CharacterClass.ARQUEIRO];
+    if (!allowedClasses.includes(classSelect.value as CharacterClass)) {
+      setStatus('Esta classe ainda está bloqueada. Escolha até a classe Arqueiro.', true);
+      return;
+    }
     begin('create', 'Forjando ' + name + ' no pedestal ' + (selected + 1) + '…');
     transport.create(selected, name, classSelect.value as CharacterClass);
   });

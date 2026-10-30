@@ -14,8 +14,19 @@ import {
   S2CPlayerExpUpdatePayload,
   S2CPlayerLevelUpPayload,
   S2CSkillCastEventPayload,
+  S2CSkillCastRejectedPayload,
+  SkillCastRejectCode,
+  CombatStatusType,
+  CombatStatusEventReason,
+  CombatStatusStatePayload,
+  CombatStatusTransitionPayload,
+  SkillCategory,
+  SkillGeometryType,
+  SkillTargetResultPayload,
+  cloneVector3,
   S2CWorldSnapshotPayload,
   SKILLS_DATABASE,
+  getDefaultSkillsForClass,
   calculateSkillPower,
   ItemDropState,
   ITEMS_DATABASE,
@@ -50,9 +61,14 @@ import {
   S2CLeaderboardUpdatePayload,
   LeaderboardCategory,
   LeaderboardEntryPayload,
+  C2SEnterDungeonPayload,
+  S2CDungeonEventPayload,
+  S2CBuyDungeonTicketResultPayload,
+  DailyDungeonInfoPayload,
+  DungeonType,
 } from '@magicforge/shared';
 import { EntityManager } from './EntityManager';
-import { Entity } from '../entities/Entity';
+import { Entity, ActiveCombatStatus } from '../entities/Entity';
 import { Player } from '../entities/Player';
 import { Monster, MonsterState } from '../entities/Monster';
 import { Connection } from '../network/Connection';
@@ -60,14 +76,18 @@ import { SpatialGrid } from './SpatialGrid';
 import { SERVER_CONFIG } from '../config';
 import { DatabaseManager } from '../database/DatabaseManager';
 import { SocialAuthService } from '../auth/SocialAuthService';
+import { DungeonManager } from './DungeonManager';
 
 export class World {
   public readonly entityManager = new EntityManager();
   public readonly spatialGrid = new SpatialGrid(20.0);
   public readonly db: DatabaseManager;
+  public readonly dungeonManager: DungeonManager;
   public currentTick: number = 0;
+  public castSequence: number = 0;
+  public statusSequence: number = 0;
   public activeItemDrops = new Map<string, ItemDropState>();
-  private connections = new Map<string, Connection>();
+  public connections = new Map<string, Connection>();
 
   // Stage & Boss Mechanics
   public currentStage: number = 1;
@@ -93,47 +113,101 @@ export class World {
 
   constructor(customDb?: DatabaseManager) {
     this.db = customDb || new DatabaseManager();
-    this.spawnInitialMonsters();
+    this.dungeonManager = new DungeonManager(this);
+    this.spawnWorldMonsters(this.currentWorld);
   }
 
-  private spawnInitialMonsters(): void {
-    const mobSpawns = [
-      // Quadrante Noroeste — Acampamento dos Goblins (35m - 60m)
-      { name: 'Goblin Lanceiro', pos: createVector3(-38, 0, 32), hp: 90, damage: 12 },
-      { name: 'Goblin Arqueiro', pos: createVector3(-48, 0, 42), hp: 70, damage: 16 },
-      { name: 'Goblin Lanceiro', pos: createVector3(-56, 0, 30), hp: 90, damage: 12 },
-      { name: 'Slime da Floresta', pos: createVector3(-42, 0, 52), hp: 120, damage: 8 },
 
-      // Quadrante Nordeste — Bosque dos Lobos Alfa (35m - 60m)
-      { name: 'Lobo Selvagem', pos: createVector3(36, 0, 32), hp: 100, damage: 14 },
-      { name: 'Lobo Selvagem', pos: createVector3(48, 0, 40), hp: 100, damage: 14 },
-      { name: 'Goblin Arqueiro', pos: createVector3(54, 0, 30), hp: 70, damage: 16 },
-      { name: 'Slime da Floresta', pos: createVector3(42, 0, 54), hp: 120, damage: 8 },
+  public spawnWorldMonsters(worldIndex: number): void {
+    const mobTemplates = [
+      // Quadrante Noroeste (12m - 32m)
+      { type: 'slime', pos: createVector3(-14, 0, 12), baseHp: 120, baseDmg: 8 },
+      { type: 'melee', pos: createVector3(-20, 0, 18), baseHp: 90, baseDmg: 12 },
+      { type: 'archer', pos: createVector3(-26, 0, 14), baseHp: 70, baseDmg: 16 },
+      { type: 'wolf', pos: createVector3(-16, 0, 26), baseHp: 100, baseDmg: 14 },
 
-      // Quadrante Sudoeste — Margem do Lago Encantado (35m - 60m)
-      { name: 'Slime da Floresta', pos: createVector3(-34, 0, -32), hp: 120, damage: 8 },
-      { name: 'Slime da Floresta', pos: createVector3(-46, 0, -38), hp: 120, damage: 8 },
-      { name: 'Goblin Lanceiro', pos: createVector3(-38, 0, -50), hp: 90, damage: 12 },
-      { name: 'Lobo Selvagem', pos: createVector3(-52, 0, -42), hp: 100, damage: 14 },
+      // Quadrante Nordeste (12m - 32m)
+      { type: 'slime', pos: createVector3(14, 0, 14), baseHp: 120, baseDmg: 8 },
+      { type: 'wolf', pos: createVector3(22, 0, 12), baseHp: 100, baseDmg: 14 },
+      { type: 'melee', pos: createVector3(25, 0, 22), baseHp: 90, baseDmg: 12 },
+      { type: 'archer', pos: createVector3(18, 0, 26), baseHp: 70, baseDmg: 16 },
 
-      // Quadrante Sudeste — Posto Avançado da Guarda (35m - 60m)
-      { name: 'Goblin Lanceiro', pos: createVector3(36, 0, -32), hp: 90, damage: 12 },
-      { name: 'Goblin Arqueiro', pos: createVector3(48, 0, -38), hp: 70, damage: 16 },
-      { name: 'Lobo Selvagem', pos: createVector3(38, 0, -52), hp: 100, damage: 14 },
-      { name: 'Slime da Floresta', pos: createVector3(54, 0, -44), hp: 120, damage: 8 },
+      // Quadrante Sudoeste (12m - 32m)
+      { type: 'slime', pos: createVector3(-12, 0, -15), baseHp: 120, baseDmg: 8 },
+      { type: 'wolf', pos: createVector3(-22, 0, -14), baseHp: 100, baseDmg: 14 },
+      { type: 'melee', pos: createVector3(-16, 0, -25), baseHp: 90, baseDmg: 12 },
+      { type: 'archer', pos: createVector3(-26, 0, -22), baseHp: 70, baseDmg: 16 },
 
-      // Santuários Externos — Mini-Chefes Guardiões de Território (64m)
-      { name: 'Chefe Goblin', pos: createVector3(-64, 0, 36), hp: 350, damage: 28 },
-      { name: 'Chefe Goblin', pos: createVector3(64, 0, -36), hp: 350, damage: 28 },
+      // Quadrante Sudeste (12m - 32m)
+      { type: 'melee', pos: createVector3(15, 0, -14), baseHp: 90, baseDmg: 12 },
+      { type: 'wolf', pos: createVector3(24, 0, -12), baseHp: 100, baseDmg: 14 },
+      { type: 'slime', pos: createVector3(14, 0, -24), baseHp: 120, baseDmg: 8 },
+      { type: 'archer', pos: createVector3(25, 0, -24), baseHp: 70, baseDmg: 16 },
+
+      // Santuários Externos (Mini-Chefes a 30m - 36m)
+      { type: 'miniboss', pos: createVector3(-32, 0, 20), baseHp: 350, baseDmg: 28 },
+      { type: 'miniboss', pos: createVector3(32, 0, -20), baseHp: 350, baseDmg: 28 },
+
     ];
 
-    mobSpawns.forEach((spawn, idx) => {
-      const monster = new Monster(`mob_${idx + 1}`, spawn.name, spawn.pos, spawn.hp, spawn.damage);
+    const hpMult = 1.0 + (worldIndex - 1) * 0.8;
+    const dmgMult = 1.0 + (worldIndex - 1) * 0.6;
+
+    const getMobName = (type: string, world: number) => {
+      switch (world) {
+        case 1:
+          switch (type) {
+            case 'slime': return 'Slime da Floresta';
+            case 'melee': return 'Goblin Lanceiro';
+            case 'archer': return 'Goblin Arqueiro';
+            case 'wolf': return 'Lobo Selvagem';
+            case 'miniboss': return 'Chefe Goblin';
+            default: return 'Monstro da Floresta';
+          }
+        case 2:
+          switch (type) {
+            case 'slime': return 'Slime Glacial';
+            case 'melee': return 'Guerreiro do Gelo';
+            case 'archer': return 'Arqueiro da Neve';
+            case 'wolf': return 'Lobo de Jotunheim';
+            case 'miniboss': return 'Chefe Yetin';
+            default: return 'Monstro Glacial';
+          }
+        case 3:
+          switch (type) {
+            case 'slime': return 'Slime de Magma';
+            case 'melee': return 'Guerreiro de Cinzas';
+            case 'archer': return 'Atirador de Chamas';
+            case 'wolf': return 'Cão Infernal';
+            case 'miniboss': return 'Chefe de Magma';
+            default: return 'Monstro Vulcânico';
+          }
+        default:
+          switch (type) {
+            case 'slime': return `Slime Astral ${world}`;
+            case 'melee': return `Soldado Astral ${world}`;
+            case 'archer': return `Arqueiro Astral ${world}`;
+            case 'wolf': return `Besta Astral ${world}`;
+            case 'miniboss': return `Comandante Astral ${world}`;
+            default: return `Monstro Astral ${world}`;
+          }
+      }
+    };
+
+    mobTemplates.forEach((template, idx) => {
+      const mobName = getMobName(template.type, worldIndex);
+      const hp = Math.round(template.baseHp * hpMult);
+      const damage = Math.round(template.baseDmg * dmgMult);
+      const monster = new Monster(`mob_w${worldIndex}_${idx + 1}`, mobName, template.pos, hp, damage, template.type);
       this.entityManager.addMonster(monster);
       this.spatialGrid.updateEntity(monster);
+
+      this.broadcast(Opcode.S2C_ENTITY_SPAWN, {
+        entity: monster.toSnapshotState(),
+      } as S2CEntitySpawnPayload);
     });
 
-    console.log(`[World] Spawned ${mobSpawns.length} active combat monsters in the battle arena.`);
+    console.log(`[World] Spawned ${mobTemplates.length} monsters for World ${worldIndex} (${this.getWorldName(worldIndex)}).`);
   }
 
   public registerConnection(connection: Connection): void {
@@ -379,6 +453,21 @@ export class World {
       return;
     }
 
+    const unlockedInitialClasses = [
+      CharacterClass.GUERREIRO,
+      CharacterClass.CLERIGO,
+      CharacterClass.BARBARO,
+      CharacterClass.ARQUEIRO,
+    ];
+    if (!unlockedInitialClasses.includes(classType)) {
+      connection.send(Opcode.S2C_ERROR, {
+        errorCode: 'INVALID_SLOT',
+        errorMessage: 'Esta classe ainda não está liberada. Escolha Guerreiro, Clérigo, Bárbaro ou Arqueiro.',
+        slotIndex,
+      } as S2CCharacterActionErrorPayload);
+      return;
+    }
+
     try {
       this.db.createCharacterInSlot(connection.id, connection.accountId, slotIndex, characterName, classType);
       
@@ -444,6 +533,18 @@ export class World {
    * Conclui a autenticação, instancia o jogador na simulação 20Hz e sincroniza o estado inicial
    */
   public enterWorld(connection: Connection, player: Player): Player {
+    // Se o mundo ativo da arena for diferente do mundo do jogador (ex: servidor reiniciou com jogador no Mundo 2)
+    if (this.currentWorld !== player.currentWorld && this.entityManager.getAllPlayers().length === 0) {
+      for (const m of this.entityManager.getAllMonsters()) {
+        m.autoRespawns = false;
+        this.entityManager.removeMonster(m.id);
+        this.spatialGrid.removeEntity(m.id);
+      }
+      this.currentWorld = player.currentWorld;
+      this.currentStage = player.currentStage;
+      this.spawnWorldMonsters(this.currentWorld);
+    }
+
     this.entityManager.addPlayer(player);
     this.spatialGrid.updateEntity(player);
     connection.playerId = player.id;
@@ -456,14 +557,28 @@ export class World {
       connection.id // exclui o próprio jogador que receberá login_success
     );
 
-    // 2. Envia entidades existentes na arena para o jogador recém-conectado
+    // 2. Envia entidades existentes na arena para o jogador recém-conectado (incluindo status ativos)
     const allEntities = this.entityManager.getAllEntities();
     for (const ent of allEntities) {
       if (ent.id !== player.id) {
         connection.send(Opcode.S2C_ENTITY_SPAWN, {
           entity: ent.toSnapshotState(),
         } as S2CEntitySpawnPayload);
+        for (const st of ent.activeStatuses.values()) {
+          connection.send(Opcode.S2C_COMBAT_STATUS_EVENT, {
+            event: 'APPLIED',
+            serverTick: this.currentTick,
+            status: this.toCombatStatusPayload(st),
+          } as CombatStatusTransitionPayload);
+        }
       }
+    }
+    for (const st of player.activeStatuses.values()) {
+      connection.send(Opcode.S2C_COMBAT_STATUS_EVENT, {
+        event: 'APPLIED',
+        serverTick: this.currentTick,
+        status: this.toCombatStatusPayload(st),
+      } as CombatStatusTransitionPayload);
     }
 
     // 3. Envia drops de itens ativos no chão
@@ -542,6 +657,13 @@ export class World {
     const player = this.entityManager.removePlayer(playerId);
     this.spatialGrid.removeEntity(playerId);
     if (player) {
+      const clearedStatuses = player.clearAllStatuses();
+      for (const st of clearedStatuses) {
+        this.broadcastStatusTransition('CLEARED_ON_DISCONNECT', st, {
+          targetRemainingHp: player.currentHp,
+          isTargetDead: player.isDead,
+        });
+      }
       // Salva o progresso mais recente no banco de dados SQLite
       this.db.savePlayer(player);
       console.log(`[World] Player "${player.name}" desconectou e foi salvo com sucesso no SQLite.`);
@@ -579,6 +701,9 @@ export class World {
       this.processPlayerFarmHelper(player);
     }
 
+    // 1.1. Update Daily Dungeons & Boss Rush
+    this.dungeonManager.update(deltaTimeSec);
+
     // 2. Update all Monsters & Spatial Cell Index
     const monsters = this.entityManager.getAllMonsters();
     for (const monster of monsters) {
@@ -599,18 +724,26 @@ export class World {
       this.processMonsterCombat(monster);
     }
 
+    // 2.1. Update Combat Statuses (Bleed, Buffs, Debuffs, Shields, Expirations)
+    this.updateCombatStatuses(deltaTimeSec);
+
     // 3. Update Boss Challenge Timer
     if (this.isBossActive) {
       this.bossTimerSec -= deltaTimeSec;
       if (this.bossTimerSec <= 0) {
         const boss = this.activeBossId ? this.entityManager.getMonster(this.activeBossId) : null;
         if (boss) {
+          boss.autoRespawns = false;
           this.entityManager.removeMonster(boss.id);
           this.spatialGrid.removeEntity(boss.id);
-          this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: boss.id } as S2CEntityDespawnPayload);
+          this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: boss.id, reason: 'DEAD' } as S2CEntityDespawnPayload);
+          for (const p of this.entityManager.getAllPlayers()) {
+            if (p.targetId === boss.id) p.targetId = null;
+          }
         }
         this.isBossActive = false;
         this.activeBossId = null;
+        this.activeBossName = '';
         this.isBossAvailable = true; // Botão de re-tentativa agora fica disponível na Fase 10!
 
         this.broadcast(Opcode.S2C_BOSS_EVENT, {
@@ -678,7 +811,7 @@ export class World {
 
       if (player.attackTimer <= 0) {
         this.executePlayerAttack(player, target);
-        player.attackTimer = player.attackIntervalSec;
+        player.attackTimer = player.attackIntervalSec * player.getAttackSpeedMultiplier();
       }
     }
   }
@@ -690,17 +823,29 @@ export class World {
     const isCritical = Math.random() < (player.attributes.destreza * 0.015);
     const finalDamage = isCritical ? Math.round(rawDamage * 1.5) : rawDamage;
 
-    target.takeDamage(finalDamage);
+    const dmgRes = target.takeDamage(finalDamage, player);
+    if (dmgRes.brokenShieldStatus) {
+      this.broadcastStatusTransition('BROKEN', dmgRes.brokenShieldStatus, {
+        targetRemainingHp: target.currentHp,
+        isTargetDead: target.isDead,
+      });
+    } else if (dmgRes.refreshedShieldStatus) {
+      this.broadcastStatusTransition('REFRESHED', dmgRes.refreshedShieldStatus, {
+        targetRemainingHp: target.currentHp,
+        isTargetDead: target.isDead,
+      });
+    }
 
     const combatEvent: S2CCombatEventPayload = {
       attackerId: player.id,
       targetId: target.id,
-      damage: finalDamage,
+      damage: dmgRes.effectiveDamage,
       isCritical,
       isDodged: false,
       targetRemainingHp: target.currentHp,
       targetMaxHp: target.maxHp,
       isTargetDead: target.isDead,
+      damageSource: 'BASIC_ATTACK',
     };
 
     this.broadcast(Opcode.S2C_COMBAT_EVENT, combatEvent);
@@ -711,7 +856,7 @@ export class World {
   }
 
   private processMonsterCombat(monster: Monster): void {
-    if (monster.isDead || monster.state !== MonsterState.ATTACKING || !monster.targetPlayer) return;
+    if (monster.isDead || monster.isStunned() || monster.state !== MonsterState.ATTACKING || !monster.targetPlayer) return;
 
     const player = monster.targetPlayer as Player;
     if (player.isDead) return;
@@ -722,30 +867,65 @@ export class World {
       const isDodged = Math.random() < (player.attributes.destreza * 0.01);
 
       if (!isDodged) {
-        player.takeDamage(damage);
+        const dmgRes = player.takeDamage(damage, monster);
+        if (dmgRes.brokenShieldStatus) {
+          this.broadcastStatusTransition('BROKEN', dmgRes.brokenShieldStatus, {
+            targetRemainingHp: player.currentHp,
+            isTargetDead: player.isDead,
+          });
+        } else if (dmgRes.refreshedShieldStatus) {
+          this.broadcastStatusTransition('REFRESHED', dmgRes.refreshedShieldStatus, {
+            targetRemainingHp: player.currentHp,
+            isTargetDead: player.isDead,
+          });
+        }
+
+        const combatEvent: S2CCombatEventPayload = {
+          attackerId: monster.id,
+          targetId: player.id,
+          damage: dmgRes.effectiveDamage,
+          isCritical: false,
+          isDodged,
+          targetRemainingHp: player.currentHp,
+          targetMaxHp: player.maxHp,
+          isTargetDead: player.isDead,
+          damageSource: 'BASIC_ATTACK',
+        };
+
+        this.broadcast(Opcode.S2C_COMBAT_EVENT, combatEvent);
+
+        if (dmgRes.reflected > 0 && !monster.isDead) {
+          this.broadcast(Opcode.S2C_COMBAT_EVENT, {
+            attackerId: player.id,
+            targetId: monster.id,
+            damage: dmgRes.reflected,
+            isCritical: false,
+            isDodged: false,
+            targetRemainingHp: monster.currentHp,
+            targetMaxHp: monster.maxHp,
+            isTargetDead: monster.isDead,
+            damageSource: 'REFLECTION',
+          } as S2CCombatEventPayload);
+
+          if (monster.isDead) {
+            this.handleMonsterDeath(monster, player);
+          }
+        }
       }
-
-      const combatEvent: S2CCombatEventPayload = {
-        attackerId: monster.id,
-        targetId: player.id,
-        damage: isDodged ? 0 : damage,
-        isCritical: false,
-        isDodged,
-        targetRemainingHp: player.currentHp,
-        targetMaxHp: player.maxHp,
-        isTargetDead: player.isDead,
-      };
-
-      this.broadcast(Opcode.S2C_COMBAT_EVENT, combatEvent);
       monster.attackCooldown = monster.attackIntervalSec;
 
       if (player.isDead && this.isBossActive && monster.id === this.activeBossId) {
         // O jogador foi derrotado pelo chefão: o chefão recua para não causar spawn-camp
+        monster.autoRespawns = false;
         this.entityManager.removeMonster(monster.id);
         this.spatialGrid.removeEntity(monster.id);
-        this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: monster.id } as S2CEntityDespawnPayload);
+        this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: monster.id, reason: 'DEAD' } as S2CEntityDespawnPayload);
+        for (const p of this.entityManager.getAllPlayers()) {
+          if (p.targetId === monster.id) p.targetId = null;
+        }
         this.isBossActive = false;
         this.activeBossId = null;
+        this.activeBossName = '';
         this.isBossAvailable = true; // Botão de re-tentativa agora fica disponível na Fase 10!
 
         this.broadcast(Opcode.S2C_BOSS_EVENT, {
@@ -767,106 +947,944 @@ export class World {
     }
   }
 
+  private isFiniteVector3(v: unknown): v is Vector3 {
+    if (!v || typeof v !== 'object') return false;
+    const p = v as Vector3;
+    return Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z);
+  }
+
+  public sendSkillRejection(
+    player: Player,
+    slot: number,
+    reasonCode: SkillCastRejectCode,
+    message: string,
+    skillId?: string
+  ): void {
+    const conn = this.connections.get(player.id);
+    if (!conn) return;
+
+    conn.send(Opcode.S2C_SKILL_CAST_REJECTED, {
+      casterId: player.id,
+      slot,
+      skillId,
+      reasonCode,
+      message,
+      serverTick: this.currentTick,
+      cooldownRemainingSec: player.getSkillCooldown(slot),
+      casterCurrentResource: Math.round(player.currentResource),
+      casterMaxResource: player.maxResource,
+    } as S2CSkillCastRejectedPayload);
+
+    conn.send(Opcode.S2C_CHAT_MESSAGE, {
+      senderId: 'Grimório',
+      senderName: '⚠️ Ação Rejeitada',
+      message,
+      channel: 'system',
+      timestamp: Date.now(),
+    });
+  }
+
+  public toCombatStatusPayload(status: ActiveCombatStatus): CombatStatusStatePayload {
+    return {
+      statusId: status.statusId,
+      type: status.type,
+      skillId: status.skillId,
+      sourceEntityId: status.sourceEntityId,
+      targetEntityId: status.targetEntityId,
+      durationSec: status.durationSec,
+      remainingSec: Math.max(0, Math.round(status.remainingSec * 10) / 10),
+      expiresAtTick: status.expiresAtTick,
+      magnitude: status.magnitude,
+      remainingAbsorption: status.remainingAbsorption,
+      maxAbsorption: status.maxAbsorption,
+      reflectRatio: status.reflectRatio,
+    };
+  }
+
+  public broadcastStatusTransition(
+    event: CombatStatusEventReason,
+    status: ActiveCombatStatus,
+    extra?: { tickDamage?: number; targetRemainingHp?: number; isTargetDead?: boolean }
+  ): void {
+    const payload: CombatStatusTransitionPayload = {
+      event,
+      serverTick: this.currentTick,
+      status: this.toCombatStatusPayload(status),
+      tickDamage: extra?.tickDamage,
+      targetRemainingHp: extra?.targetRemainingHp,
+      isTargetDead: extra?.isTargetDead,
+    };
+    this.broadcast(Opcode.S2C_COMBAT_STATUS_EVENT, payload);
+  }
+
+  public updateCombatStatuses(deltaTimeSec: number): void {
+    const allEntities: Entity[] = [
+      ...this.entityManager.getAllPlayers(),
+      ...this.entityManager.getAllMonsters(),
+    ];
+
+    for (const ent of allEntities) {
+      if (ent.activeStatuses.size === 0) continue;
+
+      for (const [statusId, status] of Array.from(ent.activeStatuses.entries())) {
+        status.remainingSec -= deltaTimeSec;
+
+        // Periodic Tick (e.g. BLEED a cada 1.0s)
+        if (status.type === 'BLEED') {
+          status.nextTickSec = (status.nextTickSec ?? 1.0) - deltaTimeSec;
+          if (status.nextTickSec <= 0 && !ent.isDead) {
+            status.nextTickSec = 1.0;
+            const tickDmg = status.magnitude;
+            const dmgRes = ent.takeDamage(tickDmg);
+
+            this.broadcastStatusTransition('TICK', status, {
+              tickDamage: dmgRes.effectiveDamage,
+              targetRemainingHp: ent.currentHp,
+              isTargetDead: ent.isDead,
+            });
+
+            this.broadcast(Opcode.S2C_COMBAT_EVENT, {
+              attackerId: status.sourceEntityId,
+              targetId: ent.id,
+              damage: dmgRes.effectiveDamage,
+              isCritical: false,
+              isDodged: false,
+              targetRemainingHp: ent.currentHp,
+              targetMaxHp: ent.maxHp,
+              isTargetDead: ent.isDead,
+              damageSource: 'STATUS_TICK',
+            } as S2CCombatEventPayload);
+
+            if (dmgRes.killed && ent instanceof Monster) {
+              const killer = this.entityManager.getPlayer(status.sourceEntityId) || undefined;
+              this.handleMonsterDeath(ent, killer);
+            }
+          }
+        }
+
+        // Expiração do status
+        if (status.remainingSec <= 0 && ent.activeStatuses.has(statusId)) {
+          ent.activeStatuses.delete(statusId);
+          this.broadcastStatusTransition('EXPIRED', status, {
+            targetRemainingHp: ent.currentHp,
+            isTargetDead: ent.isDead,
+          });
+        }
+      }
+    }
+  }
+
   /**
    * Conjuração Autoritativa de Habilidades Ativas (Slots 1 a 4)
+   * Valida rigorosamente classe, slot, nível, CD, recurso, alvo, distância e geometria
+   * ANTES de consumir qualquer recurso ou acionar cooldown.
    */
   public castPlayerSkill(player: Player, slot: number, targetId?: string, targetPos?: Vector3): boolean {
-    if (player.isDead) return false;
+    if (player.isDead) {
+      this.sendSkillRejection(player, slot, 'CASTER_DEAD', 'O herói está derrotado e não pode agir!');
+      return false;
+    }
 
-    const skillKey = player.getEquippedSkill(slot) || `${player.classType.toLowerCase()}_${slot}`;
+    if (player.isStunned()) {
+      this.sendSkillRejection(player, slot, 'CASTER_STUNNED', 'Você está atordoado e não pode usar habilidades!');
+      return false;
+    }
+
+    if (!Number.isInteger(slot) || slot < 1 || slot > 4) {
+      this.sendSkillRejection(player, slot, 'INVALID_SLOT', `Slot inválido: ${slot}. Escolha entre 1 e 4.`);
+      return false;
+    }
+
+    const skillKey = player.getEquippedSkill(slot) || getDefaultSkillsForClass(player.classType)[slot];
     const skill = SKILLS_DATABASE[skillKey];
     if (!skill) {
-      console.warn(`[World] Skill não encontrada: ${skillKey}`);
+      this.sendSkillRejection(player, slot, 'INVALID_SKILL', `Habilidade não cadastrada: ${skillKey}`);
       return false;
     }
 
-    // 0. Validação de Nível Mínimo do Slot (D&D 5E Spell Slot Unlock)
+    if (skill.classType !== player.classType) {
+      this.sendSkillRejection(
+        player,
+        slot,
+        'WRONG_CLASS',
+        `Esta habilidade pertence a ${skill.classType}, não a ${player.classType}.`,
+        skill.skillId
+      );
+      return false;
+    }
+
+    if (skill.slot !== slot) {
+      this.sendSkillRejection(
+        player,
+        slot,
+        'INVALID_SLOT',
+        `A habilidade "${skill.name}" pertence ao Slot ${skill.slot}, não ao Slot ${slot}.`,
+        skill.skillId
+      );
+      return false;
+    }
+
     if (player.level < skill.unlockLevel) {
-      const conn = this.connections.get(player.id);
-      if (conn) {
-        conn.send(Opcode.S2C_CHAT_MESSAGE, {
-          senderId: 'Grimório',
-          senderName: '🔒 Nível Insuficiente',
-          message: `O Slot ${slot} (${skill.tierName}) requer Nível ${skill.unlockLevel} para ser conjurado!`,
-          channel: 'system',
-          timestamp: Date.now(),
-        });
+      this.sendSkillRejection(
+        player,
+        slot,
+        'LEVEL_LOCKED',
+        `O Slot ${slot} (${skill.tierName}) requer Nível ${skill.unlockLevel}! (Nível atual: ${player.level})`,
+        skill.skillId
+      );
+      return false;
+    }
+
+    const currentCd = player.getSkillCooldown(slot);
+    if (currentCd > 0) {
+      this.sendSkillRejection(
+        player,
+        slot,
+        'ON_COOLDOWN',
+        `Habilidade em recarga! (${currentCd.toFixed(1)}s restantes)`,
+        skill.skillId
+      );
+      return false;
+    }
+
+    if (player.currentResource < skill.cost) {
+      this.sendSkillRejection(
+        player,
+        slot,
+        'INSUFFICIENT_RESOURCE',
+        `${skill.resourceType} insuficiente! Necessário ${skill.cost} (Atual: ${Math.round(player.currentResource)}).`,
+        skill.skillId
+      );
+      return false;
+    }
+
+    if (targetPos !== undefined && !this.isFiniteVector3(targetPos)) {
+      this.sendSkillRejection(player, slot, 'INVALID_POSITION', 'Coordenadas de alvo inválidas ou não finitas.', skill.skillId);
+      return false;
+    }
+
+    // Classificação da Habilidade
+    let category: SkillCategory;
+    let geometry: SkillGeometryType;
+
+    if (skill.isHeal && skill.range === 0 && !skill.isAoe) {
+      category = 'SELF_HEAL';
+      geometry = 'POINT';
+    } else if (!skill.isHeal && skill.range === 0 && !skill.isAoe) {
+      category = 'SELF_BUFF';
+      geometry = 'POINT';
+    } else if (skill.isAoe) {
+      if (skill.skillId === 'guerreiro_nv2_3') {
+        category = 'AOE_LINE';
+        geometry = 'LINE';
+      } else if (
+        skill.range === 0 ||
+        skill.skillId === 'guerreiro_nv2_1' ||
+        skill.skillId === 'guerreiro_nv3_1' ||
+        skill.skillId === 'guerreiro_3' ||
+        skill.skillId === 'guerreiro_4'
+      ) {
+        category = 'AOE_SELF';
+        geometry = 'CIRCLE_SELF';
+      } else {
+        category = 'AOE_TARGET';
+        geometry = 'CIRCLE_TARGET';
       }
-      return false;
+    } else {
+      category = 'SINGLE_TARGET';
+      geometry = 'POINT';
     }
 
-    // 1. Validação de Cooldown
-    if (player.getSkillCooldown(slot) > 0) {
-      return false;
+    const RANGE_TOLERANCE = 0.5;
+    let resolvedTargetId: string | undefined;
+    let resolvedCenter: Vector3 = cloneVector3(player.position);
+    let resolvedDirection: number = player.headingYaw;
+    let targetsToDamage: Monster[] = [];
+    let singleTargetMonster: Monster | null = null;
+
+    // Resolução de Alvo e Validação Pré-Consumo
+    switch (category) {
+      case 'SELF_HEAL':
+      case 'SELF_BUFF': {
+        resolvedTargetId = player.id;
+        resolvedCenter = cloneVector3(player.position);
+        resolvedDirection = player.headingYaw;
+        break;
+      }
+
+      case 'SINGLE_TARGET': {
+        if (targetId) {
+          const ent = this.entityManager.getEntity(targetId);
+          if (!ent || !(ent instanceof Monster)) {
+            this.sendSkillRejection(player, slot, 'INVALID_TARGET', 'Alvo inválido ou inexistente.', skill.skillId);
+            return false;
+          }
+          if (ent.isDead) {
+            this.sendSkillRejection(player, slot, 'TARGET_DEAD', 'O monstro alvo já foi derrotado.', skill.skillId);
+            return false;
+          }
+          const d = distance(player.position, ent.position);
+          if (d > skill.range + RANGE_TOLERANCE) {
+            this.sendSkillRejection(
+              player,
+              slot,
+              'OUT_OF_RANGE',
+              `Alvo fora de alcance! (${d.toFixed(1)}m > ${skill.range}m)`,
+              skill.skillId
+            );
+            return false;
+          }
+          singleTargetMonster = ent;
+        } else {
+          // Auto-busca o monstro vivo mais próximo no alcance
+          const nearest = this.entityManager.findNearestMonster(player.position, skill.range + RANGE_TOLERANCE);
+          if (!nearest || nearest.isDead) {
+            this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum monstro ao alcance da habilidade.', skill.skillId);
+            return false;
+          }
+          singleTargetMonster = nearest;
+        }
+
+        resolvedTargetId = singleTargetMonster.id;
+        resolvedCenter = cloneVector3(singleTargetMonster.position);
+        const dx = singleTargetMonster.position.x - player.position.x;
+        const dz = singleTargetMonster.position.z - player.position.z;
+        resolvedDirection = (Math.atan2(dx, dz) * 180) / Math.PI;
+        targetsToDamage = [singleTargetMonster];
+        break;
+      }
+
+      case 'AOE_SELF': {
+        // Redemoinho de Aço (raio 5m) ou Avatar da Guerra (raio 7m) centrado no Guerreiro
+        if (targetPos && distance(player.position, targetPos) > skill.range + RANGE_TOLERANCE) {
+          this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', 'Ponto de conjuração fora do alcance permitido.', skill.skillId);
+          return false;
+        }
+        if (targetId) {
+          const ent = this.entityManager.getEntity(targetId);
+          if (!ent || ent.isDead || distance(player.position, ent.position) > skill.range + RANGE_TOLERANCE) {
+            this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', 'Alvo de referência fora do alcance permitido.', skill.skillId);
+            return false;
+          }
+        }
+
+        resolvedCenter = cloneVector3(player.position);
+        resolvedDirection = player.headingYaw;
+        const radius = skill.aoeRadius || 5.0;
+        const radiusSq = radius * radius;
+
+        const monsters = this.entityManager.getAllMonsters();
+        targetsToDamage = monsters.filter((m) => !m.isDead && distanceSquared(resolvedCenter, m.position) <= radiusSq);
+
+        if (targetsToDamage.length === 0) {
+          this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum inimigo dentro do raio de efeito da habilidade.', skill.skillId);
+          return false;
+        }
+        resolvedTargetId = targetsToDamage[0].id;
+        break;
+      }
+
+      case 'AOE_LINE': {
+        // Golpe Colossal: racha o solo em linha a partir do Guerreiro
+        let dirX = Math.sin((player.headingYaw * Math.PI) / 180);
+        let dirZ = Math.cos((player.headingYaw * Math.PI) / 180);
+
+        if (targetPos) {
+          const dist = distance(player.position, targetPos);
+          if (dist > skill.range + RANGE_TOLERANCE) {
+            this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', 'Direção de ataque além do alcance permitido.', skill.skillId);
+            return false;
+          }
+          if (dist > 0.1) {
+            dirX = (targetPos.x - player.position.x) / dist;
+            dirZ = (targetPos.z - player.position.z) / dist;
+          }
+        } else if (targetId) {
+          const ent = this.entityManager.getEntity(targetId);
+          if (ent && !ent.isDead) {
+            const dist = distance(player.position, ent.position);
+            if (dist > skill.range + RANGE_TOLERANCE) {
+              this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', 'Alvo além do alcance permitido.', skill.skillId);
+              return false;
+            }
+            if (dist > 0.1) {
+              dirX = (ent.position.x - player.position.x) / dist;
+              dirZ = (ent.position.z - player.position.z) / dist;
+            }
+          }
+        }
+
+        const lineLength = skill.range + RANGE_TOLERANCE;
+        const halfWidth = 1.5;
+        const monsters = this.entityManager.getAllMonsters();
+
+        targetsToDamage = monsters.filter((m) => {
+          if (m.isDead) return false;
+          const dx = m.position.x - player.position.x;
+          const dz = m.position.z - player.position.z;
+          const proj = dx * dirX + dz * dirZ;
+          const perp = Math.abs(dx * -dirZ + dz * dirX);
+          return proj >= 0 && proj <= lineLength && perp <= halfWidth;
+        });
+
+        if (targetsToDamage.length === 0) {
+          this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum inimigo atingido pela trajetória em linha.', skill.skillId);
+          return false;
+        }
+
+        resolvedDirection = (Math.atan2(dirX, dirZ) * 180) / Math.PI;
+        resolvedCenter = createVector3(
+          player.position.x + dirX * (skill.aoeRadius || 4.0),
+          0,
+          player.position.z + dirZ * (skill.aoeRadius || 4.0)
+        );
+        resolvedTargetId = targetsToDamage[0].id;
+        break;
+      }
+
+      case 'AOE_TARGET': {
+        // Lâmina do Julgamento: queda autorizada no alvo ou ponto até 8m
+        if (targetId) {
+          const ent = this.entityManager.getEntity(targetId);
+          if (!ent || !(ent instanceof Monster)) {
+            this.sendSkillRejection(player, slot, 'INVALID_TARGET', 'Alvo para queda da espada inexistente.', skill.skillId);
+            return false;
+          }
+          if (ent.isDead) {
+            this.sendSkillRejection(player, slot, 'TARGET_DEAD', 'O monstro alvo já foi derrotado.', skill.skillId);
+            return false;
+          }
+          const d = distance(player.position, ent.position);
+          if (d > skill.range + RANGE_TOLERANCE) {
+            this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', 'Alvo de impacto além do alcance máximo de 8m.', skill.skillId);
+            return false;
+          }
+          resolvedCenter = cloneVector3(ent.position);
+          resolvedTargetId = ent.id;
+        } else if (targetPos) {
+          const d = distance(player.position, targetPos);
+          if (d > skill.range + RANGE_TOLERANCE) {
+            this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', 'Ponto de impacto além do alcance máximo de 8m.', skill.skillId);
+            return false;
+          }
+          resolvedCenter = cloneVector3(targetPos);
+        } else {
+          const nearest = this.entityManager.findNearestMonster(player.position, skill.range + RANGE_TOLERANCE);
+          if (!nearest || nearest.isDead) {
+            this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum alvo ao alcance para invocar a lâmina.', skill.skillId);
+            return false;
+          }
+          resolvedCenter = cloneVector3(nearest.position);
+          resolvedTargetId = nearest.id;
+        }
+
+        const radius = skill.aoeRadius || 5.0;
+        const radiusSq = radius * radius;
+        const monsters = this.entityManager.getAllMonsters();
+        targetsToDamage = monsters.filter((m) => !m.isDead && distanceSquared(resolvedCenter, m.position) <= radiusSq);
+
+        if (targetsToDamage.length === 0) {
+          this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum inimigo dentro do raio de impacto da lâmina.', skill.skillId);
+          return false;
+        }
+        if (!resolvedTargetId) resolvedTargetId = targetsToDamage[0].id;
+        break;
+      }
     }
 
-    // 2. Validação de Recurso (Mana / Energia)
-    if (!player.consumeResource(skill.cost)) {
-      return false;
-    }
-
-    // 3. Inicia o Cooldown
+    // =========================================================================
+    // TODAS AS VALIDAÇÕES PASSARAM: AGORA SIM CONSOME RECURSO E APLICA COOLDOWN
+    // =========================================================================
+    player.consumeResource(skill.cost);
     player.setSkillCooldown(slot, skill.cooldownSec);
 
-    // 4. Calcula Poder (Fórmula D&D)
-    const power = calculateSkillPower(skill, player.attributes, player.level);
-    const isCritical = Math.random() < (player.attributes.destreza * 0.02);
-    const finalPower = isCritical ? Math.round(power * 1.5) : power;
+    const castId = `cast_${Date.now()}_${++this.castSequence}`;
+    const basePower = calculateSkillPower(skill, player.attributes, player.level, player.maxHp);
+    const isCritical = Math.random() < player.attributes.destreza * 0.02;
+    let finalPower = isCritical ? Math.round(basePower * 1.5) : basePower;
 
-    const affectedIds: string[] = [];
+    if (!skill.isHeal && category !== 'SELF_BUFF') {
+      finalPower = Math.round(finalPower * player.getDamageMultiplier());
+    }
 
-    // 5. Aplica Efeito
-    if (skill.isHeal) {
-      player.heal(finalPower);
-      affectedIds.push(player.id);
-    } else if (skill.isAoe) {
-      // Habilidade em Área
-      const aoeOrigin = targetPos || player.position;
-      const radiusSq = (skill.aoeRadius || 5.0) * (skill.aoeRadius || 5.0);
+    const affectedEntityIds: string[] = [];
+    const targetResults: SkillTargetResultPayload[] = [];
+    const appliedStatuses: CombatStatusStatePayload[] = [];
+    let totalEffectiveDamageOrHeal = 0;
 
-      const nearbyMonsters = this.entityManager.getAllMonsters();
-      for (const m of nearbyMonsters) {
-        if (!m.isDead && distanceSquared(aoeOrigin, m.position) <= radiusSq) {
+    // Aplicação Específica por Habilidade
+    if (skill.skillId === 'guerreiro_truque_1' || skill.skillId === 'guerreiro_1') {
+      // Golpe Firme: 1.35x STR + restaura 5 de Energia ao acertar
+      if (singleTargetMonster && !singleTargetMonster.isDead) {
+        const wasAlive = !singleTargetMonster.isDead;
+        const dmgRes = singleTargetMonster.takeDamage(finalPower, player);
+        player.restoreResource(5); // Restaura 5 de Energia autoritativa
+
+        affectedEntityIds.push(singleTargetMonster.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+        targetResults.push({
+          targetId: singleTargetMonster.id,
+          impactPosition: cloneVector3(singleTargetMonster.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: singleTargetMonster.currentHp,
+          maxHp: singleTargetMonster.maxHp,
+          isDead: singleTargetMonster.isDead,
+          isCritical,
+        });
+
+        if (wasAlive && singleTargetMonster.isDead) {
+          this.handleMonsterDeath(singleTargetMonster, player);
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_truque_2') {
+      // Golpe Dilacerante: dano imediato + Sangramento por 3s
+      if (singleTargetMonster && !singleTargetMonster.isDead) {
+        const wasAlive = !singleTargetMonster.isDead;
+        const dmgRes = singleTargetMonster.takeDamage(finalPower, player);
+
+        affectedEntityIds.push(singleTargetMonster.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+        targetResults.push({
+          targetId: singleTargetMonster.id,
+          impactPosition: cloneVector3(singleTargetMonster.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: singleTargetMonster.currentHp,
+          maxHp: singleTargetMonster.maxHp,
+          isDead: singleTargetMonster.isDead,
+          isCritical,
+        });
+
+        if (!singleTargetMonster.isDead) {
+          const bleedStatus: ActiveCombatStatus = {
+            statusId: `status_${Date.now()}_${++this.statusSequence}`,
+            type: 'BLEED',
+            skillId: skill.skillId,
+            sourceEntityId: player.id,
+            targetEntityId: singleTargetMonster.id,
+            durationSec: 3.0,
+            remainingSec: 3.0,
+            expiresAtTick: this.currentTick + Math.round(3.0 * SERVER_CONFIG.TICK_RATE),
+            magnitude: Math.max(1, Math.round(player.attributes.forca * 0.35 + player.level)),
+            nextTickSec: 1.0,
+          };
+          singleTargetMonster.addStatus(bleedStatus);
+          appliedStatuses.push(this.toCombatStatusPayload(bleedStatus));
+          this.broadcastStatusTransition('APPLIED', bleedStatus);
+        }
+
+        if (wasAlive && singleTargetMonster.isDead) {
+          this.handleMonsterDeath(singleTargetMonster, player);
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_truque_3') {
+      // Corte de Ruptura: dano imediato + Quebra de Armadura por 5s (-15% defesa)
+      if (singleTargetMonster && !singleTargetMonster.isDead) {
+        const wasAlive = !singleTargetMonster.isDead;
+        const dmgRes = singleTargetMonster.takeDamage(finalPower, player);
+
+        affectedEntityIds.push(singleTargetMonster.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+        targetResults.push({
+          targetId: singleTargetMonster.id,
+          impactPosition: cloneVector3(singleTargetMonster.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: singleTargetMonster.currentHp,
+          maxHp: singleTargetMonster.maxHp,
+          isDead: singleTargetMonster.isDead,
+          isCritical,
+        });
+
+        if (!singleTargetMonster.isDead) {
+          const armorStatus: ActiveCombatStatus = {
+            statusId: `status_${Date.now()}_${++this.statusSequence}`,
+            type: 'ARMOR_BREAK',
+            skillId: skill.skillId,
+            sourceEntityId: player.id,
+            targetEntityId: singleTargetMonster.id,
+            durationSec: 5.0,
+            remainingSec: 5.0,
+            expiresAtTick: this.currentTick + Math.round(5.0 * SERVER_CONFIG.TICK_RATE),
+            magnitude: 0.15,
+          };
+          singleTargetMonster.addStatus(armorStatus);
+          appliedStatuses.push(this.toCombatStatusPayload(armorStatus));
+          this.broadcastStatusTransition('APPLIED', armorStatus);
+        }
+
+        if (wasAlive && singleTargetMonster.isDead) {
+          this.handleMonsterDeath(singleTargetMonster, player);
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_nv1_1' || skill.skillId === 'guerreiro_2') {
+      // Retomar o Fôlego: Cura marcial no Guerreiro (1.6x STR + 2x Nível)
+      const effectiveHeal = player.heal(finalPower);
+      affectedEntityIds.push(player.id);
+      totalEffectiveDamageOrHeal = effectiveHeal;
+
+      targetResults.push({
+        targetId: player.id,
+        impactPosition: cloneVector3(player.position),
+        effectiveDamage: 0,
+        effectiveHeal,
+        remainingHp: player.currentHp,
+        maxHp: player.maxHp,
+        isDead: false,
+        isCritical: false,
+      });
+    } else if (skill.skillId === 'guerreiro_nv1_2') {
+      // Postura Ofensiva: golpe de investida + +25% velocidade de ataque por 6s
+      if (singleTargetMonster && !singleTargetMonster.isDead) {
+        const wasAlive = !singleTargetMonster.isDead;
+        const dmgRes = singleTargetMonster.takeDamage(finalPower, player);
+
+        affectedEntityIds.push(singleTargetMonster.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+        targetResults.push({
+          targetId: singleTargetMonster.id,
+          impactPosition: cloneVector3(singleTargetMonster.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: singleTargetMonster.currentHp,
+          maxHp: singleTargetMonster.maxHp,
+          isDead: singleTargetMonster.isDead,
+          isCritical,
+        });
+
+        const hasteStatus: ActiveCombatStatus = {
+          statusId: `status_${Date.now()}_${++this.statusSequence}`,
+          type: 'ATTACK_SPEED_BUFF',
+          skillId: skill.skillId,
+          sourceEntityId: player.id,
+          targetEntityId: player.id,
+          durationSec: 6.0,
+          remainingSec: 6.0,
+          expiresAtTick: this.currentTick + Math.round(6.0 * SERVER_CONFIG.TICK_RATE),
+          magnitude: 0.25,
+        };
+        player.addStatus(hasteStatus);
+        appliedStatuses.push(this.toCombatStatusPayload(hasteStatus));
+        this.broadcastStatusTransition('APPLIED', hasteStatus);
+
+        if (wasAlive && singleTargetMonster.isDead) {
+          this.handleMonsterDeath(singleTargetMonster, player);
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_nv1_3') {
+      // Escudo Desarmador: dano + atordoamento por 1.5s
+      if (singleTargetMonster && !singleTargetMonster.isDead) {
+        const wasAlive = !singleTargetMonster.isDead;
+        const dmgRes = singleTargetMonster.takeDamage(finalPower, player);
+
+        affectedEntityIds.push(singleTargetMonster.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+        targetResults.push({
+          targetId: singleTargetMonster.id,
+          impactPosition: cloneVector3(singleTargetMonster.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: singleTargetMonster.currentHp,
+          maxHp: singleTargetMonster.maxHp,
+          isDead: singleTargetMonster.isDead,
+          isCritical,
+        });
+
+        if (!singleTargetMonster.isDead) {
+          const stunStatus: ActiveCombatStatus = {
+            statusId: `status_${Date.now()}_${++this.statusSequence}`,
+            type: 'STUN',
+            skillId: skill.skillId,
+            sourceEntityId: player.id,
+            targetEntityId: singleTargetMonster.id,
+            durationSec: 1.5,
+            remainingSec: 1.5,
+            expiresAtTick: this.currentTick + Math.round(1.5 * SERVER_CONFIG.TICK_RATE),
+            magnitude: 1.0,
+          };
+          singleTargetMonster.addStatus(stunStatus);
+          appliedStatuses.push(this.toCombatStatusPayload(stunStatus));
+          this.broadcastStatusTransition('APPLIED', stunStatus);
+        }
+
+        if (wasAlive && singleTargetMonster.isDead) {
+          this.handleMonsterDeath(singleTargetMonster, player);
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_nv2_1' || skill.skillId === 'guerreiro_3') {
+      // Redemoinho de Aço: giro devastador 360° em 5m
+      for (const m of targetsToDamage) {
+        const wasAlive = !m.isDead;
+        const dmgRes = m.takeDamage(finalPower, player);
+        affectedEntityIds.push(m.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+
+        targetResults.push({
+          targetId: m.id,
+          impactPosition: cloneVector3(m.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: m.currentHp,
+          maxHp: m.maxHp,
+          isDead: m.isDead,
+          isCritical,
+        });
+
+        if (wasAlive && m.isDead) {
+          this.handleMonsterDeath(m, player);
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_nv2_2') {
+      // Baluarte Inquebrável: absorve 30% HP Máximo por 6s e reflete 20% do dano
+      const shieldValue = Math.round(player.maxHp * 0.30);
+      const shieldStatus: ActiveCombatStatus = {
+        statusId: `status_${Date.now()}_${++this.statusSequence}`,
+        type: 'SHIELD',
+        skillId: skill.skillId,
+        sourceEntityId: player.id,
+        targetEntityId: player.id,
+        durationSec: 6.0,
+        remainingSec: 6.0,
+        expiresAtTick: this.currentTick + Math.round(6.0 * SERVER_CONFIG.TICK_RATE),
+        magnitude: shieldValue,
+        remainingAbsorption: shieldValue,
+        maxAbsorption: shieldValue,
+        reflectRatio: 0.20,
+      };
+
+      player.addStatus(shieldStatus);
+      affectedEntityIds.push(player.id);
+      appliedStatuses.push(this.toCombatStatusPayload(shieldStatus));
+      this.broadcastStatusTransition('APPLIED', shieldStatus);
+      totalEffectiveDamageOrHeal = shieldValue;
+
+      targetResults.push({
+        targetId: player.id,
+        impactPosition: cloneVector3(player.position),
+        effectiveDamage: 0,
+        effectiveHeal: 0,
+        shieldGranted: shieldValue,
+        remainingHp: player.currentHp,
+        maxHp: player.maxHp,
+        isDead: false,
+        isCritical: false,
+      });
+    } else if (skill.skillId === 'guerreiro_nv2_3') {
+      // Golpe Colossal: dano em linha + empurrão de 1.5m
+      const dirRad = (resolvedDirection * Math.PI) / 180;
+      const pushX = Math.sin(dirRad) * 1.5;
+      const pushZ = Math.cos(dirRad) * 1.5;
+
+      for (const m of targetsToDamage) {
+        const wasAlive = !m.isDead;
+        const dmgRes = m.takeDamage(finalPower, player);
+        affectedEntityIds.push(m.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+
+        if (!m.isDead) {
+          m.position.x += pushX;
+          m.position.z += pushZ;
+          this.spatialGrid.updateEntity(m);
+        }
+
+        targetResults.push({
+          targetId: m.id,
+          impactPosition: cloneVector3(m.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: m.currentHp,
+          maxHp: m.maxHp,
+          isDead: m.isDead,
+          isCritical,
+        });
+
+        if (wasAlive && m.isDead) {
+          this.handleMonsterDeath(m, player);
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_nv3_1' || skill.skillId === 'guerreiro_4') {
+      // Avatar da Guerra: dano em 7m + amplia dano em 30% por 10s
+      for (const m of targetsToDamage) {
+        const wasAlive = !m.isDead;
+        const dmgRes = m.takeDamage(finalPower, player);
+        affectedEntityIds.push(m.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+
+        targetResults.push({
+          targetId: m.id,
+          impactPosition: cloneVector3(m.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: m.currentHp,
+          maxHp: m.maxHp,
+          isDead: m.isDead,
+          isCritical,
+        });
+
+        if (wasAlive && m.isDead) {
+          this.handleMonsterDeath(m, player);
+        }
+      }
+
+      const avatarStatus: ActiveCombatStatus = {
+        statusId: `status_${Date.now()}_${++this.statusSequence}`,
+        type: 'DAMAGE_BUFF',
+        skillId: skill.skillId,
+        sourceEntityId: player.id,
+        targetEntityId: player.id,
+        durationSec: 10.0,
+        remainingSec: 10.0,
+        expiresAtTick: this.currentTick + Math.round(10.0 * SERVER_CONFIG.TICK_RATE),
+        magnitude: 0.30,
+      };
+      player.addStatus(avatarStatus);
+      appliedStatuses.push(this.toCombatStatusPayload(avatarStatus));
+      this.broadcastStatusTransition('APPLIED', avatarStatus);
+    } else if (skill.skillId === 'guerreiro_nv3_2') {
+      // Lâmina do Julgamento: espada celestial que cai sobre o centro autorizado em 5m
+      for (const m of targetsToDamage) {
+        const wasAlive = !m.isDead;
+        const dmgRes = m.takeDamage(finalPower, player);
+        affectedEntityIds.push(m.id);
+        totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
+
+        targetResults.push({
+          targetId: m.id,
+          impactPosition: cloneVector3(m.position),
+          effectiveDamage: dmgRes.effectiveDamage,
+          effectiveHeal: 0,
+          remainingHp: m.currentHp,
+          maxHp: m.maxHp,
+          isDead: m.isDead,
+          isCritical,
+        });
+
+        if (wasAlive && m.isDead) {
+          this.handleMonsterDeath(m, player);
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_nv3_3') {
+      // Última Resistência Imortal: imunidade contra morte por 5s, cura 40% HP e ondas de fogo marcial em 4m
+      const healAmount = Math.round(player.maxHp * 0.40);
+      const effectiveHeal = player.heal(healAmount);
+      totalEffectiveDamageOrHeal = effectiveHeal;
+      affectedEntityIds.push(player.id);
+
+      const immortalStatus: ActiveCombatStatus = {
+        statusId: `status_${Date.now()}_${++this.statusSequence}`,
+        type: 'DEATH_IMMUNITY',
+        skillId: skill.skillId,
+        sourceEntityId: player.id,
+        targetEntityId: player.id,
+        durationSec: 5.0,
+        remainingSec: 5.0,
+        expiresAtTick: this.currentTick + Math.round(5.0 * SERVER_CONFIG.TICK_RATE),
+        magnitude: 1.0,
+      };
+      player.addStatus(immortalStatus);
+      appliedStatuses.push(this.toCombatStatusPayload(immortalStatus));
+      this.broadcastStatusTransition('APPLIED', immortalStatus);
+
+      targetResults.push({
+        targetId: player.id,
+        impactPosition: cloneVector3(player.position),
+        effectiveDamage: 0,
+        effectiveHeal,
+        remainingHp: player.currentHp,
+        maxHp: player.maxHp,
+        isDead: false,
+        isCritical: false,
+      });
+
+      // Onda de fogo marcial em 4m
+      const waveDmg = Math.round(player.attributes.forca * 2.0 + player.attributes.constituicao * 1.0);
+      const monsters = this.entityManager.getAllMonsters();
+      for (const m of monsters) {
+        if (!m.isDead && distanceSquared(player.position, m.position) <= 16.0) {
           const wasAlive = !m.isDead;
-          m.takeDamage(finalPower);
-          affectedIds.push(m.id);
+          const dmgRes = m.takeDamage(waveDmg, player);
+          affectedEntityIds.push(m.id);
+          targetResults.push({
+            targetId: m.id,
+            impactPosition: cloneVector3(m.position),
+            effectiveDamage: dmgRes.effectiveDamage,
+            effectiveHeal: 0,
+            remainingHp: m.currentHp,
+            maxHp: m.maxHp,
+            isDead: m.isDead,
+            isCritical: false,
+          });
+
           if (wasAlive && m.isDead) {
             this.handleMonsterDeath(m, player);
           }
         }
       }
     } else {
-      // Alvo Único
-      let target: Entity | null = targetId ? (this.entityManager.getEntity(targetId) || null) : null;
-      if (!target || target.isDead) {
-        target = this.entityManager.findNearestMonster(player.position, skill.range);
-      }
+      // Fallback genérico para habilidades de outras classes
+      if (skill.isHeal) {
+        const effectiveHeal = player.heal(finalPower);
+        affectedEntityIds.push(player.id);
+        totalEffectiveDamageOrHeal = effectiveHeal;
+        targetResults.push({
+          targetId: player.id,
+          impactPosition: cloneVector3(player.position),
+          effectiveDamage: 0,
+          effectiveHeal,
+          remainingHp: player.currentHp,
+          maxHp: player.maxHp,
+          isDead: false,
+          isCritical: false,
+        });
+      } else {
+        for (const m of targetsToDamage) {
+          const wasAlive = !m.isDead;
+          const dmgRes = m.takeDamage(finalPower, player);
+          affectedEntityIds.push(m.id);
+          totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
 
-      if (target && !target.isDead && target instanceof Monster) {
-        const d = distance(player.position, target.position);
-        if (d <= skill.range * 1.3) {
-          const wasAlive = !target.isDead;
-          target.takeDamage(finalPower);
-          affectedIds.push(target.id);
-          if (wasAlive && target.isDead) {
-            this.handleMonsterDeath(target, player);
+          targetResults.push({
+            targetId: m.id,
+            impactPosition: cloneVector3(m.position),
+            effectiveDamage: dmgRes.effectiveDamage,
+            effectiveHeal: 0,
+            remainingHp: m.currentHp,
+            maxHp: m.maxHp,
+            isDead: m.isDead,
+            isCritical,
+          });
+
+          if (wasAlive && m.isDead) {
+            this.handleMonsterDeath(m, player);
           }
         }
       }
     }
 
-    // 6. Transmite Evento de Conjuração para Todos na Área
+    // Transmissão Autoritativa do Evento de Conjuração
     const castPayload: S2CSkillCastEventPayload = {
+      castId,
+      serverTick: this.currentTick,
       casterId: player.id,
       skillId: skill.skillId,
       slot: skill.slot,
       skillName: skill.name,
-      targetId: targetId || (affectedIds.length > 0 ? affectedIds[0] : undefined),
-      targetPosition: targetPos,
-      damageOrHeal: finalPower,
+      category,
+      geometry,
+      originPosition: cloneVector3(player.position),
+      targetId: resolvedTargetId,
+      targetPosition: resolvedCenter,
+      headingYaw: resolvedDirection,
+      radius: skill.aoeRadius,
+      lineLength: category === 'AOE_LINE' ? skill.range : undefined,
+      lineWidth: category === 'AOE_LINE' ? 3.0 : undefined,
+      damageOrHeal: totalEffectiveDamageOrHeal,
       isHeal: skill.isHeal,
       isCritical,
-      affectedEntityIds: affectedIds,
+      affectedEntityIds,
+      targetResults,
+      appliedStatuses,
       casterCurrentResource: Math.round(player.currentResource),
       casterMaxResource: player.maxResource,
     };
@@ -968,6 +1986,19 @@ export class World {
   }
 
   public handleMonsterDeath(monster: Monster, killer?: Player): void {
+    const cleared = monster.clearAllStatuses();
+    for (const st of cleared) {
+      this.broadcastStatusTransition('CLEARED_ON_DEATH', st, {
+        targetRemainingHp: 0,
+        isTargetDead: true,
+      });
+    }
+
+    // 0. Notifica DungeonManager se este monstro pertencia a uma masmorra ativa
+    if (killer && killer instanceof Player) {
+      this.dungeonManager.onMonsterKilled(monster.id, killer);
+    }
+
     // 1. Authoritative Experience (EXP) & Level Up Progression
     if (killer && !killer.isDead && killer instanceof Player) {
       const expReward = monster.expReward;
@@ -1011,32 +2042,50 @@ export class World {
     }
 
     // 2. Boss Defeat & Stage Progression
-    if (this.isBossActive && monster.id === this.activeBossId) {
-      this.isBossActive = false;
-      this.activeBossId = null;
-      this.isBossAvailable = false;
-      this.isPortalOpen = true;
-      this.stageKills = 1;
+    const isBossDefeated = (this.isBossActive && monster.id === this.activeBossId) || monster.isBoss;
+    if (isBossDefeated) {
+      monster.autoRespawns = false;
+      this.entityManager.removeMonster(monster.id);
+      this.spatialGrid.removeEntity(monster.id);
+      this.broadcast(Opcode.S2C_ENTITY_DESPAWN, {
+        entityId: monster.id,
+        reason: 'DEAD',
+      } as S2CEntityDespawnPayload);
 
-      this.broadcast(Opcode.S2C_BOSS_EVENT, {
-        eventType: 'VICTORY',
-        bossName: monster.name,
-        newWorld: this.currentWorld + 1,
-        message: `🎉 O ${monster.name} foi DERROTADO! Você conquistou o Mundo ${this.currentWorld} (${this.getWorldName(this.currentWorld)})! O Portal Rúnico Dourado foi ABERTO no centro da arena!`,
-      } as S2CBossEventPayload);
+      for (const p of this.entityManager.getAllPlayers()) {
+        if (p.targetId === monster.id) {
+          p.targetId = null;
+        }
+      }
 
-      this.broadcast(Opcode.S2C_STAGE_UPDATE, {
-        world: this.currentWorld,
-        stage: 10,
-        worldName: this.getWorldName(this.currentWorld),
-        stageKills: 1,
-        killsRequired: 1,
-        isBossStage: true,
-        bossAvailable: false,
-        portalOpen: true,
-        portalPosition: this.portalPosition,
-        message: `Portal Rúnico Aberto para o Mundo ${this.currentWorld + 1}!`,
-      } as S2CStageUpdatePayload);
+      if (this.isBossActive && monster.id === this.activeBossId) {
+        this.isBossActive = false;
+        this.activeBossId = null;
+        this.activeBossName = '';
+        this.isBossAvailable = false;
+        this.isPortalOpen = true;
+        this.stageKills = 1;
+
+        this.broadcast(Opcode.S2C_BOSS_EVENT, {
+          eventType: 'VICTORY',
+          bossName: monster.name,
+          newWorld: this.currentWorld + 1,
+          message: `🎉 O ${monster.name} foi DERROTADO! Você conquistou o Mundo ${this.currentWorld} (${this.getWorldName(this.currentWorld)})! O Portal Rúnico Dourado foi ABERTO no centro da arena!`,
+        } as S2CBossEventPayload);
+
+        this.broadcast(Opcode.S2C_STAGE_UPDATE, {
+          world: this.currentWorld,
+          stage: 10,
+          worldName: this.getWorldName(this.currentWorld),
+          stageKills: 1,
+          killsRequired: 1,
+          isBossStage: true,
+          bossAvailable: false,
+          portalOpen: true,
+          portalPosition: this.portalPosition,
+          message: `Portal Rúnico Aberto para o Mundo ${this.currentWorld + 1}!`,
+        } as S2CStageUpdatePayload);
+      }
     } else if (!this.isBossActive) {
       // Normal wave progression (Stages 1 to 9)
       if (this.currentStage < 10) {
@@ -1474,6 +2523,7 @@ export class World {
     }
 
     let bossName: string;
+    let bossType: string;
     let bossHp: number;
     let bossAtk: number;
     let bossExp: number;
@@ -1481,31 +2531,37 @@ export class World {
     switch (this.currentWorld) {
       case 1:
         bossName = 'Grimgor, o Senhor Rúnico da Floresta';
+        bossType = 'boss_grimgor';
         bossHp = 6000;
         bossAtk = 52;
         bossExp = 1500;
         break;
       case 2:
         bossName = 'Frostbite, a Matriarca dos Lobos Gélidos';
+        bossType = 'boss_frostbite';
         bossHp = 15000;
         bossAtk = 95;
         bossExp = 3800;
         break;
       case 3:
         bossName = 'Ignis, o Titã da Forja Vulcânica';
+        bossType = 'boss_ignis';
         bossHp = 32000;
         bossAtk = 160;
         bossExp = 9000;
         break;
       default:
         bossName = `Lorde Titânico Astral (Mundo ${this.currentWorld})`;
+        bossType = 'boss_astral';
         bossHp = 32000 + (this.currentWorld - 3) * 20000;
         bossAtk = 160 + (this.currentWorld - 3) * 40;
         bossExp = 9000 * this.currentWorld;
         break;
     }
 
-    const boss = new Monster(`boss_${Date.now()}`, bossName, createVector3(0, 0, 4), bossHp, bossAtk);
+    const boss = new Monster(`boss_${Date.now()}`, bossName, createVector3(0, 0, 4), bossHp, bossAtk, bossType);
+    boss.isBoss = true;
+    boss.autoRespawns = false;
     boss.aggroRadius = 40.0;
     boss.attackRange = 2.8;
     boss.attackIntervalSec = 1.7;
@@ -1559,13 +2615,29 @@ export class World {
       return { success: false, reason: 'Aproxime-se do Portal Rúnico em (0, 0, 8) para entrar!' };
     }
 
-    // Salto Dimensional para o próximo mundo!
+    // 1. Remove todos os monstros do mundo anterior da simulação e despawna nos clientes
+    const previousMonsters = this.entityManager.getAllMonsters();
+    for (const m of previousMonsters) {
+      m.autoRespawns = false;
+      this.entityManager.removeMonster(m.id);
+      this.spatialGrid.removeEntity(m.id);
+      this.broadcast(Opcode.S2C_ENTITY_DESPAWN, {
+        entityId: m.id,
+        reason: 'DEAD',
+      } as S2CEntityDespawnPayload);
+    }
+
+    // 2. Limpa qualquer estado de chefão ativo
+    this.isBossActive = false;
+    this.activeBossId = null;
+    this.activeBossName = '';
+    this.isBossAvailable = false;
     this.isPortalOpen = false;
+
+    // 3. Salto Dimensional para o próximo mundo!
     this.currentWorld += 1;
     this.currentStage = 1;
     this.stageKills = 0;
-    this.isBossActive = false;
-    this.isBossAvailable = false;
 
     player.currentWorld = this.currentWorld;
     player.currentStage = this.currentStage;
@@ -1576,6 +2648,14 @@ export class World {
     player.position.z = -10;
     player.targetDestination = null;
     player.moveDirection = null;
+
+    // Desvincula alvo dos jogadores
+    for (const p of this.entityManager.getAllPlayers()) {
+      p.targetId = null;
+    }
+
+    // 4. Spawna os monstros do novo mundo
+    this.spawnWorldMonsters(this.currentWorld);
 
     const conn = this.connections.get(player.id);
     if (conn) {
@@ -2167,5 +3247,102 @@ export class World {
       equippedArmorCardId: armorCard,
       totalCombatPower: player.CombatPower,
     } as S2CCardsUpdatePayload);
+  }
+
+  /**
+   * Envia o inventário e ouro autoritativo atualizado para a conexão do jogador
+   */
+  public sendInventoryUpdate(player: Player): void {
+    const conn = this.connections.get(player.id);
+    if (!conn) return;
+
+    conn.send(Opcode.S2C_INVENTORY_UPDATE, {
+      slots: player.inventory,
+      gold: player.gold,
+      maxSlots: player.maxInventorySlots,
+      totalCombatPower: player.CombatPower,
+    } as S2CInventoryUpdatePayload);
+  }
+
+  /**
+   * Entrega itens ou cartas autoritativamente na conta do jogador
+   */
+  public deliverRewardItemToPlayer(player: Player, itemId: string, quantity: number): void {
+    if (itemId === 'gold') {
+      player.gold = this.db.updateCharacterGold(player.dbCharacterId, quantity);
+    } else if (itemId.startsWith('card_')) {
+      this.db.addCharacterCard(player.dbCharacterId, itemId);
+      player.cards = this.db.getCharacterCards(player.dbCharacterId);
+      player.recalculateStatsFromEquipment();
+    } else {
+      this.db.addItemToInventory(player.dbCharacterId, itemId, quantity, player.maxInventorySlots);
+      player.inventory = this.db.getInventory(player.dbCharacterId);
+      player.recalculateStatsFromEquipment();
+    }
+  }
+
+  /**
+   * Envia as informações da masmorra diária e ingressos do jogador (0x88 -> 0x89)
+   */
+  public handleRequestDungeonInfo(player: Player): void {
+    const conn = this.connections.get(player.id);
+    if (!conn) return;
+
+    const session = this.dungeonManager.getSession(player.id);
+    const info = this.db.getDailyDungeonInfo(
+      player.dbCharacterId || player.id,
+      this.dungeonManager.isPlayerInDungeon(player.id),
+      session?.dungeonType
+    );
+    conn.send(Opcode.S2C_DUNGEON_INFO, info);
+  }
+
+  /**
+   * Entra na masmorra diária / Boss Rush selecionada (0x8A -> 0x8B)
+   */
+  public handleEnterDungeon(player: Player, payload: C2SEnterDungeonPayload): void {
+    const conn = this.connections.get(player.id);
+    const result = this.dungeonManager.startDungeon(player, payload?.dungeonType || 'BOSS_RUSH');
+    if (!result.success && conn) {
+      conn.send(Opcode.S2C_DUNGEON_EVENT, {
+        status: 'DEFEAT',
+        dungeonType: payload?.dungeonType || 'BOSS_RUSH',
+        currentWave: 0,
+        maxWaves: 0,
+        timeLimitSec: 0,
+        remainingTimeSec: 0,
+        message: result.message,
+      } as S2CDungeonEventPayload);
+    }
+  }
+
+  /**
+   * Compra ingresso extra de masmorra diária usando ouro (0x8C -> 0x8D)
+   */
+  public handleBuyDungeonTicket(player: Player): void {
+    const conn = this.connections.get(player.id);
+    if (!conn) return;
+
+    const result = this.db.buyExtraDungeonTicket(player.dbCharacterId || player.id);
+    if (result.success) {
+      player.gold = result.remainingGold;
+      this.sendInventoryUpdate(player);
+    }
+
+    conn.send(Opcode.S2C_BUY_DUNGEON_TICKET_RESULT, {
+      success: result.success,
+      ticketsRemaining: result.ticketsRemaining,
+      extraTicketsBoughtToday: result.extraTicketsBoughtToday,
+      goldSpent: result.goldSpent,
+      remainingGold: result.remainingGold,
+      message: result.message,
+    } as S2CBuyDungeonTicketResultPayload);
+  }
+
+  /**
+   * Abandona voluntariamente a masmorra em andamento (0x8E)
+   */
+  public handleLeaveDungeon(player: Player): void {
+    this.dungeonManager.leaveDungeon(player);
   }
 }

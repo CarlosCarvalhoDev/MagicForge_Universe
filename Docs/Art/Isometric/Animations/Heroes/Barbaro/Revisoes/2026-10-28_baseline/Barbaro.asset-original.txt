@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4517576ec6e8144e8eb1f2bf85a1210, type: 3}
+  m_Name: Barbaro
+  m_EditorClassIdentifier: Assembly-CSharp::MagicForge.Core.CharacterClassSO
+  className: "B\xE1rbaro"
+  classDescription: Berserker tribal imbuido pelo magma da Forja. Dano explosivo corpo-a-corpo baseado em Forca (STR) e alta Constituicao.
+  classIcon: {fileID: 21300000, guid: a10000033a6524c489205bd51885cc03, type: 3}
+  isometricWorldSprite: {fileID: 21300000, guid: ad888c3716e16d45171c14a73d67cb54, type: 3}
+  idleFrames:
+  - {fileID: 21300000, guid: 70dfdbfabba34b1c80289ad51a8d2637, type: 3}
+  - {fileID: 21300002, guid: 70dfdbfabba34b1c80289ad51a8d2637, type: 3}
+  - {fileID: 21300004, guid: 70dfdbfabba34b1c80289ad51a8d2637, type: 3}
+  - {fileID: 21300006, guid: 70dfdbfabba34b1c80289ad51a8d2637, type: 3}
+  walkFrames:
+  - {fileID: 21300000, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300002, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300004, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300006, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300008, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  - {fileID: 21300010, guid: 4f484a4e6865440c832bfb7567c1259b, type: 3}
+  attackFrames:
+  - {fileID: 21300000, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300002, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300004, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300006, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300008, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  - {fileID: 21300010, guid: 8df0a89e5a764e2dbb1c57b0af5bb49f, type: 3}
+  hitFrames:
+  - {fileID: 21300000, guid: 4964b172422349458b1f5ee904ecec62, type: 3}
+  - {fileID: 21300002, guid: 4964b172422349458b1f5ee904ecec62, type: 3}
+  deathFrames:
+  - {fileID: 21300000, guid: 2d1483fe54f34c8980c6883f9ecfa07e, type: 3}
+  - {fileID: 21300002, guid: 2d1483fe54f34c8980c6883f9ecfa07e, type: 3}
+  - {fileID: 21300004, guid: 2d1483fe54f34c8980c6883f9ecfa07e, type: 3}
+  - {fileID: 21300006, guid: 2d1483fe54f34c8980c6883f9ecfa07e, type: 3}
+  defaultElement: 1
+  mainStat: 0
+  isRanged: 0
+  attackRange: 2.5
+  attackIntervalSec: 1.4
+  baseSpeed: 5.2
+  baseForca: 18
+  baseDestreza: 12
+  baseConstituicao: 16
+  baseInteligencia: 6
+  baseSabedoria: 8
+  baseCarisma: 8
+  ganhoForcaPorLevel: 3
+  ganhoDestrezaPorLevel: 1
+  ganhoConstituicaoPorLevel: 2
+  ganhoInteligenciaPorLevel: 0
+  ganhoSabedoriaPorLevel: 0
+  ganhoCarismaPorLevel: 0
+  isTier1: 1
+  evolutionOptionA: {fileID: 0}
+  evolutionOptionB: {fileID: 0}

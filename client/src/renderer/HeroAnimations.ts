@@ -54,6 +54,7 @@ export const HERO_SHEETS: Record<string, HeroSheetSet> = {
   GUERREIRO: sheets('guerreiro'),
   CLERIGO: sheets('clerigo', true, 8, 12),
   BARBARO: sheets('barbaro'),
+  ARQUEIRO: sheets('arqueiro'),
   DEMONOLOGO: demonologoSheets(),
 };
 

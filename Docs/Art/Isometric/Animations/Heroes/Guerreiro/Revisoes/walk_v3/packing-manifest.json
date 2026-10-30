@@ -1,0 +1,69 @@
+{
+  "Sheet": "iso_hero_guerreiro_walk_sheet.png",
+  "Columns": 3,
+  "Rows": 2,
+  "CellSize": 512,
+  "SheetSHA256": "EA9F8B638CC4F45E131E7723A898FC24F6F651893192D20E3233A8AC5FEDE5D3",
+  "Frames": [
+    {
+      "Index": 0,
+      "File": "iso_hero_guerreiro_walk_00.png",
+      "Source": "source_00.png",
+      "SourceSHA256": "9E2510C331548A23875C8897314002B2A13B61D88C1568B49C7F82D9112EAC6D",
+      "FrameSHA256": "AB81D3088FCC58F00807EDE8965173E763040D7CD9564C27126E1DADB2D78F03",
+      "X": 0,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 1,
+      "File": "iso_hero_guerreiro_walk_01.png",
+      "Source": "source_01.png",
+      "SourceSHA256": "4EE9955F33FE8DF69C20576A3707681454E8E5C5037C34D9F418036253E79B44",
+      "FrameSHA256": "944DBF2F17624FA9286A980A0570599C972F022C07959D3BA12E86B48F89782C",
+      "X": 512,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 2,
+      "File": "iso_hero_guerreiro_walk_02.png",
+      "Source": "source_02.png",
+      "SourceSHA256": "3BD3AB1D9B1F2E92A08186F13B4F40BD955DF16CD2D0D4038905B58D87F9CA21",
+      "FrameSHA256": "608C3CF9A7B9CA778F447C4C033C2AC30CBE2A806E5D5CA1DA38ED83463FAFFD",
+      "X": 1024,
+      "Y": 0,
+      "Size": 512
+    },
+    {
+      "Index": 3,
+      "File": "iso_hero_guerreiro_walk_03.png",
+      "Source": "source_03.png",
+      "SourceSHA256": "1849B878DFB8009B209A9BF7E0C5F1F76D16524CACB95D003AFA8EBEFC4BD894",
+      "FrameSHA256": "45BF1A36983AB00864A70A96A42C0AD38B79BB21E050479EA1ECAAF86A93F422",
+      "X": 0,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 4,
+      "File": "iso_hero_guerreiro_walk_04.png",
+      "Source": "source_04.png",
+      "SourceSHA256": "BC3F442E8EF4FF4F69A2DF65807B1E0A9E2FFD6130B96B8418FD879C3A6D0096",
+      "FrameSHA256": "BDE73E66B69F6256DB46DE08B500497AED4EAD3CFF3C10D80305E59E4009C0AA",
+      "X": 512,
+      "Y": 512,
+      "Size": 512
+    },
+    {
+      "Index": 5,
+      "File": "iso_hero_guerreiro_walk_05.png",
+      "Source": "source_05.png",
+      "SourceSHA256": "DB142911636047996E1CB38F87C8CAC481490B27F1DEEA1EC8666A789409FF80",
+      "FrameSHA256": "19D2207620FDCFCD7C6F6BD1CBBB219124706698D68649570B0097973500E101",
+      "X": 1024,
+      "Y": 512,
+      "Size": 512
+    }
+  ]
+}

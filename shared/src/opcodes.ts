@@ -38,6 +38,8 @@ export enum Opcode {
   S2C_CHARACTER_LIST = 0x3A,
   C2S_CREATE_CHARACTER_SLOT = 0x3B,
   C2S_SELECT_CHARACTER_SLOT = 0x3C,
+  S2C_SKILL_CAST_REJECTED = 0x3D,
+  S2C_COMBAT_STATUS_EVENT = 0x3E,
 
   // --- Items, Drops & Inventory (0x40 - 0x4F) ---
   S2C_ITEM_DROP_SPAWN = 0x40,
@@ -84,6 +86,15 @@ export enum Opcode {
   // --- Rankings & Leaderboards (0x86 - 0x8F) ---
   C2S_REQUEST_LEADERBOARD = 0x86,
   S2C_LEADERBOARD_UPDATE = 0x87,
+
+  // --- Daily Dungeons & Boss Rush (0x88 - 0x8E) ---
+  C2S_REQUEST_DUNGEON_INFO = 0x88,
+  S2C_DUNGEON_INFO = 0x89,
+  C2S_ENTER_DUNGEON = 0x8A,
+  S2C_DUNGEON_EVENT = 0x8B,
+  C2S_BUY_DUNGEON_TICKET = 0x8C,
+  S2C_BUY_DUNGEON_TICKET_RESULT = 0x8D,
+  C2S_LEAVE_DUNGEON = 0x8E,
 
   // --- Heartbeat & Quality of Service (0xF0 - 0xFF) ---
   C2S_PING = 0xF0,

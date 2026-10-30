@@ -1,9 +1,14 @@
-import { ItemRarity, RARITY_COLORS, S2CItemDropSpawnPayload, Vector3, distance } from '@magicforge/shared';
+import { ItemRarity, RARITY_COLORS, S2CItemDropSpawnPayload, S2CSkillCastEventPayload, CombatStatusTransitionPayload, SKILLS_DATABASE, Vector3, distance } from '@magicforge/shared';
 import { InterpolatedEntity } from '../interpolation/SnapshotBuffer';
 import { HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground, getFacingDirection, HeroAction } from './HeroAnimations';
 import { FloatingDialogue } from '../ui/FloatingDialogue';
 import { IdleMath } from '../idle/IdleMath';
 import { SoundManager } from '../audio/SoundManager';
+import { PixelWorld } from './PixelWorld';
+import { PixelVfxPlayer } from './PixelVfxPlayer';
+import { planWarriorCastFx } from './PixelVfx';
+import { WarriorPresentation } from './WarriorPresentation';
+import type { VisualStage } from './WorldPresentation';
 
 export interface FloatingText {
   id: string;
@@ -38,6 +43,11 @@ export interface CombatVisualFx {
 }
 
 export class GameRenderer {
+  public setStagePresentation(stage: VisualStage): void { this.pixelWorld.presentation.setStage(stage); }
+  public readonly pixelWorld = new PixelWorld();
+  public readonly vfx = new PixelVfxPlayer();
+  public readonly warriorPresentation = new WarriorPresentation();
+  public readonly visualStyle: 'pixel' | 'legacy';
   private dialogues = new FloatingDialogue();
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -79,12 +89,15 @@ export class GameRenderer {
     { x: -28, z: 22, color: '#34d399', type: 'grass' },
   ];
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, visualStyle: 'pixel' | 'legacy' = 'pixel') {
+    this.visualStyle = visualStyle;
     this.canvas = canvas;
     const context = canvas.getContext('2d');
     if (!context) throw new Error('Could not get 2D canvas context');
     this.ctx = context;
 
+    this.pixelWorld.ready.catch(error => console.error(error));
+    this.vfx.ready.catch(error => console.error(error));
     this.loadHeroSpriteSheets();
     this.loadIsometricSprites();
     this.loadFloorTiles();
@@ -201,6 +214,7 @@ export class GameRenderer {
 
   public triggerEntityAnimation(entityId: string, action: HeroAction): void {
     this.animationClock.trigger(entityId, action, performance.now());
+    this.pixelWorld.clock.trigger(entityId, action, performance.now());
   }
 
   public triggerSkillCast(
@@ -242,6 +256,7 @@ export class GameRenderer {
   }
 
   public addDamageText(worldPos: Vector3, damage: number, isCritical: boolean, isDodged: boolean): void {
+    if (!isDodged && damage > 0) this.vfx.queue.spawn({ kind: 'impact', position: worldPos }, performance.now());
     let text = `-${damage}`;
     let color = '#ff4d4f'; // red
 
@@ -293,6 +308,7 @@ export class GameRenderer {
 
   public addLevelUpEffect(worldPos: Vector3, newLevel: number): void {
     SoundManager.playLevelUp();
+    this.vfx.queue.spawn({ kind: 'levelUp', position: worldPos }, performance.now());
     this.floatingTexts.push({
       id: Math.random().toString(),
       text: `✦ LEVEL UP! [Nv. ${newLevel}] ✦`,
@@ -304,7 +320,24 @@ export class GameRenderer {
     });
   }
 
-  public resetNarrative(): void { this.dialogues.reset(); }
+  public resetNarrative(): void { this.dialogues.reset(); this.vfx.queue.clear(); this.warriorPresentation.clear(); }
+
+  public acceptSkillCast(event: S2CSkillCastEventPayload): boolean {
+    return this.warriorPresentation.acceptCast(event, performance.now());
+  }
+
+  public applyCombatStatus(event: CombatStatusTransitionPayload, entities: InterpolatedEntity[]): void {
+    if (!this.warriorPresentation.transition(event, performance.now())) return;
+    const target = entities.find(e => e.id === event.status.targetEntityId);
+    if (target && event.event === 'BROKEN') this.floatingTexts.push({ id: `status-${event.status.statusId}`, text: 'ESCUDO QUEBRADO', color: '#b9e9fa', x: target.position.x, y: target.position.z - 2, opacity: 1, createdAt: performance.now() });
+    // BLEED damage is already broadcast via S2C_COMBAT_EVENT; do not duplicate numbers here.
+  }
+
+  public playSkillVfx(event: S2CSkillCastEventPayload, entities: InterpolatedEntity[]): void {
+    const radius = event.radius ?? SKILLS_DATABASE[event.skillId]?.aoeRadius;
+    for (const request of planWarriorCastFx(event, entities, radius)) this.vfx.queue.spawn(request, performance.now());
+    for (const status of event.appliedStatuses ?? []) this.warriorPresentation.transition({ event: 'APPLIED', serverTick: event.serverTick ?? 0, status }, performance.now());
+  }
 
   public spawnCombatFx(
     type: CombatVisualFx['type'],
@@ -431,6 +464,23 @@ export class GameRenderer {
     if (myPlayer) {
       this.cameraOffset.x = myPlayer.position.x;
       this.cameraOffset.y = myPlayer.position.z;
+    }
+
+    // Pixel-art migration: presentation changes only; network snapshots remain authoritative.
+    if (this.visualStyle === 'pixel') {
+      this.pixelWorld.draw(ctx, entities, this.cameraOffset, this.zoom, myPlayerId, this.selectedTargetId, now);
+      this.vfx.draw(ctx, entities, this.cameraOffset, this.zoom, now);
+      this.vfx.drawStatuses(ctx, this.warriorPresentation.visible(now, entities), entities, this.cameraOffset, this.zoom, now);
+      this.renderItemDrops(width / 2, height / 2);
+      this.renderFloatingText(width / 2, height / 2);
+      const currentDialogue = this.dialogues.current(now);
+      const currentSpeaker = currentDialogue ? entities.find(entity => entity.id === currentDialogue.entityId) : undefined;
+      if (currentSpeaker) {
+        const x = width / 2 + (currentSpeaker.position.x - this.cameraOffset.x) * this.zoom;
+        const y = height / 2 + (currentSpeaker.position.z - this.cameraOffset.y) * this.zoom - 115;
+        this.dialogues.draw(ctx, x, y, now);
+      }
+      return;
     }
 
     const screenCenterX = width / 2;
