@@ -117,6 +117,7 @@ export class World {
     this.spawnWorldMonsters(this.currentWorld);
   }
 
+
   public spawnWorldMonsters(worldIndex: number): void {
     const mobTemplates = [
       // Quadrante Noroeste (12m - 32m)
@@ -146,6 +147,7 @@ export class World {
       // Santuários Externos (Mini-Chefes a 30m - 36m)
       { type: 'miniboss', pos: createVector3(-32, 0, 20), baseHp: 350, baseDmg: 28 },
       { type: 'miniboss', pos: createVector3(32, 0, -20), baseHp: 350, baseDmg: 28 },
+
     ];
 
     const hpMult = 1.0 + (worldIndex - 1) * 0.8;

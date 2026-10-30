@@ -66,7 +66,8 @@ export function setupAuthSelection(transport: AuthTransport) {
   classSelect.replaceChildren(...Array.from(legacyClass.options, option => option.cloneNode(true)));
   classSelect.value = legacyClass.value;
   const preview = () => {
-    portrait.src = '/assets/portraits/' + classSelect.value + '.jpg';
+    portrait.src = '/assets/portraits/' + classSelect.value + '.png';
+    portrait.onerror = () => { portrait.src = '/assets/portraits/' + classSelect.value + '.jpg'; };
     classLabel.textContent = className(classSelect.value as CharacterClass);
     portrait.alt = 'Retrato da classe ' + classLabel.textContent;
   };
@@ -130,7 +131,8 @@ export function setupAuthSelection(transport: AuthTransport) {
       let hero = pedestal.querySelector<HTMLImageElement>('.forge-slot-portrait');
       if (slot && !slot.isEmpty) {
         if (!hero) { hero = document.createElement('img'); hero.className = 'forge-slot-portrait'; pedestal.append(hero); }
-        hero.src = '/assets/portraits/' + slot.classType + '.jpg';
+        hero.src = '/assets/portraits/' + slot.classType + '.png';
+        const portraitImg = hero; hero.onerror = () => { portraitImg.src = '/assets/portraits/' + slot.classType + '.jpg'; };
         hero.alt = 'Retrato de ' + slot.name + ', ' + className(slot.classType);
       } else hero?.remove();
       (pedestal.querySelector('span') as HTMLElement).hidden = Boolean(slot && !slot.isEmpty);

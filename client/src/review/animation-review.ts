@@ -28,7 +28,7 @@ function selectedSheet(className: string): HeroSheetSpec {
   if (className === 'BARBARO' && action.value === 'walk') return barbarianWalkVersions[barbarianVersion.value];
   if (className === 'GUERREIRO' && action.value === 'walk') return warriorWalkVersions[warriorVersion.value];
   if (className === 'CLERIGO' && action.value === 'walk' && walkVersions[walkVersion.value]) return walkVersions[walkVersion.value];
-  return HERO_SHEETS[className][action.value as HeroAction];
+  return HERO_SHEETS[className][action.value as HeroAction] || HERO_SHEETS[className].idle!;
 }
 const play = document.getElementById('play') as HTMLButtonElement;
 const speed = document.getElementById('speed') as HTMLSelectElement;

@@ -9,14 +9,14 @@ export const SERVER_CONFIG = {
   // Server Authoritative Bounds & Anticheat Constraints
   MAX_ALLOWED_SPEED: 8.0, // Hard cap to detect speed hack / teleportation
   MAP_BOUNDS: {
-    minX: -60,
-    maxX: 60,
-    minZ: -60,
-    maxZ: 60,
+    minX: -110,
+    maxX: 110,
+    minZ: -110,
+    maxZ: 110,
   },
 
   // Visibility / Snapshot radius (units)
-  VISIBILITY_RADIUS: 120.0,
+  VISIBILITY_RADIUS: 180.0,
 
   // QoS / Heartbeat
   PING_INTERVAL_MS: 5000,
