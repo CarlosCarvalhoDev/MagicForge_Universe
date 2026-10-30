@@ -29,6 +29,7 @@ import {
 import { ClientNetwork } from './network/ClientNetwork';
 import { SnapshotBuffer, InterpolatedEntity } from './interpolation/SnapshotBuffer';
 import { GameRenderer } from './renderer/GameRenderer';
+import { IdleMath } from './idle/IdleMath';
 import { setupAuthSelection } from './ui/AuthSelection';
 import { getGuestCredential } from './ui/GuestSession';
 import { setupFarmHelper } from './ui/FarmHelper';
@@ -1591,7 +1592,7 @@ network.onAutoSalvageResult = payload => {
   farmHelperUI.onSalvageResult(payload);
   playerGold = payload.newGoldTotal;
   refreshExpansionContext();
-  if (playerGoldText) playerGoldText.textContent = playerGold.toLocaleString('pt-BR');
+  if (playerGoldText) playerGoldText.textContent = IdleMath.format(playerGold);
   if (inventoryGoldLabel) inventoryGoldLabel.textContent = playerGold.toLocaleString('pt-BR') + ' Ouro';
   addChatMessage('Farm Helper', payload.message, 'sys');
 };
@@ -1712,8 +1713,52 @@ canvas.addEventListener(
 // ----------------------------------------------------
 // In-Game Live Chat Box Helper
 // ----------------------------------------------------
+const gameChatBox = document.getElementById('game-chat-box') as HTMLDivElement | null;
+const btnToggleChat = document.getElementById('btn-toggle-chat') as HTMLButtonElement | null;
+const chatToggleIcon = document.getElementById('chat-toggle-icon') as HTMLSpanElement | null;
 const chatInputForm = document.getElementById('chat-input-form') as HTMLFormElement | null;
 const chatInputField = document.getElementById('chat-input-field') as HTMLInputElement | null;
+
+function setChatCollapsed(collapsed: boolean) {
+  if (!gameChatBox) return;
+  if (collapsed) {
+    gameChatBox.classList.add('collapsed');
+    if (chatToggleIcon) chatToggleIcon.textContent = '▲';
+    try { localStorage.setItem('mf_chat_collapsed', 'true'); } catch {}
+  } else {
+    gameChatBox.classList.remove('collapsed');
+    if (chatToggleIcon) chatToggleIcon.textContent = '▼';
+    try { localStorage.setItem('mf_chat_collapsed', 'false'); } catch {}
+    if (chatMessagesContainer) {
+      chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+    }
+  }
+}
+
+if (btnToggleChat) {
+  btnToggleChat.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isCollapsed = gameChatBox?.classList.contains('collapsed') ?? false;
+    setChatCollapsed(!isCollapsed);
+  });
+}
+
+try {
+  const savedCollapsed = localStorage.getItem('mf_chat_collapsed');
+  if (savedCollapsed !== null) {
+    setChatCollapsed(savedCollapsed === 'true');
+  } else if (window.innerHeight < 820) {
+    setChatCollapsed(true);
+  }
+} catch {}
+
+if (chatInputField) {
+  chatInputField.addEventListener('focus', () => {
+    if (gameChatBox?.classList.contains('collapsed')) {
+      setChatCollapsed(false);
+    }
+  });
+}
 
 function addChatMessage(tag: string, message: string, type: 'sys' | 'auto' | 'loot' | 'combat' | 'user' | 'malak' = 'sys') {
   if (!chatMessagesContainer) return;
@@ -1897,7 +1942,15 @@ network.onCombatEvent = (event) => {
 };
 
 network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
-  renderer.triggerEntityAnimation(event.casterId, 'attack');
+  const entities = snapshotBuffer.getInterpolatedEntities();
+  const caster = entities.find((e) => e.id === event.casterId);
+  const target = event.targetId ? entities.find((e) => e.id === event.targetId) : null;
+  const casterPos = caster ? { x: caster.position.x, z: caster.position.z } : undefined;
+  const targetPos = target
+    ? { x: target.position.x, z: target.position.z }
+    : (event.targetPosition ? { x: event.targetPosition.x, z: event.targetPosition.z } : casterPos);
+
+  renderer.triggerSkillCast(event.casterId, event.skillId, casterPos, targetPos);
   if (event.targetId && !event.isHeal) {
     renderer.triggerEntityAnimation(event.targetId, 'hit');
   }
@@ -1909,19 +1962,13 @@ network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
     }
   }
 
-  const entities = snapshotBuffer.getInterpolatedEntities();
   let effectPos = { x: 0, y: 0, z: 0 };
-
   if (event.targetPosition) {
     effectPos = event.targetPosition;
-  } else if (event.targetId) {
-    const target = entities.find((e) => e.id === event.targetId);
-    if (target) effectPos = target.position;
-  }
-
-  if (effectPos.x === 0 && effectPos.z === 0) {
-    const caster = entities.find((e) => e.id === event.casterId);
-    if (caster) effectPos = caster.position;
+  } else if (target) {
+    effectPos = target.position;
+  } else if (caster) {
+    effectPos = caster.position;
   }
 
   renderer.addSkillEffectText(effectPos, event.skillName, event.damageOrHeal, event.isHeal, event.isCritical);
@@ -2060,10 +2107,10 @@ network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
     addChatMessage('Sistema', payload.lootMessage, 'sys');
   }
 
-  if (playerGoldText) playerGoldText.textContent = `${playerGold.toLocaleString('pt-BR')}`;
+  if (playerGoldText) playerGoldText.textContent = IdleMath.format(playerGold);
   if (inventoryGoldLabel) inventoryGoldLabel.textContent = `${playerGold.toLocaleString('pt-BR')} Ouro`;
   if (modalCpText) modalCpText.textContent = `${playerCombatPower.toLocaleString('pt-BR')}`;
-  if (hudCpVal) hudCpVal.textContent = `${playerCombatPower.toLocaleString('pt-BR')}`;
+  if (hudCpVal) hudCpVal.textContent = IdleMath.format(playerCombatPower);
   if (hudCpBig) hudCpBig.textContent = playerCombatPower.toLocaleString('pt-BR');
 
   renderInventorySlots();

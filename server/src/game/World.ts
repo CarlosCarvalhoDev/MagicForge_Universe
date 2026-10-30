@@ -98,33 +98,33 @@ export class World {
 
   private spawnInitialMonsters(): void {
     const mobSpawns = [
-      // Quadrante Noroeste (12m - 32m)
-      { name: 'Slime da Floresta', pos: createVector3(-14, 0, 12), hp: 120, damage: 8 },
-      { name: 'Goblin Lanceiro', pos: createVector3(-20, 0, 18), hp: 90, damage: 12 },
-      { name: 'Goblin Arqueiro', pos: createVector3(-26, 0, 14), hp: 70, damage: 16 },
-      { name: 'Lobo Selvagem', pos: createVector3(-16, 0, 26), hp: 100, damage: 14 },
+      // Quadrante Noroeste — Acampamento dos Goblins (35m - 60m)
+      { name: 'Goblin Lanceiro', pos: createVector3(-38, 0, 32), hp: 90, damage: 12 },
+      { name: 'Goblin Arqueiro', pos: createVector3(-48, 0, 42), hp: 70, damage: 16 },
+      { name: 'Goblin Lanceiro', pos: createVector3(-56, 0, 30), hp: 90, damage: 12 },
+      { name: 'Slime da Floresta', pos: createVector3(-42, 0, 52), hp: 120, damage: 8 },
 
-      // Quadrante Nordeste (12m - 32m)
-      { name: 'Slime da Floresta', pos: createVector3(14, 0, 14), hp: 120, damage: 8 },
-      { name: 'Lobo Selvagem', pos: createVector3(22, 0, 12), hp: 100, damage: 14 },
-      { name: 'Goblin Lanceiro', pos: createVector3(25, 0, 22), hp: 90, damage: 12 },
-      { name: 'Goblin Arqueiro', pos: createVector3(18, 0, 26), hp: 70, damage: 16 },
+      // Quadrante Nordeste — Bosque dos Lobos Alfa (35m - 60m)
+      { name: 'Lobo Selvagem', pos: createVector3(36, 0, 32), hp: 100, damage: 14 },
+      { name: 'Lobo Selvagem', pos: createVector3(48, 0, 40), hp: 100, damage: 14 },
+      { name: 'Goblin Arqueiro', pos: createVector3(54, 0, 30), hp: 70, damage: 16 },
+      { name: 'Slime da Floresta', pos: createVector3(42, 0, 54), hp: 120, damage: 8 },
 
-      // Quadrante Sudoeste (12m - 32m)
-      { name: 'Slime da Floresta', pos: createVector3(-12, 0, -15), hp: 120, damage: 8 },
-      { name: 'Lobo Selvagem', pos: createVector3(-22, 0, -14), hp: 100, damage: 14 },
-      { name: 'Goblin Lanceiro', pos: createVector3(-16, 0, -25), hp: 90, damage: 12 },
-      { name: 'Goblin Arqueiro', pos: createVector3(-26, 0, -22), hp: 70, damage: 16 },
+      // Quadrante Sudoeste — Margem do Lago Encantado (35m - 60m)
+      { name: 'Slime da Floresta', pos: createVector3(-34, 0, -32), hp: 120, damage: 8 },
+      { name: 'Slime da Floresta', pos: createVector3(-46, 0, -38), hp: 120, damage: 8 },
+      { name: 'Goblin Lanceiro', pos: createVector3(-38, 0, -50), hp: 90, damage: 12 },
+      { name: 'Lobo Selvagem', pos: createVector3(-52, 0, -42), hp: 100, damage: 14 },
 
-      // Quadrante Sudeste (12m - 32m)
-      { name: 'Goblin Lanceiro', pos: createVector3(15, 0, -14), hp: 90, damage: 12 },
-      { name: 'Lobo Selvagem', pos: createVector3(24, 0, -12), hp: 100, damage: 14 },
-      { name: 'Slime da Floresta', pos: createVector3(14, 0, -24), hp: 120, damage: 8 },
-      { name: 'Goblin Arqueiro', pos: createVector3(25, 0, -24), hp: 70, damage: 16 },
+      // Quadrante Sudeste — Posto Avançado da Guarda (35m - 60m)
+      { name: 'Goblin Lanceiro', pos: createVector3(36, 0, -32), hp: 90, damage: 12 },
+      { name: 'Goblin Arqueiro', pos: createVector3(48, 0, -38), hp: 70, damage: 16 },
+      { name: 'Lobo Selvagem', pos: createVector3(38, 0, -52), hp: 100, damage: 14 },
+      { name: 'Slime da Floresta', pos: createVector3(54, 0, -44), hp: 120, damage: 8 },
 
-      // Santuários Externos (Mini-Chefes a 30m - 36m)
-      { name: 'Chefe Goblin', pos: createVector3(-32, 0, 20), hp: 350, damage: 28 },
-      { name: 'Chefe Goblin', pos: createVector3(32, 0, -20), hp: 350, damage: 28 },
+      // Santuários Externos — Mini-Chefes Guardiões de Território (64m)
+      { name: 'Chefe Goblin', pos: createVector3(-64, 0, 36), hp: 350, damage: 28 },
+      { name: 'Chefe Goblin', pos: createVector3(64, 0, -36), hp: 350, damage: 28 },
     ];
 
     mobSpawns.forEach((spawn, idx) => {

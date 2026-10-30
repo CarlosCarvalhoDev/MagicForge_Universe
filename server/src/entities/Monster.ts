@@ -24,17 +24,18 @@ export interface LootDropEntry {
 
 export class Monster extends Entity {
   public spawnPosition: Vector3;
+  public originalCampPosition: Vector3;
   public state: MonsterState = MonsterState.IDLE;
-  public aggroRadius: number = 9.0;
-  public attackRange: number = 2.2;
-  public attackIntervalSec: number = 1.6;
+  public aggroRadius: number = 18.0;
+  public attackRange: number = 2.4;
+  public attackIntervalSec: number = 1.3;
   public attackDamage: number = 15;
-  public speed: number = 3.6;
+  public speed: number = 5.2;
 
   public attackCooldown: number = 0;
   public targetPlayer: Entity | null = null;
   public respawnTimer: number = 0;
-  public respawnDelaySec: number = 6.5; // Respawn mais lento e natural
+  public respawnDelaySec: number = 4.0;
   private wanderTimer: number = 0;
   private wanderIntervalSec: number = 4.0;
   private wanderTarget: Vector3 | null = null;
@@ -44,9 +45,19 @@ export class Monster extends Entity {
   constructor(id: string, name: string, spawnPos: Vector3, maxHp = 100, damage = 15) {
     super(id, EntityType.MONSTER, name, spawnPos, maxHp);
     this.spawnPosition = cloneVector3(spawnPos);
+    this.originalCampPosition = cloneVector3(spawnPos);
     this.attackDamage = damage;
     this.wanderIntervalSec = 2.0 + Math.random() * 4.0;
     this.configureDefaultLoot();
+
+    if (this.name.includes('Lobo')) {
+      this.speed = 6.0;
+      this.aggroRadius = 20.0;
+    } else if (this.name.includes('Chefe') || this.name.includes('Grimgor') || this.name.includes('Malakor')) {
+      this.speed = 4.8;
+      this.aggroRadius = 26.0;
+      this.attackRange = 3.2;
+    }
   }
 
   private configureDefaultLoot(): void {
@@ -277,13 +288,14 @@ export class Monster extends Entity {
     if (newPosition) {
       this.spawnPosition = cloneVector3(newPosition);
     } else {
-      // Renasce distribuído amplamente pelo mapa (12m a 38m do centro)
+      // Renasce no raio do seu acampamento designado (+- 3.5m)
+      const basePos = this.originalCampPosition || this.spawnPosition;
       const angle = Math.random() * Math.PI * 2;
-      const radius = 12 + Math.random() * 26;
+      const radius = 0.8 + Math.random() * 3.5;
       this.spawnPosition = createVector3(
-        Math.round(Math.cos(angle) * radius * 10) / 10,
+        Math.round((basePos.x + Math.cos(angle) * radius) * 10) / 10,
         0,
-        Math.round(Math.sin(angle) * radius * 10) / 10
+        Math.round((basePos.z + Math.sin(angle) * radius) * 10) / 10
       );
     }
     this.position = cloneVector3(this.spawnPosition);

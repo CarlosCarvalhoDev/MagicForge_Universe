@@ -18,7 +18,7 @@ const comparisons: Record<string, HeroSheetSpec> = { rejected: walkVersions.reje
 function selectedSheet(className: string): HeroSheetSpec {
   if (className === 'GUERREIRO' && action.value === 'walk') return warriorWalkVersions[warriorVersion.value];
   if (className === 'CLERIGO' && action.value === 'walk' && walkVersions[walkVersion.value]) return walkVersions[walkVersion.value];
-  return HERO_SHEETS[className][action.value as HeroAction];
+  return HERO_SHEETS[className][action.value as HeroAction] || HERO_SHEETS[className].idle!;
 }
 const play = document.getElementById('play') as HTMLButtonElement;
 const speed = document.getElementById('speed') as HTMLSelectElement;
