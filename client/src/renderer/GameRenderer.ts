@@ -1,9 +1,7 @@
 import { ItemRarity, RARITY_COLORS, S2CItemDropSpawnPayload, S2CSkillCastEventPayload, CombatStatusTransitionPayload, SKILLS_DATABASE, Vector3, distance } from '@magicforge/shared';
 import { InterpolatedEntity } from '../interpolation/SnapshotBuffer';
-import { HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground, getFacingDirection, HeroAction } from './HeroAnimations';
+import { HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground } from './HeroAnimations';
 import { FloatingDialogue } from '../ui/FloatingDialogue';
-import { IdleMath } from '../idle/IdleMath';
-import { SoundManager } from '../audio/SoundManager';
 import { PixelWorld } from './PixelWorld';
 import { PixelVfxPlayer } from './PixelVfxPlayer';
 import { planWarriorCastFx } from './PixelVfx';
@@ -31,17 +29,6 @@ export interface ActiveItemDrop {
   spawnTimestamp: number;
 }
 
-export interface CombatVisualFx {
-  id: string;
-  type: 'fel_bolt' | 'soul_drain' | 'profane_circle' | 'demon_aura';
-  sourceX: number;
-  sourceY: number;
-  targetX: number;
-  targetY: number;
-  startTime: number;
-  durationMs: number;
-}
-
 export class GameRenderer {
   public setStagePresentation(stage: VisualStage): void { this.pixelWorld.presentation.setStage(stage); }
   public readonly pixelWorld = new PixelWorld();
@@ -52,7 +39,6 @@ export class GameRenderer {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private floatingTexts: FloatingText[] = [];
-  private activeFx: CombatVisualFx[] = [];
   public activeDrops = new Map<string, ActiveItemDrop>();
 
   // World to screen mapping (Scaled up for bold hero & monster presence)
@@ -73,21 +59,9 @@ export class GameRenderer {
   private monsterIsoSprites: Record<string, HTMLImageElement> = {};
   private arenaStoneTile: HTMLImageElement | null = null;
   private fantasyGrassTile: HTMLImageElement | null = null;
-  private seamlessGrassTile: HTMLImageElement | null = null;
   private cleanedImageCache = new Map<string, HTMLCanvasElement>();
   private animationClock = new HeroAnimationClock();
   private entityFacingLeft = new Map<string, boolean>();
-  private breezeParticles: Array<{ x: number; y: number; speedX: number; speedY: number; size: number; color: string; phase: number }> = [];
-  private readonly floraPatches = [
-    { x: -14, z: 8, color: '#38bdf8', type: 'flower' },
-    { x: 16, z: -10, color: '#facc15', type: 'dandelion' },
-    { x: -24, z: -16, color: '#4ade80', type: 'grass' },
-    { x: 26, z: 18, color: '#c084fc', type: 'flower' },
-    { x: -8, z: 28, color: '#f472b6', type: 'flower' },
-    { x: 32, z: -22, color: '#22c55e', type: 'grass' },
-    { x: 14, z: 38, color: '#facc15', type: 'dandelion' },
-    { x: -28, z: 22, color: '#34d399', type: 'grass' },
-  ];
 
   constructor(canvas: HTMLCanvasElement, visualStyle: 'pixel' | 'legacy' = 'pixel') {
     this.visualStyle = visualStyle;
@@ -98,19 +72,8 @@ export class GameRenderer {
 
     this.pixelWorld.ready.catch(error => console.error(error));
     this.vfx.ready.catch(error => console.error(error));
-    this.loadHeroSpriteSheets();
-    this.loadIsometricSprites();
-    this.loadFloorTiles();
-    for (let i = 0; i < 24; i++) {
-      this.breezeParticles.push({
-        x: Math.random() * 1920,
-        y: Math.random() * 1080,
-        speedX: 0.6 + Math.random() * 0.9,
-        speedY: 0.25 + Math.random() * 0.45,
-        size: 2.5 + Math.random() * 3.5,
-        color: ['#fbbf24', '#f59e0b', '#34d399', '#10b981', '#67e8f9'][i % 5],
-        phase: Math.random() * Math.PI * 2,
-      });
+    if (visualStyle === 'legacy') {
+      this.loadHeroSpriteSheets(); this.loadIsometricSprites(); this.loadFloorTiles();
     }
   }
 
@@ -120,10 +83,6 @@ export class GameRenderer {
     const forest = new Image();
     forest.src = '/assets/environment/tile_mundo_1_floresta.jpg';
     this.fantasyGrassTile = forest;
-
-    const grass = new Image();
-    grass.src = '/assets/isometric/tile_fantasy_grass.jpg';
-    this.seamlessGrassTile = grass;
 
     const stone = new Image();
     stone.src = '/assets/isometric/tile_arena_stone.jpg';
@@ -156,7 +115,6 @@ export class GameRenderer {
       BRUXO: '/assets/isometric/iso_hero_bruxo.jpg',
       MAGO: '/assets/isometric/iso_hero_mago.jpg',
       ARQUEIRO: '/assets/isometric/iso_hero_arqueiro.jpg',
-      DEMONOLOGO: '/assets/isometric/iso_hero_demonologo.png',
     };
 
     for (const [key, src] of Object.entries(classMap)) {
@@ -212,42 +170,9 @@ export class GameRenderer {
     return offCanvas;
   }
 
-  public triggerEntityAnimation(entityId: string, action: HeroAction): void {
+  public triggerEntityAnimation(entityId: string, action: 'attack' | 'hit' | 'death'): void {
     this.animationClock.trigger(entityId, action, performance.now());
     this.pixelWorld.clock.trigger(entityId, action, performance.now());
-  }
-
-  public triggerSkillCast(
-    casterId: string,
-    skillId: string,
-    casterPos?: { x: number; z: number },
-    targetPos?: { x: number; z: number }
-  ): void {
-    let action: HeroAction = 'attack';
-    let fxType: 'fel_bolt' | 'soul_drain' | 'profane_circle' | 'demon_aura' | null = null;
-
-    if (skillId.includes('demonologo_truque') || skillId === 'demonologo_1') {
-      action = 'cast_bolt';
-      fxType = 'fel_bolt';
-    } else if (skillId.includes('demonologo_nv1') || skillId === 'demonologo_2') {
-      action = 'cast_drain';
-      fxType = 'soul_drain';
-    } else if (skillId.includes('demonologo_nv2') || skillId === 'demonologo_3') {
-      action = 'cast_circle';
-      fxType = 'profane_circle';
-    } else if (skillId.includes('demonologo_nv3') || skillId === 'demonologo_4') {
-      action = 'cast_ultimate';
-      fxType = 'demon_aura';
-    }
-
-    this.triggerEntityAnimation(casterId, action);
-
-    if (fxType && casterPos) {
-      const srcVec: Vector3 = { x: casterPos.x, y: 0, z: casterPos.z };
-      const tgtVec: Vector3 = targetPos ? { x: targetPos.x, y: 0, z: targetPos.z } : srcVec;
-      const duration = fxType === 'soul_drain' ? 1200 : fxType === 'demon_aura' ? 1400 : 700;
-      this.spawnCombatFx(fxType, srcVec, tgtVec, duration);
-    }
   }
 
   public resize(width: number, height: number): void {
@@ -307,7 +232,6 @@ export class GameRenderer {
   }
 
   public addLevelUpEffect(worldPos: Vector3, newLevel: number): void {
-    SoundManager.playLevelUp();
     this.vfx.queue.spawn({ kind: 'levelUp', position: worldPos }, performance.now());
     this.floatingTexts.push({
       id: Math.random().toString(),
@@ -338,119 +262,6 @@ export class GameRenderer {
     for (const request of planWarriorCastFx(event, entities, radius)) this.vfx.queue.spawn(request, performance.now());
     for (const status of event.appliedStatuses ?? []) this.warriorPresentation.transition({ event: 'APPLIED', serverTick: event.serverTick ?? 0, status }, performance.now());
   }
-
-  public spawnCombatFx(
-    type: CombatVisualFx['type'],
-    sourcePos: Vector3,
-    targetPos?: Vector3,
-    durationMs: number = 800
-  ): void {
-    const target = targetPos || sourcePos;
-    this.activeFx.push({
-      id: Math.random().toString(),
-      type,
-      sourceX: sourcePos.x,
-      sourceY: sourcePos.z,
-      targetX: target.x,
-      targetY: target.z,
-      startTime: performance.now(),
-      durationMs,
-    });
-
-    if (type === 'fel_bolt') SoundManager.playDemonCast();
-    else if (type === 'soul_drain') SoundManager.playSoulDrain();
-    else if (type === 'profane_circle') SoundManager.playProfaneCircle();
-    else if (type === 'demon_aura') SoundManager.playMetamorphosis();
-  }
-
-  private renderCombatFx(cx: number, cy: number, now: number): void {
-    const { ctx } = this;
-    this.activeFx = this.activeFx.filter((fx) => {
-      const elapsed = now - fx.startTime;
-      if (elapsed >= fx.durationMs) return false;
-      const progress = elapsed / fx.durationMs;
-
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-
-      const sx = cx + (fx.sourceX - this.cameraOffset.x) * this.zoom;
-      const sy = cy + (fx.sourceY - this.cameraOffset.y) * this.zoom - 30;
-      const tx = cx + (fx.targetX - this.cameraOffset.x) * this.zoom;
-      const ty = cy + (fx.targetY - this.cameraOffset.y) * this.zoom - 30;
-
-      if (fx.type === 'fel_bolt') {
-        const curX = sx + (tx - sx) * progress;
-        const curY = sy + (ty - sy) * progress;
-        const radius = 9 * (1 + Math.sin(progress * Math.PI) * 0.4);
-
-        const grad = ctx.createRadialGradient(curX, curY, 1, curX, curY, radius * 1.8);
-        grad.addColorStop(0, '#ffffff');
-        grad.addColorStop(0.3, '#34d399');
-        grad.addColorStop(0.8, 'rgba(16, 185, 129, 0.4)');
-        grad.addColorStop(1, 'rgba(5, 150, 105, 0)');
-
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(curX, curY, radius * 1.8, 0, Math.PI * 2);
-        ctx.fill();
-
-        for (let i = 1; i <= 4; i++) {
-          const trailT = Math.max(0, progress - i * 0.05);
-          const trX = sx + (tx - sx) * trailT;
-          const trY = sy + (ty - sy) * trailT;
-          ctx.fillStyle = `rgba(52, 211, 153, ${0.4 / i})`;
-          ctx.beginPath();
-          ctx.arc(trX, trY, radius * (0.8 / i), 0, Math.PI * 2);
-          ctx.fill();
-        }
-      } else if (fx.type === 'soul_drain') {
-        ctx.strokeStyle = '#c084fc';
-        ctx.lineWidth = 3 + Math.sin(now * 0.02) * 1.5;
-        ctx.beginPath();
-        ctx.moveTo(tx, ty);
-        const midX = (tx + sx) / 2 + Math.sin(now * 0.01) * 20;
-        const midY = (ty + sy) / 2 + Math.cos(now * 0.01) * 20;
-        ctx.quadraticCurveTo(midX, midY, sx, sy);
-        ctx.stroke();
-
-        const pProgress = (now * 0.003) % 1;
-        const px = tx + (sx - tx) * pProgress;
-        const py = ty + (sy - ty) * pProgress;
-        ctx.fillStyle = '#a855f7';
-        ctx.beginPath();
-        ctx.arc(px, py, 5, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (fx.type === 'profane_circle') {
-        const floorY = cy + (fx.targetY - this.cameraOffset.y) * this.zoom;
-        const rX = 55 * this.zoom / 16;
-        const rY = 25 * this.zoom / 16;
-        const alpha = Math.sin(progress * Math.PI);
-
-        ctx.strokeStyle = `rgba(239, 68, 68, ${alpha * 0.8})`;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.ellipse(tx, floorY, rX, rY, 0, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.fillStyle = `rgba(16, 185, 129, ${alpha * 0.25})`;
-        ctx.fill();
-      } else if (fx.type === 'demon_aura') {
-        const auraRadius = 45 + Math.sin(now * 0.015) * 8;
-        const grad = ctx.createRadialGradient(sx, sy, 5, sx, sy, auraRadius);
-        grad.addColorStop(0, 'rgba(52, 211, 153, 0.5)');
-        grad.addColorStop(0.6, 'rgba(147, 51, 234, 0.3)');
-        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(sx, sy, auraRadius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      ctx.restore();
-      return true;
-    });
-  }
-
 
   public render(entities: InterpolatedEntity[], myPlayerId: string | null): void {
     const { ctx, canvas } = this;
@@ -528,12 +339,10 @@ export class GameRenderer {
         ctx.setLineDash([]);
       }
 
-      // Draw Drop Shadow (proportional to zoom)
-      const shadowW = Math.round((isMonster ? (ent.maxHp > 200 ? 2.9 : 2.0) : 2.1) * this.zoom);
-      const shadowH = Math.round(shadowW * 0.36);
+      // Draw Drop Shadow (sized for bold presence)
       ctx.beginPath();
-      ctx.ellipse(screenX, screenY + Math.round(1.3 * this.zoom), shadowW, shadowH, 0, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.52)';
+      ctx.ellipse(screenX, screenY + 22, isMonster ? (ent.maxHp > 200 ? 46 : 32) : 34, 12, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
       ctx.fill();
 
       // Draw Target Reticle
@@ -565,25 +374,7 @@ export class GameRenderer {
 
         if (classSheets) {
           const playback = this.animationClock.sample(ent.id, ent.isMoving, ent.currentHp, HERO_SHEETS[heroClass], now);
-          const dir = getFacingDirection(ent.headingYaw);
-
-          let actionKey = playback.action;
-          let flipX = facingLeft;
-
-          if (playback.action === 'walk') {
-            if (dir === 'north' && classSheets['walk_north']) {
-              actionKey = 'walk_north' as any;
-              flipX = false;
-            } else if ((dir === 'east' || dir === 'west') && classSheets['walk_side']) {
-              actionKey = 'walk_side' as any;
-              flipX = dir === 'west';
-            } else {
-              actionKey = 'walk';
-              flipX = facingLeft;
-            }
-          }
-
-          const sheetSpec = classSheets[actionKey] || classSheets[playback.action];
+          const sheetSpec = classSheets[playback.action];
           const cleanSheet = sheetSpec ? this.getTransparentCanvas(sheetSpec.img) : null;
 
           if (sheetSpec && cleanSheet && cleanSheet.width % sheetSpec.cols === 0 && cleanSheet.height % sheetSpec.rows === 0) {
@@ -596,67 +387,14 @@ export class GameRenderer {
             const sx = col * cellW;
             const sy = row * cellH;
 
-            // Proportional hero drawSize: scales with camera zoom and world units
-            const heroUnits = heroClass === 'DEMONOLOGO' ? 10.5 : 9.5;
-            const drawSize = Math.round(heroUnits * this.zoom);
-            const footOffset = Math.round(2.25 * this.zoom);
-
-            if (heroClass === 'DEMONOLOGO' && (playback.action === 'attack' || playback.action.startsWith('cast_'))) {
-              ctx.save();
-              ctx.translate(screenX, screenY);
-              ctx.beginPath();
-              const action = playback.action;
-
-              if (action === 'cast_bolt') {
-                ctx.arc(0, -drawSize / 3, 48, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(0, -drawSize / 3, 8, 0, -drawSize / 3, 50);
-                grad.addColorStop(0, 'rgba(52, 211, 153, 0.45)');
-                grad.addColorStop(0.6, 'rgba(16, 185, 129, 0.2)');
-                grad.addColorStop(1, 'rgba(5, 150, 105, 0)');
-                ctx.fillStyle = grad;
-                ctx.fill();
-              } else if (action === 'cast_drain') {
-                ctx.ellipse(0, 0, 42, 18, 0, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(0, 0, 5, 0, 0, 42);
-                grad.addColorStop(0, 'rgba(192, 132, 252, 0.5)');
-                grad.addColorStop(0.7, 'rgba(147, 51, 234, 0.25)');
-                grad.addColorStop(1, 'rgba(88, 28, 135, 0)');
-                ctx.fillStyle = grad;
-                ctx.fill();
-              } else if (action === 'cast_circle') {
-                ctx.ellipse(0, 0, 55, 24, 0, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(0, 0, 8, 0, 0, 55);
-                grad.addColorStop(0, 'rgba(239, 68, 68, 0.55)');
-                grad.addColorStop(0.6, 'rgba(185, 28, 28, 0.3)');
-                grad.addColorStop(1, 'rgba(127, 29, 29, 0)');
-                ctx.fillStyle = grad;
-                ctx.fill();
-              } else if (action === 'cast_ultimate') {
-                ctx.arc(0, -drawSize / 3, 62, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(0, -drawSize / 3, 10, 0, -drawSize / 3, 65);
-                grad.addColorStop(0, 'rgba(245, 158, 11, 0.45)');
-                grad.addColorStop(0.5, 'rgba(239, 68, 68, 0.3)');
-                grad.addColorStop(1, 'rgba(147, 51, 234, 0)');
-                ctx.fillStyle = grad;
-                ctx.fill();
-              } else {
-                ctx.arc(0, -drawSize / 3, 50, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(0, -drawSize / 3, 10, 0, -drawSize / 3, 55);
-                grad.addColorStop(0, 'rgba(239, 68, 68, 0.28)');
-                grad.addColorStop(0.6, 'rgba(245, 158, 11, 0.16)');
-                grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
-                ctx.fillStyle = grad;
-                ctx.fill();
-              }
-              ctx.restore();
-            }
-
+            // Scaled hero drawSize to 160px for prominent heroic scale
+            const drawSize = 160;
             ctx.save();
             ctx.translate(screenX, screenY);
-            if (flipX) {
+            if (facingLeft) {
               ctx.scale(-1, 1);
             }
-            ctx.drawImage(cleanSheet, sx, sy, cellW, cellH, -drawSize / 2, -drawSize + footOffset, drawSize, drawSize);
+            ctx.drawImage(cleanSheet, sx, sy, cellW, cellH, -drawSize / 2, -drawSize + 36, drawSize, drawSize);
             ctx.restore();
             drewSheet = true;
           }
@@ -668,16 +406,15 @@ export class GameRenderer {
           const cleanHero = isoImg ? this.getTransparentCanvas(isoImg) : null;
 
           if (cleanHero) {
-            // Proportional static hero drawSize
-            const drawSize = Math.round(9.5 * this.zoom);
-            const footOffset = Math.round(2.25 * this.zoom);
-            const bobY = ent.isMoving ? Math.abs(Math.sin(now * 0.012)) * -4 : Math.sin(now * 0.004) * -1.5;
+            // Scaled static hero drawSize to 150px
+            const drawSize = 150;
+            const bobY = ent.isMoving ? Math.abs(Math.sin(now * 0.012)) * -6 : Math.sin(now * 0.004) * -2;
             ctx.save();
             ctx.translate(screenX, screenY + bobY);
             if (facingLeft) {
               ctx.scale(-1, 1);
             }
-            ctx.drawImage(cleanHero, -drawSize / 2, -drawSize + footOffset, drawSize, drawSize);
+            ctx.drawImage(cleanHero, -drawSize / 2, -drawSize + 36, drawSize, drawSize);
             ctx.restore();
           } else {
             ctx.beginPath();
@@ -693,16 +430,14 @@ export class GameRenderer {
         const cleanMob = mobSprite ? this.getTransparentCanvas(mobSprite) : null;
 
         if (cleanMob) {
-          const mobUnits = isBoss ? 13.5 : 8.5;
-          const drawSize = Math.round(mobUnits * this.zoom);
-          const footOffset = Math.round(1.9 * this.zoom);
-          const bobY = ent.isMoving ? Math.abs(Math.sin(now * 0.011)) * -4 : Math.sin(now * 0.003) * -1.5;
+          const drawSize = isBoss ? 210 : 135;
+          const bobY = ent.isMoving ? Math.abs(Math.sin(now * 0.011)) * -5 : Math.sin(now * 0.003) * -2;
           ctx.save();
           ctx.translate(screenX, screenY + bobY);
           if (facingLeft) {
             ctx.scale(-1, 1);
           }
-          ctx.drawImage(cleanMob, -drawSize / 2, -drawSize + footOffset, drawSize, drawSize);
+          ctx.drawImage(cleanMob, -drawSize / 2, -drawSize + 30, drawSize, drawSize);
           ctx.restore();
         } else {
           const radius = isBoss ? 38 : 26;
@@ -783,14 +518,8 @@ export class GameRenderer {
     // 4. Draw Ground Item Drops (Glowing beacons & loot bags)
     this.renderItemDrops(screenCenterX, screenCenterY);
 
-    // 4.5 Draw Active Combat FX
-    this.renderCombatFx(screenCenterX, screenCenterY, now);
-
     // 5. Draw Floating Combat Text
     this.renderFloatingText(screenCenterX, screenCenterY);
-
-    // 6. Draw Ambient Forest Breeze
-    this.renderForestBreeze(now);
     const dialogue = this.dialogues.current(now);
     const speaker = dialogue ? entities.find(entity => entity.id === dialogue.entityId) : undefined;
     if (speaker) {
@@ -800,247 +529,94 @@ export class GameRenderer {
     }
   }
 
-  private getFeatheredArenaCanvas(img: HTMLImageElement): HTMLCanvasElement {
-    const cached = this.cleanedImageCache.get('feathered_arena');
-    if (cached) return cached;
-
-    const offscreen = document.createElement('canvas');
-    const w = img.naturalWidth || img.width || 1024;
-    const h = img.naturalHeight || img.height || 1024;
-    offscreen.width = w;
-    offscreen.height = h;
-    const ctx = offscreen.getContext('2d');
-    if (!ctx) return offscreen;
-
-    ctx.drawImage(img, 0, 0, w, h);
-
-    const mask = document.createElement('canvas');
-    mask.width = w;
-    mask.height = h;
-    const mctx = mask.getContext('2d');
-    if (mctx) {
-      const pad = 48;
-      mctx.fillStyle = '#ffffff';
-      mctx.fillRect(pad, pad, w - pad * 2, h - pad * 2);
-
-      const gL = mctx.createLinearGradient(0, 0, pad, 0);
-      gL.addColorStop(0, 'rgba(255,255,255,0)');
-      gL.addColorStop(1, 'rgba(255,255,255,1)');
-      mctx.fillStyle = gL;
-      mctx.fillRect(0, pad, pad, h - pad * 2);
-
-      const gR = mctx.createLinearGradient(w - pad, 0, w, 0);
-      gR.addColorStop(0, 'rgba(255,255,255,1)');
-      gR.addColorStop(1, 'rgba(255,255,255,0)');
-      mctx.fillStyle = gR;
-      mctx.fillRect(w - pad, pad, pad, h - pad * 2);
-
-      const gT = mctx.createLinearGradient(0, 0, 0, pad);
-      gT.addColorStop(0, 'rgba(255,255,255,0)');
-      gT.addColorStop(1, 'rgba(255,255,255,1)');
-      mctx.fillStyle = gT;
-      mctx.fillRect(pad, 0, w - pad * 2, pad);
-
-      const gB = mctx.createLinearGradient(0, h - pad, 0, h);
-      gB.addColorStop(0, 'rgba(255,255,255,1)');
-      gB.addColorStop(1, 'rgba(255,255,255,0)');
-      mctx.fillStyle = gB;
-      mctx.fillRect(pad, h - pad, w - pad * 2, pad);
-
-      const gTL = mctx.createRadialGradient(pad, pad, 0, pad, pad, pad);
-      gTL.addColorStop(0, 'rgba(255,255,255,1)');
-      gTL.addColorStop(1, 'rgba(255,255,255,0)');
-      mctx.fillStyle = gTL;
-      mctx.fillRect(0, 0, pad, pad);
-
-      const gTR = mctx.createRadialGradient(w - pad, pad, 0, w - pad, pad, pad);
-      gTR.addColorStop(0, 'rgba(255,255,255,1)');
-      gTR.addColorStop(1, 'rgba(255,255,255,0)');
-      mctx.fillStyle = gTR;
-      mctx.fillRect(w - pad, 0, pad, pad);
-
-      const gBL = mctx.createRadialGradient(pad, h - pad, 0, pad, h - pad, pad);
-      gBL.addColorStop(0, 'rgba(255,255,255,1)');
-      gBL.addColorStop(1, 'rgba(255,255,255,0)');
-      mctx.fillStyle = gBL;
-      mctx.fillRect(0, h - pad, pad, pad);
-
-      const gBR = mctx.createRadialGradient(w - pad, h - pad, 0, w - pad, h - pad, pad);
-      gBR.addColorStop(0, 'rgba(255,255,255,1)');
-      gBR.addColorStop(1, 'rgba(255,255,255,0)');
-      mctx.fillStyle = gBR;
-      mctx.fillRect(w - pad, h - pad, pad, pad);
-
-      ctx.globalCompositeOperation = 'destination-in';
-      ctx.drawImage(mask, 0, 0);
-    }
-
-    this.cleanedImageCache.set('feathered_arena', offscreen);
-    return offscreen;
-  }
-
   private drawArenaGrid(cx: number, cy: number): void {
-    const { ctx, canvas } = this;
-    const width = canvas.width;
-    const height = canvas.height;
-    const now = performance.now();
+    const { ctx } = this;
+    const arenaWorldSize = 120; // 120m x 120m single grand stage
+    const minX = -arenaWorldSize / 2;
+    const minZ = -arenaWorldSize / 2;
 
-    // 0. Continuous Seamless Grass Ground (covers the whole infinite world with integer-snapped +1px tiles)
-    const baseTile = (this.seamlessGrassTile && this.seamlessGrassTile.complete && this.seamlessGrassTile.naturalWidth > 0)
-      ? this.seamlessGrassTile
-      : this.fantasyGrassTile;
+    const mapScreenX = cx + (minX - this.cameraOffset.x) * this.zoom;
+    const mapScreenY = cy + (minZ - this.cameraOffset.y) * this.zoom;
+    const mapScreenW = arenaWorldSize * this.zoom;
+    const mapScreenH = arenaWorldSize * this.zoom;
 
-    if (baseTile && baseTile.complete && baseTile.naturalWidth > 0) {
-      const tileSize = Math.round(64 * this.zoom);
-      const startX = Math.floor(((cx - this.cameraOffset.x * this.zoom) % tileSize + tileSize) % tileSize - tileSize);
-      const startY = Math.floor(((cy - this.cameraOffset.y * this.zoom) % tileSize + tileSize) % tileSize - tileSize);
-
-      ctx.save();
-      for (let x = startX; x < width + tileSize; x += tileSize) {
-        for (let y = startY; y < height + tileSize; y += tileSize) {
-          ctx.drawImage(baseTile, Math.floor(x), Math.floor(y), tileSize + 1, tileSize + 1);
-        }
-      }
-      ctx.restore();
-    }
-
-    // 0.5. Central Sacred Battlefield Clearing (-60m to +60m = 120m)
-    // Feathered smoothly into the surrounding endless grass — zero lines, zero border seam!
+    // 1. Render Single Grand Stage Environment (Mundo 1: Floresta da Forja) - ONE single map, not tiled!
     if (this.fantasyGrassTile && this.fantasyGrassTile.complete && this.fantasyGrassTile.naturalWidth > 0) {
-      const arenaWorldSize = 120;
-      const arenaSx = Math.floor(cx + (-arenaWorldSize / 2 - this.cameraOffset.x) * this.zoom);
-      const arenaSy = Math.floor(cy + (-arenaWorldSize / 2 - this.cameraOffset.y) * this.zoom);
-      const arenaDrawW = Math.ceil(arenaWorldSize * this.zoom);
-      const arenaDrawH = Math.ceil(arenaWorldSize * this.zoom);
+      ctx.drawImage(this.fantasyGrassTile, mapScreenX, mapScreenY, mapScreenW, mapScreenH);
 
-      if (arenaSx + arenaDrawW > 0 && arenaSx < width && arenaSy + arenaDrawH > 0 && arenaSy < height) {
-        const featheredCanvas = this.getFeatheredArenaCanvas(this.fantasyGrassTile);
-        ctx.save();
-        ctx.drawImage(featheredCanvas, arenaSx, arenaSy, arenaDrawW, arenaDrawH);
-        ctx.restore();
-      }
+      // Soft edge vignette around the boundaries of the arena
+      const edgeFade = 50;
+      const gradL = ctx.createLinearGradient(mapScreenX, 0, mapScreenX + edgeFade, 0);
+      gradL.addColorStop(0, 'rgba(10, 15, 29, 0.95)');
+      gradL.addColorStop(1, 'rgba(10, 15, 29, 0)');
+      ctx.fillStyle = gradL;
+      ctx.fillRect(mapScreenX, mapScreenY, edgeFade, mapScreenH);
+
+      const gradR = ctx.createLinearGradient(mapScreenX + mapScreenW - edgeFade, 0, mapScreenX + mapScreenW, 0);
+      gradR.addColorStop(0, 'rgba(10, 15, 29, 0)');
+      gradR.addColorStop(1, 'rgba(10, 15, 29, 0.95)');
+      ctx.fillStyle = gradR;
+      ctx.fillRect(mapScreenX + mapScreenW - edgeFade, mapScreenY, edgeFade, mapScreenH);
+
+      const gradT = ctx.createLinearGradient(0, mapScreenY, 0, mapScreenY + edgeFade);
+      gradT.addColorStop(0, 'rgba(10, 15, 29, 0.95)');
+      gradT.addColorStop(1, 'rgba(10, 15, 29, 0)');
+      ctx.fillStyle = gradT;
+      ctx.fillRect(mapScreenX, mapScreenY, mapScreenW, edgeFade);
+
+      const gradB = ctx.createLinearGradient(0, mapScreenY + mapScreenH - edgeFade, 0, mapScreenY + mapScreenH);
+      gradB.addColorStop(0, 'rgba(10, 15, 29, 0)');
+      gradB.addColorStop(1, 'rgba(10, 15, 29, 0.95)');
+      ctx.fillStyle = gradB;
+      ctx.fillRect(mapScreenX, mapScreenY + mapScreenH - edgeFade, mapScreenW, edgeFade);
+
+      // Soft ambient vignette for UI readability
+      ctx.fillStyle = 'rgba(10, 15, 29, 0.12)';
+      ctx.fillRect(mapScreenX, mapScreenY, mapScreenW, mapScreenH);
     }
 
-    // 1. Enchanted Pond / Lago Rúnico (Southwest Quadrant, x: -36, z: -28)
-    const pondWorldX = -36;
-    const pondWorldZ = -28;
-    const pondRadius = 14.5;
-    const pondSx = cx + (pondWorldX - this.cameraOffset.x) * this.zoom;
-    const pondSy = cy + (pondWorldZ - this.cameraOffset.y) * this.zoom;
-    const pondRx = pondRadius * this.zoom;
-    const pondRy = pondRx * 0.58;
+    // 2. Ornate Arena Border & Corner Runes
+    ctx.save();
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(mapScreenX, mapScreenY, mapScreenW, mapScreenH);
 
-    if (pondSx + pondRx > 0 && pondSx - pondRx < width && pondSy + pondRy > 0 && pondSy - pondRy < height) {
-      ctx.save();
-      // Shoreline wet sand / moss fringe
+    const corners = [
+      [mapScreenX, mapScreenY],
+      [mapScreenX + mapScreenW, mapScreenY],
+      [mapScreenX, mapScreenY + mapScreenH],
+      [mapScreenX + mapScreenW, mapScreenY + mapScreenH],
+    ];
+    ctx.font = '14px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const [cornX, cornY] of corners) {
       ctx.beginPath();
-      ctx.ellipse(pondSx, pondSy, pondRx + 6, pondRy + 4, 0, 0, Math.PI * 2);
-      const shoreGrad = ctx.createRadialGradient(pondSx, pondSy, pondRx * 0.7, pondSx, pondSy, pondRx + 6);
-      shoreGrad.addColorStop(0, 'rgba(8, 145, 178, 0.4)');
-      shoreGrad.addColorStop(0.7, 'rgba(45, 74, 34, 0.85)');
-      shoreGrad.addColorStop(1, 'rgba(30, 50, 20, 0)');
-      ctx.fillStyle = shoreGrad;
+      ctx.arc(cornX, cornY, 12, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
       ctx.fill();
-
-      // Water body
-      ctx.beginPath();
-      ctx.ellipse(pondSx, pondSy, pondRx, pondRy, 0, 0, Math.PI * 2);
-      const waterGrad = ctx.createRadialGradient(pondSx, pondSy - pondRy * 0.2, 5, pondSx, pondSy, pondRx);
-      waterGrad.addColorStop(0, 'rgba(14, 165, 233, 0.82)');
-      waterGrad.addColorStop(0.5, 'rgba(3, 105, 161, 0.90)');
-      waterGrad.addColorStop(1, 'rgba(12, 74, 110, 0.96)');
-      ctx.fillStyle = waterGrad;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+      ctx.strokeStyle = '#fbbf24';
       ctx.lineWidth = 2;
       ctx.stroke();
-
-      // Animated water caustics / ripples
-      const ripplePhase1 = (now * 0.0008) % 1;
-      const ripplePhase2 = (now * 0.0008 + 0.5) % 1;
-      for (const phase of [ripplePhase1, ripplePhase2]) {
-        ctx.beginPath();
-        ctx.ellipse(pondSx, pondSy, pondRx * phase, pondRy * phase, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(186, 230, 253, ${0.35 * (1 - phase)})`;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
-
-      // Floating lily pads & lotus blossoms
-      const pads = [
-        { dx: -0.4, dy: -0.3, r: 0.12, blossom: true },
-        { dx: 0.35, dy: -0.45, r: 0.09, blossom: false },
-        { dx: -0.25, dy: 0.4, r: 0.14, blossom: true },
-        { dx: 0.5, dy: 0.25, r: 0.11, blossom: false },
-        { dx: 0.05, dy: -0.55, r: 0.08, blossom: true },
-      ];
-      for (const pad of pads) {
-        const padX = pondSx + pad.dx * pondRx;
-        const padY = pondSy + pad.dy * pondRy;
-        const padR = pondRx * pad.r;
-        ctx.beginPath();
-        ctx.ellipse(padX, padY, padR, padR * 0.6, 0.2, 0, Math.PI * 1.8);
-        ctx.fillStyle = '#15803d';
-        ctx.fill();
-        ctx.strokeStyle = '#166534';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        if (pad.blossom) {
-          ctx.beginPath();
-          ctx.arc(padX + 2, padY - 2, Math.max(3, padR * 0.4), 0, Math.PI * 2);
-          ctx.fillStyle = '#f472b6';
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(padX + 2, padY - 2, Math.max(1.5, padR * 0.2), 0, Math.PI * 2);
-          ctx.fillStyle = '#fef08a';
-          ctx.fill();
-        }
-      }
-      ctx.restore();
+      ctx.fillStyle = '#fef08a';
+      ctx.fillText('ᚱ', cornX, cornY);
     }
+    ctx.restore();
 
-    // 2. Swaying Tall Grass & Wildflower Patches
-    for (const patch of this.floraPatches) {
-      const pSx = cx + (patch.x - this.cameraOffset.x) * this.zoom;
-      const pSy = cy + (patch.z - this.cameraOffset.y) * this.zoom;
-      if (pSx > -50 && pSx < width + 50 && pSy > -50 && pSy < height + 50) {
-        const wind = Math.sin(now * 0.0028 + patch.x * 0.6) * 4.5;
-        ctx.save();
-        ctx.translate(pSx, pSy);
-
-        for (let b = -2; b <= 2; b++) {
-          const bladeH = 14 + Math.abs(b) * -2;
-          const bladeX = b * 4;
-          const swayAmt = wind * (bladeH / 14);
-
-          ctx.beginPath();
-          ctx.moveTo(bladeX, 0);
-          ctx.quadraticCurveTo(bladeX + swayAmt * 0.5, -bladeH * 0.5, bladeX + swayAmt, -bladeH);
-          ctx.strokeStyle = '#22c55e';
-          ctx.lineWidth = 1.8;
-          ctx.stroke();
-
-          if (patch.type === 'flower' && Math.abs(b) === 1) {
-            ctx.beginPath();
-            ctx.arc(bladeX + swayAmt, -bladeH, 2.5, 0, Math.PI * 2);
-            ctx.fillStyle = patch.color;
-            ctx.fill();
-          } else if (patch.type === 'dandelion' && b === 0) {
-            ctx.beginPath();
-            ctx.arc(bladeX + swayAmt, -bladeH, 3, 0, Math.PI * 2);
-            ctx.fillStyle = patch.color;
-            ctx.fill();
-          }
-        }
-        ctx.restore();
-      }
-    }
-
-    // 3. Center Spawn Altar / Runic Circle (World 0,0 - located on the central stone path)
+    // 3. Subtle Arena Combat Boundary (circle around center)
+    const combatRadius = 50;
     const altarScreenX = cx + (0 - this.cameraOffset.x) * this.zoom;
     const altarScreenY = cy + (0 - this.cameraOffset.y) * this.zoom;
 
+    ctx.beginPath();
+    ctx.arc(altarScreenX, altarScreenY, combatRadius * this.zoom, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 8]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 4. Center Spawn Altar / Runic Circle (World 0,0 - located on the central stone path)
     ctx.beginPath();
     ctx.arc(altarScreenX, altarScreenY, 7 * this.zoom, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(251, 191, 36, 0.55)';
@@ -1055,7 +631,7 @@ export class GameRenderer {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // 4. Draw Runic Stage Portal (at diagonal coordinates 20, 20)
+    // 5. Draw Runic Stage Portal (at diagonal coordinates 20, 20)
     if (this.runicPortalImg && this.runicPortalImg.complete && this.runicPortalImg.naturalWidth > 0) {
       const portalWorldX = 20;
       const portalWorldZ = 20;
@@ -1063,7 +639,7 @@ export class GameRenderer {
       const pScreenY = cy + (portalWorldZ - this.cameraOffset.y) * this.zoom;
 
       const portalSize = 72;
-      const pulse = Math.sin(now * 0.0035) * 6;
+      const pulse = Math.sin(performance.now() * 0.0035) * 6;
 
       ctx.save();
       ctx.shadowColor = '#c084fc';
@@ -1078,14 +654,10 @@ export class GameRenderer {
       ctx.restore();
 
       // Portal title tag
-      ctx.save();
-      ctx.font = 'bold 10px Inter, sans-serif';
-      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.fillStyle = '#facc15';
       ctx.textAlign = 'center';
-      ctx.shadowColor = '#000000';
-      ctx.shadowBlur = 4;
-      ctx.fillText('PORTAL RÚNICO (FASE 2)', pScreenX, pScreenY - (portalSize + pulse) / 2 - 22);
-      ctx.restore();
+      ctx.fillText('🌀 PORTAL RÚNICO (FASE 2)', pScreenX, pScreenY - 48);
     }
   }
 
@@ -1187,115 +759,33 @@ export class GameRenderer {
     return closestDrop;
   }
 
-  private renderForestBreeze(now: number): void {
-    const { ctx, canvas } = this;
-    const w = canvas.width;
-    const h = canvas.height;
-
-    ctx.save();
-    for (const p of this.breezeParticles) {
-      p.x += p.speedX;
-      p.y += p.speedY + Math.sin(now * 0.002 + p.phase) * 0.35;
-
-      if (p.x > w + 20) p.x = -20;
-      if (p.y > h + 20) p.y = -20;
-
-      const rot = (now * 0.0015 + p.phase) % (Math.PI * 2);
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(rot);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = 0.45 + Math.sin(now * 0.003 + p.phase) * 0.2;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, p.size, p.size * 0.45, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-    ctx.restore();
-  }
-
   private renderItemDrops(cx: number, cy: number): void {
     const { ctx } = this;
     const now = performance.now();
 
-    if (this.activeDrops.size === 0) return;
-
-    // Cluster drops within 2.2m radius to prevent pileup and light beacon towers
-    type DropCluster = {
-      drops: ActiveItemDrop[];
-      x: number;
-      z: number;
-      topRarity: ItemRarity;
-      totalGold: number;
-      hasNonGold: boolean;
-      topItem: ActiveItemDrop;
-    };
-
-    const clusters: DropCluster[] = [];
-    const rarityRank = (r: ItemRarity): number => {
-      switch (r) {
-        case ItemRarity.LENDARIO: return 5;
-        case ItemRarity.EPICO: return 4;
-        case ItemRarity.RARO: return 3;
-        case ItemRarity.INCOMUM: return 2;
-        default: return 1;
-      }
-    };
-
-    for (const drop of this.activeDrops.values()) {
-      let matchedCluster: DropCluster | null = null;
-      for (const cl of clusters) {
-        const dist = Math.hypot(drop.position.x - cl.x, drop.position.z - cl.z);
-        if (dist <= 2.2) {
-          matchedCluster = cl;
-          break;
-        }
-      }
-
-      if (matchedCluster) {
-        matchedCluster.drops.push(drop);
-        if (drop.itemId === 'gold') matchedCluster.totalGold += drop.quantity;
-        else matchedCluster.hasNonGold = true;
-        if (rarityRank(drop.rarity) > rarityRank(matchedCluster.topRarity)) {
-          matchedCluster.topRarity = drop.rarity;
-          matchedCluster.topItem = drop;
-        }
-      } else {
-        clusters.push({
-          drops: [drop],
-          x: drop.position.x,
-          z: drop.position.z,
-          topRarity: drop.rarity,
-          totalGold: drop.itemId === 'gold' ? drop.quantity : 0,
-          hasNonGold: drop.itemId !== 'gold',
-          topItem: drop,
-        });
-      }
-    }
-
-    clusters.sort((a, b) => {
-      const distA = Math.hypot(a.x - this.cameraOffset.x, a.z - this.cameraOffset.y);
-      const distB = Math.hypot(b.x - this.cameraOffset.x, b.z - this.cameraOffset.y);
+    const sortedDrops = Array.from(this.activeDrops.values()).sort((a, b) => {
+      const distA = Math.hypot(a.position.x - this.cameraOffset.x, a.position.z - this.cameraOffset.y);
+      const distB = Math.hypot(b.position.x - this.cameraOffset.x, b.position.z - this.cameraOffset.y);
       return distA - distB;
     });
 
     let labeledCount = 0;
-    for (const cluster of clusters) {
-      const sx = cx + (cluster.x - this.cameraOffset.x) * this.zoom;
-      const sy = cy + (cluster.z - this.cameraOffset.y) * this.zoom;
+    for (const drop of sortedDrops) {
+      const sx = cx + (drop.position.x - this.cameraOffset.x) * this.zoom;
+      const sy = cy + (drop.position.z - this.cameraOffset.y) * this.zoom;
 
-      const rarityTheme = RARITY_COLORS[cluster.topRarity] || {
+      const rarityTheme = RARITY_COLORS[drop.rarity] || {
         border: '#ffffff',
         glow: 'rgba(255, 255, 255, 0.4)',
         text: '#ffffff',
         bg: 'rgba(30, 41, 59, 0.6)',
       };
       const rarityColor = rarityTheme.border;
-      const bobOffset = Math.sin(now * 0.005 + cluster.x) * 4;
+      const bobOffset = Math.sin(now * 0.005 + drop.position.x) * 4;
 
       ctx.save();
 
-      // 1. Single Elegant Beaming Light Pillar per cluster
+      // 1. Vertical Beaming Light Pillar
       const beamGrad = ctx.createLinearGradient(sx, sy, sx, sy - 55);
       beamGrad.addColorStop(0, rarityColor);
       beamGrad.addColorStop(0.3, rarityTheme.glow);
@@ -1323,8 +813,7 @@ export class GameRenderer {
 
       // 3. Loot Icon (Floating glowing bag/chest)
       const iconY = sy - 20 + bobOffset;
-      const isGoldOnly = !cluster.hasNonGold;
-      ctx.fillStyle = isGoldOnly ? '#fbbf24' : '#f8fafc';
+      ctx.fillStyle = drop.itemId === 'gold' ? '#fbbf24' : '#f8fafc';
       ctx.beginPath();
       ctx.arc(sx, iconY, 8, 0, Math.PI * 2);
       ctx.fill();
@@ -1337,23 +826,14 @@ export class GameRenderer {
       ctx.font = 'bold 9px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(isGoldOnly ? '💰' : '📦', sx, iconY);
+      ctx.fillText(drop.itemId === 'gold' ? '💰' : '📦', sx, iconY);
 
-      // 4. Floating Name Badge (rendered for closest clusters)
-      const distToCam = Math.hypot(cluster.x - this.cameraOffset.x, cluster.z - this.cameraOffset.y);
-      if (distToCam < 20.0 && labeledCount < 6) {
+      // 4. Floating Name Badge (rendered for the closest 6 drops to avoid text clutter)
+      const distToCam = Math.hypot(drop.position.x - this.cameraOffset.x, drop.position.z - this.cameraOffset.y);
+      if (distToCam < 16.0 && labeledCount < 6) {
         labeledCount++;
         const textY = iconY - 16;
-        let labelText: string;
-        if (cluster.drops.length === 1) {
-          const single = cluster.drops[0];
-          labelText = single.quantity > 1 ? `${single.name} (${single.quantity})` : single.name;
-        } else if (isGoldOnly) {
-          labelText = `💰 Ouro (+${cluster.totalGold} G)`;
-        } else {
-          labelText = `${cluster.topItem.name} (+${cluster.drops.length - 1})`;
-        }
-
+        const labelText = drop.quantity > 1 ? `${drop.name} (${drop.quantity})` : drop.name;
         ctx.font = 'bold 11px Inter, sans-serif';
         const textMetrics = ctx.measureText(labelText);
         const bgWidth = textMetrics.width + 14;
