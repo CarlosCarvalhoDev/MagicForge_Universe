@@ -73,9 +73,3 @@ Thumbs.db
 ehthumbs.db
 [Dd]esktop.ini
 $RECYCLE.BIN/
-
-# --- Ferramentas e Integracoes Locais (Sprite Maker, Gorest, Comfy, PixelLab) ---
-tools/
-
-# --- Scripts locais de inicializacao ---
-*.bat

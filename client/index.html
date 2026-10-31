@@ -32,14 +32,10 @@
       }
 
       #game-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
         display: block;
+        width: 100%;
+        height: 100%;
         cursor: crosshair;
-        z-index: 1;
       }
 
       /* Glassmorphism Panels */
@@ -636,91 +632,20 @@
         transform: scale(0.92);
       }
 
-      /* Game Chat Box (Collapsible & Compact) */
+      /* Game Chat Box (Enlarged with Scroll & Input) */
       #game-chat-box {
         width: 100%;
-        max-width: 560px;
+        max-width: 580px;
         background: rgba(15, 23, 42, 0.85);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border: 1.5px solid rgba(255, 255, 255, 0.12);
         border-radius: 14px;
-        padding: 8px 14px 10px;
+        padding: 10px 14px;
         pointer-events: auto;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
         display: flex;
         flex-direction: column;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      .chat-header-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-bottom: 5px;
-        margin-bottom: 4px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      }
-
-      .chat-tabs {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .chat-channel-tab {
-        font-size: 0.72rem;
-        font-weight: 800;
-        color: #94a3b8;
-        padding: 1px 6px;
-        border-radius: 4px;
-        user-select: none;
-      }
-
-      .chat-channel-tab.active {
-        color: #c084fc;
-        background: rgba(168, 85, 247, 0.15);
-        border: 1px solid rgba(168, 85, 247, 0.3);
-      }
-
-      .chat-toggle-btn {
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #f1f5f9;
-        border-radius: 6px;
-        padding: 2px 7px;
-        font-size: 0.68rem;
-        font-weight: 800;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        transition: all 0.15s ease-out;
-      }
-
-      .chat-toggle-btn:hover {
-        background: rgba(51, 65, 85, 0.95);
-        border-color: #fbbf24;
-        color: #fbbf24;
-      }
-
-      #game-chat-box.collapsed {
-        padding: 4px 10px 5px;
-        background: rgba(15, 23, 42, 0.68);
-      }
-
-      #game-chat-box.collapsed .chat-header-bar {
-        margin-bottom: 2px;
-        padding-bottom: 3px;
-      }
-
-      #game-chat-box.collapsed #chat-messages-container {
-        height: 24px;
-        overflow: hidden;
-      }
-
-      #game-chat-box.collapsed .chat-input-form {
-        display: none;
       }
 
       #chat-messages-container {
@@ -1104,68 +1029,9 @@
         gap: 14px;
       }
 
-      @media (max-width: 1200px) {
-        #bottom-center-zone {
-          max-width: 460px;
-        }
-        #mobile-combat-arc-container {
-          transform: scale(0.85);
-          transform-origin: bottom right;
-          right: 14px;
-          bottom: 14px;
-        }
-        .bottom-center-toolbar {
-          gap: 8px;
-        }
-        .btn-auto-toggle {
-          padding: 6px 14px;
-          font-size: 0.78rem;
-        }
-        .btn-farm-gear {
-          padding: 6px 12px;
-          font-size: 0.78rem;
-        }
-        .quick-potion-chip {
-          padding: 5px 10px;
-          font-size: 0.75rem;
-        }
-      }
-
       @media (max-width: 900px) {
         .slot-cards-row {
           grid-template-columns: 1fr;
-        }
-      }
-
-      @media (max-width: 768px) {
-        #top-hud {
-          top: 8px;
-          left: 8px;
-          right: 8px;
-        }
-        #hero-status-card {
-          transform: scale(0.82);
-          transform-origin: top left;
-        }
-        #top-right-location-card {
-          transform: scale(0.82);
-          transform-origin: top right;
-        }
-        #top-center-wave-card {
-          max-width: 250px;
-          transform: scale(0.88);
-        }
-        #mobile-combat-arc-container {
-          transform: scale(0.72);
-          transform-origin: bottom right;
-          right: 8px;
-          bottom: 8px;
-        }
-        #bottom-center-zone {
-          max-width: calc(100vw - 190px);
-          left: 10px;
-          transform: none;
-          bottom: 10px;
         }
       }
 
@@ -3791,7 +3657,6 @@
           <option value="CLERIGO">Clérigo (Ranged - WIS)</option>
           <option value="BARBARO">Bárbaro (Melee - STR)</option>
           <option value="ARQUEIRO">Arqueiro (Ranged - DEX)</option>
-          <option value="DEMONOLOGO">Demonólogo (Ranged - CHA+CON)</option>
           <option value="MONGE" disabled>🔒 Monge (Em Breve)</option>
           <option value="MAGO" disabled>🔒 Mago (Em Breve)</option>
           <option value="BRUXO" disabled>🔒 Bruxo (Em Breve)</option>
@@ -3889,17 +3754,8 @@
         </div>
       </div>
 
-      <!-- In-Game Chat Box with History & Typing Input (Collapsible) -->
+      <!-- In-Game Chat Box with History & Typing Input -->
       <div id="game-chat-box">
-        <div class="chat-header-bar">
-          <div class="chat-tabs">
-            <span class="chat-channel-tab active">💬 Geral</span>
-          </div>
-          <button id="btn-toggle-chat" class="chat-toggle-btn" type="button" title="Recolher / Expandir Chat [C]">
-            <span id="chat-toggle-icon">▼</span>
-            <span style="font-size: 0.65rem; color: #94a3b8;">Chat</span>
-          </button>
-        </div>
         <div id="chat-messages-container">
           <div class="chat-msg"><span class="chat-tag-sys">[Sistema]</span><span class="chat-body">Bem-vindo ao MagicForge: Universe!</span></div>
           <div class="chat-msg"><span class="chat-tag-auto">[Auto]</span><span class="chat-body">Farm Idle ativo: Caçando monstros da fase...</span></div>

@@ -14,7 +14,6 @@ export enum CharacterClass {
   BRUXO = 'BRUXO',
   MAGO = 'MAGO',
   ARQUEIRO = 'ARQUEIRO',
-  DEMONOLOGO = 'DEMONOLOGO',
 }
 
 export enum PrimaryStatType {
@@ -54,7 +53,7 @@ export const CLASS_DEFINITIONS: Record<CharacterClass, ClassDefinition> = {
     isRanged: true,
     attackRange: 10.0,
     attackIntervalSec: 1.5,
-    baseSpeed: 7.8,
+    baseSpeed: 5.0,
     baseStats: { forca: 8, destreza: 10, constituicao: 12, inteligencia: 12, sabedoria: 16, carisma: 12 },
   },
   [CharacterClass.GUERREIRO]: {
@@ -64,7 +63,7 @@ export const CLASS_DEFINITIONS: Record<CharacterClass, ClassDefinition> = {
     isRanged: false,
     attackRange: 2.5,
     attackIntervalSec: 1.2,
-    baseSpeed: 7.8,
+    baseSpeed: 5.0,
     baseStats: { forca: 15, destreza: 10, constituicao: 14, inteligencia: 8, sabedoria: 10, carisma: 13 },
   },
   [CharacterClass.BARBARO]: {
@@ -74,7 +73,7 @@ export const CLASS_DEFINITIONS: Record<CharacterClass, ClassDefinition> = {
     isRanged: false,
     attackRange: 2.5,
     attackIntervalSec: 1.4,
-    baseSpeed: 7.8,
+    baseSpeed: 5.2,
     baseStats: { forca: 18, destreza: 12, constituicao: 16, inteligencia: 6, sabedoria: 8, carisma: 8 },
   },
   [CharacterClass.MONGE]: {
@@ -84,7 +83,7 @@ export const CLASS_DEFINITIONS: Record<CharacterClass, ClassDefinition> = {
     isRanged: false,
     attackRange: 2.5,
     attackIntervalSec: 0.9,
-    baseSpeed: 7.8,
+    baseSpeed: 5.5,
     baseStats: { forca: 12, destreza: 16, constituicao: 12, inteligencia: 8, sabedoria: 14, carisma: 8 },
   },
   [CharacterClass.BRUXO]: {
@@ -94,7 +93,7 @@ export const CLASS_DEFINITIONS: Record<CharacterClass, ClassDefinition> = {
     isRanged: true,
     attackRange: 10.0,
     attackIntervalSec: 1.5,
-    baseSpeed: 7.8,
+    baseSpeed: 5.0,
     baseStats: { forca: 8, destreza: 10, constituicao: 10, inteligencia: 12, sabedoria: 10, carisma: 18 },
   },
   [CharacterClass.MAGO]: {
@@ -104,7 +103,7 @@ export const CLASS_DEFINITIONS: Record<CharacterClass, ClassDefinition> = {
     isRanged: true,
     attackRange: 10.0,
     attackIntervalSec: 1.5,
-    baseSpeed: 7.8,
+    baseSpeed: 5.0,
     baseStats: { forca: 6, destreza: 10, constituicao: 10, inteligencia: 18, sabedoria: 12, carisma: 10 },
   },
   [CharacterClass.ARQUEIRO]: {
@@ -114,18 +113,8 @@ export const CLASS_DEFINITIONS: Record<CharacterClass, ClassDefinition> = {
     isRanged: true,
     attackRange: 12.0,
     attackIntervalSec: 1.1,
-    baseSpeed: 7.8,
+    baseSpeed: 5.2,
     baseStats: { forca: 10, destreza: 18, constituicao: 12, inteligencia: 10, sabedoria: 10, carisma: 8 },
-  },
-  [CharacterClass.DEMONOLOGO]: {
-    classType: CharacterClass.DEMONOLOGO,
-    displayName: 'Demonólogo',
-    mainStat: PrimaryStatType.CARISMA,
-    isRanged: true,
-    attackRange: 11.0,
-    attackIntervalSec: 1.4,
-    baseSpeed: 7.8,
-    baseStats: { forca: 8, destreza: 12, constituicao: 14, inteligencia: 14, sabedoria: 10, carisma: 16 },
   },
 };
 
@@ -191,5 +180,4 @@ export const CLASS_STAT_GROWTH: Record<CharacterClass, Partial<CharacterAttribut
   [CharacterClass.ARQUEIRO]: { destreza: 3, constituicao: 1, sabedoria: 1 },
   [CharacterClass.MAGO]: { inteligencia: 3, constituicao: 1, sabedoria: 1 },
   [CharacterClass.BRUXO]: { carisma: 3, constituicao: 2 },
-  [CharacterClass.DEMONOLOGO]: { carisma: 3, constituicao: 2 },
 };
