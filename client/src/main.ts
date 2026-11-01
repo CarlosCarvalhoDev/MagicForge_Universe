@@ -2451,36 +2451,7 @@ window.addEventListener('keydown', (e) => {
   }
 
   if (e.key === 'Enter') {
-    
-const tacticalActionBar = document.getElementById('tactical-action-bar');
-const btnTacticalDrawerToggle = document.getElementById('btn-tactical-drawer-toggle');
-const tacticalDrawerArrow = document.getElementById('tactical-drawer-arrow');
-
-function setTacticalDrawerOpen(isOpen: boolean) {
-  if (!tacticalActionBar) return;
-  tacticalActionBar.dataset.drawerOpen = isOpen ? 'true' : 'false';
-  tacticalActionBar.classList.toggle('drawer-collapsed', !isOpen);
-  if (btnTacticalDrawerToggle) {
-    btnTacticalDrawerToggle.setAttribute('aria-expanded', String(isOpen));
-  }
-  if (tacticalDrawerArrow) {
-    tacticalDrawerArrow.textContent = isOpen ? '❮' : '❯';
-  }
-}
-
-// Em tela reduzida (<= 1180px) ou mobile, o menu lateral tático inicia FECHADO por padrão.
-// Em desktop amplo (> 1180px), permanece aberto por padrão.
-setTacticalDrawerOpen(window.innerWidth > 1180);
-
-if (btnTacticalDrawerToggle) {
-  btnTacticalDrawerToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const currentlyOpen = tacticalActionBar?.dataset.drawerOpen !== 'false';
-    setTacticalDrawerOpen(!currentlyOpen);
-  });
-}
-
-if (chatInputField) {
+    if (chatInputField) {
       e.preventDefault();
       chatInputField.focus();
       return;
@@ -2511,6 +2482,38 @@ if (chatInputField) {
     closeFarmHelper();
   }
 });
+
+// Left Collapsible Tactical Drawer Controller (Responsive & Mobile Touch Ready)
+const tacticalActionBar = document.getElementById('tactical-action-bar');
+const btnTacticalDrawerToggle = document.getElementById('btn-tactical-drawer-toggle');
+const tacticalDrawerArrow = document.getElementById('tactical-drawer-arrow');
+
+function setTacticalDrawerOpen(isOpen: boolean) {
+  if (!tacticalActionBar) return;
+  tacticalActionBar.dataset.drawerOpen = isOpen ? 'true' : 'false';
+  tacticalActionBar.classList.toggle('drawer-collapsed', !isOpen);
+  if (btnTacticalDrawerToggle) {
+    btnTacticalDrawerToggle.setAttribute('aria-expanded', String(isOpen));
+  }
+  if (tacticalDrawerArrow) {
+    tacticalDrawerArrow.textContent = isOpen ? '❮' : '❯';
+  }
+}
+
+// Em tela reduzida (<= 1180px) ou mobile, o menu lateral tático inicia FECHADO por padrão.
+// Em desktop amplo (> 1180px), permanece aberto por padrão.
+setTacticalDrawerOpen(window.innerWidth > 1180);
+
+if (btnTacticalDrawerToggle) {
+  const handleDrawerToggle = (e: Event) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const currentlyOpen = tacticalActionBar?.dataset.drawerOpen !== 'false';
+    setTacticalDrawerOpen(!currentlyOpen);
+  };
+  btnTacticalDrawerToggle.addEventListener('click', handleDrawerToggle);
+  btnTacticalDrawerToggle.addEventListener('touchend', handleDrawerToggle, { passive: false });
+}
 
 // UI Listeners
 btnConnect.addEventListener('click', () => {

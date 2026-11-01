@@ -3887,25 +3887,6 @@
         <input type="range" id="slider-delay" min="50" max="250" step="10" value="100" />
       </div>
     </aside>
-    <script>
-      try {
-        if (window.innerWidth <= 1180) {
-          const bar = document.getElementById('tactical-action-bar');
-          if (bar) {
-            bar.dataset.drawerOpen = 'false';
-            bar.classList.add('drawer-collapsed');
-          }
-          const arrow = document.getElementById('tactical-drawer-arrow');
-          if (arrow) {
-            arrow.textContent = '❯';
-          }
-          const btn = document.getElementById('btn-tactical-drawer-toggle');
-          if (btn) {
-            btn.setAttribute('aria-expanded', 'false');
-          }
-        }
-      } catch (e) {}
-    </script>
 
     <!-- Dynamic Floating Virtual Joystick (Appears only on touch / drag on left screen) -->
     <div id="virtual-joystick-zone" style="display: none; position: fixed; pointer-events: none; z-index: 50; transform: translate(-50%, -50%);">
@@ -3973,6 +3954,23 @@
         <span class='tactical-drawer-arrow' id='tactical-drawer-arrow' aria-hidden='true'>❮</span>
       </button>
     </aside>
+    <script>
+      (function() {
+        try {
+          if (window.innerWidth <= 1180) {
+            var bar = document.getElementById('tactical-action-bar');
+            if (bar) {
+              bar.dataset.drawerOpen = 'false';
+              bar.classList.add('drawer-collapsed');
+            }
+            var arrow = document.getElementById('tactical-drawer-arrow');
+            if (arrow) arrow.textContent = '❯';
+            var btn = document.getElementById('btn-tactical-drawer-toggle');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+          }
+        } catch (e) {}
+      })();
+    </script>
 
     <!-- Bottom Center In-Game Chat Box -->
     <div id='bottom-center-zone'>
