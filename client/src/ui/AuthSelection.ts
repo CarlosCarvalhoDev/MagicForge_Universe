@@ -498,7 +498,7 @@ export function setupAuthSelection(
       if (!authenticated || !account || payload.accountUsername?.trim().toLowerCase() !== account) return;
       const valid = Array.isArray(payload.slots) && payload.slots.length === 3
         && [0, 1, 2].every(index => payload.slots.some(slot => slot.slotIndex === index && typeof slot.isEmpty === 'boolean'
-          && (slot.isEmpty || (typeof slot.name === 'string' && Object.values(CharacterClass).includes(slot.classType!)))));
+          && (slot.isEmpty || (typeof slot.name === 'string' && typeof slot.classType === 'string' && slot.classType.length > 0))));
       if (!valid) {
         slots = null;
         selected = null;
