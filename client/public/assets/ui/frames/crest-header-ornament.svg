@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 44" fill="none">
+  <defs>
+    <linearGradient id="crestGold" x1="0" y1="0" x2="360" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#78350F" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#D97706"/>
+      <stop offset="50%" stop-color="#FEF08A"/>
+      <stop offset="82%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#78350F" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gemFill" x1="180" y1="6" x2="180" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+  </defs>
+  <!-- Horizontal Filigree Wings -->
+  <path d="M8 22 H132 L146 12 H164 M214 12 H196 M228 22 H352" stroke="url(#crestGold)" stroke-width="1.6"/>
+  <path d="M36 27 H138 L148 33 H166 M194 33 H212 L222 27 H324" stroke="url(#crestGold)" stroke-width="1" stroke-opacity="0.7"/>
+  <!-- Left & Right Wing Scroll Diamonds -->
+  <polygon points="96,22 103,18 110,22 103,26" fill="#F59E0B" stroke="#FEF08A" stroke-width="0.8"/>
+  <polygon points="264,22 257,18 250,22 257,26" fill="#F59E0B" stroke="#FEF08A" stroke-width="0.8"/>
+  <circle cx="68" cy="22" r="2" fill="#FBBF24"/>
+  <circle cx="292" cy="22" r="2" fill="#FBBF24"/>
+  <!-- Center Runic Medallion Shield -->
+  <path d="M150 22 L164 8 H196 L210 22 L196 36 H164 Z" fill="#0B1020" stroke="#FBBF24" stroke-width="1.8"/>
+  <path d="M156 22 L167 12 H193 L204 22 L193 32 H167 Z" fill="#131B2E" stroke="#FDE68A" stroke-width="0.8" stroke-opacity="0.6"/>
+  <!-- Central Faceted Astral Gem -->
+  <polygon points="180,10 190,22 180,34 170,22" fill="url(#gemFill)" stroke="#FFFBEB" stroke-width="1"/>
+  <polygon points="180,14 185,22 180,30 175,22" fill="#FEF9C3" fill-opacity="0.55"/>
+  <!-- Side Runes inside Medallion -->
+  <circle cx="163" cy="22" r="2" fill="#FDE68A"/>
+  <circle cx="197" cy="22" r="2" fill="#FDE68A"/>
+</svg>
+

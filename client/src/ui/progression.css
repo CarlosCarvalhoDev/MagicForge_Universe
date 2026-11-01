@@ -1,17 +1,2221 @@
-#leaderboard-dialog { width:min(1000px,94vw); max-height:90vh; padding:24px; border:1px solid #fbbf2466; border-radius:16px; background:#111a2a; color:#e2e8f0; }
-#leaderboard-dialog::backdrop { background:#030712cc; }
-.ranking-header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
-.ranking-header h2 { color:#fbbf24; font:700 22px 'Cinzel',serif; }
-.ranking-tabs { display:flex; gap:8px; flex-wrap:wrap; margin:20px 0; }
-#leaderboard-dialog button, #inventory-expansion-confirm button { min-height:44px; padding:8px 12px; border:1px solid #fbbf2444; border-radius:7px; color:#e2e8f0; background:#1d2940; cursor:pointer; }
-.ranking-tabs [aria-selected=true] { color:#fbbf24 !important; border-color:#fbbf24 !important; }
-.ranking-table-wrap { overflow-x:auto; }
-.ranking-table-wrap table { width:100%; border-collapse:collapse; font-size:12px; }
-.ranking-table-wrap th,.ranking-table-wrap td { text-align:left; padding:12px 10px; border-bottom:1px solid #94a3b822; white-space:nowrap; }
-.ranking-me { background:#fbbf2410; color:#fde68a; }
-#leaderboard-personal { padding:16px; margin:16px 0; border:1px solid #fbbf2433; border-radius:8px; }
-#leaderboard-status,#inventory-expansion-status { font-size:12px; color:#cbd5e1; line-height:1.6; }
-#inventory-expansion-confirm { border:1px solid #fbbf2444; padding:12px; border-radius:8px; margin:8px 0; }
-#inventory-expansion-confirm[hidden] { display:none; }
-.chat-msg-malak { background:linear-gradient(90deg,#272532,#111827); border-left:2px solid #a8a29e; padding:7px; }
-.chat-tag-malak { color:#e7e5e4; font-weight:700; }
+/* ==========================================================================
+   MODAIS, CARDS & HUD DO JOGO — MOLDURAS ESCULPIDAS & FILIGRANA RÚNICA (RPG)
+   ========================================================================== */
+
+/* 1. Moldura Esculpida de Todos os Modais (Grimório, Ficha/Mochila, Cartas, Farm, Hall da Fama) */
+.modal-content,
+.grimorio-modal-content,
+.unified-hero-modal-content,
+.skill-card-modal-content,
+#leaderboard-dialog {
+  position: relative;
+  border: 2px solid #d97706 !important;
+  outline: 1.5px solid rgba(254, 240, 138, 0.35);
+  outline-offset: -8px;
+  border-radius: 6px !important;
+  background-color: #090d18 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    url('/assets/ui/frames/crest-header-ornament.svg'),
+    radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.24), transparent 58%),
+    radial-gradient(circle at 85% 90%, rgba(139, 92, 246, 0.12), transparent 50%),
+    linear-gradient(170deg, rgba(24, 21, 38, 0.98) 0%, rgba(8, 11, 22, 0.99) 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    top 2px left 2px,
+    top 2px right 2px,
+    bottom 2px left 2px,
+    bottom 2px right 2px,
+    top 4px center,
+    center,
+    center,
+    center !important;
+  background-size:
+    52px 52px,
+    52px 52px,
+    52px 52px,
+    52px 52px,
+    240px 28px,
+    100% 100%,
+    100% 100%,
+    100% 100% !important;
+  box-shadow:
+    inset 0 0 0 4px rgba(10, 14, 26, 0.92),
+    inset 0 0 28px rgba(245, 158, 11, 0.12),
+    0 28px 68px rgba(0, 0, 0, 0.95),
+    0 0 42px rgba(245, 158, 11, 0.18) !important;
+  color: #ece8dc;
+}
+
+/* Remove pseudo-elemento textual antigo pois agora temos crest-header-ornament.svg */
+.modal-content::before,
+#leaderboard-dialog::before {
+  content: none !important;
+}
+
+/* Cabeçalhos Rúnicos dos Modais com Divisor Esculpido */
+.modal-header,
+.unified-modal-header,
+.ranking-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 6px !important;
+  padding-bottom: 18px !important;
+  border-bottom: none !important;
+  background-image: url('/assets/ui/frames/divider-runic-ornate.svg') !important;
+  background-repeat: no-repeat !important;
+  background-position: bottom center !important;
+  background-size: min(460px, 90%) 18px !important;
+  position: relative;
+}
+
+.modal-header::after,
+.unified-modal-header::after,
+.ranking-header::after {
+  content: none !important;
+}
+
+.modal-title,
+.modal-title-main,
+.ranking-header h2,
+#skill-card-modal-title {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  background: linear-gradient(180deg, #fffbeb 0%, #fde68a 52%, #d97706 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
+}
+
+/* Botão Fechar Rúnico Esculpido */
+.btn-close,
+#leaderboard-close {
+  width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.65) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.25);
+  outline-offset: -4px;
+  background: linear-gradient(180deg, rgba(44, 32, 48, 0.96), rgba(15, 18, 30, 0.98)) !important;
+  color: #fde68a !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 12px rgba(0, 0, 0, 0.65);
+  transition: all 0.18s ease;
+}
+
+.btn-close:hover,
+#leaderboard-close:hover {
+  border-color: #f87171 !important;
+  background: linear-gradient(180deg, #b91c1c, #7f1d1d) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.65);
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   2. GRIMÓRIO DE HABILIDADES & CARDS DE MAGIA COM CANTONEIRAS (.skill-card-v2)
+   ========================================================================== */
+.grimorio-strategy-banner {
+  background-color: #101525 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(90deg, rgba(36, 26, 48, 0.95), rgba(15, 20, 34, 0.95)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center !important;
+  background-size: 24px 24px, 24px 24px, 24px 24px, 24px 24px, 100% 100% !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.48) !important;
+  border-left: 4px solid #fbbf24 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 0 0 16px rgba(251, 191, 36, 0.08), 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.strategy-badge {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.24), rgba(180, 83, 9, 0.24)) !important;
+  color: #fef08a !important;
+  border: 1px solid rgba(251, 191, 36, 0.6) !important;
+  border-radius: 3px !important;
+}
+
+.grimorio-slot-section {
+  background-color: #0b101e !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    radial-gradient(circle at 0% 0%, rgba(251, 191, 36, 0.09), transparent 55%),
+    linear-gradient(180deg, rgba(18, 23, 38, 0.92), rgba(10, 14, 26, 0.96)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    top 2px left 2px,
+    top 2px right 2px,
+    bottom 2px left 2px,
+    bottom 2px right 2px,
+    center,
+    center !important;
+  background-size: 32px 32px, 32px 32px, 32px 32px, 32px 32px, 100% 100%, 100% 100% !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.35) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.16);
+  outline-offset: -6px;
+  border-radius: 6px !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 10px 26px rgba(0, 0, 0, 0.6);
+}
+
+.grimorio-slot-section.unlocked {
+  border-color: rgba(251, 191, 36, 0.55) !important;
+}
+
+.slot-circle-pill {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.08em !important;
+}
+
+/* Card de Habilidade Individual no Grimório — Moldura Rúnica Completa */
+.skill-card-v2 {
+  position: relative;
+  background-color: #0c1120 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.12), transparent 65%),
+    linear-gradient(165deg, rgba(28, 32, 52, 0.95) 0%, rgba(11, 15, 28, 0.98) 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center,
+    center !important;
+  background-size: 28px 28px, 28px 28px, 28px 28px, 28px 28px, 100% 100%, 100% 100% !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.42) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.18);
+  outline-offset: -5px;
+  border-radius: 5px !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 10px 22px rgba(0, 0, 0, 0.65);
+}
+
+.skill-card-v2::after {
+  content: none !important;
+}
+
+.skill-card-v2:hover {
+  border-color: #fbbf24 !important;
+  outline-color: rgba(254, 240, 138, 0.42);
+  box-shadow:
+    inset 0 0 16px rgba(251, 191, 36, 0.14),
+    0 14px 28px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(251, 191, 36, 0.25);
+}
+
+.skill-card-v2.is-equipped {
+  border-color: #34d399 !important;
+  outline-color: rgba(52, 211, 153, 0.35);
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.22), transparent 65%),
+    linear-gradient(165deg, rgba(14, 38, 38, 0.95) 0%, rgba(10, 18, 28, 0.98) 100%) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(52, 211, 153, 0.28),
+    0 0 24px rgba(16, 185, 129, 0.3) !important;
+}
+
+.skill-v2-img-wrap {
+  border: 2px solid #fbbf24 !important;
+  outline: 1px solid rgba(254, 240, 138, 0.35);
+  outline-offset: 2px;
+  border-radius: 6px !important;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.4), inset 0 0 8px rgba(0, 0, 0, 0.85);
+}
+
+.skill-v2-desc {
+  background: rgba(6, 9, 18, 0.82) !important;
+  border: 1px solid rgba(251, 191, 36, 0.22) !important;
+  border-radius: 4px !important;
+}
+
+.btn-equip-skill {
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px !important;
+}
+
+.btn-equip-skill.equip {
+  border: 1.5px solid #fef08a !important;
+  outline: 1px solid rgba(120, 53, 15, 0.65);
+  outline-offset: -3px;
+  background-color: #d97706 !important;
+  background-image:
+    url('/assets/ui/frames/button-ornament-left.svg'),
+    url('/assets/ui/frames/button-ornament-right.svg'),
+    linear-gradient(180deg, #fef08a 0%, #fbbf24 25%, #d97706 78%, #92400e 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position: left 6px center, right 6px center, center !important;
+  background-size: 28px 26px, 28px 26px, 100% 100% !important;
+  color: #1c0f02 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 4px 12px rgba(217, 119, 6, 0.45) !important;
+}
+
+.btn-equip-skill.active {
+  background: linear-gradient(180deg, rgba(6, 95, 70, 0.78), rgba(6, 78, 59, 0.92)) !important;
+  border: 1.5px solid #34d399 !important;
+  outline: 1px solid rgba(167, 243, 208, 0.25);
+  outline-offset: -3px;
+  color: #a7f3d0 !important;
+}
+
+/* ==========================================================================
+   3. FICHA DO HERÓI, EQUIPAMENTOS, MOCHILA, REFINO, PEDRAS & CARTAS
+   ========================================================================== */
+.unified-hero-left-pane {
+  background-color: #090d18 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    url('/assets/ui/frames/crest-header-ornament.svg'),
+    radial-gradient(circle at 50% 35%, rgba(245, 158, 11, 0.16), transparent 65%),
+    linear-gradient(180deg, rgba(22, 24, 42, 0.96) 0%, rgba(9, 13, 24, 0.99) 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    top 2px left 2px,
+    top 2px right 2px,
+    bottom 2px left 2px,
+    bottom 2px right 2px,
+    top 4px center,
+    center,
+    center !important;
+  background-size:
+    42px 42px,
+    42px 42px,
+    42px 42px,
+    42px 42px,
+    200px 24px,
+    100% 100%,
+    100% 100% !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.55) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.25);
+  outline-offset: -6px;
+  border-radius: 6px !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(251, 191, 36, 0.16),
+    inset 0 0 28px rgba(0, 0, 0, 0.78) !important;
+}
+
+/* Halo Rúnico atrás do Herói no centro da boneca de equipamentos */
+.hero-center-pedestal {
+  background-image:
+    url('/assets/ui/frames/magic-circle-halo.svg'),
+    radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.18), transparent 70%) !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 92% 92%, 100% 100% !important;
+}
+
+.hero-cp-banner {
+  background-color: #1a1410 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(135deg, rgba(46, 32, 18, 0.96), rgba(18, 20, 34, 0.98)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center !important;
+  background-size: 22px 22px, 22px 22px, 22px 22px, 22px 22px, 100% 100% !important;
+  border: 1.5px solid #fbbf24 !important;
+  outline: 1px solid rgba(254, 240, 138, 0.3);
+  outline-offset: -4px;
+  border-radius: 5px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 0 20px rgba(251, 191, 36, 0.3) !important;
+}
+
+.cp-label {
+  font-family: 'Cinzel', serif;
+  color: #fde68a !important;
+}
+
+.equipment-slot {
+  background-color: #0b101e !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.92), rgba(9, 13, 24, 0.98)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center !important;
+  background-size: 16px 16px, 16px 16px, 16px 16px, 16px 16px, 100% 100% !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.45) !important;
+  border-radius: 5px !important;
+  box-shadow:
+    inset 0 0 10px rgba(0, 0, 0, 0.85),
+    0 4px 12px rgba(0, 0, 0, 0.65) !important;
+}
+
+.equipment-slot.equipped {
+  border-color: #fbbf24 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.26), rgba(15, 23, 42, 0.96)) !important;
+}
+
+.hero-stats-accordion {
+  background: rgba(8, 11, 20, 0.88) !important;
+  border: 1px solid rgba(251, 191, 36, 0.32) !important;
+  border-radius: 5px !important;
+}
+
+.mini-stat {
+  background: linear-gradient(180deg, rgba(26, 32, 50, 0.85), rgba(12, 16, 28, 0.95)) !important;
+  border: 1px solid rgba(251, 191, 36, 0.22) !important;
+  border-radius: 4px !important;
+}
+
+/* Abas de Submenu Rúnicas (Mochila, Refinamento, Pedras, Cartas) */
+.submenu-tab-btn {
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 0.05em;
+  background-color: #101525 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    linear-gradient(180deg, rgba(28, 34, 52, 0.9), rgba(12, 16, 28, 0.96)) !important;
+  background-repeat: no-repeat !important;
+  background-position: top 1px left 1px, top 1px right 1px, center !important;
+  background-size: 16px 16px, 16px 16px, 100% 100% !important;
+  border: 1px solid rgba(251, 191, 36, 0.35) !important;
+  border-radius: 4px !important;
+  color: #d4c59e !important;
+}
+
+.submenu-tab-btn.active {
+  background-color: #d97706 !important;
+  background-image:
+    url('/assets/ui/frames/button-ornament-left.svg'),
+    url('/assets/ui/frames/button-ornament-right.svg'),
+    linear-gradient(180deg, #fef08a 0%, #fbbf24 25%, #d97706 78%, #92400e 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position: left 4px center, right 4px center, center !important;
+  background-size: 22px 20px, 22px 20px, 100% 100% !important;
+  border: 1.5px solid #fef08a !important;
+  outline: 1px solid rgba(120, 53, 15, 0.6);
+  outline-offset: -3px;
+  color: #1c0f02 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 16px rgba(251, 191, 36, 0.45) !important;
+}
+
+/* Slots da Mochila & Inspetor de Relíquias */
+.inventory-slot {
+  background: linear-gradient(145deg, rgba(24, 30, 48, 0.9), rgba(10, 14, 26, 0.96)) !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.28) !important;
+  border-radius: 4px !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.inventory-slot:hover {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.4), inset 0 0 8px rgba(251, 191, 36, 0.18);
+}
+
+.inventory-inspector,
+.refino-forge-card,
+.pedras-socket-card,
+.cartas-album-card {
+  background-color: #0b101e !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    url('/assets/ui/frames/crest-header-ornament.svg'),
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.14), transparent 60%),
+    linear-gradient(180deg, rgba(20, 25, 42, 0.94), rgba(10, 14, 26, 0.98)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    top 2px left 2px,
+    top 2px right 2px,
+    bottom 2px left 2px,
+    bottom 2px right 2px,
+    top 3px center,
+    center,
+    center !important;
+  background-size:
+    32px 32px,
+    32px 32px,
+    32px 32px,
+    32px 32px,
+    180px 22px,
+    100% 100%,
+    100% 100% !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.45) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.2);
+  outline-offset: -5px;
+  border-radius: 5px !important;
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.12), 0 10px 26px rgba(0, 0, 0, 0.65);
+}
+
+.btn-action-primary,
+.btn-refine-action {
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid #fef08a !important;
+  outline: 1px solid rgba(120, 53, 15, 0.65);
+  outline-offset: -3px;
+  border-radius: 4px !important;
+  background-color: #d97706 !important;
+  background-image:
+    url('/assets/ui/frames/button-ornament-left.svg'),
+    url('/assets/ui/frames/button-ornament-right.svg'),
+    linear-gradient(180deg, #fef08a 0%, #fbbf24 25%, #d97706 78%, #92400e 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position: left 6px center, right 6px center, center !important;
+  background-size: 28px 26px, 28px 26px, 100% 100% !important;
+  color: #1c0f02 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 4px 14px rgba(217, 119, 6, 0.48) !important;
+}
+
+/* ==========================================================================
+   4. HALL DA FAMA (#leaderboard-dialog) & EXPANSÃO DE MOCHILA
+   ========================================================================== */
+#leaderboard-dialog {
+  width: min(1000px, 94vw);
+  max-height: 90vh;
+  padding: 22px 26px;
+  color: #ece8dc;
+}
+
+#leaderboard-dialog::backdrop {
+  background: rgba(3, 7, 18, 0.84);
+  backdrop-filter: blur(8px);
+}
+
+.ranking-header h2 {
+  font: 700 22px 'Cinzel', serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ranking-header h2::before {
+  content: '🏆';
+  -webkit-text-fill-color: initial;
+}
+
+.ranking-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+
+#leaderboard-dialog button,
+#inventory-expansion-confirm button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  border-radius: 4px;
+  color: #f3dfa6;
+  background: linear-gradient(180deg, rgba(30, 35, 54, 0.92), rgba(14, 18, 32, 0.96));
+  font: 700 11.5px 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+#leaderboard-dialog button:hover,
+#inventory-expansion-confirm button:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.3);
+}
+
+.ranking-tabs [aria-selected="true"] {
+  background: linear-gradient(180deg, #fde68a 0%, #f59e0b 48%, #b45309 100%) !important;
+  color: #1c1204 !important;
+  border-color: #fef08a !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 0 16px rgba(251, 191, 36, 0.4);
+}
+
+.ranking-table-wrap {
+  overflow-x: auto;
+  border: 1.5px solid rgba(251, 191, 36, 0.35);
+  border-radius: 5px;
+  background: rgba(9, 13, 24, 0.84);
+}
+
+.ranking-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.ranking-table-wrap th {
+  font: 700 11px 'Cinzel', serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fde68a;
+  background: rgba(251, 191, 36, 0.14);
+  padding: 11px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.35);
+  white-space: nowrap;
+}
+
+.ranking-table-wrap td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  white-space: nowrap;
+}
+
+.ranking-me {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.05));
+  color: #fde68a;
+  font-weight: 700;
+}
+
+#leaderboard-personal {
+  padding: 12px 16px;
+  margin: 12px 0;
+  border: 1px solid rgba(251, 191, 36, 0.42);
+  border-left: 3px solid #fbbf24;
+  border-radius: 5px;
+  background: rgba(15, 23, 42, 0.8);
+  color: #fde68a;
+  font-size: 12.5px;
+}
+
+#leaderboard-status,
+#inventory-expansion-status {
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+#inventory-expansion-confirm {
+  border: 1.5px solid rgba(251, 191, 36, 0.48);
+  background: rgba(15, 23, 42, 0.94);
+  padding: 12px;
+  border-radius: 5px;
+  margin: 8px 0;
+}
+
+#inventory-expansion-confirm[hidden] {
+  display: none;
+}
+
+/* ==========================================================================
+   5. MOLDURA RÚNICA DA TELA DO JOGO & CARDS DO HUD IN-GAME
+   ========================================================================== */
+
+/* Moldura Rúnica Esculpida da Tela do Jogo (Viewport RPG Frame) */
+#runic-viewport-frame {
+  position: fixed;
+  inset: 0;
+  pointer-events: none !important;
+  z-index: 18;
+  border: 3px solid rgba(217, 119, 6, 0.78);
+  outline: 1.5px solid rgba(254, 240, 138, 0.34);
+  outline-offset: -7px;
+  box-shadow:
+    inset 0 0 0 4px rgba(8, 12, 24, 0.92),
+    inset 0 0 0 5.5px rgba(251, 191, 36, 0.28),
+    inset 0 0 52px rgba(4, 7, 16, 0.72),
+    inset 0 0 22px rgba(217, 119, 6, 0.14);
+}
+
+#runic-viewport-frame::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(340px, 46vw);
+  height: 18px;
+  background: url('/assets/ui/frames/crest-header-ornament.svg') no-repeat center top / contain;
+  opacity: 0.85;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9));
+}
+
+.viewport-rune-corner {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95));
+  opacity: 0.94;
+}
+
+.viewport-rune-corner.tl {
+  top: 2px;
+  left: 2px;
+  background-image: url('/assets/ui/frames/corner-tl.svg');
+}
+
+.viewport-rune-corner.tr {
+  top: 2px;
+  right: 2px;
+  background-image: url('/assets/ui/frames/corner-tr.svg');
+}
+
+.viewport-rune-corner.bl {
+  bottom: 18px;
+  left: 2px;
+  background-image: url('/assets/ui/frames/corner-bl.svg');
+}
+
+.viewport-rune-corner.br {
+  bottom: 18px;
+  right: 2px;
+  background-image: url('/assets/ui/frames/corner-br.svg');
+}
+
+.viewport-rune-pillar {
+  position: absolute;
+  top: 26%;
+  bottom: 26%;
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.45) 20%,
+    #fef08a 50%,
+    rgba(251, 191, 36, 0.45) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
+  opacity: 0.72;
+}
+
+.viewport-rune-pillar.left {
+  left: 3px;
+}
+
+.viewport-rune-pillar.right {
+  right: 3px;
+}
+
+/* Barra Global de Experiência Rúnica integrada na base da moldura */
+#exp-bar-container {
+  height: 18px !important;
+  background: #070b15 !important;
+  border-top: 1.5px solid rgba(251, 191, 36, 0.65) !important;
+  border-bottom: 2px solid #78350f !important;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.9),
+    0 -4px 16px rgba(0, 0, 0, 0.85) !important;
+  z-index: 32 !important;
+}
+
+.exp-bar-track {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent calc(10% - 1px),
+      rgba(254, 240, 138, 0.18) calc(10% - 1px),
+      rgba(254, 240, 138, 0.18) 10%
+    ),
+    linear-gradient(180deg, rgba(10, 14, 26, 0.96), rgba(18, 23, 38, 0.96)) !important;
+}
+
+.exp-bar-fill {
+  background: linear-gradient(90deg, #92400e 0%, #d97706 45%, #fbbf24 85%, #fef08a 100%) !important;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+}
+
+.exp-bar-text {
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.66rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  color: #fffbeb !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.98), 0 0 8px rgba(120, 53, 15, 0.9) !important;
+}
+
+/* Cards do Topo e Chat */
+#hero-status-card,
+#top-center-wave-card,
+.zone-info-pill,
+#game-chat-box {
+  border: 1.5px solid rgba(251, 191, 36, 0.55) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.22);
+  outline-offset: -4px;
+  border-radius: 6px !important;
+  background-color: #0b101e !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(165deg, rgba(22, 26, 42, 0.96) 0%, rgba(10, 14, 26, 0.98) 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center !important;
+  background-size: 20px 20px, 20px 20px, 20px 20px, 20px 20px, 100% 100% !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(251, 191, 36, 0.14),
+    0 8px 24px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Card de Status do Herói (Avatar, Características da Classe & Barras) */
+#hero-status-card {
+  --class-accent: #fbbf24;
+  --class-accent-soft: rgba(251, 191, 36, 0.24);
+  --class-accent-border: rgba(251, 191, 36, 0.65);
+  padding: 10px 14px !important;
+  gap: 12px !important;
+  min-width: 288px !important;
+  z-index: 28 !important;
+}
+
+#hero-status-card[data-hero-class="GUERREIRO"] {
+  --class-accent: #f59e0b;
+  --class-accent-soft: rgba(245, 158, 11, 0.25);
+  --class-accent-border: rgba(251, 191, 36, 0.78);
+}
+
+#hero-status-card[data-hero-class="CLERIGO"] {
+  --class-accent: #fde047;
+  --class-accent-soft: rgba(253, 224, 71, 0.24);
+  --class-accent-border: rgba(254, 240, 138, 0.82);
+}
+
+#hero-status-card[data-hero-class="BARBARO"] {
+  --class-accent: #ef4444;
+  --class-accent-soft: rgba(239, 68, 68, 0.26);
+  --class-accent-border: rgba(248, 113, 113, 0.78);
+}
+
+#hero-status-card[data-hero-class="ARQUEIRO"] {
+  --class-accent: #34d399;
+  --class-accent-soft: rgba(52, 211, 153, 0.24);
+  --class-accent-border: rgba(110, 231, 183, 0.78);
+}
+
+#hero-status-card[data-hero-class="DEMONOLOGO"] {
+  --class-accent: #c084fc;
+  --class-accent-soft: rgba(192, 132, 252, 0.26);
+  --class-accent-border: rgba(216, 180, 254, 0.8);
+}
+
+.hero-avatar-box {
+  width: 58px !important;
+  height: 58px !important;
+  border: 2px solid var(--class-accent, #fbbf24) !important;
+  outline: 1.5px solid rgba(254, 240, 138, 0.45);
+  outline-offset: 2px;
+  border-radius: 50% !important;
+  box-shadow:
+    0 0 16px var(--class-accent-soft, rgba(251, 191, 36, 0.45)),
+    inset 0 0 10px rgba(0, 0, 0, 0.88) !important;
+}
+
+.hero-level-badge {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 800 !important;
+  border: 1.2px solid #fef08a !important;
+  background: linear-gradient(180deg, #d97706, #78350f) !important;
+  color: #fffbeb !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85) !important;
+}
+
+.hero-honor-tag {
+  position: static !important;
+  transform: none !important;
+  background: linear-gradient(180deg, #1e162b, #0c101d) !important;
+  border: 1px solid var(--class-accent-border, rgba(251, 191, 36, 0.75)) !important;
+  color: #fef08a !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.56rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em;
+  padding: 1px 6px !important;
+  border-radius: 999px !important;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+}
+
+.hero-info-name {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em;
+  color: #fde68a !important;
+  font-size: 0.92rem !important;
+}
+
+.hero-cp-pill {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(251, 191, 36, 0.55) !important;
+  background: linear-gradient(180deg, rgba(38, 28, 18, 0.92), rgba(15, 20, 32, 0.96)) !important;
+  color: #fef08a !important;
+}
+
+.hero-class-identity-row {
+  display: flex;
+  align-items: center;
+  margin: 1px 0 2px;
+}
+
+.hero-class-trait-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--class-accent-border, rgba(251, 191, 36, 0.55));
+  background: linear-gradient(90deg, var(--class-accent-soft, rgba(251, 191, 36, 0.18)), rgba(12, 16, 28, 0.92));
+  color: #fef3c7;
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.hero-vitals-bars {
+  width: 100% !important;
+  min-width: 220px;
+  gap: 4px !important;
+}
+
+.mini-bar-track {
+  position: relative !important;
+  width: 100% !important;
+  height: 13px !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(251, 191, 36, 0.42) !important;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.92);
+  overflow: hidden !important;
+}
+
+.mini-bar-tag {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  font-family: 'Cinzel', serif;
+  font-size: 0.54rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #fffbeb;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.98);
+  pointer-events: none;
+}
+
+.mini-bar-tag.resource {
+  color: #fef08a;
+}
+
+/* Card Central de Onda & Fases */
+.stage-world-title {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em;
+  color: #fde68a !important;
+}
+
+.stage-phase-badge {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 800 !important;
+  border: 1px solid #fef08a !important;
+  background: linear-gradient(180deg, #d97706, #78350f) !important;
+  color: #fffbeb !important;
+  border-radius: 3px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Topo Direito: Localização, Navegação de Sessão (Heróis / Sair) e Seletores Rúnicos */
+#top-right-location-card {
+  gap: 8px !important;
+  z-index: 28 !important;
+}
+
+.top-right-header-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.zone-title {
+  font-family: 'Cinzel', serif !important;
+  color: #fde68a !important;
+  letter-spacing: 0.03em;
+}
+
+.stage-badge {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 800 !important;
+  border: 1px solid #fef08a !important;
+  background: linear-gradient(180deg, #b45309, #451a03) !important;
+  color: #fffbeb !important;
+  border-radius: 3px !important;
+}
+
+.hud-session-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-session-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 5px !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1.5px solid rgba(251, 191, 36, 0.62) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.22);
+  outline-offset: -3px;
+  background-color: #0d1222 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(180deg, rgba(32, 28, 48, 0.96), rgba(11, 15, 28, 0.99)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center !important;
+  background-size: 13px 13px, 13px 13px, 13px 13px, 13px 13px, 100% 100% !important;
+  color: #fde68a !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 6px 16px rgba(0, 0, 0, 0.8) !important;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.hud-session-btn:hover {
+  border-color: #fef08a !important;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 10px rgba(251, 191, 36, 0.25),
+    0 0 16px rgba(251, 191, 36, 0.45) !important;
+}
+
+.hud-session-btn.logout {
+  border-color: rgba(248, 113, 113, 0.65) !important;
+  color: #fecaca !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(180deg, rgba(69, 18, 26, 0.95), rgba(24, 10, 18, 0.99)) !important;
+}
+
+.hud-session-btn.logout:hover {
+  border-color: #f87171 !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 0 10px rgba(239, 68, 68, 0.32),
+    0 0 16px rgba(239, 68, 68, 0.52) !important;
+}
+
+.hud-session-svg {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.85));
+}
+
+/* Seletores Rúnicos do Canto Superior Direito (Gold, Zoom, Tela, Economia, Rede, Ping) */
+.top-status-lux-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px !important;
+  flex-wrap: wrap;
+}
+
+.gold-wallet-capsule,
+.lux-zoom-capsule,
+.lux-ping-pill,
+.lux-icon-btn {
+  border: 1.5px solid rgba(251, 191, 36, 0.58) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.2);
+  outline-offset: -3px;
+  border-radius: 5px !important;
+  background-color: #0b101e !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(180deg, rgba(26, 30, 48, 0.96), rgba(10, 14, 26, 0.99)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center !important;
+  background-size: 12px 12px, 12px 12px, 12px 12px, 12px 12px, 100% 100% !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 6px 16px rgba(0, 0, 0, 0.78) !important;
+  min-height: 34px;
+}
+
+.gold-wallet-capsule {
+  padding: 4px 12px !important;
+  gap: 6px !important;
+}
+
+.gold-coin-svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.9));
+}
+
+.gold-amount-text {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 800 !important;
+  color: #fef08a !important;
+}
+
+.gold-currency-label {
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #f59e0b;
+}
+
+.lux-zoom-capsule {
+  padding: 3px 6px !important;
+  gap: 5px !important;
+}
+
+.zoom-btn {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 3px !important;
+  border: 1px solid rgba(251, 191, 36, 0.55) !important;
+  background: linear-gradient(180deg, #b45309, #451a03) !important;
+  color: #fef08a !important;
+  font-family: 'Cinzel', serif !important;
+  font-weight: 900 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0, 0, 0, 0.75);
+}
+
+.zoom-btn:hover {
+  background: linear-gradient(180deg, #fbbf24, #b45309) !important;
+  color: #1c0f02 !important;
+  border-color: #fffbeb !important;
+}
+
+.zoom-label {
+  font-family: 'Cinzel', serif !important;
+  color: #fde68a !important;
+  font-weight: 800 !important;
+  min-width: 30px !important;
+}
+
+.lux-icon-btn {
+  width: auto !important;
+  min-width: 34px;
+  height: 34px !important;
+  padding: 0 9px !important;
+  gap: 5px;
+  color: #fde68a !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+}
+
+.lux-icon-btn:hover,
+.lux-icon-btn[data-fullscreen="true"] {
+  border-color: #fef08a !important;
+  color: #fffbeb !important;
+  box-shadow:
+    inset 0 0 10px rgba(251, 191, 36, 0.25),
+    0 0 14px rgba(251, 191, 36, 0.48) !important;
+  transform: translateY(-1px) !important;
+}
+
+.lux-svg-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
+}
+
+.lux-ping-pill {
+  padding: 4px 10px !important;
+  gap: 6px !important;
+}
+
+.lux-ping-text {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 800 !important;
+  color: #6ee7b7 !important;
+}
+
+.boss-alert-badge {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em;
+  border: 1.5px solid #ef4444 !important;
+  background: linear-gradient(180deg, #dc2626, #7f1d1d) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.6) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* Dock Lateral Direito de Ações (Herói, Mochila, Grimório, Farm, Rank) */
+#right-vertical-dock,
+#dock-navigation-bar {
+  position: fixed !important;
+  right: 16px !important;
+  top: 41% !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  z-index: 26 !important;
+}
+
+.dock-btn {
+  width: 74px !important;
+  height: 68px !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em;
+  border-radius: 12px !important;
+  background-color: #0d1222 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    radial-gradient(circle at 50% 25%, rgba(251, 191, 36, 0.18), transparent 70%),
+    linear-gradient(180deg, rgba(26, 30, 48, 0.96), rgba(10, 14, 26, 0.99)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 2px top 2px,
+    right 2px top 2px,
+    left 2px bottom 2px,
+    right 2px bottom 2px,
+    center,
+    center !important;
+  background-size: 16px 16px, 16px 16px, 16px 16px, 16px 16px, 100% 100%, 100% 100% !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.65) !important;
+  color: #fde68a !important;
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.18), 0 8px 20px rgba(0, 0, 0, 0.85) !important;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  border-color: #fde047 !important;
+  box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.3), 0 0 18px rgba(251, 191, 36, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+.dock-svg-icon {
+  width: 28px !important;
+  height: 28px !important;
+  display: block;
+  margin: 0 auto 4px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.85));
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.dock-btn:hover .dock-svg-icon {
+  transform: scale(1.14);
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.75));
+}
+
+/* ==========================================================================
+   6. BOTÕES DE COMBATE & SKILLS EM MEIA-LUA ( DIFERENCIAÇÃO RÚNICA )
+   ========================================================================== */
+
+#mobile-combat-arc-container {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 22px !important;
+  width: 340px !important;
+  height: 340px !important;
+  transform: none !important;
+  z-index: 25 !important;
+}
+
+/* Botão de Ataque Primário Rúnico Forjado */
+#btn-primary-attack {
+  width: 112px !important;
+  height: 112px !important;
+  bottom: 8px !important;
+  right: 8px !important;
+  border: 2.5px solid #fef08a !important;
+  outline: 2px solid rgba(251, 191, 36, 0.75);
+  outline-offset: 3px;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(254, 240, 138, 0.45) 0%, transparent 55%),
+    radial-gradient(circle at 50% 50%, #7f1d1d 0%, #450a0a 58%, #1a070d 100%) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(251, 191, 36, 0.55),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.85),
+    0 10px 28px rgba(0, 0, 0, 0.92),
+    0 0 28px rgba(245, 158, 11, 0.48),
+    0 0 16px rgba(239, 68, 68, 0.4) !important;
+  color: #fef08a !important;
+  font-family: 'Cinzel', serif !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+  overflow: visible !important;
+}
+
+.attack-seal-ring {
+  position: absolute;
+  inset: -10px;
+  background: url('/assets/ui/frames/attack-runic-ring.svg') center / contain no-repeat;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.45));
+  transition: transform 0.35s ease;
+}
+
+#btn-primary-attack:hover {
+  filter: brightness(1.1);
+  box-shadow:
+    inset 0 0 0 2.5px #fef08a,
+    0 12px 30px rgba(0, 0, 0, 0.95),
+    0 0 36px rgba(251, 191, 36, 0.82),
+    0 0 22px rgba(239, 68, 68, 0.65) !important;
+  transform: scale(1.06);
+}
+
+#btn-primary-attack:hover .attack-seal-ring {
+  transform: rotate(22deg) scale(1.03);
+}
+
+#btn-primary-attack:active {
+  transform: scale(0.95);
+}
+
+.attack-crest-svg {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(251, 191, 36, 0.55));
+  margin-bottom: 2px;
+}
+
+#attack-btn-label {
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.76rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
+  color: #fffbeb !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+  line-height: 1.05;
+}
+
+.attack-class-trait {
+  font-family: 'Cinzel', serif;
+  font-size: 0.54rem;
+  font-weight: 700;
+  color: #fde68a;
+  letter-spacing: 0.04em;
+  opacity: 0.95;
+  max-width: 92px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+.attack-hotkey-pill {
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #fef08a;
+  background: linear-gradient(180deg, #b45309, #451a03);
+  color: #fffbeb;
+  font-family: 'Cinzel', serif;
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+
+/* Botões de Habilidade em Meia-Lua (Slots 1 a 4) - Proporção Ampliada */
+.skill-arc-btn {
+  width: 82px !important;
+  height: 82px !important;
+  border: 2.2px solid rgba(251, 191, 36, 0.78) !important;
+  outline: 1.5px solid rgba(254, 240, 138, 0.35);
+  outline-offset: -4px;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(251, 191, 36, 0.16), transparent 65%),
+    radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.96), rgba(9, 13, 24, 0.99)) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(10, 14, 26, 0.92),
+    0 8px 20px rgba(0, 0, 0, 0.9),
+    0 0 18px rgba(245, 158, 11, 0.32) !important;
+  transition: all 0.15s ease;
+}
+
+#skill-btn-1 {
+  bottom: 12px !important;
+  right: 218px !important;
+}
+
+#skill-btn-2 {
+  bottom: 112px !important;
+  right: 192px !important;
+}
+
+#skill-btn-3 {
+  bottom: 192px !important;
+  right: 112px !important;
+}
+
+#skill-btn-4 {
+  bottom: 218px !important;
+  right: 12px !important;
+  width: 90px !important;
+  height: 90px !important;
+}
+
+.skill-arc-btn:hover {
+  border-color: #fde047 !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(10, 14, 26, 0.92),
+    0 8px 22px rgba(0, 0, 0, 0.92),
+    0 0 24px rgba(251, 191, 36, 0.6) !important;
+  transform: scale(1.06);
+}
+
+/* Slot 4 / Habilidade Suprema Destaque Especial */
+.skill-arc-btn[data-slot="4"] {
+  border-color: #f59e0b !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(10, 14, 26, 0.92),
+    0 8px 24px rgba(0, 0, 0, 0.88),
+    0 0 28px rgba(239, 68, 68, 0.55) !important;
+}
+
+.skill-key-badge {
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.74rem !important;
+  font-weight: 800 !important;
+  border: 1.2px solid #fef08a !important;
+  background: linear-gradient(180deg, #b45309, #451a03) !important;
+  color: #fef08a !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85) !important;
+}
+
+.skill-cost {
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em;
+  color: #67e8f9 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+
+/* ==========================================================================
+   7. MENU TÁTICO LATERAL ESQUERDO RETRÁTIL (CONTRAPOSTO AO DOCK DIREITO)
+      & CHAT CENTRALIZADO NA BASE
+   ========================================================================== */
+
+#tactical-action-bar.runic-tactical-bar {
+  position: fixed !important;
+  left: 16px !important;
+  top: 41% !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 152px !important;
+  padding: 10px !important;
+  gap: 8px !important;
+  border-radius: 10px !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.62) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.22);
+  outline-offset: -3px;
+  background-color: rgba(10, 14, 26, 0.95) !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(180deg, rgba(24, 28, 46, 0.96), rgba(9, 13, 24, 0.99)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 2px top 2px,
+    right 2px top 2px,
+    left 2px bottom 2px,
+    right 2px bottom 2px,
+    center !important;
+  background-size: 16px 16px, 16px 16px, 16px 16px, 16px 16px, 100% 100% !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 12px 30px rgba(0, 0, 0, 0.9) !important;
+  z-index: 27 !important;
+  pointer-events: auto !important;
+  transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease !important;
+}
+
+#tactical-action-bar.runic-tactical-bar.drawer-collapsed,
+#tactical-action-bar.runic-tactical-bar[data-drawer-open="false"] {
+  transform: translateY(-50%) translateX(calc(-100% - 16px)) !important;
+  box-shadow: none !important;
+}
+
+.tactical-drawer-items {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Botão Lateral de Seta (Abrir / Recolher Menu Tático) */
+.tactical-drawer-toggle {
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 10px 10px 0;
+  border: 1.5px solid rgba(251, 191, 36, 0.72);
+  border-left: none;
+  background: linear-gradient(180deg, rgba(30, 36, 58, 0.97), rgba(11, 15, 28, 0.99));
+  color: #fde68a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    4px 6px 18px rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, width 0.18s ease;
+}
+
+.tactical-drawer-toggle:hover {
+  color: #fffbeb;
+  border-color: #fde047;
+  box-shadow:
+    inset 0 0 8px rgba(251, 191, 36, 0.3),
+    0 0 16px rgba(251, 191, 36, 0.55);
+}
+
+.tactical-drawer-arrow {
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+  transition: transform 0.22s ease;
+}
+
+.btn-auto-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 12px !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.74rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em;
+  border-radius: 6px !important;
+  border: 1.5px solid #34d399 !important;
+  background-color: #064e3b !important;
+  background-image:
+    url('/assets/ui/frames/wing-left.svg'),
+    url('/assets/ui/frames/wing-right.svg'),
+    linear-gradient(180deg, #059669, #064e3b) !important;
+  background-repeat: no-repeat !important;
+  background-position: left 4px center, right 4px center, center !important;
+  background-size: 14px 10px, 14px 10px, 100% 100% !important;
+  color: #ecfdf5 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.75),
+    0 0 14px rgba(16, 185, 129, 0.38) !important;
+}
+
+.btn-auto-toggle.off {
+  border-color: rgba(251, 191, 36, 0.5) !important;
+  background-color: #121728 !important;
+  background-image:
+    url('/assets/ui/frames/wing-left.svg'),
+    url('/assets/ui/frames/wing-right.svg'),
+    linear-gradient(180deg, rgba(38, 30, 48, 0.95), rgba(15, 18, 30, 0.98)) !important;
+  color: #fde68a !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.75) !important;
+}
+
+.btn-farm-gear {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+  min-height: 42px;
+  padding: 8px 12px !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.74rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em;
+  border-radius: 6px !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.62) !important;
+  background-color: #121728 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(180deg, rgba(38, 30, 48, 0.95), rgba(14, 18, 32, 0.98)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center !important;
+  background-size: 11px 11px, 11px 11px, 11px 11px, 11px 11px, 100% 100% !important;
+  color: #fde68a !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 12px rgba(0, 0, 0, 0.75) !important;
+}
+
+.btn-farm-gear:hover {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45) !important;
+}
+
+.tactical-btn-svg {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
+}
+
+.tactical-key-hint {
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(254, 240, 138, 0.45);
+  background: rgba(9, 13, 24, 0.75);
+  color: #fef08a;
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.quick-potion-chip {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 12px !important;
+  gap: 8px !important;
+  border-radius: 6px !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.55) !important;
+  background-color: #101526 !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(180deg, rgba(28, 22, 38, 0.95), rgba(10, 14, 26, 0.98)) !important;
+  background-repeat: no-repeat !important;
+  background-position:
+    left 1px top 1px,
+    right 1px top 1px,
+    left 1px bottom 1px,
+    right 1px bottom 1px,
+    center !important;
+  background-size: 11px 11px, 11px 11px, 11px 11px, 11px 11px, 100% 100% !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.75) !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 0.74rem !important;
+  font-weight: 800 !important;
+}
+
+.quick-potion-chip.hp-chip {
+  border-color: rgba(248, 113, 113, 0.65) !important;
+}
+
+.quick-potion-chip.mp-chip {
+  border-color: rgba(96, 165, 250, 0.65) !important;
+}
+
+.quick-potion-chip:hover {
+  transform: translateY(-1px);
+  border-color: #fef08a !important;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.42) !important;
+}
+
+.tactical-potion-svg {
+  width: 19px;
+  height: 19px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.9));
+}
+
+/* Chat In-Game Centralizado na Base */
+#bottom-center-zone {
+  position: fixed !important;
+  bottom: 22px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: min(500px, calc(100vw - 740px)) !important;
+  min-width: 300px !important;
+  max-width: 520px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  z-index: 22 !important;
+}
+
+#game-chat-box {
+  width: 100% !important;
+}
+
+/* Chat In-Game Rúnico */
+.chat-channel-tab.active {
+  font-family: 'Cinzel', serif !important;
+  color: #fde68a !important;
+  border-bottom: 2px solid #fbbf24 !important;
+}
+
+.chat-send-btn {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em;
+  border-radius: 4px !important;
+  border: 1.2px solid rgba(251, 191, 36, 0.5) !important;
+  background: linear-gradient(180deg, #b45309, #78350f) !important;
+  color: #fffbeb !important;
+}
+
+.chat-msg-malak {
+  background: linear-gradient(90deg, #272532, #111827);
+  border-left: 2px solid #a8a29e;
+  padding: 7px;
+}
+
+.chat-tag-malak {
+  color: #e7e5e4;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   8. EQUIVALÊNCIA NAVEGADOR & MOBILE (RESPONSIVIDADE HUD IDLE RPG)
+   ========================================================================== */
+
+/* Em telas médias/reduzidas (<= 1380px), ocultamos a pílula redundante de zona no canto direito
+   para que o Card de Fase centralizado nunca colida com os controles superiores */
+@media (max-width: 1380px) {
+  .zone-info-pill {
+    display: none !important;
+  }
+
+  #hero-status-card {
+    min-width: 280px !important;
+    max-width: 320px !important;
+    padding: 8px 12px !important;
+  }
+
+  #top-center-wave-card {
+    min-width: 250px !important;
+    max-width: 310px !important;
+    padding: 7px 12px !important;
+  }
+}
+
+/* Navegador com Tela Reduzida / Tablet Landscape (<= 1180px) */
+@media (max-width: 1180px) {
+  #hero-status-card {
+    top: 10px !important;
+    left: 10px !important;
+    min-width: 235px !important;
+    max-width: 275px !important;
+    padding: 7px 10px !important;
+    gap: 8px !important;
+  }
+
+  #hud-hero-level {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  #hud-hero-honor-tag {
+    max-width: 96px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .hero-avatar-box {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  .hero-vitals-bars {
+    min-width: 155px !important;
+  }
+
+  #top-center-wave-card {
+    top: 10px !important;
+    left: 48% !important;
+    transform: translateX(-50%) !important;
+    min-width: 280px !important;
+    max-width: 325px !important;
+    padding: 6px 10px !important;
+  }
+
+  #stage-world-title {
+    white-space: nowrap !important;
+  }
+
+  #top-right-location-card {
+    top: 10px !important;
+    right: 10px !important;
+    max-width: 300px !important;
+    gap: 4px !important;
+  }
+
+  .lux-control-row {
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    max-width: 310px !important;
+    gap: 4px !important;
+  }
+
+  .lux-btn-text,
+  .gold-currency-label {
+    display: none !important;
+  }
+
+  #right-vertical-dock,
+  #dock-navigation-bar {
+    right: 10px !important;
+    top: 38% !important;
+    transform: translateY(-50%) !important;
+    gap: 6px !important;
+  }
+
+  .dock-btn {
+    width: 60px !important;
+    height: 54px !important;
+    font-size: 0.58rem !important;
+  }
+
+  .dock-svg-icon {
+    width: 22px !important;
+    height: 22px !important;
+    margin-bottom: 2px;
+  }
+
+  #tactical-action-bar.runic-tactical-bar {
+    left: 10px !important;
+    top: 40% !important;
+    width: 138px !important;
+    padding: 8px !important;
+    gap: 6px !important;
+  }
+
+  #tactical-action-bar.runic-tactical-bar.drawer-collapsed,
+  #tactical-action-bar.runic-tactical-bar[data-drawer-open="false"] {
+    transform: translateY(-50%) translateX(calc(-100% - 10px)) !important;
+  }
+
+  .btn-auto-toggle,
+  .btn-farm-gear,
+  .quick-potion-chip {
+    min-height: 36px;
+    padding: 6px 10px !important;
+    font-size: 0.68rem !important;
+  }
+
+  #mobile-combat-arc-container {
+    width: 296px !important;
+    height: 296px !important;
+    bottom: 20px !important;
+    right: 14px !important;
+  }
+
+  #btn-primary-attack {
+    width: 96px !important;
+    height: 96px !important;
+  }
+
+  .attack-crest-svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .skill-arc-btn {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  #skill-btn-1 {
+    bottom: 10px !important;
+    right: 204px !important;
+  }
+
+  #skill-btn-2 {
+    bottom: 106px !important;
+    right: 180px !important;
+  }
+
+  #skill-btn-3 {
+    bottom: 180px !important;
+    right: 106px !important;
+  }
+
+  #skill-btn-4 {
+    bottom: 204px !important;
+    right: 10px !important;
+    width: 76px !important;
+    height: 76px !important;
+  }
+
+  #bottom-center-zone {
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: min(360px, calc(100vw - 620px)) !important;
+    min-width: 240px !important;
+  }
+}
+
+/* Telas Estreitas / Tablet Portrait / Mobile (<= 900px) */
+@media (max-width: 900px), (max-height: 560px) {
+  #runic-viewport-frame {
+    inset: 3px;
+  }
+
+  .viewport-rune-corner {
+    width: 28px;
+    height: 28px;
+  }
+
+  .viewport-rune-pillar {
+    display: none;
+  }
+
+  #hero-status-card {
+    top: 8px !important;
+    left: 8px !important;
+    min-width: 0 !important;
+    max-width: 205px !important;
+    padding: 5px 8px !important;
+    gap: 6px !important;
+  }
+
+  .hero-avatar-box {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .hero-vitals-bars {
+    width: 100% !important;
+    min-width: 120px !important;
+    gap: 2px !important;
+  }
+
+  .mini-bar-track {
+    height: 10px !important;
+  }
+
+  .mini-bar-tag {
+    font-size: 0.44rem;
+    left: 4px;
+  }
+
+  .hero-class-trait-pill {
+    display: none !important;
+  }
+
+  #top-right-location-card {
+    top: 8px !important;
+    right: 8px !important;
+    gap: 4px !important;
+    max-width: 45vw !important;
+  }
+
+  .hud-session-btn {
+    min-height: 28px;
+    padding: 3px 7px;
+    font-size: 0.58rem !important;
+  }
+
+  .tactical-key-hint,
+  #btn-fullscreen-toggle {
+    display: none !important;
+  }
+
+  .gold-wallet-capsule,
+  .lux-zoom-capsule,
+  .lux-ping-pill,
+  .lux-icon-btn {
+    min-height: 24px !important;
+    height: 24px !important;
+    padding: 2px 6px !important;
+    font-size: 0.56rem !important;
+  }
+
+  .zoom-step-btn {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* Em telas portrait/estreitas, o Card de Fase fica centralizado logo abaixo da linha superior */
+  #top-center-wave-card {
+    top: 128px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    min-width: 220px !important;
+    max-width: 88vw !important;
+    padding: 5px 10px !important;
+  }
+
+  #right-vertical-dock,
+  #dock-navigation-bar {
+    top: 39% !important;
+    right: 8px !important;
+    transform: translateY(-50%) !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    z-index: 26 !important;
+  }
+
+  .dock-btn {
+    width: 52px !important;
+    height: 48px !important;
+    font-size: 0.52rem !important;
+  }
+
+  .dock-svg-icon {
+    width: 20px !important;
+    height: 20px !important;
+    margin-bottom: 1px;
+  }
+
+  #tactical-action-bar.runic-tactical-bar {
+    left: 8px !important;
+    top: 38% !important;
+    width: 124px !important;
+    padding: 7px !important;
+    gap: 5px !important;
+  }
+
+  #tactical-action-bar.runic-tactical-bar.drawer-collapsed,
+  #tactical-action-bar.runic-tactical-bar[data-drawer-open="false"] {
+    transform: translateY(-50%) translateX(calc(-100% - 8px)) !important;
+  }
+
+  .tactical-drawer-toggle {
+    right: -26px;
+    width: 26px;
+    height: 58px;
+  }
+
+  .btn-auto-toggle,
+  .btn-farm-gear,
+  .quick-potion-chip {
+    min-height: 32px;
+    padding: 4px 8px !important;
+    font-size: 0.62rem !important;
+  }
+
+  .attack-hotkey-pill {
+    display: none;
+  }
+
+  /* Em Mobile Portrait, o arco de combate fica logo acima da barra de chat centralizada */
+  #mobile-combat-arc-container {
+    width: 244px !important;
+    height: 244px !important;
+    bottom: 88px !important;
+    right: 8px !important;
+  }
+
+  #btn-primary-attack {
+    width: 82px !important;
+    height: 82px !important;
+    bottom: 6px !important;
+    right: 6px !important;
+  }
+
+  .attack-crest-svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  #attack-btn-label {
+    font-size: 0.64rem !important;
+  }
+
+  .attack-class-trait {
+    font-size: 0.44rem;
+    max-width: 64px;
+  }
+
+  .skill-arc-btn {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  #skill-btn-1 {
+    bottom: 8px !important;
+    right: 168px !important;
+  }
+
+  #skill-btn-2 {
+    bottom: 92px !important;
+    right: 146px !important;
+  }
+
+  #skill-btn-3 {
+    bottom: 152px !important;
+    right: 86px !important;
+  }
+
+  #skill-btn-4 {
+    bottom: 172px !important;
+    right: 8px !important;
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  .skill-key-badge {
+    font-size: 0.62rem !important;
+    padding: 1px 4px !important;
+  }
+
+  .skill-cost {
+    font-size: 0.56rem !important;
+  }
+
+  .skill-arc-btn .cooldown-text {
+    font-size: 1.05rem !important;
+  }
+
+  /* Chat centralizado lá embaixo sem colidir com o arco de skills */
+  #bottom-center-zone {
+    bottom: 20px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(350px, calc(100vw - 20px)) !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+
+  #game-chat-box .chat-messages-box {
+    max-height: 24px !important;
+    padding: 3px 8px !important;
+  }
+
+  #leaderboard-dialog {
+    padding: 14px 14px;
+    width: 96vw;
+  }
+
+  .ranking-header h2 {
+    font-size: 17px;
+  }
+
+  .ranking-tabs {
+    margin: 10px 0;
+    gap: 6px;
+  }
+
+  #leaderboard-dialog button {
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 10.5px;
+  }
+}
