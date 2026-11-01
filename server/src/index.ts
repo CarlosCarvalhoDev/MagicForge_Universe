@@ -1,4 +1,5 @@
 import http from 'http';
+import os from 'os';
 import { SERVER_CONFIG } from './config';
 import { World } from './game/World';
 import { GameLoop } from './game/GameLoop';
@@ -46,7 +47,9 @@ httpServer.listen(SERVER_CONFIG.PORT, '0.0.0.0', () => {
   console.log(`[Server] Tick Rate: ${SERVER_CONFIG.TICK_RATE}Hz | Delta Time: ${SERVER_CONFIG.TICK_DELTA_TIME_SEC}s`);
   console.log(`[Server] Health Check available at http://localhost:${SERVER_CONFIG.PORT}/health`);
   console.log(`[Server] WebSocket endpoint (Local): ws://localhost:${SERVER_CONFIG.PORT}`);
-  console.log(`[Server] WebSocket endpoint (Mobile/LAN): ws://192.168.1.12:${SERVER_CONFIG.PORT}`);
+  const interfaces = os.networkInterfaces();
+    const lanIps = Object.values(interfaces).flat().filter((i): i is os.NetworkInterfaceInfo => Boolean(i && i.family === 'IPv4' && !i.internal)).map(i => i.address);
+    lanIps.forEach(ip => console.log(`[Server] WebSocket endpoint (LAN): ws://${ip}:${SERVER_CONFIG.PORT}`));
 
   // Start authoritative loop
   gameLoop.start();

@@ -69,7 +69,10 @@ import {
   Vector3,
 } from '@magicforge/shared';
 
+import { resolveServerUrl } from './NetworkConfig';
+
 export type MessageListener<T> = (data: T) => void;
+
 
 export class ClientNetwork {
   private ws: WebSocket | null = null;
@@ -124,16 +127,11 @@ export class ClientNetwork {
   public autoReconnect: boolean = true;
 
   constructor(serverUrl?: string) {
-    if (serverUrl) {
-      this.serverUrl = serverUrl;
-    } else if (import.meta.env?.VITE_SERVER_URL) {
-      this.serverUrl = import.meta.env.VITE_SERVER_URL;
-    } else if (typeof window !== 'undefined' && window.location?.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      this.serverUrl = `${protocol}//${window.location.hostname}:3000`;
-    } else {
-      this.serverUrl = 'ws://192.168.1.12:3000';
-    }
+    this.serverUrl = resolveServerUrl(serverUrl, import.meta.env?.VITE_SERVER_URL);
+  }
+
+  public getServerUrl(): string {
+    return this.serverUrl;
   }
 
   public connect(): void {
