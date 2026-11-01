@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 38" fill="none">
+  <defs>
+    <linearGradient id="ribBg" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B0F1D" stop-opacity="0.2"/>
+      <stop offset="15%" stop-color="#1A172B" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#292038" stop-opacity="0.98"/>
+      <stop offset="85%" stop-color="#1A172B" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0B0F1D" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="ribGold" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#78350F" stop-opacity="0.2"/>
+      <stop offset="15%" stop-color="#F59E0B"/>
+      <stop offset="50%" stop-color="#FEF08A"/>
+      <stop offset="85%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#78350F" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <path d="M12 19 L28 5 H292 L308 19 L292 33 H28 Z" fill="url(#ribBg)" stroke="url(#ribGold)" stroke-width="1.5"/>
+  <path d="M22 19 L34 9 H286 L298 19 L286 29 H34 Z" stroke="#FDE68A" stroke-width="0.6" stroke-opacity="0.45"/>
+  <polygon points="28,19 33,14 38,19 33,24" fill="#FBBF24"/>
+  <polygon points="292,19 287,14 282,19 287,24" fill="#FBBF24"/>
+</svg>
+

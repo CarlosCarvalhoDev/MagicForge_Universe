@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bladeGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFBEB"/>
+      <stop offset="45%" stop-color="#FDE68A"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="hiltGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+  </defs>
+  <!-- Crossed Runic Greatswords -->
+  <path d="M12 10 L22 12 L50 40 L44 46 L16 18 Z" fill="url(#bladeGrad)" stroke="#451A03" stroke-width="1.6"/>
+  <path d="M52 10 L42 12 L14 40 L20 46 L48 18 Z" fill="url(#bladeGrad)" stroke="#451A03" stroke-width="1.6"/>
+  <!-- Crossguards -->
+  <path d="M38 48 L52 34 L55 37 L41 51 Z" fill="url(#hiltGrad)" stroke="#FEF08A" stroke-width="1.2"/>
+  <path d="M26 48 L12 34 L9 37 L23 51 Z" fill="url(#hiltGrad)" stroke="#FEF08A" stroke-width="1.2"/>
+  <!-- Pommels -->
+  <circle cx="52" cy="52" r="4" fill="#EF4444" stroke="#FEF08A" stroke-width="1.4"/>
+  <circle cx="12" cy="52" r="4" fill="#EF4444" stroke="#FEF08A" stroke-width="1.4"/>
+  <!-- Center Runic Sun Diamond -->
+  <polygon points="32,20 41,32 32,44 23,32" fill="#991B1B" stroke="#FEF08A" stroke-width="1.8"/>
+  <polygon points="32,25 37,32 32,39 27,32" fill="#FDE047"/>
+</svg>

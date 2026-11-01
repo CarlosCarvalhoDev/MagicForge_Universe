@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <!-- Adventurer Leather Satchel / Backpack -->
+  <defs>
+    <linearGradient id="leatherGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="50%" stop-color="#78350f"/>
+      <stop offset="100%" stop-color="#451a03"/>
+    </linearGradient>
+    <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="60%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+  </defs>
+  <!-- Handle Loop -->
+  <path d="M12 6 C12 3 20 3 20 6" stroke="url(#brassGrad)" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Main Bag Body -->
+  <rect x="5" y="8" width="22" height="20" rx="4" fill="url(#leatherGrad)" stroke="#d97706" stroke-width="1.2"/>
+  <!-- Top Flap -->
+  <path d="M5 8 L27 8 L25 18 C25 19 23 20 20 20 L12 20 C9 20 7 19 7 18 Z" fill="#92400e" stroke="url(#brassGrad)" stroke-width="1"/>
+  <!-- Straps with Buckles -->
+  <line x1="10" y1="8" x2="10" y2="27" stroke="#451a03" stroke-width="2"/>
+  <line x1="22" y1="8" x2="22" y2="27" stroke="#451a03" stroke-width="2"/>
+  <rect x="8.5" y="15" width="3" height="4" rx="0.8" fill="url(#brassGrad)"/>
+  <rect x="20.5" y="15" width="3" height="4" rx="0.8" fill="url(#brassGrad)"/>
+  <!-- Central Lock Medallion -->
+  <circle cx="16" cy="18" r="2.2" fill="url(#brassGrad)" stroke="#451a03" stroke-width="0.8"/>
+  <circle cx="16" cy="18" r="0.8" fill="#1c1917"/>
+  <!-- Side Bedroll / Flask Tie -->
+  <rect x="3.5" y="13" width="2.5" height="10" rx="1.2" fill="#78350f" stroke="#d97706" stroke-width="0.8"/>
+  <rect x="26" y="13" width="2.5" height="10" rx="1.2" fill="#78350f" stroke="#d97706" stroke-width="0.8"/>
+</svg>

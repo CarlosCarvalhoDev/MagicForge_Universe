@@ -1,29 +1,462 @@
-#cinematic-intro { position:fixed; inset:0; width:100vw; height:100dvh; max-width:none; max-height:none; margin:0; padding:0; border:0; color:#f8fafc; background:#000; overflow:hidden; }
-#cinematic-intro::backdrop { background:#000; }
-.cinematic-art { position:absolute; inset:0; opacity:1; transition:opacity .5s ease; background:#000; }
-.cinematic-art.is-fading { opacity:0; }
-.cinematic-art img { width:100%; height:100%; object-fit:cover; opacity:.65; animation:cinematic-zoom 13s ease-out both; }
-.cinematic-art::after { content:''; position:absolute; inset:0; background:linear-gradient(0deg,#000 2%,#0008 45%,#0003); }
-.cinematic-top { position:absolute; inset:20px 24px auto; display:flex; align-items:center; justify-content:space-between; gap:16px; z-index:2; font-size:12px; letter-spacing:.1em; }
-#cinematic-intro button { min-height:44px; padding:10px 16px; border:1px solid #fbbf2455; border-radius:7px; color:#f9e6ae; background:#0a0f1dcc; cursor:pointer; }
-#cinematic-intro button:disabled { opacity:.5; cursor:default; }
-.cinematic-caption { position:absolute; inset:auto 7vw 7vh; z-index:1; max-width:960px; }
-.cinematic-caption h2 { font:700 clamp(25px,4vw,48px) 'Cinzel',serif; color:#f8dda2; margin-bottom:20px; }
-.cinematic-caption p { font-size:clamp(15px,2vw,22px); line-height:1.7; min-height:100px; text-shadow:0 2px 8px #000; }
-.cinematic-caption nav { display:flex; gap:12px; flex-wrap:wrap; margin-top:24px; }
-.cinematic-elements { display:none; position:absolute; inset:25% 5% auto; gap:14px; justify-content:center; flex-wrap:wrap; z-index:1; }
-[data-effect=elements] .cinematic-elements { display:flex; }
-.cinematic-elements i { font-style:normal; border-radius:50%; padding:20px; border:1px solid #fbbf2477; color:#fff4cd; background:#1c2538dd; box-shadow:0 0 25px #fbbf2433; }
-[data-effect=fracture] img { filter:contrast(1.3) saturate(.5); }
-[data-effect=shards]::before { content:'✦  ·  ✧  ·  ✦'; position:absolute; inset:18% 10%; z-index:1; font-size:clamp(40px,9vw,130px); letter-spacing:.3em; color:#fbbf2499; }
-@keyframes cinematic-zoom { from { transform:scale(1); } to { transform:scale(1.08); } }
-.forge-hero-quote { position:absolute; top:34px; left:10px; right:10px; padding:12px; z-index:3; border:1px solid #fbbf2466; border-radius:10px; background:#292118f0; color:#fff0c4; font-size:12px; line-height:1.6; box-shadow:0 8px 25px #0008; pointer-events:none; }
-.forge-pedestal[role=button] { cursor:pointer; }
-.forge-pedestal[role=button]:focus-visible { outline:2px solid #fbbf24; outline-offset:3px; }
-.boss-story-banner { position:fixed; top:110px; left:50%; transform:translateX(-50%); width:min(640px,94vw); z-index:550; display:flex; gap:14px; align-items:center; padding:18px; border:1px solid #fbbf2477; border-radius:12px; background:linear-gradient(110deg,#24151cf5,#101827f5); color:#fff0ce; box-shadow:0 10px 40px #0008; pointer-events:none; }
-.boss-story-banner[hidden] { display:none; }
-.boss-story-banner img { width:72px; height:72px; object-fit:contain; }
-.boss-story-banner strong { display:block; color:#fbbf24; margin-bottom:6px; }
-.boss-story-banner p { font-size:13px; line-height:1.5; margin:0; }
-@media(max-width:600px) { .cinematic-top { inset:12px 12px auto; font-size:10px; } .cinematic-caption { inset:auto 6vw 4vh; } .cinematic-caption p { min-height:150px; } .cinematic-elements { top:20%; } .cinematic-elements i { padding:12px; font-size:12px; } .boss-story-banner { top:90px; } }
-@media(prefers-reduced-motion:reduce) { .cinematic-art img { animation:none; } .cinematic-art { transition:none; } }
+/* ==========================================================================
+   NARRATIVA & CINEMÁTICA RÚNICA (REVER HISTÓRIA, CENAS & BOSS LORE)
+   ========================================================================== */
+
+#cinematic-intro {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #f8fafc;
+  background: #05070d;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+#cinematic-intro::backdrop {
+  background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.95), #020617 100%);
+}
+
+.cinematic-art {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  background: #02040a;
+}
+
+.cinematic-art.is-fading {
+  opacity: 0;
+}
+
+.cinematic-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+  filter: contrast(1.1) brightness(0.9);
+  animation: cinematic-zoom 14s ease-out both;
+}
+
+.cinematic-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 30%, transparent 40%, rgba(2, 6, 23, 0.7) 100%),
+    linear-gradient(0deg, rgba(3, 7, 18, 0.98) 0%, rgba(3, 7, 18, 0.5) 45%, rgba(3, 7, 18, 0.3) 100%);
+}
+
+/* Barra Superior com Selo Rúnico de Progresso e Botão Pular */
+.cinematic-top {
+  position: absolute;
+  inset: 24px 32px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 10;
+}
+
+#cinematic-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 700 11px 'Cinzel', serif;
+  letter-spacing: 0.18em;
+  color: #fde68a;
+  background: linear-gradient(180deg, rgba(28, 22, 38, 0.92), rgba(12, 16, 28, 0.96));
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  border-radius: 4px;
+  padding: 6px 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+}
+
+#cinematic-progress::before {
+  content: '✦';
+  color: #fbbf24;
+  font-size: 10px;
+}
+
+/* Moldura Esculpida da Legenda da História */
+.cinematic-caption {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: min(880px, 92vw);
+  box-sizing: border-box;
+  padding: 28px 36px 24px;
+  border: 2px solid #d97706;
+  outline: 1.5px solid rgba(254, 240, 138, 0.35);
+  outline-offset: -8px;
+  border-radius: 6px;
+  background-color: #0a0d1a;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    url('/assets/ui/frames/crest-header-ornament.svg'),
+    url('/assets/ui/frames/divider-runic-ornate.svg'),
+    radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.22), transparent 60%),
+    linear-gradient(175deg, rgba(26, 22, 40, 0.98) 0%, rgba(8, 11, 24, 0.99) 100%);
+  background-repeat: no-repeat;
+  background-position:
+    top 2px left 2px,
+    top 2px right 2px,
+    bottom 2px left 2px,
+    bottom 2px right 2px,
+    top 3px center,
+    bottom 76px center,
+    center,
+    center;
+  background-size:
+    46px 46px,
+    46px 46px,
+    46px 46px,
+    46px 46px,
+    220px 26px,
+    min(420px, 85%) 16px,
+    100% 100%,
+    100% 100%;
+  box-shadow:
+    inset 0 0 0 4px rgba(10, 14, 26, 0.9),
+    inset 0 0 32px rgba(245, 158, 11, 0.12),
+    0 24px 64px rgba(0, 0, 0, 0.95),
+    0 0 40px rgba(245, 158, 11, 0.2);
+}
+
+.cinematic-caption h2 {
+  font: 800 clamp(22px, 3.2vw, 36px) 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  margin: 4px 0 14px;
+  text-align: center;
+  background: linear-gradient(180deg, #fffbeb 0%, #fde68a 52%, #d97706 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.9));
+}
+
+.cinematic-caption p {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: clamp(14px, 1.6vw, 17px);
+  line-height: 1.65;
+  color: #ece8dc;
+  min-height: 78px;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  margin-bottom: 24px;
+}
+
+.cinematic-caption nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Botões da Cinemática */
+#cinematic-intro button {
+  min-height: 42px;
+  padding: 8px 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  color: #fde68a;
+  background: linear-gradient(180deg, rgba(38, 30, 48, 0.95), rgba(14, 18, 32, 0.98));
+  font: 700 11.5px 'Cinzel', serif;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 14px rgba(0, 0, 0, 0.65);
+  transition: all 0.18s ease;
+}
+
+#cinematic-intro button:hover:not(:disabled) {
+  border-color: #fbbf24;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.35);
+  transform: translateY(-1px);
+}
+
+#cinematic-intro button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botão Próxima / Começar Jornada com Asas de Ouro Forjadas */
+#cinematic-next {
+  min-height: 44px !important;
+  padding: 8px 34px !important;
+  color: #1c0f02 !important;
+  border: 1.5px solid #fef08a !important;
+  outline: 1px solid rgba(120, 53, 15, 0.65);
+  outline-offset: -3px;
+  background-color: #d97706 !important;
+  background-image:
+    url('/assets/ui/frames/button-ornament-left.svg'),
+    url('/assets/ui/frames/button-ornament-right.svg'),
+    linear-gradient(180deg, #fef08a 0%, #fbbf24 25%, #d97706 78%, #92400e 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position: left 6px center, right 6px center, center !important;
+  background-size: 26px 24px, 26px 24px, 100% 100% !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 4px 16px rgba(217, 119, 6, 0.5) !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+#cinematic-next:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 0 24px rgba(251, 191, 36, 0.75) !important;
+}
+
+/* Narração com Estado Ativo */
+#cinematic-voice[aria-pressed="true"] {
+  border-color: #34d399;
+  color: #a7f3d0;
+  background: linear-gradient(180deg, rgba(6, 95, 70, 0.75), rgba(6, 78, 59, 0.9));
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.35);
+}
+
+/* Orbes Elementais */
+.cinematic-elements {
+  display: none;
+  position: absolute;
+  inset: 22% 5% auto;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  z-index: 5;
+}
+
+[data-effect="elements"] .cinematic-elements {
+  display: flex;
+}
+
+.cinematic-elements i {
+  font-style: normal;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  border-radius: 50%;
+  width: 58px;
+  height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(251, 191, 36, 0.65);
+  color: #fef08a;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.25), transparent 70%),
+    linear-gradient(180deg, rgba(30, 36, 56, 0.9), rgba(12, 16, 28, 0.96));
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.35), inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+[data-effect="fracture"] img {
+  filter: contrast(1.3) saturate(0.5);
+}
+
+[data-effect="shards"]::before {
+  content: '✦  ·  ✧  ·  ✦';
+  position: absolute;
+  inset: 18% 10%;
+  z-index: 5;
+  font-size: clamp(36px, 8vw, 110px);
+  letter-spacing: 0.3em;
+  color: rgba(251, 191, 36, 0.6);
+  text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes cinematic-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+/* Balão de Fala do Herói na Sala dos Forjados */
+.forge-hero-quote {
+  position: absolute;
+  top: 36px;
+  left: 10px;
+  right: 10px;
+  padding: 10px 14px;
+  z-index: 10;
+  border: 1.5px solid rgba(251, 191, 36, 0.6);
+  border-radius: 6px;
+  background-color: #0b101e;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(160deg, rgba(38, 28, 20, 0.98), rgba(14, 18, 32, 0.98));
+  background-repeat: no-repeat;
+  background-position: top 1px left 1px, top 1px right 1px, bottom 1px left 1px, bottom 1px right 1px, center;
+  background-size: 16px 16px, 16px 16px, 16px 16px, 16px 16px, 100% 100%;
+  color: #fff3d1;
+  font-size: 11.5px;
+  line-height: 1.5;
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.15), 0 10px 28px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+
+.forge-pedestal[role="button"] {
+  cursor: pointer;
+}
+
+.forge-pedestal[role="button"]:focus-visible {
+  outline: 2px solid #fbbf24;
+  outline-offset: 3px;
+}
+
+/* Banner de Chefe em Combate (Boss Encounter) */
+.boss-story-banner {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, 94vw);
+  z-index: 550;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 16px 20px;
+  border: 2px solid #dc2626;
+  outline: 1.5px solid rgba(251, 191, 36, 0.5);
+  outline-offset: -5px;
+  border-radius: 6px;
+  background-color: #120914;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg'),
+    linear-gradient(110deg, rgba(48, 16, 26, 0.98), rgba(15, 20, 36, 0.98));
+  background-repeat: no-repeat;
+  background-position: top 1px left 1px, top 1px right 1px, bottom 1px left 1px, bottom 1px right 1px, center;
+  background-size: 24px 24px, 24px 24px, 24px 24px, 24px 24px, 100% 100%;
+  color: #fff0ce;
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.3), 0 14px 44px rgba(0, 0, 0, 0.9), 0 0 28px rgba(220, 38, 38, 0.35);
+  pointer-events: none;
+}
+
+.boss-story-banner[hidden] {
+  display: none;
+}
+
+.boss-story-banner img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  border: 1.5px solid #fbbf24;
+  border-radius: 4px;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.4);
+}
+
+.boss-story-banner strong {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  color: #fbbf24;
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.boss-story-banner p {
+  font-size: 12.5px;
+  line-height: 1.45;
+  margin: 0;
+  color: #e2e8f0;
+}
+
+/* Responsividade Mobile da Cinemática */
+@media (max-width: 640px) {
+  .cinematic-top {
+    inset: 12px 14px auto;
+  }
+
+  #cinematic-progress {
+    font-size: 9.5px;
+    padding: 4px 10px;
+  }
+
+  #cinematic-intro button {
+    min-height: 38px;
+    padding: 6px 14px;
+    font-size: 10px;
+  }
+
+  .cinematic-caption {
+    inset: auto 50% 16px;
+    padding: 20px 18px 16px;
+    background-size:
+      32px 32px,
+      32px 32px,
+      32px 32px,
+      32px 32px,
+      170px 20px,
+      min(300px, 90%) 14px,
+      100% 100%,
+      100% 100%;
+    background-position:
+      top 2px left 2px,
+      top 2px right 2px,
+      bottom 2px left 2px,
+      bottom 2px right 2px,
+      top 3px center,
+      bottom 62px center,
+      center,
+      center;
+  }
+
+  .cinematic-caption h2 {
+    font-size: 19px;
+    margin-bottom: 8px;
+  }
+
+  .cinematic-caption p {
+    font-size: 12.5px;
+    min-height: 85px;
+    margin-bottom: 16px;
+  }
+
+  .cinematic-caption nav {
+    gap: 8px;
+  }
+
+  #cinematic-next {
+    min-height: 38px !important;
+    padding: 6px 24px !important;
+  }
+
+  .boss-story-banner {
+    top: 80px;
+    padding: 12px;
+  }
+
+  .boss-story-banner img {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-art img { animation: none; }
+  .cinematic-art { transition: none; }
+}

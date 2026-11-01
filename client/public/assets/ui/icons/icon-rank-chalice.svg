@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <!-- Royal Ancestral Chalice / Ranking Trophy -->
+  <defs>
+    <linearGradient id="cupGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="35%" stop-color="#fde68a"/>
+      <stop offset="70%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+    <radialGradient id="rubyGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f87171"/>
+      <stop offset="75%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </radialGradient>
+  </defs>
+  <!-- Chalice Base -->
+  <ellipse cx="16" cy="27" rx="8" ry="2.5" fill="url(#cupGold)" stroke="#92400e" stroke-width="1"/>
+  <!-- Stem -->
+  <path d="M14.5 25 L14.5 19 C14.5 18 15 17 16 17 C17 17 17.5 18 17.5 19 L17.5 25 Z" fill="url(#cupGold)" stroke="#b45309" stroke-width="0.8"/>
+  <circle cx="16" cy="21" r="2.2" fill="url(#cupGold)" stroke="#78350f" stroke-width="0.8"/>
+  <!-- Cup Body -->
+  <path d="M7 6 C7 15 11 17 16 17 C21 17 25 15 25 6 Z" fill="url(#cupGold)" stroke="#92400e" stroke-width="1.2"/>
+  <!-- Rim Lip -->
+  <ellipse cx="16" cy="6" rx="9" ry="2.2" fill="#fffbeb" stroke="url(#cupGold)" stroke-width="1.2"/>
+  <!-- Regal Side Handles -->
+  <path d="M7 8 C3 8 3 14 7 15" stroke="url(#cupGold)" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M25 8 C29 8 29 14 25 15" stroke="url(#cupGold)" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Center Inset Ruby -->
+  <polygon points="16,9 18.5,12 16,15 13.5,12" fill="url(#rubyGlow)" stroke="#fef08a" stroke-width="0.8"/>
+  <circle cx="16" cy="12" r="0.8" fill="#fff"/>
+  <!-- Crown Points on Lip -->
+  <polygon points="16,3 17.5,5 14.5,5" fill="#fef08a"/>
+  <polygon points="11,3.8 12.5,5.5 9.8,5.5" fill="#fef08a"/>
+  <polygon points="21,3.8 22.2,5.5 19.5,5.5" fill="#fef08a"/>
+</svg>
