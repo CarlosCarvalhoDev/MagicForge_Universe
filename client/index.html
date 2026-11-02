@@ -48,9 +48,10 @@
         z-index: 1;
       }
 
-      /* Glassmorphism Panels */
+      /* Glassmorphism Panels (Solid dark fallback for iOS Safari/WebKit) */
       .glass-panel {
-        background: rgba(15, 23, 42, 0.82);
+        background-color: #0b1120;
+        background: rgba(11, 17, 32, 0.95);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -529,13 +530,16 @@
       .skill-arc-btn .cooldown-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(10, 15, 29, 0.88);
+        background: radial-gradient(circle at center, rgba(15, 23, 42, 0.74) 40%, rgba(5, 8, 16, 0.88) 100%);
+        border: 1px solid rgba(251, 191, 36, 0.35);
         border-radius: 50%;
         display: none;
         align-items: center;
         justify-content: center;
         pointer-events: none;
         z-index: 4;
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
       }
 
       .skill-arc-btn .cooldown-overlay.active {
@@ -543,10 +547,12 @@
       }
 
       .skill-arc-btn .cooldown-text {
-        font-size: 1.45rem;
-        font-weight: 900;
-        color: #fbbf24;
-        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+        font-family: 'Cinzel', serif;
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #fde68a;
+        letter-spacing: 0.04em;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 8px rgba(245, 158, 11, 0.5);
       }
 
       /* Bottom Center Controls & Game Chat */
@@ -760,17 +766,17 @@
       }
 
       .chat-msg {
-        display: flex;
-        gap: 6px;
+        display: block;
+        line-height: 1.3;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
       }
 
-      .chat-tag-sys { color: #38bdf8; font-weight: 700; }
-      .chat-tag-loot { color: #fbbf24; font-weight: 700; }
-      .chat-tag-auto { color: #4ade80; font-weight: 700; }
-      .chat-tag-combat { color: #f87171; font-weight: 700; }
-      .chat-tag-user { color: #c084fc; font-weight: 700; }
-      .chat-body { color: #e2e8f0; word-break: break-word; }
+      .chat-tag-sys { color: #38bdf8; font-weight: 700; display: inline-block; margin-right: 4px; white-space: nowrap; }
+      .chat-tag-loot { color: #fbbf24; font-weight: 700; display: inline-block; margin-right: 4px; white-space: nowrap; }
+      .chat-tag-auto { color: #4ade80; font-weight: 700; display: inline-block; margin-right: 4px; white-space: nowrap; }
+      .chat-tag-combat { color: #f87171; font-weight: 700; display: inline-block; margin-right: 4px; white-space: nowrap; }
+      .chat-tag-user { color: #c084fc; font-weight: 700; display: inline-block; margin-right: 4px; white-space: nowrap; }
+      .chat-body { color: #e2e8f0; display: inline; word-break: break-word; overflow-wrap: break-word; }
 
       .chat-input-form {
         display: flex;
@@ -3663,25 +3669,12 @@
         }
       }
 
-      /* Em telas muito estreitas (Celular em pé / Portrait <= 620px),
-         move o card de Fase para baixo do card do Herói para zero sobreposição */
-      @media (max-width: 620px) {
-        #top-center-wave-card {
-          top: 66px;
-          left: 6px;
-          transform: none;
-          min-width: 155px;
-          max-width: 185px;
-          align-items: flex-start;
-        }
-
-        #bottom-center-zone {
-          width: calc(100vw - 204px);
-        }
-
-        #chat-messages-container {
-          height: 32px;
-        }
+      /* Safe area variables */
+      :root {
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left: env(safe-area-inset-left, 0px);
+        --safe-right: env(safe-area-inset-right, 0px);
       }
     </style>
   </head>
@@ -3919,7 +3912,7 @@
       </button>
     </div>
 
-    <!-- Left Vertical Collapsible Tactical Drawer (Contraposto ao Right Vertical Dock) -->
+    <!-- Left Tactical Drawer -->
     <aside class='bottom-center-toolbar runic-tactical-bar' id='tactical-action-bar' data-drawer-open='true' aria-label='Menu Tático Lateral'>
       <div class='tactical-drawer-items' id='tactical-drawer-items'>
         <button id='btn-toggle-auto' class='btn-auto-toggle' type='button' title='Ativar/Desativar Combate Automático'>
@@ -4000,9 +3993,9 @@
       </div>
     </div>
 
-    <!-- Ragnarok Mobile Half-Moon (Meia-Lua) Combat Arc (Bottom-Right) -->
+    <!-- Combat Arc (Bottom-Right) -->
     <div id="mobile-combat-arc-container">
-      <!-- Main Attack Button (Center of the Fan) -->
+      <!-- Primary Attack -->
       <button class="mobile-primary-btn" id="btn-primary-attack" type="button" title="Ataque Básico Autorizado [Espaço]">
         <span class="attack-seal-ring" aria-hidden="true"></span>
         <span class="mobile-primary-icon"><img id="attack-btn-svg" src="/assets/ui/icons/icon-attack-crest.svg" alt="" class="attack-crest-svg" /></span>

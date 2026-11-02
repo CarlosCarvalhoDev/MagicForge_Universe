@@ -495,10 +495,34 @@ export function setupAuthSelection(
       }
     },
     onCharacterList(payload: S2CCharacterListPayload) {
-      if (!authenticated || !account || payload.accountUsername?.trim().toLowerCase() !== account) return;
-      const valid = Array.isArray(payload.slots) && payload.slots.length === 3
-        && [0, 1, 2].every(index => payload.slots.some(slot => slot.slotIndex === index && typeof slot.isEmpty === 'boolean'
-          && (slot.isEmpty || (typeof slot.name === 'string' && typeof slot.classType === 'string' && slot.classType.length > 0))));
+      if (!authenticated || !account) return;
+      if (payload.accountUsername && payload.accountUsername.trim().toLowerCase() !== account) {
+        if (payload.accountUsername.trim().toLowerCase() === account.toLowerCase()) {
+          account = payload.accountUsername.trim().toLowerCase();
+        } else {
+          return;
+        }
+      }
+      const rawSlots = Array.isArray(payload.slots) ? payload.slots : [];
+      // Normaliza garantindo exatamente 3 pedestais (0, 1, 2)
+      const normalizedSlots = [0, 1, 2].map(index => {
+        const found = rawSlots.find(s => Number(s.slotIndex) === index);
+        if (!found) {
+          return { slotIndex: index, isEmpty: true };
+        }
+        const isEmpty = Boolean(found.isEmpty) || (!found.name && !found.classType);
+        return {
+          ...found,
+          slotIndex: index,
+          isEmpty,
+          name: found.name || '',
+          classType: found.classType,
+        };
+      });
+
+      const valid = normalizedSlots.length === 3 && normalizedSlots.every(slot =>
+        slot.isEmpty || (typeof slot.name === 'string' && slot.name.length > 0 && typeof slot.classType === 'string' && slot.classType.length > 0)
+      );
       if (!valid) {
         slots = null;
         selected = null;
@@ -508,11 +532,11 @@ export function setupAuthSelection(
       }
       const wasCreate = pending === 'create';
       const createdSlot = selected;
-      slots = [...payload.slots].sort((a, b) => a.slotIndex - b.slotIndex);
+      slots = normalizedSlots;
       selected = null;
       nameInput.value = '';
       finish();
-      note.textContent = 'Conta: ' + payload.accountUsername + ' · ' + slots.filter(slot => !slot.isEmpty).length + ' de 3 pedestais ocupados.';
+      note.textContent = 'Conta: ' + (payload.accountUsername || account) + ' · ' + slots.filter(slot => !slot.isEmpty).length + ' de 3 pedestais ocupados.';
       setStatus(payload.message || 'Escolha um herói para entrar ou um pedestal vazio para criar.');
 
       // Auto-resume character slot if resuming from reload

@@ -48,8 +48,11 @@ httpServer.listen(SERVER_CONFIG.PORT, '0.0.0.0', () => {
   console.log(`[Server] Health Check available at http://localhost:${SERVER_CONFIG.PORT}/health`);
   console.log(`[Server] WebSocket endpoint (Local): ws://localhost:${SERVER_CONFIG.PORT}`);
   const interfaces = os.networkInterfaces();
-    const lanIps = Object.values(interfaces).flat().filter((i): i is os.NetworkInterfaceInfo => Boolean(i && i.family === 'IPv4' && !i.internal)).map(i => i.address);
-    lanIps.forEach(ip => console.log(`[Server] WebSocket endpoint (LAN): ws://${ip}:${SERVER_CONFIG.PORT}`));
+  const lanIps = Object.values(interfaces)
+    .flat()
+    .filter((i): i is os.NetworkInterfaceInfo => Boolean(i && i.family === 'IPv4' && !i.internal))
+    .map(i => i.address);
+  lanIps.forEach(ip => console.log(`[Server] WebSocket endpoint (LAN): ws://${ip}:${SERVER_CONFIG.PORT}`));
 
   // Start authoritative loop
   gameLoop.start();

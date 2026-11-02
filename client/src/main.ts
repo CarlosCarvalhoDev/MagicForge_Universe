@@ -2483,7 +2483,6 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// Left Collapsible Tactical Drawer Controller (Responsive & Mobile Touch Ready)
 const tacticalActionBar = document.getElementById('tactical-action-bar');
 const btnTacticalDrawerToggle = document.getElementById('btn-tactical-drawer-toggle');
 const tacticalDrawerArrow = document.getElementById('tactical-drawer-arrow');
@@ -2500,8 +2499,6 @@ function setTacticalDrawerOpen(isOpen: boolean) {
   }
 }
 
-// Em tela reduzida (<= 1180px) ou mobile, o menu lateral tático inicia FECHADO por padrão.
-// Em desktop amplo (> 1180px), permanece aberto por padrão.
 setTacticalDrawerOpen(window.innerWidth > 1180);
 
 if (btnTacticalDrawerToggle) {

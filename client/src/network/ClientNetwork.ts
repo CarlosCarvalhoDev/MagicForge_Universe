@@ -125,6 +125,7 @@ export class ClientNetwork {
 
   private reconnectTimeoutId: number | null = null;
   public autoReconnect: boolean = true;
+  private useProxyFallback: boolean = false;
 
   constructor(serverUrl?: string) {
     this.serverUrl = resolveServerUrl(serverUrl, import.meta.env?.VITE_SERVER_URL);
@@ -149,9 +150,18 @@ export class ClientNetwork {
       this.disconnect(false);
     }
 
-    console.log(`[ClientNetwork] Connecting to ${this.serverUrl}...`);
+    let targetUrl = this.serverUrl;
+    if (typeof window !== 'undefined' && window.location?.host) {
+      const isHttps = window.location.protocol === 'https:';
+      const isTunnelHost = !/^(localhost|127\.0\.0\.1|192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(window.location.hostname);
+      if (isHttps || isTunnelHost || this.useProxyFallback) {
+        const proto = isHttps ? 'wss:' : 'ws:';
+        targetUrl = `${proto}//${window.location.host}/ws`;
+      }
+    }
+    console.log(`[ClientNetwork] Connecting to ${targetUrl}...`);
     try {
-      this.ws = new WebSocket(this.serverUrl);
+      this.ws = new WebSocket(targetUrl);
     } catch (err) {
       console.error('[ClientNetwork] Erro ao instanciar WebSocket:', err);
       if (this.autoReconnect) this.scheduleReconnect();
@@ -181,6 +191,9 @@ export class ClientNetwork {
 
     this.ws.onerror = (err) => {
       console.error('[ClientNetwork] WebSocket error:', err);
+      if (!this.isConnected) {
+        this.useProxyFallback = !this.useProxyFallback;
+      }
       if (this.autoReconnect && !this.isConnected) {
         this.scheduleReconnect();
       }
