@@ -798,7 +798,6 @@
 /* Cards do Topo e Chat (Opaque background fallback for iOS Safari) */
 #hero-status-card,
 #top-center-wave-card,
-#top-right-location-card,
 .zone-info-pill,
 #game-chat-box,
 .gold-wallet-capsule {
@@ -996,8 +995,21 @@
 
 /* Topo Direito: Localização, Navegação de Sessão (Heróis / Sair) e Seletores Rúnicos */
 #top-right-location-card {
-  gap: 8px !important;
+  position: absolute !important;
+  top: calc(14px + var(--safe-top, 0px)) !important;
+  right: calc(14px + var(--safe-right, 0px)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 6px !important;
   z-index: 28 !important;
+  pointer-events: auto !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-image: none !important;
+  padding: 0 !important;
 }
 
 .top-right-header-row {
@@ -1997,16 +2009,184 @@
   }
 
   #bottom-center-zone {
-    bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 50% !important;
+    bottom: calc(20px + var(--safe-bottom, 0px)) !important;
+    left: calc(50% - 14px) !important;
+    right: auto !important;
     transform: translateX(-50%) !important;
-    width: min(360px, calc(100vw - 620px)) !important;
-    min-width: 240px !important;
+    width: auto !important;
+    max-width: calc(100vw - 110px) !important;
+    min-width: 0 !important;
     z-index: 26 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  #game-chat-box {
+    pointer-events: auto !important;
+    max-height: 110px !important;
+    width: 184px !important;
+    max-width: calc(100vw - 110px) !important;
+    padding: 4px 6px 5px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    background: rgba(11, 16, 30, 0.94) !important;
+    border: 1px solid rgba(251, 191, 36, 0.35) !important;
+    border-radius: 6px !important;
+  }
+
+  #game-chat-box .chat-header-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding-bottom: 2px !important;
+    margin-bottom: 2px !important;
+    gap: 3px !important;
+    cursor: pointer !important;
+  }
+
+  .chat-toggle-btn {
+    width: 20px !important;
+    height: 18px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    background: rgba(30, 41, 59, 0.9) !important;
+    border: 1px solid rgba(251, 191, 36, 0.45) !important;
+    border-radius: 4px !important;
+    color: #fde047 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 5 !important;
+  }
+
+  .chat-toggle-text {
+    display: none !important;
+  }
+
+  #chat-toggle-icon {
+    font-size: 0.60rem !important;
+    line-height: 1 !important;
+  }
+
+  #game-chat-box.collapsed {
+    padding: 3px 8px !important;
+    background: rgba(11, 16, 30, 0.94) !important;
+    border: 1px solid rgba(251, 191, 36, 0.6) !important;
+    border-radius: 6px !important;
+    width: auto !important;
+    min-width: 65px !important;
+    max-width: 110px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8) !important;
+    cursor: pointer !important;
+  }
+
+  #game-chat-box.collapsed .chat-header-bar {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-bottom: none !important;
+    gap: 6px !important;
+    justify-content: space-between !important;
+  }
+
+  #game-chat-box.collapsed .chat-channel-tab:not(.active) {
+    display: none !important;
+  }
+
+  #game-chat-box.collapsed #chat-messages-container,
+  #game-chat-box.collapsed .chat-input-form {
+    display: none !important;
+  }
+
+  #game-chat-box #chat-messages-container {
+    height: 42px !important;
+    max-height: 42px !important;
+    font-size: 0.60rem !important;
+    line-height: 1.25 !important;
+    gap: 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .chat-msg {
+    display: block !important;
+    line-height: 1.25 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9) !important;
+  }
+
+  .chat-msg > [class^="chat-tag-"] {
+    display: inline-block !important;
+    margin-right: 4px !important;
+    white-space: nowrap !important;
+    font-weight: 700 !important;
+  }
+
+  .chat-body {
+    display: inline !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  #game-chat-box .chat-channel-badge {
+    display: none !important;
+  }
+
+  #game-chat-box .chat-input-form {
+    padding: 4px 0 0 !important;
+    margin-top: 3px !important;
+    gap: 4px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #game-chat-box .chat-input-field {
+    height: 24px !important;
+    padding: 2px 6px !important;
+    font-size: 0.62rem !important;
+    min-width: 0 !important;
+    width: 0 !important;
+    flex: 1 1 0% !important;
+    box-sizing: border-box !important;
+  }
+
+  #game-chat-box .chat-send-btn {
+    height: 24px !important;
+    padding: 0 7px !important;
+    font-size: 0.56rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  #leaderboard-dialog {
+    padding: 14px 14px;
+    width: 96vw;
+  }
+
+  .ranking-header h2 {
+    font-size: 17px;
+  }
+
+  .ranking-tabs {
+    margin: 10px 0;
+    gap: 6px;
+  }
+
+  #leaderboard-dialog button {
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 10.5px;
   }
 }
 
-/* Telas Estreitas e Mobile */
+/* ==========================================================================
+   TELAS ESTREITAS & MOBILE (<= 900px / Landscape Mobile)
+   ========================================================================== */
 @media (max-width: 900px), (max-height: 560px) {
   html, body {
     overflow-x: hidden !important;
@@ -2025,9 +2205,10 @@
     display: none;
   }
 
+  /* 1. Card de Perfil do Jogador (Mobile Compacto) */
   #hero-status-card {
-    top: calc(8px + var(--safe-top)) !important;
-    left: calc(8px + var(--safe-left)) !important;
+    top: calc(8px + var(--safe-top, 0px)) !important;
+    left: calc(8px + var(--safe-left, 0px)) !important;
     width: 172px !important;
     max-width: 172px !important;
     min-width: 0 !important;
@@ -2103,9 +2284,10 @@
     height: 8px !important;
   }
 
+  /* 2. Menu Superior Direito (Navegação & Status Lux) */
   #top-right-location-card {
-    top: calc(8px + var(--safe-top)) !important;
-    right: calc(8px + var(--safe-right)) !important;
+    top: calc(8px + var(--safe-top, 0px)) !important;
+    right: calc(8px + var(--safe-right, 0px)) !important;
     width: auto !important;
     max-width: calc(100vw - 190px) !important;
     display: flex !important;
@@ -2113,6 +2295,10 @@
     align-items: flex-end !important;
     gap: 4px !important;
     z-index: 28 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
   }
 
   .top-right-header-row {
@@ -2152,6 +2338,7 @@
     max-width: 100% !important;
   }
 
+  /* Elementos ocultados no mobile para evitar sobreposição */
   .zone-info-pill,
   #btn-fullscreen-toggle,
   #btn-toggle-inspector,
@@ -2212,8 +2399,9 @@
     flex-shrink: 0 !important;
   }
 
+  /* 3. Card Central de Fases & Chefão */
   #top-center-wave-card {
-    top: calc(82px + var(--safe-top)) !important;
+    top: calc(82px + var(--safe-top, 0px)) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: max-content !important;
@@ -2223,6 +2411,7 @@
     z-index: 27 !important;
   }
 
+  /* 4. Dock Lateral Direito */
   #right-vertical-dock,
   #dock-navigation-bar {
     top: 39% !important;
@@ -2245,6 +2434,7 @@
     margin-bottom: 1px;
   }
 
+  /* 5. Drawer Tático Esquerdo */
   #tactical-action-bar.runic-tactical-bar {
     left: 8px !important;
     top: 38% !important;
@@ -2274,203 +2464,7 @@
     font-size: 0.62rem !important;
   }
 
-  #mobile-combat-arc-container {
-    width: 162px !important;
-    height: 182px !important;
-    bottom: calc(20px + var(--safe-bottom)) !important;
-    right: calc(8px + var(--safe-right)) !important;
-    pointer-events: none !important;
-    z-index: 28 !important;
-  }
-
-  #mobile-combat-arc-container > * {
-    pointer-events: auto !important;
-  }
-
-  #btn-primary-attack {
-    width: 72px !important;
-    height: 72px !important;
-    bottom: 4px !important;
-    right: 4px !important;
-  }
-
-  .attack-crest-svg {
-    width: 25px !important;
-    height: 25px !important;
-  }
-
-  #attack-btn-label {
-    font-size: 0.6rem !important;
-  }
-
-  .attack-class-trait {
-    font-size: 0.44rem !important;
-    max-width: 66px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.02em !important;
-    line-height: 1.1 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    color: #fef08a !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
-  }
-
-  .skill-arc-btn {
-    width: 46px !important;
-    height: 46px !important;
-  }
-
-  #skill-btn-1 {
-    bottom: 10px !important;
-    right: 88px !important;
-  }
-
-  #skill-btn-2 {
-    bottom: 62px !important;
-    right: 62px !important;
-  }
-
-  #skill-btn-3 {
-    bottom: 88px !important;
-    right: 10px !important;
-  }
-
-  #skill-btn-4 {
-    width: 54px !important;
-    height: 54px !important;
-    bottom: 118px !important;
-    right: 48px !important;
-    border-width: 2.5px !important;
-    border-color: #f59e0b !important;
-    box-shadow:
-      inset 0 0 0 2px rgba(10, 14, 26, 0.92),
-      0 0 18px rgba(245, 158, 11, 0.72),
-      0 6px 16px rgba(0, 0, 0, 0.9) !important;
-  }
-
-  .skill-key-badge {
-    font-size: 0.52rem !important;
-    padding: 1px 3px !important;
-  }
-
-  .skill-cost {
-    font-size: 0.5rem !important;
-  }
-
-  .skill-arc-btn .cooldown-overlay {
-    position: absolute !important;
-    inset: 0 !important;
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.74) 40%, rgba(5, 8, 16, 0.88) 100%) !important;
-    border-radius: 50% !important;
-    border: 1px solid rgba(251, 191, 36, 0.35) !important;
-    backdrop-filter: blur(2px) !important;
-    -webkit-backdrop-filter: blur(2px) !important;
-  }
-
-  .skill-arc-btn .cooldown-text {
-    font-family: 'Cinzel', serif !important;
-    font-size: 0.68rem !important;
-    font-weight: 800 !important;
-    color: #fde68a !important;
-    letter-spacing: 0.04em !important;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 8px rgba(245, 158, 11, 0.5) !important;
-  }
-
-  #skill-btn-4 .cooldown-text {
-    font-size: 0.76rem !important;
-  }
-
-  #bottom-center-zone {
-    bottom: calc(22px + var(--safe-bottom)) !important;
-    left: calc(8px + var(--safe-left)) !important;
-    right: auto !important;
-    transform: none !important;
-    width: calc(100vw - 158px) !important;
-    max-width: 226px !important;
-    min-width: 0 !important;
-    z-index: 26 !important;
-    pointer-events: none !important;
-  }
-
-  #game-chat-box {
-    pointer-events: auto !important;
-    max-height: 104px !important;
-    width: 100% !important;
-    padding: 5px 7px 6px !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-    background: rgba(11, 16, 30, 0.92) !important;
-    border: 1px solid rgba(251, 191, 36, 0.35) !important;
-    border-radius: 6px !important;
-  }
-
-  #game-chat-box .chat-header-bar {
-    padding-bottom: 3px !important;
-    margin-bottom: 3px !important;
-  }
-
-  #game-chat-box #chat-messages-container {
-    height: 42px !important;
-    max-height: 42px !important;
-    font-size: 0.60rem !important;
-    line-height: 1.25 !important;
-    gap: 2px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow-y: auto !important;
-    word-break: normal !important;
-    overflow-wrap: break-word !important;
-  }
-
-  .chat-msg {
-    display: block !important;
-    line-height: 1.25 !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9) !important;
-  }
-
-  .chat-msg > [class^="chat-tag-"] {
-    display: inline-block !important;
-    margin-right: 4px !important;
-    white-space: nowrap !important;
-    font-weight: 700 !important;
-  }
-
-  .chat-body {
-    display: inline !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-  }
-
-  #game-chat-box .chat-channel-badge {
-    display: none !important;
-  }
-
-  #game-chat-box .chat-input-form {
-    padding: 4px 0 0 !important;
-    margin-top: 3px !important;
-    gap: 4px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  #game-chat-box .chat-input-field {
-    height: 24px !important;
-    padding: 2px 6px !important;
-    font-size: 0.62rem !important;
-    min-width: 0 !important;
-    width: 0 !important;
-    flex: 1 1 0% !important;
-    box-sizing: border-box !important;
-  }
-
-  #game-chat-box .chat-send-btn {
-    height: 24px !important;
-    padding: 0 7px !important;
-    font-size: 0.56rem !important;
-    flex-shrink: 0 !important;
-  }
-
+  /* 6. Modais do Sistema (Ranking / Ficha) */
   #leaderboard-dialog {
     padding: 14px 14px;
     width: 96vw;
@@ -2699,3 +2693,670 @@
 
 .btn-claim-offline:active {
   transform: translateY(1px);
+}
+
+/* Chat Channels Tabs & Collapse Enhancement */
+.chat-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat-channel-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.chat-channel-tab:hover:not(.locked) {
+  color: #fef08a;
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.chat-channel-tab.active {
+  color: #fbbf24 !important;
+  background: rgba(251, 191, 36, 0.14) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.chat-channel-tab.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.chat-channel-tab.locked:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.tab-lock-icon {
+  font-size: 0.48rem;
+  margin-left: 1px;
+  opacity: 0.8;
+}
+
+#game-chat-box.collapsed {
+  padding: 5px 12px 5px !important;
+  background: rgba(15, 23, 42, 0.88) !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7) !important;
+  width: auto !important;
+}
+
+#game-chat-box.collapsed #chat-messages-container,
+#game-chat-box.collapsed .chat-input-form {
+  display: none !important;
+}
+
+#game-chat-box.collapsed .chat-header-bar {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+/* ==========================================================================
+   COMBAT ACTIONS & DYNAMIC AUTO / SQUARE SKILLS TRANSITION (BENCHMARK IDLE ARPG)
+   ========================================================================== */
+
+#mobile-combat-arc-container,
+.combat-action-container {
+  position: fixed !important;
+  bottom: calc(20px + var(--safe-bottom, 0px)) !important;
+  right: calc(16px + var(--safe-right, 0px)) !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 480px !important;
+  z-index: 28 !important;
+  pointer-events: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 6px !important;
+}
+
+#mobile-combat-arc-container > * {
+  pointer-events: auto !important;
+}
+
+/* 1. AUTO ON View */
+.combat-auto-view {
+  display: flex;
+  justify-content: flex-end;
+  animation: combatFadeIn 0.2s ease-out;
+}
+
+.combat-auto-big-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.5) 50%, rgba(4, 120, 87, 0.75) 100%),
+              linear-gradient(165deg, #161a2a 0%, #0a0e1a 100%);
+  border: 1.5px solid #34d399;
+  outline: 1.2px solid rgba(52, 211, 153, 0.35);
+  outline-offset: -3px;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.45), 0 6px 18px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.combat-auto-big-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: #6ee7b7;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.7), 0 10px 24px rgba(0, 0, 0, 0.85);
+}
+
+.combat-auto-big-btn:active {
+  transform: scale(0.96);
+}
+
+.auto-pulse-aura {
+  position: absolute;
+  inset: -4px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(52, 211, 153, 0.55);
+  animation: autoPulseRing 2s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes autoPulseRing {
+  0% { transform: scale(0.97); opacity: 0.9; }
+  100% { transform: scale(1.1); opacity: 0; }
+}
+
+.auto-btn-main-icon {
+  font-size: 1.3rem;
+  filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.8));
+  animation: swordWiggle 3s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+@keyframes swordWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+.auto-btn-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #ecfdf5;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.85), 0 2px 4px rgba(0, 0, 0, 0.95);
+  white-space: nowrap;
+}
+
+.auto-btn-sub,
+.auto-btn-hotkey-badge {
+  display: none !important;
+}
+
+/* 2. MANUAL VIEW (Square RPG Skills Stack) */
+.combat-manual-view {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+  animation: combatFadeIn 0.2s ease-out;
+}
+
+@keyframes combatFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.combat-manual-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 52px;
+}
+
+.combat-auto-reactivate-btn,
+.combat-grimorio-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  transition: all 0.15s ease !important;
+}
+
+.combat-auto-reactivate-btn {
+  background: linear-gradient(135deg, rgba(6, 95, 70, 0.95), rgba(4, 120, 87, 0.95)) !important;
+  border: 1.5px solid #34d399 !important;
+  color: #ecfdf5 !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 8px rgba(52, 211, 153, 0.4) !important;
+}
+
+.combat-auto-reactivate-btn:hover {
+  transform: translateY(-1px) scale(1.06) !important;
+  border-color: #6ee7b7 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6) !important;
+}
+
+.combat-auto-reactivate-btn:active {
+  transform: scale(0.95);
+}
+
+.combat-grimorio-btn {
+  background: #0b101e !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.65) !important;
+  color: #fef08a !important;
+  font-size: 0.80rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 6px rgba(251, 191, 36, 0.25) !important;
+}
+
+.combat-grimorio-btn:hover {
+  transform: translateY(-1px) scale(1.06) !important;
+  border-color: #fde047 !important;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.45) !important;
+}
+
+.combat-grimorio-btn:active {
+  transform: scale(0.95);
+}
+
+/* Skills Square Column / Grid (Abre para cima, máx 5 por coluna, colunas extras para a direita) */
+.skills-square-row {
+  display: flex;
+  flex-direction: column-reverse; /* Abre para cima a partir do ataque básico */
+  flex-wrap: wrap; /* Colunas adicionais avançam para o lado direito */
+  align-content: flex-start; /* Lado esquerdo sempre as primeiras */
+  gap: 5px;
+  max-height: calc(5 * 52px + 4 * 5px); /* Limite estrito de 5 skills por coluna */
+}
+
+/* Botões Quadrados de Skill com Moldura Rúnica do Sistema */
+.skill-square-btn {
+  position: relative !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 8px !important;
+  background-color: #0b101e !important;
+  background-image:
+    url('/assets/ui/frames/corner-tl.svg'),
+    url('/assets/ui/frames/corner-tr.svg'),
+    url('/assets/ui/frames/corner-bl.svg'),
+    url('/assets/ui/frames/corner-br.svg') !important;
+  background-position:
+    top 1px left 1px,
+    top 1px right 1px,
+    bottom 1px left 1px,
+    bottom 1px right 1px !important;
+  background-repeat: no-repeat !important;
+  background-size: 8px 8px !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.75) !important;
+  outline: 1px solid rgba(254, 240, 138, 0.22) !important;
+  outline-offset: -3px !important;
+  padding: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  overflow: hidden !important;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.skill-square-btn:hover {
+  transform: translateY(-2px) scale(1.04) !important;
+  border-color: #fde047 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.9), 0 0 12px rgba(251, 191, 36, 0.45) !important;
+}
+
+.skill-square-btn:active {
+  transform: scale(0.95) !important;
+}
+
+/* Slot de Ataque Básico */
+.skill-square-btn.attack-slot {
+  border-color: #f59e0b !important;
+  background-color: #1a0808 !important;
+}
+
+.skill-square-btn.attack-slot:hover {
+  border-color: #fef08a !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.6) !important;
+}
+
+.skill-square-svg {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+}
+
+/* Slot 4 / Supremo */
+.skill-square-btn.ultimate-slot {
+  border-color: #fbbf24 !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), 0 0 12px rgba(245, 158, 11, 0.45) !important;
+}
+
+.skill-square-btn.ultimate-slot:hover {
+  border-color: #fef08a !important;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.75) !important;
+}
+
+.ultimate-crown-badge {
+  position: absolute;
+  top: -1px;
+  right: 2px;
+  font-size: 0.68rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+  z-index: 5;
+}
+
+.skill-square-key {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.5rem;
+  font-weight: 800;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  color: #fef08a;
+  line-height: 1.1;
+  z-index: 5;
+}
+
+.skill-square-icon-box {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.skill-square-icon-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.skill-square-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(0deg, rgba(10, 14, 26, 0.95) 0%, rgba(10, 14, 26, 0.75) 70%, transparent 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 2px;
+  z-index: 4;
+}
+
+.skill-square-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.5rem;
+  font-weight: 800;
+  color: #fef08a;
+}
+
+.skill-square-btn .skill-cost {
+  font-family: 'Cinzel', serif;
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: #facc15;
+  letter-spacing: 0.02em;
+}
+
+/* Cooldown Overlay */
+.skill-square-btn .cooldown-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 14, 26, 0.88);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.skill-square-btn .cooldown-overlay.active {
+  opacity: 1;
+}
+
+.skill-square-btn .cooldown-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #fde68a;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+}
+
+/* Slot Bloqueado */
+.skill-square-btn.slot-locked {
+  filter: grayscale(0.85) brightness(0.65);
+  border-color: rgba(148, 163, 184, 0.4);
+  outline-color: transparent;
+}
+
+.skill-square-btn.slot-locked .skill-square-icon-box {
+  opacity: 0.4;
+}
+
+.slot-lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.65);
+  z-index: 7;
+}
+
+.slot-lock-overlay .lock-icon {
+  font-size: 0.85rem;
+}
+
+.slot-lock-overlay .lock-lvl {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #cbd5e1;
+}
+
+/* Absolute-position and circular overrides for Square Skills Row (Desktop Default) */
+.attack-seal-ring {
+  display: none !important;
+}
+
+#btn-primary-attack,
+#skill-btn-1,
+#skill-btn-2,
+#skill-btn-3,
+#skill-btn-4 {
+  position: relative !important;
+  bottom: auto !important;
+  right: auto !important;
+  left: auto !important;
+  top: auto !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 8px !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+#btn-primary-attack {
+  outline: 1px solid rgba(254, 240, 138, 0.25) !important;
+  outline-offset: -3px !important;
+}
+
+#btn-primary-attack:hover,
+#skill-btn-1:hover,
+#skill-btn-2:hover,
+#skill-btn-3:hover,
+#skill-btn-4:hover {
+  transform: translateY(-2px) scale(1.04) !important;
+}
+
+#btn-primary-attack:active,
+#skill-btn-1:active,
+#skill-btn-2:active,
+#skill-btn-3:active,
+#skill-btn-4:active {
+  transform: scale(0.95) !important;
+}
+
+/* Mobile Responsiveness for Combat Action, Chat & Square Skills */
+@media (max-width: 768px), (max-height: 500px) {
+  #top-center-wave-card {
+    max-width: min(270px, calc(100vw - 75px)) !important;
+  }
+
+  #game-chat-box {
+    max-width: min(48vw, 190px) !important;
+    padding: 3px 6px !important;
+    border-radius: 8px !important;
+  }
+
+  .chat-tabs {
+    gap: 2px !important;
+  }
+
+  .chat-channel-tab {
+    padding: 1px 4px !important;
+    font-size: 0.50rem !important;
+    border-radius: 3px !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  .tab-lock-icon {
+    font-size: 0.40rem !important;
+  }
+
+  #chat-messages-container {
+    height: 36px !important;
+    font-size: 0.55rem !important;
+    gap: 1px !important;
+  }
+
+  #chat-input-form {
+    margin-top: 2px !important;
+    padding-top: 2px !important;
+    gap: 2px !important;
+  }
+
+  #chat-input-field {
+    padding: 2px 4px !important;
+    font-size: 0.55rem !important;
+    height: 22px !important;
+  }
+
+  #chat-send-btn {
+    padding: 2px 6px !important;
+    font-size: 0.55rem !important;
+    height: 22px !important;
+  }
+
+  #mobile-combat-arc-container,
+  .combat-action-container {
+    bottom: calc(18px + var(--safe-bottom, 0px)) !important;
+    right: calc(6px + var(--safe-right, 0px)) !important;
+    gap: 4px !important;
+  }
+
+  .combat-auto-big-btn {
+    padding: 4px 10px 4px 8px !important;
+    gap: 5px !important;
+    border-radius: 6px !important;
+    max-width: 95px !important;
+    border-width: 1.5px !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4), 0 4px 10px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .auto-pulse-aura {
+    inset: -3px !important;
+    border-radius: 9px !important;
+  }
+
+  .auto-btn-main-icon {
+    font-size: 1rem !important;
+  }
+
+  .auto-btn-title {
+    font-size: 0.76rem !important;
+    letter-spacing: 0.04em !important;
+    line-height: 1 !important;
+  }
+
+  .auto-btn-sub,
+  .auto-btn-hotkey-badge {
+    display: none !important;
+  }
+
+  .combat-manual-header {
+    gap: 4px !important;
+    width: 42px !important;
+    justify-content: space-between !important;
+  }
+
+  .combat-auto-reactivate-btn,
+  .combat-grimorio-btn {
+    width: 19px !important;
+    height: 19px !important;
+    border-radius: 4px !important;
+  }
+
+  .combat-auto-reactivate-btn {
+    font-size: 0.70rem !important;
+  }
+
+  .combat-grimorio-btn {
+    font-size: 0.65rem !important;
+  }
+
+  .skills-square-row {
+    max-height: calc(5 * 42px + 4 * 3px + 10px) !important;
+    gap: 3px !important;
+  }
+
+  #btn-primary-attack,
+  #skill-btn-1,
+  #skill-btn-2,
+  #skill-btn-3,
+  #skill-btn-4,
+  .skill-square-btn {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 6px !important;
+    background-size: 6px 6px !important;
+  }
+
+  .skill-square-icon-box {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .skill-square-svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .skill-square-key {
+    font-size: 0.40rem !important;
+    padding: 0 2px !important;
+  }
+
+  .skill-square-label,
+  .skill-square-btn .skill-cost {
+    font-size: 0.44rem !important;
+  }
+
+  .ultimate-crown-badge {
+    font-size: 0.55rem !important;
+  }
+}
+
+/* Final Polish for Attack Slot and Button Visibility */
+.skill-square-btn .attack-class-trait,
+.attack-class-trait {
+  display: none !important;
+}
