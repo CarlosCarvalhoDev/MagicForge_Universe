@@ -9,12 +9,18 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="MagicForge" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/assets/ui/icons/icon-hero-helm.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/assets/portraits/GUERREIRO.jpg" />
     <title>MagicForge: Universe - MMORPG Network & Interpolation Client</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
+      #modal-auth-selection[hidden],
+      #modal-auth-selection:not([data-ready="true"]) {
+        display: none !important;
+      }
       * {
         margin: 0;
         padding: 0;
@@ -32,10 +38,14 @@
       }
 
       #game-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
         display: block;
-        width: 100%;
-        height: 100%;
         cursor: crosshair;
+        z-index: 1;
       }
 
       /* Glassmorphism Panels */
@@ -632,20 +642,91 @@
         transform: scale(0.92);
       }
 
-      /* Game Chat Box (Enlarged with Scroll & Input) */
+      /* Game Chat Box (Collapsible & Compact) */
       #game-chat-box {
         width: 100%;
-        max-width: 580px;
+        max-width: 560px;
         background: rgba(15, 23, 42, 0.85);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border: 1.5px solid rgba(255, 255, 255, 0.12);
         border-radius: 14px;
-        padding: 10px 14px;
+        padding: 8px 14px 10px;
         pointer-events: auto;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
         display: flex;
         flex-direction: column;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .chat-header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 5px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .chat-tabs {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .chat-channel-tab {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: #94a3b8;
+        padding: 1px 6px;
+        border-radius: 4px;
+        user-select: none;
+      }
+
+      .chat-channel-tab.active {
+        color: #c084fc;
+        background: rgba(168, 85, 247, 0.15);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+      }
+
+      .chat-toggle-btn {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #f1f5f9;
+        border-radius: 6px;
+        padding: 2px 7px;
+        font-size: 0.68rem;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease-out;
+      }
+
+      .chat-toggle-btn:hover {
+        background: rgba(51, 65, 85, 0.95);
+        border-color: #fbbf24;
+        color: #fbbf24;
+      }
+
+      #game-chat-box.collapsed {
+        padding: 4px 10px 5px;
+        background: rgba(15, 23, 42, 0.68);
+      }
+
+      #game-chat-box.collapsed .chat-header-bar {
+        margin-bottom: 2px;
+        padding-bottom: 3px;
+      }
+
+      #game-chat-box.collapsed #chat-messages-container {
+        height: 24px;
+        overflow: hidden;
+      }
+
+      #game-chat-box.collapsed .chat-input-form {
+        display: none;
       }
 
       #chat-messages-container {
@@ -1210,6 +1291,81 @@
         color: #64748b;
         border: 1px solid rgba(255, 255, 255, 0.05);
         cursor: not-allowed;
+      }
+
+      .btn-preview-card {
+        padding: 3px 7px;
+        font-size: 0.66rem;
+        font-weight: 700;
+        background: rgba(251, 191, 36, 0.15);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.35);
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        transition: all 0.2s ease;
+      }
+
+      .btn-preview-card:hover {
+        background: rgba(251, 191, 36, 0.3);
+        border-color: #fbbf24;
+        transform: translateY(-1px);
+      }
+
+      .skill-v2-card-preview-thumb {
+        width: 38px;
+        height: 52px;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1.5px solid rgba(251, 191, 36, 0.5);
+        background: #0f172a;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      }
+
+      .skill-v2-card-preview-thumb:hover {
+        transform: scale(1.1);
+        border-color: #fbbf24;
+        box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+      }
+
+      .skill-v2-card-preview-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .skill-card-modal-content {
+        max-width: 440px;
+        width: 90vw;
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.98));
+        border: 2px solid #fbbf24;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(251, 191, 36, 0.25);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        animation: cardPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes cardPopIn {
+        from { transform: scale(0.85); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      .skill-card-modal-img {
+        width: 100%;
+        max-height: 480px;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+        border: 1.5px solid rgba(251, 191, 36, 0.5);
       }
 
       /* Instructions badge positioned at top-center */
@@ -2687,6 +2843,7 @@
         letter-spacing: 0.08em;
         background: linear-gradient(135deg, #fef08a, #f59e0b, #d97706);
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
         margin: 0;
       }
@@ -3103,7 +3260,7 @@
 
         .stage-world-title {
           font-size: 0.62rem;
-          max-width: 118px;
+          max-width: 240px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -3190,10 +3347,11 @@
         /* 4. Barra de Menus (Herói, Mochila, Grimório, Farm, Rank) compacta no topo-direito */
         #right-vertical-dock,
         #dock-navigation-bar {
-          top: 36px;
-          right: 6px;
-          flex-direction: row;
-          gap: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          right: 8px;
+          flex-direction: column;
+          gap: 6px;
         }
 
         .dock-btn {
@@ -3294,14 +3452,12 @@
           font-size: 0.48rem;
         }
 
-        /* 6. Zona Inferior Esquerda: Auto, Poções e Chat Compacto */
+        /* 6. Zona Inferior Central: Chat Compacto Centralizado */
         #bottom-center-zone {
-          bottom: 16px;
-          left: 6px;
-          transform: none;
-          width: calc(100vw - 208px);
-          max-width: 280px;
-          align-items: flex-start;
+          bottom: 18px;
+          left: 50%;
+          transform: translateX(-50%);
+          align-items: center;
           gap: 4px;
         }
 
@@ -3531,7 +3687,7 @@
   </head>
   <body>
     <!-- 1. Top-Left Hero Status Card (Estilo Mobile Ragnarok / Stickman Go) -->
-    <div id="hero-status-card" class="glass-panel">
+    <div id="hero-status-card" class="glass-panel" data-hero-class="GUERREIRO">
       <div class="hero-avatar-box" id="hud-avatar-btn" title="Abrir Ficha de Personagem & Equipamentos [C]">
         <img id="hud-hero-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Avatar" class="hero-avatar-img" />
         <span id="hud-hero-level" class="hero-level-badge">Nv. 3</span>
@@ -3540,18 +3696,21 @@
         <div class="hero-title-row">
           <span id="hud-hero-level-pill" class="hero-level-pill-tag">Nv. 3</span>
           <span id="hud-hero-name" class="hero-name-label">LordAventureiro</span>
-          <span class="hero-honor-tag">Cavaleiro Honrado</span>
+          <span id="hud-hero-honor-tag" class="hero-honor-tag">Guerreiro • FOR/CAR</span>
         </div>
         <div class="hero-cp-brand">
           <span class="hero-cp-tag">PC</span>
           <span id="hud-cp-big" class="hero-cp-number">1.425</span>
+          <span id="hud-class-trait-pill" class="hero-class-trait-pill">⚔️ Vanguarda • Energia</span>
         </div>
         <div class="hero-vitals-bars">
           <div class="mini-bar-track">
+            <span class="mini-bar-tag">HP</span>
             <div id="hud-hero-hp-bar" class="vital-bar-fill hp-fill" style="width: 100%"></div>
             <span id="hud-hero-hp-text" class="mini-bar-text">1085 / 1130</span>
           </div>
           <div class="mini-bar-track">
+            <span id="hud-resource-short-label" class="mini-bar-tag resource">EN</span>
             <div id="hud-hero-mp-bar" class="vital-bar-fill mp-fill" style="width: 100%"></div>
             <span id="hud-hero-mp-text" class="mini-bar-text">100 / 100</span>
           </div>
@@ -3602,39 +3761,66 @@
       <span id="enter-portal-label">ENTRAR NO PORTAL RÚNICO (FASE 2)</span>
     </button>
 
-    <!-- 3. Top-Right Location & Luxury Currency Status Bar -->
+    <!-- 3. Top-Right Location, Session Navigation & Luxury Runic Status Bar -->
     <div id="top-right-location-card">
-      <div class="glass-panel zone-info-pill">
-        <span id="zone-biome-icon" style="font-size: 0.95rem;">🌲</span>
-        <div style="display: flex; flex-direction: column;">
-          <span id="zone-location-title" class="zone-title">Floresta da Forja (1)</span>
-          <span style="font-size: 0.65rem; color: #94a3b8;">Canal 1 • Coords: (0, 0)</span>
+      <div class="top-right-header-row">
+        <div class="glass-panel zone-info-pill">
+          <span id="zone-biome-icon" style="font-size: 0.95rem;">🌲</span>
+          <div style="display: flex; flex-direction: column;">
+            <span id="zone-location-title" class="zone-title">Floresta da Forja (1)</span>
+            <span class="zone-coords-sub" style="font-size: 0.65rem; color: #94a3b8;">Canal 1 • Coords: (0, 0)</span>
+          </div>
+          <span id="current-stage-badge" class="stage-badge">Fase 1/10</span>
         </div>
-        <span id="current-stage-badge" class="stage-badge">Fase 1/10</span>
+
+        <div class="hud-session-controls" role="group" aria-label="Navegação de Sessão">
+          <button id="btn-return-char-select" class="hud-session-btn char-select" type="button" title="Retornar à Sala dos Forjados (Seleção de Personagens)">
+            <img src="/assets/ui/icons/icon-char-switch.svg" alt="" class="hud-session-svg" />
+            <span class="hud-session-label">Heróis</span>
+          </button>
+          <button id="btn-logout-to-login" class="hud-session-btn logout" type="button" title="Sair para a Tela de Login">
+            <img src="/assets/ui/icons/icon-logout-portal.svg" alt="" class="hud-session-svg" />
+            <span class="hud-session-label">Sair</span>
+          </button>
+        </div>
       </div>
 
       <div class="top-status-lux-bar">
         <div class="gold-wallet-capsule" title="Ouro do Jogador">
-          <span class="gold-coin-icon">💰</span>
+          <span class="gold-coin-icon"><img src="/assets/ui/icons/icon-gold-coin.svg" alt="" class="gold-coin-svg" /></span>
           <span id="player-gold-text" class="gold-amount-text">0</span>
           <span class="gold-currency-label">G</span>
         </div>
         <div class="lux-zoom-capsule" title="Zoom da Câmera (Scroll ou +/-)">
-          <button id="btn-zoom-out" class="zoom-btn" title="Afastar Câmera">−</button>
+          <button id="btn-zoom-out" class="zoom-btn" type="button" title="Afastar Câmera">−</button>
           <span id="hud-zoom-label" class="zoom-label">16x</span>
-          <button id="btn-zoom-in" class="zoom-btn" title="Aproximar Câmera">+</button>
+          <button id="btn-zoom-in" class="zoom-btn" type="button" title="Aproximar Câmera">+</button>
         </div>
-        <button id="btn-power-save" class="lux-icon-btn" title="Modo Economia de Bateria">
+        <button id="btn-fullscreen-toggle" class="lux-icon-btn lux-screen-btn" type="button" title="Alternar Modo Tela Cheia">
+          <img src="/assets/ui/icons/icon-screen-fullscreen.svg" alt="" class="lux-svg-icon" />
+          <span class="lux-btn-text">Tela</span>
+        </button>
+        <button id="btn-power-save" class="lux-icon-btn" type="button" title="Modo Economia de Bateria">
           <span id="power-save-icon">🌙</span>
         </button>
-        <button id="btn-toggle-inspector" class="lux-icon-btn" title="Alternar Painel de Rede e Simulação" style="padding: 0 10px; width: auto; font-size: 0.72rem; font-weight: 700; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
-          <span>⚙️</span><span>Rede</span>
+        <button id="btn-toggle-inspector" class="lux-icon-btn lux-net-btn" type="button" title="Alternar Painel de Rede e Simulação">
+          <span>⚙️</span><span class="lux-btn-text">Rede</span>
         </button>
         <div class="lux-ping-pill" title="Latência do Servidor">
           <div id="status-dot" class="status-dot"></div>
           <span id="ping-text" class="lux-ping-text">-- ms</span>
         </div>
       </div>
+    </div>
+
+    <!-- Moldura Rúnica Esculpida da Tela do Jogo (Non-interactive RPG Viewport Frame) -->
+    <div id="runic-viewport-frame" aria-hidden="true">
+      <span class="viewport-rune-corner tl"></span>
+      <span class="viewport-rune-corner tr"></span>
+      <span class="viewport-rune-corner bl"></span>
+      <span class="viewport-rune-corner br"></span>
+      <span class="viewport-rune-pillar left"></span>
+      <span class="viewport-rune-pillar right"></span>
     </div>
 
     <!-- Canvas Viewport -->
@@ -3657,6 +3843,7 @@
           <option value="CLERIGO">Clérigo (Ranged - WIS)</option>
           <option value="BARBARO">Bárbaro (Melee - STR)</option>
           <option value="ARQUEIRO">Arqueiro (Ranged - DEX)</option>
+          <option value="DEMONOLOGO">Demonólogo (Ranged - CHA+CON)</option>
           <option value="MONGE" disabled>🔒 Monge (Em Breve)</option>
           <option value="MAGO" disabled>🔒 Mago (Em Breve)</option>
           <option value="BRUXO" disabled>🔒 Bruxo (Em Breve)</option>
@@ -3701,6 +3888,25 @@
         <input type="range" id="slider-delay" min="50" max="250" step="10" value="100" />
       </div>
     </aside>
+    <script>
+      try {
+        if (window.innerWidth <= 1180) {
+          const bar = document.getElementById('tactical-action-bar');
+          if (bar) {
+            bar.dataset.drawerOpen = 'false';
+            bar.classList.add('drawer-collapsed');
+          }
+          const arrow = document.getElementById('tactical-drawer-arrow');
+          if (arrow) {
+            arrow.textContent = '❯';
+          }
+          const btn = document.getElementById('btn-tactical-drawer-toggle');
+          if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+          }
+        }
+      } catch (e) {}
+    </script>
 
     <!-- Dynamic Floating Virtual Joystick (Appears only on touch / drag on left screen) -->
     <div id="virtual-joystick-zone" style="display: none; position: fixed; pointer-events: none; z-index: 50; transform: translate(-50%, -50%);">
@@ -3712,50 +3918,76 @@
     <!-- Right Vertical Navigation Dock (Ragnarok Mobile Style) -->
     <div id="right-vertical-dock">
       <button class="dock-btn" id="btn-dock-character" title="Ficha do Personagem & Equipamentos [C]">
-        <span class="dock-icon">👤</span>
+        <span class="dock-icon"><img src="/assets/ui/icons/icon-hero-helm.svg" alt="" class="dock-svg-icon" /></span>
         <span>Herói</span>
       </button>
       <button class="dock-btn" id="btn-dock-inventory" title="Mochila de Itens [I]">
-        <span class="dock-icon">🎒</span>
+        <span class="dock-icon"><img src="/assets/ui/icons/icon-mochila-satchel.svg" alt="" class="dock-svg-icon" /></span>
         <span>Mochila</span>
       </button>
       <button class="dock-btn" id="btn-dock-skillbook" title="Grimório de Habilidades [K]">
-        <span class="dock-icon">📖</span>
+        <span class="dock-icon"><img src="/assets/ui/icons/icon-grimorio-tome.svg" alt="" class="dock-svg-icon" /></span>
         <span>Grimório</span>
       </button>
       <button class="dock-btn" id="btn-dock-farm" title="Assistente de Farm Idle [F]">
-        <span class="dock-icon">🤖</span>
+        <span class="dock-icon"><img src="/assets/ui/icons/icon-farm-anvil.svg" alt="" class="dock-svg-icon" /></span>
         <span>Farm</span>
       </button>
       <button class="dock-btn" id="btn-dock-ranking" title="Classificação e Rankings">
-        <span class="dock-icon">🏆</span>
+        <span class="dock-icon"><img src="/assets/ui/icons/icon-rank-chalice.svg" alt="" class="dock-svg-icon" /></span>
         <span>Rank</span>
       </button>
     </div>
 
-    <!-- Bottom Center Controls & In-Game Chat Box -->
-    <div id="bottom-center-zone">
-      <!-- Quick Action Toolbar: [AUTO], Farm Gear, Quick Potions -->
-      <div class="bottom-center-toolbar">
-        <button id="btn-toggle-auto" class="btn-auto-toggle" title="Ativar/Desativar Combate Automático">
-          <span id="auto-status-icon">⚔️</span>
-          <span id="auto-status-text">AUTO ON</span>
+    <!-- Left Vertical Collapsible Tactical Drawer (Contraposto ao Right Vertical Dock) -->
+    <aside class='bottom-center-toolbar runic-tactical-bar' id='tactical-action-bar' data-drawer-open='true' aria-label='Menu Tático Lateral'>
+      <div class='tactical-drawer-items' id='tactical-drawer-items'>
+        <button id='btn-toggle-auto' class='btn-auto-toggle' type='button' title='Ativar/Desativar Combate Automático'>
+          <span id='auto-status-icon'>⚔️</span>
+          <span id='auto-status-text'>AUTO ON</span>
         </button>
 
-        <button id="btn-open-farm-gear" class="btn-farm-gear" title="Configurar Farm Helper [F]">
-          <span>⚙️</span> Farm
+        <button id='btn-open-farm-gear' class='btn-farm-gear' type='button' title='Configurar Farm Helper [F]'>
+          <img src='/assets/ui/icons/icon-farm-anvil.svg' alt='' class='tactical-btn-svg' />
+          <span>Farm</span>
+          <span class='tactical-key-hint'>F</span>
         </button>
 
-        <div id="btn-quick-hp" class="quick-potion-chip" style="color: #34d399;" title="Usar Poção de Vida">
-          <span>🧪</span> <span id="quick-hp-count">HP</span>
+        <div id='btn-quick-hp' class='quick-potion-chip hp-chip' role='button' tabindex='0' title='Usar Poção de Vida'>
+          <img src='/assets/ui/icons/icon-potion-hp.svg' alt='' class='tactical-potion-svg' />
+          <span id='quick-hp-count'>HP (0)</span>
         </div>
-        <div id="btn-quick-mp" class="quick-potion-chip" style="color: #38bdf8;" title="Usar Poção de Energia/MP">
-          <span>💧</span> <span id="quick-mp-count">MP</span>
+        <div id='btn-quick-mp' class='quick-potion-chip mp-chip' role='button' tabindex='0' title='Usar Poção de Energia/MP'>
+          <img src='/assets/ui/icons/icon-potion-mp.svg' alt='' class='tactical-potion-svg' />
+          <span id='quick-mp-count'>MP (0)</span>
         </div>
       </div>
 
-      <!-- In-Game Chat Box with History & Typing Input -->
+      <button
+        id='btn-tactical-drawer-toggle'
+        class='tactical-drawer-toggle'
+        type='button'
+        aria-expanded='true'
+        aria-controls='tactical-drawer-items'
+        title='Recolher / Expandir Menu Tático Lateral'
+      >
+        <span class='tactical-drawer-arrow' id='tactical-drawer-arrow' aria-hidden='true'>❮</span>
+      </button>
+    </aside>
+
+    <!-- Bottom Center In-Game Chat Box -->
+    <div id='bottom-center-zone'>
+      <!-- In-Game Chat Box with History & Typing Input (Collapsible) -->
       <div id="game-chat-box">
+        <div class="chat-header-bar">
+          <div class="chat-tabs">
+            <span class="chat-channel-tab active">💬 Geral</span>
+          </div>
+          <button id="btn-toggle-chat" class="chat-toggle-btn" type="button" title="Recolher / Expandir Chat [C]">
+            <span id="chat-toggle-icon">▼</span>
+            <span style="font-size: 0.65rem; color: #94a3b8;">Chat</span>
+          </button>
+        </div>
         <div id="chat-messages-container">
           <div class="chat-msg"><span class="chat-tag-sys">[Sistema]</span><span class="chat-body">Bem-vindo ao MagicForge: Universe!</span></div>
           <div class="chat-msg"><span class="chat-tag-auto">[Auto]</span><span class="chat-body">Farm Idle ativo: Caçando monstros da fase...</span></div>
@@ -3774,9 +4006,12 @@
     <!-- Ragnarok Mobile Half-Moon (Meia-Lua) Combat Arc (Bottom-Right) -->
     <div id="mobile-combat-arc-container">
       <!-- Main Attack Button (Center of the Fan) -->
-      <button class="mobile-primary-btn" id="btn-primary-attack" title="Ataque Básico Autorizado [Espaço]">
-        <span class="mobile-primary-icon">⚔️</span>
-        <span class="mobile-primary-label">Atacar</span>
+      <button class="mobile-primary-btn" id="btn-primary-attack" type="button" title="Ataque Básico Autorizado [Espaço]">
+        <span class="attack-seal-ring" aria-hidden="true"></span>
+        <span class="mobile-primary-icon"><img id="attack-btn-svg" src="/assets/ui/icons/icon-attack-crest.svg" alt="" class="attack-crest-svg" /></span>
+        <span class="mobile-primary-label" id="attack-btn-label">Atacar</span>
+        <span class="attack-class-trait" id="attack-class-trait">Corte Rúnico</span>
+        <span class="attack-hotkey-pill">ESPAÇO</span>
       </button>
 
       <!-- Slot 1 -->
@@ -3871,6 +4106,26 @@
 
         <!-- Container for the 4 Slot Sections -->
         <div class="grimorio-slots-container" id="skillbook-slots-container"></div>
+      </div>
+    </div>
+
+    <!-- Skill Card Preview Lightbox Modal -->
+    <div id="skill-card-modal" class="modal-backdrop" style="display: none; z-index: 10000;">
+      <div class="glass-panel modal-content skill-card-modal-content">
+        <div class="modal-header" style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(251, 191, 36, 0.2); padding-bottom: 8px;">
+          <div class="modal-title-group" style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.4rem;">🃏</span>
+            <div>
+              <div id="skill-card-modal-title" style="font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 700; color: #fbbf24;">Carta de Habilidade</div>
+              <div id="skill-card-modal-tier" style="font-size: 0.72rem; color: #94a3b8;">D&D 5E Spell Card</div>
+            </div>
+          </div>
+          <button id="btn-close-skill-card-modal" class="btn-close" title="Fechar (ESC)">✕</button>
+        </div>
+        <img id="skill-card-modal-img" class="skill-card-modal-img" src="" alt="Carta Ilustrada" />
+        <p id="skill-card-modal-desc" style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.4; text-align: center; margin: 4px 0; background: rgba(15, 23, 42, 0.6); padding: 8px 12px; border-radius: 8px; width: 100%; box-sizing: border-box;"></p>
+        <div id="skill-card-modal-meta" style="display: flex; gap: 8px; font-size: 0.72rem; justify-content: center; flex-wrap: wrap;"></div>
+        <button id="btn-skill-card-modal-equip" class="btn-equip-skill equip" style="margin-top: 4px;">⚔️ EQUIPAR ESTA HABILIDADE</button>
       </div>
     </div>
 
@@ -4286,7 +4541,7 @@
         <p id="leaderboard-status" role="status" aria-live="polite"></p><button id="leaderboard-refresh" type="button">Atualizar ranking</button>
       </section>
     </dialog>
-    <div id="modal-auth-selection">
+    <div id="modal-auth-selection" hidden>
       <main class="forge-auth" aria-labelledby="forge-auth-title">
         <header class="forge-masthead">
           <div class="forge-wordmark">MAGICFORGE<small>U N I V E R S E</small></div>
@@ -4296,6 +4551,11 @@
           <span class="forge-eyebrow">A QUEDA DA BIGORNA ASTRAL</span>
           <h1 id="forge-auth-title">Entre na<br>Forja Astral.</h1>
           <p id="forge-intro-copy">Acesse sua conta para encontrar seus heróis e continuar sua jornada.</p>
+          <div class="forge-runic-crests" aria-hidden="true">
+            <span class="runic-crest-pill"><i>✦</i> 5 Classes Forjadas (D&amp;D 5E)</span>
+            <span class="runic-crest-pill"><i>⚔</i> Grimório Rúnico &amp; Cartas</span>
+            <span class="runic-crest-pill"><i>👑</i> Sala dos Forjados · 3 Pedestais</span>
+          </div>
         </div>
         <div id="forge-account-session" class="forge-account-session" hidden><span id="forge-session-name"></span><button id="forge-sign-out" type="button">Trocar conta</button></div>
         <div class="forge-layout">
@@ -4344,10 +4604,10 @@
             <section id="forge-social-login" class="forge-social-login" aria-labelledby="forge-social-title">
               <h3 id="forge-social-title">Outras formas de entrar</h3>
               <div class="forge-social-buttons">
-                <button type="button" data-auth-provider="GOOGLE" disabled>Google</button>
-                <button type="button" data-auth-provider="APPLE" disabled>Apple</button>
-                <button type="button" data-auth-provider="DISCORD" disabled>Discord</button>
-                <button type="button" data-auth-provider="GUEST" disabled>Convidado · neste navegador</button>
+                <button type="button" data-auth-provider="GOOGLE" disabled><span class="forge-provider-icon google" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.2-.9 2.3-2 3l3.2 2.5c1.9-1.7 3-4.3 3-7.4 0-.7-.1-1.4-.2-2H12z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.2-2.5c-.9.6-2 1-3.5 1-2.7 0-5-1.8-5.8-4.3H2.9v2.6C4.6 19.8 8 22 12 22z"/><path fill="#FBBC05" d="M6.2 13.8c-.2-.6-.3-1.2-.3-1.8s.1-1.2.3-1.8V7.6H2.9C2.3 8.9 2 10.4 2 12s.3 3.1.9 4.4l3.3-2.6z"/><path fill="#4285F4" d="M12 5.9c1.5 0 2.8.5 3.9 1.5l2.9-2.9C17 2.9 14.7 2 12 2 8 2 4.6 4.2 2.9 7.6l3.3 2.6C7 7.7 9.3 5.9 12 5.9z"/></svg></span><span class="forge-provider-copy"><strong>Google</strong><small>Conta Google</small></span></button>
+                <button type="button" data-auth-provider="APPLE" disabled><span class="forge-provider-icon apple" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg></span><span class="forge-provider-copy"><strong>Apple</strong><small>Apple ID</small></span></button>
+                <button type="button" data-auth-provider="DISCORD" disabled><span class="forge-provider-icon discord" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="#5865F2"><path d="M20.32 4.37a19.8 19.8 0 0 0-4.89-1.52.07.07 0 0 0-.07.04c-.21.38-.44.87-.61 1.25a18.27 18.27 0 0 0-5.49 0 12.64 12.64 0 0 0-.62-1.25.08.08 0 0 0-.07-.04c-1.7.29-3.34.81-4.89 1.52a.07.07 0 0 0-.03.03C.53 9.05-.32 13.58.1 18.06a.08.08 0 0 0 .03.05 19.9 19.9 0 0 0 5.99 3.03.08.08 0 0 0 .08-.03c.46-.63.87-1.3 1.22-2a.08.08 0 0 0-.04-.11 13.1 13.1 0 0 1-1.87-.9.08.08 0 0 1-.01-.12c.13-.09.25-.19.37-.29a.07.07 0 0 1 .08-.01c3.93 1.79 8.18 1.79 12.07 0a.07.07 0 0 1 .08.01c.12.1.24.2.37.29a.08.08 0 0 1-.01.12c-.6.35-1.22.65-1.87.9a.08.08 0 0 0-.04.11c.36.7.77 1.37 1.22 2a.08.08 0 0 0 .08.03 19.83 19.83 0 0 0 6-3.03.08.08 0 0 0 .03-.05c.5-5.18-.84-9.68-3.55-13.66a.06.06 0 0 0-.03-.03zM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.96 2.42-2.16 2.42zm7.97 0c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.95 2.42-2.16 2.42z"/></svg></span><span class="forge-provider-copy"><strong>Discord</strong><small>Comunidade</small></span></button>
+                <button type="button" data-auth-provider="GUEST" disabled><span class="forge-provider-icon guest" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/><path d="M12 8v8M8 12h8"/></svg></span><span class="forge-provider-copy"><strong>Convidado</strong><small>Neste navegador</small></span></button>
               </div>
               <p id="forge-social-note">Google, Apple e Discord ainda não estão disponíveis.</p>
             </section>

@@ -186,6 +186,72 @@ function refreshExpansionContext() {
 let playerCurrentXp: number = 0;
 let playerXpToNextLevel: number = 150;
 
+
+const HERO_CLASS_HUD_META: Record<CharacterClass, {
+  honorTag: string;
+  traitPill: string;
+  resourceShort: string;
+  attackTrait: string;
+}> = {
+  [CharacterClass.GUERREIRO]: {
+    honorTag: 'Guerreiro • FOR/CAR',
+    traitPill: '⚔️ Vanguarda • Fervor',
+    resourceShort: 'EN',
+    attackTrait: 'Golpe Sagrado',
+  },
+  [CharacterClass.CLERIGO]: {
+    honorTag: 'Clérigo • SAB/CON',
+    traitPill: '✨ Luz Divina • Fé',
+    resourceShort: 'MP',
+    attackTrait: 'Centelha Radiante',
+  },
+  [CharacterClass.BARBARO]: {
+    honorTag: 'Bárbaro • FOR/CON',
+    traitPill: '🩸 Berserker • Fúria',
+    resourceShort: 'FUR',
+    attackTrait: 'Fúria Brutal',
+  },
+  [CharacterClass.ARQUEIRO]: {
+    honorTag: 'Arqueiro • DES',
+    traitPill: '🏹 Precisão • Foco',
+    resourceShort: 'FOC',
+    attackTrait: 'Disparo Élfico',
+  },
+  [CharacterClass.MONGE]: {
+    honorTag: 'Monge • SAB/DES',
+    traitPill: '🥋 Asceta • Chi',
+    resourceShort: 'CHI',
+    attackTrait: 'Palma Rúnica',
+  },
+  [CharacterClass.BRUXO]: {
+    honorTag: 'Bruxo • CAR/SAB',
+    traitPill: '👁️ Ocultista • Mana',
+    resourceShort: 'MP',
+    attackTrait: 'Raio Sombrio',
+  },
+  [CharacterClass.MAGO]: {
+    honorTag: 'Mago • INT',
+    traitPill: '⚡ Arcanista • Mana',
+    resourceShort: 'MP',
+    attackTrait: 'Orbe Arcano',
+  },
+};
+
+function applyHeroClassHudIdentity(chosenClass: CharacterClass) {
+  const meta = HERO_CLASS_HUD_META[chosenClass] || HERO_CLASS_HUD_META[CharacterClass.GUERREIRO];
+  document.body.dataset.heroClass = chosenClass;
+  const honorTag = document.getElementById('hud-hero-honor-tag');
+  if (honorTag) honorTag.textContent = meta.honorTag;
+  const traitPill = document.getElementById('hud-class-trait-pill');
+  if (traitPill) traitPill.textContent = meta.traitPill;
+  const tagHp = document.getElementById('hud-tag-hp');
+  if (tagHp) tagHp.textContent = 'HP';
+  const tagMp = document.getElementById('hud-tag-mp');
+  if (tagMp) tagMp.textContent = meta.resourceShort;
+  const attackTrait = document.getElementById('attack-class-trait');
+  if (attackTrait) attackTrait.textContent = meta.attackTrait;
+}
+
 function updateExpBarUI(level: number, currentXp: number, xpToNextLevel: number): void {
   const pct = xpToNextLevel > 0 ? ((currentXp / xpToNextLevel) * 100).toFixed(1) : '100.0';
   if (playerExpBar) playerExpBar.style.width = `${Math.min(100, Math.max(0, Number(pct)))}%`;
@@ -2182,6 +2248,7 @@ network.onLoginSuccess = (payload) => {
   }
   const chosenClass = myPlayerClass || (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
   if (hudHeroPortrait) hudHeroPortrait.src = `/assets/portraits/${chosenClass}.jpg`;
+  applyHeroClassHudIdentity(chosenClass);
   if (hudHeroName) hudHeroName.textContent = payload.characterName || 'Jogador';
   if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
@@ -2449,7 +2516,36 @@ window.addEventListener('keydown', (e) => {
   }
 
   if (e.key === 'Enter') {
-    if (chatInputField) {
+    
+const tacticalActionBar = document.getElementById('tactical-action-bar');
+const btnTacticalDrawerToggle = document.getElementById('btn-tactical-drawer-toggle');
+const tacticalDrawerArrow = document.getElementById('tactical-drawer-arrow');
+
+function setTacticalDrawerOpen(isOpen: boolean) {
+  if (!tacticalActionBar) return;
+  tacticalActionBar.dataset.drawerOpen = isOpen ? 'true' : 'false';
+  tacticalActionBar.classList.toggle('drawer-collapsed', !isOpen);
+  if (btnTacticalDrawerToggle) {
+    btnTacticalDrawerToggle.setAttribute('aria-expanded', String(isOpen));
+  }
+  if (tacticalDrawerArrow) {
+    tacticalDrawerArrow.textContent = isOpen ? '❮' : '❯';
+  }
+}
+
+// Em tela reduzida (<= 1180px) ou mobile, o menu lateral tático inicia FECHADO por padrão.
+// Em desktop amplo (> 1180px), permanece aberto por padrão.
+setTacticalDrawerOpen(window.innerWidth > 1180);
+
+if (btnTacticalDrawerToggle) {
+  btnTacticalDrawerToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const currentlyOpen = tacticalActionBar?.dataset.drawerOpen !== 'false';
+    setTacticalDrawerOpen(!currentlyOpen);
+  });
+}
+
+if (chatInputField) {
       e.preventDefault();
       chatInputField.focus();
       return;

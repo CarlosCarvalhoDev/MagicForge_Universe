@@ -15,7 +15,10 @@ interface AuthTransport {
 }
 
 /** The server owns every slot; creating a hero never implies entering the world. */
-export function setupAuthSelection(transport: AuthTransport) {
+export function setupAuthSelection(
+  transport: AuthTransport,
+  options: { storage?: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> } = {}
+) {
   const root = document.getElementById('modal-auth-selection')!;
   const accountForm = document.getElementById('forge-account-form') as HTMLFormElement;
   const accountInput = document.getElementById('forge-account-name') as HTMLInputElement;
@@ -34,6 +37,13 @@ export function setupAuthSelection(transport: AuthTransport) {
   const background = Array.from(document.body.children)
     .filter((el): el is HTMLElement => el instanceof HTMLElement && el !== root && el.tagName !== 'SCRIPT')
     .map(element => ({ element, wasInert: element.inert }));
+
+  const storage = options.storage || (typeof window !== 'undefined' ? (window.localStorage || window.sessionStorage) : undefined);
+  const SESSION_KEY = 'magicforge_active_session_v1';
+  let savedPassword = '';
+  let autoResuming = false;
+  let autoResumeSlot: number | null = null;
+
   let account = '';
   let authenticated = false;
   let passwordToSend = '';
@@ -49,10 +59,12 @@ export function setupAuthSelection(transport: AuthTransport) {
 
   const show = () => {
     root.hidden = false;
+    root.style.removeProperty('display');
     background.forEach(({ element }) => { element.inert = true; });
   };
   const close = () => {
     root.hidden = true;
+    root.style.display = 'none';
     background.forEach(({ element, wasInert }) => { element.inert = wasInert; });
   };
   const setStatus = (message: string, error = false) => {
@@ -66,7 +78,8 @@ export function setupAuthSelection(transport: AuthTransport) {
   classSelect.replaceChildren(...Array.from(legacyClass.options, option => option.cloneNode(true)));
   classSelect.value = legacyClass.value;
   const preview = () => {
-    portrait.src = '/assets/portraits/' + classSelect.value + '.jpg';
+    portrait.src = '/assets/portraits/' + classSelect.value + '.png';
+    portrait.onerror = () => { portrait.src = '/assets/portraits/' + classSelect.value + '.jpg'; };
     classLabel.textContent = className(classSelect.value as CharacterClass);
     portrait.alt = 'Retrato da classe ' + classLabel.textContent;
   };
@@ -115,11 +128,11 @@ export function setupAuthSelection(transport: AuthTransport) {
       const index = Number(card.dataset.slotIndex);
       const slot = slots?.[index];
       card.classList.toggle('is-selected', selected === index);
-      card.classList.toggle('is-occupied', Boolean(slot && !slot.isEmpty));
+      card.classList.toggle('is-occupied', Boolean(slot && !slot.isEmpty)); card.dataset.classType = slot && !slot.isEmpty && slot.classType ? slot.classType : '';
       card.querySelector('h3')!.textContent = slot ? slot.isEmpty ? 'Uma nova lenda' : slot.name! : 'Destino por revelar';
-      card.querySelector('p')!.textContent = !slot ? 'Carregue sua conta para revelar este pedestal.'
+      card.querySelector('p')!.innerHTML = !slot ? 'Carregue sua conta para revelar este pedestal.'
         : slot.isEmpty ? 'Este pedestal aguarda seu próximo herói.'
-        : className(slot.classType) + ' · Nv. ' + number(slot.level) + '\nCP ' + number(slot.combatPower) + ' · Ouro ' + number(slot.gold) + '\nVida ' + number(slot.currentHp) + '/' + number(slot.maxHp);
+        : `<span class="forge-stat-class">${className(slot.classType)} · Nv. ${number(slot.level)}</span>\n<span class="forge-stat-economy"><span class="forge-stat-cp">CP ${number(slot.combatPower)}</span> · <span class="forge-stat-gold">Ouro ${number(slot.gold)}</span></span>\n<span class="forge-stat-hp">Vida ${number(slot.currentHp)}/${number(slot.maxHp)}</span>`;
       const pedestal = card.querySelector('.forge-pedestal')!;
       (pedestal as HTMLElement).tabIndex = slot && !slot.isEmpty ? 0 : -1;
       if (slot && !slot.isEmpty) { pedestal.setAttribute('role', 'button'); pedestal.setAttribute('aria-label', 'Conhecer ' + slot.name); }
@@ -130,7 +143,8 @@ export function setupAuthSelection(transport: AuthTransport) {
       let hero = pedestal.querySelector<HTMLImageElement>('.forge-slot-portrait');
       if (slot && !slot.isEmpty) {
         if (!hero) { hero = document.createElement('img'); hero.className = 'forge-slot-portrait'; pedestal.append(hero); }
-        hero.src = '/assets/portraits/' + slot.classType + '.jpg';
+        hero.src = '/assets/portraits/' + slot.classType + '.png';
+        const portraitImg = hero; hero.onerror = () => { portraitImg.src = '/assets/portraits/' + slot.classType + '.jpg'; };
         hero.alt = 'Retrato de ' + slot.name + ', ' + className(slot.classType);
       } else hero?.remove();
       (pedestal.querySelector('span') as HTMLElement).hidden = Boolean(slot && !slot.isEmpty);
@@ -153,7 +167,6 @@ export function setupAuthSelection(transport: AuthTransport) {
     render();
     window.clearTimeout(timeout);
     timeout = window.setTimeout(() => {
-      // An unconfirmed create may already exist. Require a fresh list before retrying.
       waitingForConnection = false;
       passwordToSend = '';
       passwordInput.value = '';
@@ -196,11 +209,11 @@ export function setupAuthSelection(transport: AuthTransport) {
         emailInput.reportValidity(); return;
       }
     }
-    // DatabaseManager normalizes account usernames to lowercase.
     account = username.toLowerCase();
     authenticated = false;
     authKind = registerMode ? 'register' : 'login';
     passwordToSend = passwordInput.value;
+    savedPassword = passwordInput.value;
     emailToSend = registerMode ? emailInput.value.trim() || undefined : undefined;
     passwordInput.value = '';
     confirmInput.value = '';
@@ -227,7 +240,7 @@ export function setupAuthSelection(transport: AuthTransport) {
   root.querySelector<HTMLButtonElement>('[data-auth-provider="GUEST"]')!.addEventListener('click', () => {
     if (pending || !transport.authenticateSocial) return;
     authKind = 'guest'; account = 'guest'; authenticated = false; slots = null; selected = null;
-    passwordInput.value = ''; confirmInput.value = ''; passwordToSend = ''; emailToSend = undefined;
+    passwordInput.value = ''; confirmInput.value = ''; passwordToSend = ''; savedPassword = ''; emailToSend = undefined;
     if (transport.isConnected()) authenticate();
     else { waitingForConnection = true; begin('authenticate', 'Conectando como convidado…'); transport.connect(); }
   });
@@ -250,10 +263,14 @@ export function setupAuthSelection(transport: AuthTransport) {
     else transport.authenticate(account, password);
   }
 
-  document.getElementById('forge-sign-out')!.addEventListener('click', () => {
+  function performSignOutToLogin() {
+    try { storage?.removeItem(SESSION_KEY); } catch {}
+    autoResuming = false;
+    autoResumeSlot = null;
     account = '';
     authenticated = false;
     passwordToSend = '';
+    savedPassword = '';
     passwordInput.value = '';
     confirmInput.value = ''; emailToSend = undefined; registerMode = false;
     slots = null;
@@ -262,9 +279,67 @@ export function setupAuthSelection(transport: AuthTransport) {
     waitingForConnection = false;
     finish();
     transport.disconnect();
+    show();
     setStatus('Entre com sua conta para continuar.');
     accountInput.focus();
-  });
+  }
+
+  function performReturnToCharacterSelect() {
+    autoResuming = false;
+    autoResumeSlot = null;
+    inWorld = false;
+    selected = null;
+    if (account) {
+      try {
+        storage?.setItem(SESSION_KEY, JSON.stringify({
+          account,
+          authKind,
+          password: savedPassword,
+        }));
+      } catch {}
+    }
+    finish();
+    show();
+    if (authenticated) {
+      if (transport.isConnected()) {
+        requestList();
+      } else {
+        setStatus('Escolha quem continuará sua jornada na Sala dos Forjados.');
+      }
+    } else if (account) {
+      if (transport.isConnected()) {
+        authenticate();
+      } else {
+        waitingForConnection = true;
+        begin('authenticate', 'Retornando à Sala dos Forjados…');
+        transport.connect();
+      }
+    } else {
+      setStatus('Entre com sua conta para acessar a Sala dos Forjados.');
+    }
+  }
+
+  document.getElementById('forge-sign-out')!.addEventListener('click', performSignOutToLogin);
+  document.getElementById('btn-logout-to-login')?.addEventListener('click', performSignOutToLogin);
+  document.getElementById('btn-return-char-select')?.addEventListener('click', performReturnToCharacterSelect);
+
+  const btnFullscreen = document.getElementById('btn-fullscreen-toggle');
+  if (btnFullscreen) {
+    const syncFullscreenState = () => {
+      const isFull = Boolean(document.fullscreenElement);
+      btnFullscreen.dataset.fullscreen = isFull ? 'true' : 'false';
+      btnFullscreen.setAttribute('aria-pressed', String(isFull));
+    };
+    btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+      } else {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    });
+    document.addEventListener('fullscreenchange', syncFullscreenState);
+    syncFullscreenState();
+  }
 
   for (const card of cards) {
     const quote = document.createElement('div'); quote.className = 'forge-hero-quote'; quote.hidden = true; quote.setAttribute('role', 'tooltip'); quote.id = 'hero-quote-' + card.dataset.slotIndex; card.append(quote);
@@ -308,7 +383,7 @@ export function setupAuthSelection(transport: AuthTransport) {
     }
     const allowedClasses = [CharacterClass.GUERREIRO, CharacterClass.CLERIGO, CharacterClass.BARBARO, CharacterClass.ARQUEIRO];
     if (!allowedClasses.includes(classSelect.value as CharacterClass)) {
-      setStatus('Esta classe ainda está bloqueada. Escolha até a classe Arqueiro.', true);
+      setStatus('Esta classe ainda está bloqueada. Escolha uma classe disponível na Forja.', true);
       return;
     }
     begin('create', 'Forjando ' + name + ' no pedestal ' + (selected + 1) + '…');
@@ -324,6 +399,9 @@ export function setupAuthSelection(transport: AuthTransport) {
   });
   document.getElementById('btn-auth-switch-dev')!.addEventListener('click', () => {
     if (pending) return;
+    try { storage?.removeItem(SESSION_KEY); } catch {}
+    autoResuming = false;
+    autoResumeSlot = null;
     account = '';
     slots = null;
     selected = null;
@@ -332,13 +410,45 @@ export function setupAuthSelection(transport: AuthTransport) {
     document.getElementById('char-name')?.focus();
   });
 
-  show();
-  render();
-  setStatus(transport.authenticate ? 'Informe sua conta e senha para entrar.' : 'O acesso por conta e senha ainda não está disponível.');
+  let storedSession: { account: string; authKind?: 'login' | 'guest'; password?: string; slotIndex?: number } | null = null;
+  try {
+    const raw = storage?.getItem(SESSION_KEY);
+    if (raw) storedSession = JSON.parse(raw);
+  } catch {}
+
+  root.dataset.ready = 'true';
+
+  if (storedSession && storedSession.account) {
+    account = storedSession.account;
+    authKind = storedSession.authKind || 'login';
+    if (storedSession.password) {
+      passwordToSend = storedSession.password;
+      savedPassword = storedSession.password;
+    }
+    if (typeof storedSession.slotIndex === 'number') {
+      autoResumeSlot = storedSession.slotIndex;
+    }
+    autoResuming = true;
+    close();
+    if (transport.isConnected()) {
+      authenticate();
+    } else {
+      waitingForConnection = true;
+      begin('authenticate', 'Reconectando à Forja Astral…');
+      transport.connect();
+    }
+  } else {
+    show();
+    render();
+    setStatus(transport.authenticate ? 'Informe sua conta e senha para entrar.' : 'O acesso por conta e senha ainda não está disponível.');
+  }
+
   return {
     isOpen: () => !root.hidden,
+    returnToCharacterSelection: performReturnToCharacterSelect,
+    logoutToLogin: performSignOutToLogin,
     onConnected() {
-      if (!account || root.hidden) return;
+      if (!account) return;
       if (waitingForConnection && pending === 'authenticate') authenticate();
     },
     onAccountAuthenticated(username: string, provider = 'LOCAL') {
@@ -353,11 +463,16 @@ export function setupAuthSelection(transport: AuthTransport) {
     },
     onAuthenticationError(message: string) {
       if (pending !== 'authenticate') return;
+      try { storage?.removeItem(SESSION_KEY); } catch {}
+      autoResuming = false;
+      autoResumeSlot = null;
       authenticated = false;
       passwordToSend = '';
+      savedPassword = '';
       passwordInput.value = '';
       confirmInput.value = ''; emailToSend = undefined;
       finish();
+      show();
       setStatus(message || 'Não foi possível entrar. Confira sua conta e senha.', true);
       passwordInput.focus();
     },
@@ -373,12 +488,14 @@ export function setupAuthSelection(transport: AuthTransport) {
       slots = null;
       selected = null;
       finish();
-      show();
-      note.textContent = 'Conta: ' + account + ' · aguardando atualização dos pedestais.';
-      setStatus(wasInWorld ? 'Conexão interrompida. Entre novamente para voltar à sua jornada.' : 'Conexão interrompida. Entre novamente com sua conta e senha.', true);
+      if (!autoResuming) {
+        show();
+        note.textContent = 'Conta: ' + account + ' · aguardando atualização dos pedestais.';
+        setStatus(wasInWorld ? 'Conexão interrompida. Entre novamente para voltar à sua jornada.' : 'Conexão interrompida. Entre novamente com sua conta e senha.', true);
+      }
     },
     onCharacterList(payload: S2CCharacterListPayload) {
-      if (!authenticated || !account || root.hidden || payload.accountUsername?.trim().toLowerCase() !== account) return;
+      if (!authenticated || !account || payload.accountUsername?.trim().toLowerCase() !== account) return;
       const valid = Array.isArray(payload.slots) && payload.slots.length === 3
         && [0, 1, 2].every(index => payload.slots.some(slot => slot.slotIndex === index && typeof slot.isEmpty === 'boolean'
           && (slot.isEmpty || (typeof slot.name === 'string' && Object.values(CharacterClass).includes(slot.classType!)))));
@@ -397,16 +514,36 @@ export function setupAuthSelection(transport: AuthTransport) {
       finish();
       note.textContent = 'Conta: ' + payload.accountUsername + ' · ' + slots.filter(slot => !slot.isEmpty).length + ' de 3 pedestais ocupados.';
       setStatus(payload.message || 'Escolha um herói para entrar ou um pedestal vazio para criar.');
+
+      // Auto-resume character slot if resuming from reload
+      if (autoResuming && autoResumeSlot !== null) {
+        const target = slots[autoResumeSlot];
+        if (target && !target.isEmpty) {
+          selected = autoResumeSlot;
+          autoResuming = false;
+          autoResumeSlot = null;
+          begin('select', 'Retomando a jornada de ' + target.name + '…');
+          transport.select(selected);
+          return;
+        }
+      }
+      autoResuming = false;
+      autoResumeSlot = null;
+
       if (wasCreate && createdSlot !== null) cards[createdSlot].querySelector('button')!.focus();
     },
     onError(error: S2CCharacterActionErrorPayload) {
       if (!pending || root.hidden) return;
       const action = pending;
       if (error.errorCode === 'UNAUTHENTICATED') {
+        try { storage?.removeItem(SESSION_KEY); } catch {}
+        autoResuming = false;
+        autoResumeSlot = null;
         authenticated = false;
         slots = null;
         selected = null;
         finish();
+        show();
         setStatus('Sua sessão não está autenticada. Entre novamente com sua conta e senha.', true);
         return;
       }
@@ -422,6 +559,16 @@ export function setupAuthSelection(transport: AuthTransport) {
     onLogin() {
       inWorld = Boolean(account);
       waitingForConnection = false;
+      if (account && selected !== null) {
+        try {
+          storage?.setItem(SESSION_KEY, JSON.stringify({
+            account,
+            authKind,
+            password: savedPassword,
+            slotIndex: selected
+          }));
+        } catch {}
+      }
       finish();
       close();
       document.getElementById('btn-dock-character')?.focus();

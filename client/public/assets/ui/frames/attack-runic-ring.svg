@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="ringGold" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFBEB"/>
+      <stop offset="30%" stop-color="#FDE047"/>
+      <stop offset="68%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+    <radialGradient id="coreGlow" cx="50%" cy="38%" r="58%">
+      <stop offset="0%" stop-color="#FEF08A" stop-opacity="0.35"/>
+      <stop offset="55%" stop-color="#B45309" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#090D18" stop-opacity="0.92"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="60" fill="url(#coreGlow)" stroke="url(#ringGold)" stroke-width="2.5"/>
+  <circle cx="64" cy="64" r="53" stroke="#FEF08A" stroke-width="1" stroke-dasharray="6 4" stroke-opacity="0.72"/>
+  <polygon points="64,2 70,12 64,17 58,12" fill="url(#ringGold)" stroke="#451A03" stroke-width="1"/>
+  <polygon points="64,126 70,116 64,111 58,116" fill="url(#ringGold)" stroke="#451A03" stroke-width="1"/>
+  <polygon points="2,64 12,58 17,64 12,70" fill="url(#ringGold)" stroke="#451A03" stroke-width="1"/>
+  <polygon points="126,64 116,58 111,64 116,70" fill="url(#ringGold)" stroke="#451A03" stroke-width="1"/>
+  <polygon points="19,19 28,22 25,28 22,28" fill="#FDE047"/>
+  <polygon points="109,19 100,22 103,28 106,28" fill="#FDE047"/>
+  <polygon points="19,109 28,106 25,100 22,100" fill="#FDE047"/>
+  <polygon points="109,109 100,106 103,100 106,100" fill="#FDE047"/>
+  <circle cx="64" cy="64" r="46" stroke="url(#ringGold)" stroke-width="1.6" stroke-opacity="0.85"/>
+</svg>

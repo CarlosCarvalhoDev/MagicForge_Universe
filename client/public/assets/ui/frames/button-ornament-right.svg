@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 44" fill="none">
+  <g transform="translate(48, 0) scale(-1, 1)">
+    <path d="M2 22 L14 6 H30 L20 22 L30 38 H14 Z" fill="#1E1306" fill-opacity="0.45" stroke="#FEF08A" stroke-width="1.4"/>
+    <polygon points="14,22 22,14 30,22 22,30" fill="#FEF08A" stroke="#78350F" stroke-width="1"/>
+    <polygon points="18,22 22,18 26,22 22,26" fill="#B45309"/>
+    <circle cx="36" cy="22" r="2.2" fill="#FEF08A"/>
+  </g>
+</svg>
+
