@@ -77,6 +77,9 @@ import {
   S2CPartyUpdatePayload,
   S2CPartyInviteReceivedPayload,
   S2CPartyActionResultPayload,
+  S2COfflineRewardInfoPayload,
+  C2SClaimOfflineRewardsPayload,
+  S2COfflineRewardsClaimedPayload,
 } from '@magicforge/shared';
 
 export type MessageListener<T> = (data: T) => void;
@@ -132,6 +135,8 @@ export class ClientNetwork {
   public onPartyUpdate: MessageListener<S2CPartyUpdatePayload> | null = null;
   public onPartyInviteReceived: MessageListener<S2CPartyInviteReceivedPayload> | null = null;
   public onPartyActionResult: MessageListener<S2CPartyActionResultPayload> | null = null;
+  public onOfflineRewardInfo: MessageListener<S2COfflineRewardInfoPayload> | null = null;
+  public onOfflineRewardsClaimed: MessageListener<S2COfflineRewardsClaimedPayload> | null = null;
   public onLatencyUpdated: ((pingMs: number) => void) | null = null;
   public onConnectionStateChange: ((connected: boolean) => void) | null = null;
 
@@ -498,6 +503,11 @@ export class ClientNetwork {
     this.send(Opcode.C2S_PARTY_DISBAND, {});
   }
 
+  public sendClaimOfflineRewards(multiplier: number = 1): void {
+    const payload: C2SClaimOfflineRewardsPayload = { multiplier };
+    this.send(Opcode.C2S_CLAIM_OFFLINE_REWARDS, payload);
+  }
+
   private startPingHeartbeat(): void {
     this.stopPingHeartbeat();
     this.pingIntervalId = window.setInterval(() => {
@@ -704,6 +714,16 @@ export class ClientNetwork {
 
         case Opcode.S2C_PARTY_ACTION_RESULT: {
           this.onPartyActionResult?.(packet.data as S2CPartyActionResultPayload);
+          break;
+        }
+
+        case Opcode.S2C_OFFLINE_REWARD_INFO: {
+          this.onOfflineRewardInfo?.(packet.data as S2COfflineRewardInfoPayload);
+          break;
+        }
+
+        case Opcode.S2C_OFFLINE_REWARDS_CLAIMED: {
+          this.onOfflineRewardsClaimed?.(packet.data as S2COfflineRewardsClaimedPayload);
           break;
         }
 

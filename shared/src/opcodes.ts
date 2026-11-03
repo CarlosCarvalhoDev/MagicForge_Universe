@@ -113,6 +113,11 @@ export enum Opcode {
   S2C_PARTY_UPDATE = 0xA7,
   S2C_PARTY_ACTION_RESULT = 0xA8,
 
+  // --- Offline Progress & AFK Rewards (Baú do Tempo) (0xB0 - 0xB9) ---
+  S2C_OFFLINE_REWARD_INFO = 0xB0,
+  C2S_CLAIM_OFFLINE_REWARDS = 0xB1,
+  S2C_OFFLINE_REWARDS_CLAIMED = 0xB2,
+
   // --- Heartbeat & Quality of Service (0xF0 - 0xFF) ---
   C2S_PING = 0xF0,
   S2C_PONG = 0xF1,

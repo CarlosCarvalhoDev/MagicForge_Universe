@@ -19,6 +19,7 @@ import {
   CardAlbumEntryPayload,
   CARDS_DATABASE,
   FarmHelperSettingsPayload,
+  OfflineLootItem,
 } from '@magicforge/shared';
 import { Entity } from './Entity';
 import { SERVER_CONFIG } from '../config';
@@ -62,6 +63,16 @@ export class Player extends Entity {
   };
   public potionHpCooldownSec: number = 0;
   public potionMpCooldownSec: number = 0;
+
+  // Offline Progress / AFK Rewards (Baú do Tempo)
+  public lastLogoutTime: number = 0;
+  public pendingOfflineReward: {
+    accumulatedGold: number;
+    accumulatedExp: number;
+    loot: OfflineLootItem[];
+    offlineSeconds: number;
+    cappedSeconds: number;
+  } | null = null;
 
   // Resource & Skills
   public currentResource: number;

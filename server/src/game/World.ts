@@ -66,6 +66,10 @@ import {
   S2CBuyDungeonTicketResultPayload,
   DailyDungeonInfoPayload,
   DungeonType,
+  S2COfflineRewardInfoPayload,
+  C2SClaimOfflineRewardsPayload,
+  S2COfflineRewardsClaimedPayload,
+  OfflineLootItem,
 } from '@magicforge/shared';
 import { EntityManager } from './EntityManager';
 import { Entity, ActiveCombatStatus } from '../entities/Entity';
@@ -690,6 +694,10 @@ export class World {
     } as S2CLoginSuccessPayload);
 
     console.log(`[World] Player "${player.name}" (${player.classType}) entrou no mundo em [${player.position.x.toFixed(1)}, ${player.position.z.toFixed(1)}]. Total players ativos: ${this.entityManager.getAllPlayers().length}`);
+
+    // 9. Processa Recompensas Offline (Baú do Tempo / Progresso AFK)
+    this.checkAndNotifyOfflineRewards(connection, player);
+
     return player;
   }
 
@@ -697,6 +705,7 @@ export class World {
     const player = this.entityManager.removePlayer(playerId);
     this.spatialGrid.removeEntity(playerId);
     if (player) {
+      player.lastLogoutTime = Date.now();
       const clearedStatuses = player.clearAllStatuses();
       for (const st of clearedStatuses) {
         this.broadcastStatusTransition('CLEARED_ON_DISCONNECT', st, {
@@ -2598,6 +2607,158 @@ export class World {
       portalOpen: false,
       message: '🌾 Retornou à Fase 9 (Farm Contínuo). Re-desafie o Chefão quando desejar!',
     } as S2CStageUpdatePayload);
+  }
+
+  /**
+   * Avalia o tempo decorrido desde o último logout do herói e notifica com o Baú do Tempo (Recompensas AFK)
+   * Regras canônicas de Idle RPG:
+   * - Mínimo de 300s (5 minutos) para evitar popups incômodos em simples recarregamentos de página
+   * - Limite máximo de 43.200s (12 horas)
+   * - Ganhos transparentes e progressivos baseados em Mundo, Fase e Nível do herói
+   */
+  public checkAndNotifyOfflineRewards(connection: Connection, player: Player): void {
+    if (!player.lastLogoutTime || player.lastLogoutTime <= 0) return;
+
+    const now = Date.now();
+    const elapsedSeconds = Math.floor((now - player.lastLogoutTime) / 1000);
+    const MIN_THRESHOLD_SEC = 300; // 5 minutos
+    const MAX_CAPPED_SEC = 43200; // 12 horas
+
+    if (elapsedSeconds < MIN_THRESHOLD_SEC) {
+      return;
+    }
+
+    const effectiveSeconds = Math.min(elapsedSeconds, MAX_CAPPED_SEC);
+
+    // Fórmulas transparentes de Idle RPG
+    const goldPerSec = player.currentWorld * 15 + player.currentStage * 5 + player.level * 3;
+    const expPerSec = player.currentWorld * 10 + player.currentStage * 4 + player.level * 2;
+
+    const accumulatedGold = Math.floor(effectiveSeconds * goldPerSec);
+    const accumulatedExp = Math.floor(effectiveSeconds * expPerSec);
+
+    // Gerador de materiais a cada 15 min (900s) de ausência
+    const lootPreview: OfflineLootItem[] = [];
+    const materialIntervals = Math.min(10, Math.floor(effectiveSeconds / 900));
+    if (materialIntervals > 0) {
+      lootPreview.push({
+        itemId: 'iron_ore',
+        name: 'Minério de Ferro Bruto',
+        rarity: 'COMUM',
+        quantity: materialIntervals * 2,
+      });
+      lootPreview.push({
+        itemId: 'potion_hp_minor',
+        name: 'Poção Menor de Cura',
+        rarity: 'COMUM',
+        quantity: Math.max(1, Math.floor(materialIntervals * 1.5)),
+      });
+    }
+
+    player.pendingOfflineReward = {
+      accumulatedGold,
+      accumulatedExp,
+      loot: lootPreview,
+      offlineSeconds: elapsedSeconds,
+      cappedSeconds: effectiveSeconds,
+    };
+
+    connection.send(Opcode.S2C_OFFLINE_REWARD_INFO, {
+      offlineSeconds: elapsedSeconds,
+      cappedSeconds: effectiveSeconds,
+      accumulatedGold,
+      accumulatedExp,
+      lootPreview,
+      minThresholdSeconds: MIN_THRESHOLD_SEC,
+    } as S2COfflineRewardInfoPayload);
+
+    console.log(`[World] Herói "${player.name}" esteve offline por ${elapsedSeconds}s (efetivo: ${effectiveSeconds}s). Recompensa AFK gerada: ${accumulatedGold} Ouro, ${accumulatedExp} EXP.`);
+  }
+
+  /**
+   * Resgate autoritativo das Recompensas Offline (Baú do Tempo)
+   */
+  public claimOfflineRewards(player: Player, multiplier: number = 1): { success: boolean; message: string } {
+    if (!player.pendingOfflineReward) {
+      const conn = this.connections.get(player.id);
+      if (conn) {
+        conn.send(Opcode.S2C_OFFLINE_REWARDS_CLAIMED, {
+          success: false,
+          claimedGold: 0,
+          claimedExp: 0,
+          lootClaimed: [],
+          newGold: player.gold,
+          newLevel: player.level,
+          newExp: player.currentXp,
+          message: 'Nenhuma recompensa offline pendente para resgate.',
+        } as S2COfflineRewardsClaimedPayload);
+      }
+      return { success: false, message: 'Nenhuma recompensa offline pendente para resgate.' };
+    }
+
+    const safeMultiplier = Math.max(1, Math.min(3, Math.floor(multiplier || 1)));
+    const reward = player.pendingOfflineReward;
+    const finalGold = reward.accumulatedGold * safeMultiplier;
+    const finalExp = reward.accumulatedExp * safeMultiplier;
+
+    // 1. Concede Ouro
+    player.gold += finalGold;
+    this.db.updateCharacterGold(player.dbCharacterId, finalGold);
+
+    // 2. Concede EXP e processa avanço de nível
+    const progress = player.addExperience(finalExp);
+    if (progress.leveledUp) {
+      this.handlePlayerLevelUp(player);
+    }
+
+    // 3. Adiciona materiais na mochila
+    for (const item of reward.loot) {
+      try {
+        this.db.addItemToInventory(player.dbCharacterId, item.itemId, item.quantity);
+      } catch (err) {
+        console.warn(`[World] Falha ao adicionar item offline "${item.itemId}" para "${player.name}":`, err);
+      }
+    }
+    player.inventory = this.db.getInventory(player.dbCharacterId);
+
+    // 4. Limpa pendência e atualiza timestamp de logout
+    const claimedLoot = [...reward.loot];
+    player.pendingOfflineReward = null;
+    player.lastLogoutTime = Date.now();
+    this.db.savePlayer(player);
+
+    const conn = this.connections.get(player.id);
+    if (conn) {
+      conn.send(Opcode.S2C_OFFLINE_REWARDS_CLAIMED, {
+        success: true,
+        claimedGold: finalGold,
+        claimedExp: finalExp,
+        lootClaimed: claimedLoot,
+        newGold: player.gold,
+        newLevel: player.level,
+        newExp: player.currentXp,
+        message: `✦ BAÚ DO TEMPO RESGATADO! Você coletou +${finalGold.toLocaleString('pt-BR')} Ouro e +${finalExp.toLocaleString('pt-BR')} EXP!`,
+      } as S2COfflineRewardsClaimedPayload);
+
+      conn.send(Opcode.S2C_INVENTORY_UPDATE, {
+        slots: player.inventory,
+        gold: player.gold,
+        maxSlots: player.maxInventorySlots,
+        totalCombatPower: player.CombatPower,
+      } as S2CInventoryUpdatePayload);
+
+      conn.send(Opcode.S2C_PLAYER_EXP_UPDATE, {
+        playerId: player.id,
+        currentXp: player.currentXp,
+        xpToNextLevel: player.xpToNextLevel,
+        level: player.level,
+        expGained: finalExp,
+        source: 'Baú do Tempo (Progresso AFK)',
+      } as S2CPlayerExpUpdatePayload);
+    }
+
+    console.log(`[World] Herói "${player.name}" resgatou Baú do Tempo com sucesso: +${finalGold} ouro, +${finalExp} exp.`);
+    return { success: true, message: 'Recompensas offline resgatadas com sucesso!' };
   }
 
   public challengeStageBoss(player?: Player): { success: boolean; reason?: string } {

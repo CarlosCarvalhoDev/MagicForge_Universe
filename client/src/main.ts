@@ -40,6 +40,7 @@ import { setupCinematicIntro } from './ui/CinematicIntro';
 import { setupBossNarrative } from './ui/BossNarrative';
 import { PartyHUD } from './ui/PartyHUD';
 import { ChannelSelector } from './ui/ChannelSelector';
+import { OfflineRewardModal } from './ui/OfflineRewardModal';
 import './ui/auth-selection.css';
 import './ui/progression.css';
 import './ui/narrative.css';
@@ -1710,6 +1711,17 @@ network.onLeaderboardUpdate = data => leaderboard.onUpdate(data);
 const bossNarrative = setupBossNarrative();
 const partyHUD = new PartyHUD(network);
 const channelSelector = new ChannelSelector(network);
+const offlineRewardModal = new OfflineRewardModal({
+  isReady: () => network.isConnected && network.isAuthenticated,
+  claim: (multiplier) => network.sendClaimOfflineRewards(multiplier),
+});
+network.onOfflineRewardInfo = (payload) => {
+  offlineRewardModal.show(payload);
+};
+network.onOfflineRewardsClaimed = (payload) => {
+  offlineRewardModal.onClaimed(payload);
+  addChatMessage('Baú do Tempo', payload.message, 'sys');
+};
 
 // Resize handling
 function handleResize() {

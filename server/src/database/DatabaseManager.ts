@@ -71,6 +71,7 @@ export interface CharacterRecord {
   sabedoria: number;
   carisma: number;
   combat_power: number;
+  last_logout?: number;
   created_at: number;
   updated_at: number;
 }
@@ -195,6 +196,12 @@ export class DatabaseManager {
 
     try {
       this.db.exec('ALTER TABLE characters ADD COLUMN current_stage INTEGER NOT NULL DEFAULT 1;');
+    } catch {
+      // Ignora se a coluna já existir
+    }
+
+    try {
+      this.db.exec('ALTER TABLE characters ADD COLUMN last_logout INTEGER NOT NULL DEFAULT 0;');
     } catch {
       // Ignora se a coluna já existir
     }
@@ -778,6 +785,7 @@ export class DatabaseManager {
     };
     player.recalculateStatsFromEquipment();
     player.currentHp = existing.current_hp > 0 ? Math.min(player.maxHp, existing.current_hp) : player.maxHp;
+    player.lastLogoutTime = existing.last_logout || existing.updated_at || Date.now();
     player.isDead = false;
     return player;
   }
@@ -942,6 +950,7 @@ export class DatabaseManager {
           auto_sell_rare = ?,
           auto_loot = ?,
           max_inventory_slots = ?,
+          last_logout = ?,
           updated_at = ?
         WHERE name = ?
       `).run(
@@ -976,11 +985,23 @@ export class DatabaseManager {
         player.farmSettings.autoSellRare ? 1 : 0,
         player.farmSettings.autoLootEnabled ? 1 : 0,
         player.maxInventorySlots,
+        player.lastLogoutTime || now,
         now,
         player.name
       );
     } catch (err) {
       console.error(`[Database] Erro ao salvar personagem "${player.name}":`, err);
+    }
+  }
+
+  /**
+   * Atualiza expressamente o carimbo de logout do herói no SQLite
+   */
+  public updatePlayerLogoutTime(characterName: string, timestamp: number): void {
+    try {
+      this.db.prepare('UPDATE characters SET last_logout = ?, updated_at = ? WHERE name = ?').run(timestamp, timestamp, characterName);
+    } catch (err) {
+      console.error(`[Database] Erro ao atualizar logout de "${characterName}":`, err);
     }
   }
 

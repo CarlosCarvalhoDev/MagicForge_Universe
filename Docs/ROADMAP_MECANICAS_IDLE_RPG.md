@@ -8,8 +8,8 @@
 * **Data da Última Atualização**: 03/11/2026
 * **Branch Principal**: `master` (100% sincronizado com `origin/master`)
 * **Testes Automatizados**:
-  - Servidor: 23/23 testes passando (100% autoritativo)
-  - Cliente (Apresentação, Runic Layout & Party): 36/36 testes passando (100%)
+  - Servidor: 27/27 testes passando (100% autoritativo)
+  - Cliente (Apresentação, Runic Layout, Party & AFK Modal): 37/37 testes passando (100%)
   - Build de Produção do Cliente (`vite build`): 100% OK
 
 ---
@@ -40,6 +40,12 @@
    - UI Web: HUD de Grupo (`PartyHUD.ts`) e Seletor de Canais (`ChannelSelector.ts`).
 6. **Apresentação Rúnica & UI Visual (Merge com `fix/telas-bordas-cards`)**:
    - Molduras rúnicas esculpidas, SVG assets customizados, gaveta tática responsiva, docking de poções e pedestal de seleção de heróis.
+7. **Ciclo de Desafio de Chefe com Auto-Recuo & Retry (Etapa 1)**:
+   - Auto-recuo imediato para a Fase 9 com farm contínuo de mobs em caso de derrota/timeout.
+   - Re-desafio manual com cura total e toggle de auto-challenge autoritativo.
+8. **Recompensas AFK / Progresso Offline - Baú do Tempo (Etapa 2)**:
+   - Cálculo autoritativo de Ouro e EXP acumulados com teto de 12 horas e limiar mínimo de 5 minutos.
+   - Drops de suprimentos/minérios por tempo ausente e modal estético `[Coletar Recompensas Offline]`.
 
 ---
 
@@ -71,17 +77,22 @@ flowchart TD
 
 ---
 
-### ⏳ ETAPA 2: Recompensas AFK / Progresso Offline (Baú do Tempo)
+### ✅ ETAPA 2: Recompensas AFK / Progresso Offline (Baú do Tempo) *(CONCLUÍDO E VALIDADO)*
 * **Objetivo**: Recompensar o jogador pelo tempo que passou fora do jogo (celular bloqueado ou navegador fechado).
-* **Mecânica**:
-  - Salvar `last_logout_timestamp` no SQLite.
-  - Ao fazer login: calcular o tempo decorrido $\Delta t$ (limitado entre 5 minutos e 12 horas).
-  - Fórmula de rendimento: $\text{Ouro Ganho} = \Delta t \times \text{Taxa de Ouro/min da Maior Fase Alcançada}$.
-  - Modal estético de boas-vindas com botão de resgate `[Coletar Recompensas Offline]`.
+* **Mecânica Implementada e Testada**:
+  - `last_logout` persistido e atualizado autoritativamente na tabela `characters` do SQLite.
+  - Ao logar, se $\Delta t \ge 300\text{s}$ (5 minutos), gera `S2C_OFFLINE_REWARD_INFO` com teto de 12 horas ($43.200\text{s}$).
+  - Fórmulas autoritativas:
+    - $\text{Ouro/s} = \text{Mundo} \times 15 + \text{Fase} \times 5 + \text{Nível} \times 3$
+    - $\text{EXP/s} = \text{Mundo} \times 10 + \text{Fase} \times 4 + \text{Nível} \times 2$
+    - Suprimentos/Minérios: Minério de ferro e poções concedidos a cada 15 min de ausência.
+  - Resgate autoritativo (`C2S_CLAIM_OFFLINE_REWARDS`) com proteção contra double-claim.
+  - Modal estético `OfflineRewardModal.ts` com filigrana rúnica no client web.
+* **Validação**: 4 testes de backend em `server/tests/offline-rewards.test.ts` e teste de layout/duração em `client/tests/offline-rewards-ui.test.mjs`.
 
 ---
 
-### ⏳ ETAPA 3: Progressão de Nível de Habilidades (Skill Up)
+### 📍 ETAPA 3: Progressão de Nível de Habilidades (Skill Up / Grimório) *(PRÓXIMO)*
 * **Objetivo**: Permitir que habilidades ativas e truques evoluam além do nível base.
 * **Mecânica**:
   - Cada habilidade no Grimório pode subir de Nível 1 a Nível 20.
