@@ -808,7 +808,36 @@ export class World {
     if (this.isBossActive) {
       this.bossTimerSec -= deltaTimeSec;
       if (this.bossTimerSec <= 0) {
-        this.handleBossFailure('TIMEOUT');
+        const boss = this.activeBossId ? this.entityManager.getMonster(this.activeBossId) : null;
+        if (boss) {
+          boss.autoRespawns = false;
+          this.entityManager.removeMonster(boss.id);
+          this.spatialGrid.removeEntity(boss.id);
+          this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: boss.id, reason: 'DEAD' } as S2CEntityDespawnPayload);
+          for (const p of this.entityManager.getAllPlayers()) {
+            if (p.targetId === boss.id) p.targetId = null;
+          }
+        }
+        this.isBossActive = false;
+        this.activeBossId = null;
+        this.activeBossName = '';
+        this.isBossAvailable = true; // Botão de re-tentativa agora fica disponível na Fase 10!
+
+        this.broadcast(Opcode.S2C_BOSS_EVENT, {
+          eventType: 'TIMEOUT',
+          message: '⌛ O tempo de 60s acabou e o Chefão escapou! Você continua na Fase 10. Suba seu Poder de Combate (CP) e clique em DESAFIAR CHEFÃO!',
+        } as S2CBossEventPayload);
+
+        this.broadcast(Opcode.S2C_STAGE_UPDATE, {
+          world: this.currentWorld,
+          stage: this.currentStage,
+          worldName: this.getWorldName(this.currentWorld),
+          stageKills: 0,
+          killsRequired: 1,
+          isBossStage: true,
+          bossAvailable: true,
+          portalOpen: false,
+        } as S2CStageUpdatePayload);
       }
     }
 
@@ -907,12 +936,7 @@ export class World {
     if (monster.isDead || monster.isStunned() || monster.state !== MonsterState.ATTACKING || !monster.targetPlayer) return;
 
     const player = monster.targetPlayer as Player;
-    if (player.isDead) {
-      if (this.isBossActive && monster.id === this.activeBossId) {
-        this.handleBossFailure('DEATH');
-      }
-      return;
-    }
+    if (player.isDead) return;
 
     if (monster.attackCooldown <= 0) {
       const damage = monster.attackDamage;
@@ -968,8 +992,34 @@ export class World {
       monster.attackCooldown = monster.attackIntervalSec;
 
       if (player.isDead && this.isBossActive && monster.id === this.activeBossId) {
-        // O jogador foi derrotado pelo chefão: aciona auto-recuo para farm seguro na Fase 9
-        this.handleBossFailure('DEATH');
+        // O jogador foi derrotado pelo chefão: o chefão recua para não causar spawn-camp
+        monster.autoRespawns = false;
+        this.entityManager.removeMonster(monster.id);
+        this.spatialGrid.removeEntity(monster.id);
+        this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: monster.id, reason: 'DEAD' } as S2CEntityDespawnPayload);
+        for (const p of this.entityManager.getAllPlayers()) {
+          if (p.targetId === monster.id) p.targetId = null;
+        }
+        this.isBossActive = false;
+        this.activeBossId = null;
+        this.activeBossName = '';
+        this.isBossAvailable = true; // Botão de re-tentativa agora fica disponível na Fase 10!
+
+        this.broadcast(Opcode.S2C_BOSS_EVENT, {
+          eventType: 'TIMEOUT',
+          message: `💀 O herói caiu em combate! O ${this.activeBossName} retornou às sombras. Você continua na Fase 10. Recupere-se e clique em [DESAFIAR CHEFÃO]!`,
+        } as S2CBossEventPayload);
+
+        this.broadcast(Opcode.S2C_STAGE_UPDATE, {
+          world: this.currentWorld,
+          stage: 10,
+          worldName: this.getWorldName(this.currentWorld),
+          stageKills: 0,
+          killsRequired: 1,
+          isBossStage: true,
+          bossAvailable: true,
+          portalOpen: false,
+        } as S2CStageUpdatePayload);
       }
     }
   }
@@ -2101,37 +2151,20 @@ export class World {
           }
 
           if (this.currentStage === 10) {
-            if (this.isBossAvailable && killer?.farmSettings?.autoChallengeBoss === false) {
-              // Mantém o jogador no modo de farm seguro na Fase 9 com botão de desafio ativo
-              this.currentStage = 9;
-              this.stageKills = 0;
-              this.broadcast(Opcode.S2C_STAGE_UPDATE, {
-                world: this.currentWorld,
-                stage: 9,
-                worldName: this.getWorldName(this.currentWorld),
-                stageKills: this.killsPerStage,
-                killsRequired: this.killsPerStage,
-                isBossStage: false,
-                bossAvailable: true,
-                portalOpen: false,
-                message: '💀 Chefão da Fase 10 pronto para combate! Clique em [DESAFIAR CHEFÃO] quando desejar.',
-              } as S2CStageUpdatePayload);
-            } else {
-              // Reached Stage 10: AUTO-SUMMON THE WORLD BOSS!
-              this.broadcast(Opcode.S2C_STAGE_UPDATE, {
-                world: this.currentWorld,
-                stage: 10,
-                worldName: this.getWorldName(this.currentWorld),
-                stageKills: 0,
-                killsRequired: 1,
-                isBossStage: true,
-                bossAvailable: false,
-                portalOpen: false,
-                message: `⚠️ FASE 10/10 ATINGIDA! O CHEFÃO DO MUNDO DESPERTOU!`,
-              } as S2CStageUpdatePayload);
+            // Reached Stage 10: AUTO-SUMMON THE WORLD BOSS!
+            this.broadcast(Opcode.S2C_STAGE_UPDATE, {
+              world: this.currentWorld,
+              stage: 10,
+              worldName: this.getWorldName(this.currentWorld),
+              stageKills: 0,
+              killsRequired: 1,
+              isBossStage: true,
+              bossAvailable: false,
+              portalOpen: false,
+              message: `⚠️ FASE 10/10 ATINGIDA! O CHEFÃO DO MUNDO DESPERTOU!`,
+            } as S2CStageUpdatePayload);
 
-              this.challengeStageBoss(killer);
-            }
+            this.challengeStageBoss();
           } else {
             // Advanced to next stage (2..9)
             this.broadcast(Opcode.S2C_STAGE_UPDATE, {
@@ -2535,90 +2568,9 @@ export class World {
     } as S2CLeaderboardUpdatePayload);
   }
 
-  /**
-   * Trata falha no combate contra o chefão (tempo limite esgotado ou herói derrotado).
-   * Aciona o Auto-Recuo clássico de Idle RPG para a Fase 9 (Modo Farm Seguro),
-   * revivendo heróis, restaurando vida e mantendo o botão de re-desafio ativo.
-   */
-  private handleBossFailure(reason: 'TIMEOUT' | 'DEATH'): void {
-    const boss = this.activeBossId ? this.entityManager.getMonster(this.activeBossId) : null;
-    if (boss) {
-      boss.autoRespawns = false;
-      this.entityManager.removeMonster(boss.id);
-      this.spatialGrid.removeEntity(boss.id);
-      this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: boss.id, reason: 'DEAD' } as S2CEntityDespawnPayload);
-      for (const p of this.entityManager.getAllPlayers()) {
-        if (p.targetId === boss.id) p.targetId = null;
-      }
-    }
-
-    const prevBossName = this.activeBossName || 'Chefão';
-    this.isBossActive = false;
-    this.activeBossId = null;
-    this.activeBossName = '';
-    this.bossTimerSec = 0;
-
-    // Auto-Recuo para a Fase 9 (Modo Farm Seguro)
-    this.currentStage = 9;
-    this.stageKills = 0;
-    this.isBossAvailable = true;
-
-    // Reviver heróis caídos com full HP/MP e recuar para o acampamento seguro
-    for (const player of this.entityManager.getAllPlayers()) {
-      if (player.isDead) {
-        player.currentHp = player.maxHp;
-        player.currentResource = player.maxResource;
-        player.isDead = false;
-        player.position = createVector3(0, 0, -10);
-      } else {
-        player.currentHp = player.maxHp;
-        player.currentResource = player.maxResource;
-      }
-      player.currentStage = 9;
-      this.db.savePlayer(player);
-    }
-
-    const message = reason === 'TIMEOUT'
-      ? `⌛ O tempo de 60s acabou e o ${prevBossName} escapou! Você recuou para a Fase 9 (Farm Seguro). Fortaleça-se e clique em [DESAFIAR CHEFÃO]!`
-      : `💀 O herói caiu perante o ${prevBossName}! Você recuou para a Fase 9 para continuar farmando com segurança. Fortaleça-se e clique em [DESAFIAR CHEFÃO]!`;
-
-    this.broadcast(Opcode.S2C_BOSS_EVENT, {
-      eventType: 'TIMEOUT',
-      message,
-    } as S2CBossEventPayload);
-
-    this.broadcast(Opcode.S2C_STAGE_UPDATE, {
-      world: this.currentWorld,
-      stage: 9,
-      worldName: this.getWorldName(this.currentWorld),
-      stageKills: 0,
-      killsRequired: this.killsPerStage,
-      isBossStage: false,
-      bossAvailable: true,
-      portalOpen: false,
-      message: '🌾 Retornou à Fase 9 (Farm Contínuo). Re-desafie o Chefão quando desejar!',
-    } as S2CStageUpdatePayload);
-  }
-
   public challengeStageBoss(player?: Player): { success: boolean; reason?: string } {
     if (this.isBossActive) {
       return { success: false, reason: 'Um Chefão já está em combate na arena!' };
-    }
-
-    // Avança para a Fase 10 (Arena do Chefe)
-    this.currentStage = 10;
-    this.stageKills = 0;
-
-    // Cura integral e restauração de recursos para a luta
-    for (const p of this.entityManager.getAllPlayers()) {
-      p.currentHp = p.maxHp;
-      p.currentResource = p.maxResource;
-      if (p.isDead) {
-        p.isDead = false;
-        p.position = createVector3(0, 0, -10);
-      }
-      p.currentStage = 10;
-      this.db.savePlayer(p);
     }
 
     let bossName: string;

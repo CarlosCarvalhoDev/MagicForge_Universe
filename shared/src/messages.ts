@@ -560,7 +560,6 @@ export interface FarmHelperSettingsPayload {
   autoSellUncommon: boolean;
   autoSellRare: boolean;
   autoLootEnabled: boolean;
-  autoChallengeBoss?: boolean; // Se ativo, desafia o chefão automaticamente ao completar farm na Fase 9
 }
 
 export interface C2SUpdateFarmSettingsPayload {

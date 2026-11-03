@@ -58,7 +58,6 @@ export class Player extends Entity {
     autoSellUncommon: false,
     autoSellRare: false,
     autoLootEnabled: true,
-    autoChallengeBoss: false,
   };
   public potionHpCooldownSec: number = 0;
   public potionMpCooldownSec: number = 0;
