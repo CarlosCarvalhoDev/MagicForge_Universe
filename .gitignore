@@ -76,3 +76,6 @@ $RECYCLE.BIN/
 
 # Scripts locais de inicializacao
 *.bat
+
+# Scratch & Scraping Cache
+scratch/
