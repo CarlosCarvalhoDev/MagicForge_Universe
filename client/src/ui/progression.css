@@ -864,11 +864,7 @@
   --class-accent-border: rgba(110, 231, 183, 0.78);
 }
 
-#hero-status-card[data-hero-class="DEMONOLOGO"] {
-  --class-accent: #c084fc;
-  --class-accent-soft: rgba(192, 132, 252, 0.26);
-  --class-accent-border: rgba(216, 180, 254, 0.8);
-}
+
 
 .hero-avatar-box {
   width: 58px !important;

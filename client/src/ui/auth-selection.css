@@ -514,16 +514,7 @@
     0 0 24px rgba(245, 158, 11, 0.16);
 }
 
-.forge-slot.is-occupied[data-class-type="DEMONOLOGO"] {
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 46px 46px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 46px 46px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 46px 46px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 46px 46px no-repeat,
-    url('/assets/ui/frames/crest-header-ornament.svg') top center / 220px 28px no-repeat,
-    radial-gradient(circle at 50% 28%, rgba(220, 38, 38, 0.26), rgba(139, 92, 246, 0.16) 48%, transparent 68%),
-    linear-gradient(180deg, rgba(40, 20, 40, 0.97) 0%, rgba(9, 11, 23, 0.99) 100%);
-}
+
 
 .forge-slot:hover {
   transform: translateY(-3px);

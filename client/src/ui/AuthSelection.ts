@@ -508,7 +508,7 @@ export function setupAuthSelection(
       const normalizedSlots = [0, 1, 2].map(index => {
         const found = rawSlots.find(s => Number(s.slotIndex) === index);
         if (!found) {
-          return { slotIndex: index, isEmpty: true };
+          return { slotIndex: index, isEmpty: true, name: String(), classType: undefined };
         }
         const isEmpty = Boolean(found.isEmpty) || (!found.name && !found.classType);
         return {
