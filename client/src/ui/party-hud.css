@@ -1,0 +1,595 @@
+/* Party HUD & Channel Selector Styles */
+
+/* 1. Left Party HUD Container */
+#party-hud-card {
+  position: absolute;
+  top: 104px;
+  left: 14px;
+  width: 230px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  z-index: 24;
+  pointer-events: auto;
+  user-select: none;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease-in-out;
+}
+
+#party-hud-card.collapsed .party-members-list,
+#party-hud-card.collapsed .party-footer-actions {
+  display: none !important;
+}
+
+.party-hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.party-hud-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.05em;
+}
+
+.party-hud-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+.party-hud-toggle-btn:hover {
+  color: #f1f5f9;
+}
+
+/* Solo / No Party State */
+.party-solo-view {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.party-solo-hint {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+.party-btn-quick-invite {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.3));
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: #fef08a;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.party-btn-quick-invite:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.35), rgba(217, 119, 6, 0.5));
+  border-color: #fbbf24;
+  transform: translateY(-1px);
+}
+
+/* Active Party Members List */
+.party-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.party-member-card {
+  position: relative;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s;
+}
+
+.party-member-card:hover {
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.party-member-card.is-local {
+  border-left: 3px solid #3b82f6;
+}
+
+.party-member-card.is-leader {
+  border-left: 3px solid #fbbf24;
+}
+
+.party-member-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.party-member-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.party-member-crown {
+  font-size: 0.75rem;
+  color: #fbbf24;
+  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6));
+}
+
+.party-member-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.party-member-level {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.party-member-actions-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.party-member-actions-btn:hover {
+  color: #fbbf24;
+}
+
+/* Vitals mini bars */
+.party-vitals-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.party-bar-track {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.party-bar-fill-hp {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.2s ease-out;
+}
+
+.party-bar-fill-hp.low {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.party-bar-fill-mp {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  transition: width 0.2s ease-out;
+}
+
+.party-bar-numbers {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6rem;
+  color: #cbd5e1;
+  font-weight: 600;
+  padding: 0 1px;
+}
+
+/* Member Action Dropdown Menu */
+.party-action-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 6px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 50;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+  min-width: 120px;
+}
+
+.party-action-menu-item {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  text-align: left;
+  padding: 5px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.party-action-menu-item:hover {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.party-action-menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+/* Party Footer Actions */
+.party-footer-actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.party-btn-secondary {
+  flex: 1;
+  background: rgba(51, 65, 85, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.party-btn-secondary:hover {
+  background: rgba(51, 65, 85, 0.8);
+  color: #f1f5f9;
+}
+
+.party-btn-leave {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.party-btn-leave:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #fff;
+}
+
+/* 2. Party Invite Modal (Prompt) */
+#party-invite-prompt-modal {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid #fbbf24;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(251, 191, 36, 0.3);
+  border-radius: 14px;
+  padding: 16px 20px;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: partySlideDown 0.25s ease-out;
+}
+
+@keyframes partySlideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.party-invite-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.party-invite-text {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+
+.party-invite-highlight {
+  color: #60a5fa;
+  font-weight: 700;
+}
+
+.party-invite-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.party-invite-btn-accept {
+  flex: 1;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.party-invite-btn-accept:hover {
+  filter: brightness(1.15);
+}
+
+.party-invite-btn-decline {
+  flex: 1;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.party-invite-btn-decline:hover {
+  background: rgba(239, 68, 68, 0.35);
+  color: #fff;
+}
+
+/* 3. Channel Selector Dropdown & Button in Top-Right */
+.channel-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: #fef08a;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  pointer-events: auto;
+}
+
+.channel-pill-btn:hover {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: #fbbf24;
+  transform: translateY(-1px);
+}
+
+.channel-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+/* Channel Modal Dialog */
+#channel-selector-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.channel-modal-card {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8);
+  border-radius: 16px;
+  padding: 20px;
+  width: 360px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.channel-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.channel-modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.channel-modal-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.channel-modal-close:hover {
+  color: #f1f5f9;
+}
+
+.channel-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.channel-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: all 0.15s;
+}
+
+.channel-item-row:hover {
+  border-color: rgba(251, 191, 36, 0.3);
+  background: rgba(30, 41, 59, 0.9);
+}
+
+.channel-item-row.is-current {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.channel-item-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.channel-status-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.channel-status-badge.livre {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.channel-status-badge.normal {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fef08a;
+}
+
+.channel-status-badge.lotado {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.channel-btn-switch {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.channel-btn-switch:hover {
+  filter: brightness(1.15);
+}
+
+.channel-btn-current {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  color: #34d399;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: default;
+}
+
+/* 4. Party Floating Toasts */
+#party-toast-container {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.party-toast {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: #fef08a;
+  font-size: 0.78rem;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  animation: partyToastFade 3s forwards;
+  pointer-events: auto;
+}
+
+@keyframes partyToastFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  85% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+

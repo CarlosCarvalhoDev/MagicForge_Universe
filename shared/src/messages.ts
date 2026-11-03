@@ -697,4 +697,110 @@ export interface S2CBuyDungeonTicketResultPayload {
 
 export interface C2SLeaveDungeonPayload {}
 
+// ==========================================
+// Channels, Worlds & Instances Payloads (0x90 - 0x99)
+// ==========================================
+
+export type ChannelLoadStatus = 'LIVRE' | 'POVOADO' | 'LOTADO';
+
+export interface ChannelSummaryPayload {
+  channelId: number;
+  worldIndex: number;
+  worldName: string;
+  activePlayers: number;
+  maxPlayers: number;
+  loadStatus: ChannelLoadStatus;
+  isCurrentChannel: boolean;
+}
+
+export interface C2SRequestChannelListPayload {
+  worldIndex?: number;
+}
+
+export interface S2CChannelListPayload {
+  worldIndex: number;
+  worldName: string;
+  currentChannelId: number;
+  channels: ChannelSummaryPayload[];
+}
+
+export interface C2SChangeChannelPayload {
+  targetChannelId: number;
+}
+
+export interface S2CChangeChannelResultPayload {
+  success: boolean;
+  channelId?: number;
+  worldIndex?: number;
+  worldName?: string;
+  reason?: string;
+  message: string;
+}
+
+// ==========================================
+// Party & Social Systems Payloads (0xA0 - 0xAF)
+// ==========================================
+
+export interface PartyMemberPayload {
+  playerId: string;
+  name: string;
+  classType: CharacterClass;
+  level: number;
+  currentHp: number;
+  maxHp: number;
+  currentResource: number;
+  maxResource: number;
+  isLeader: boolean;
+  isOnline: boolean;
+  worldIndex: number;
+  channelId: number;
+}
+
+export interface S2CPartyUpdatePayload {
+  partyId: string | null;
+  leaderId: string | null;
+  members: PartyMemberPayload[];
+  isDisbanded?: boolean;
+  message?: string;
+}
+
+export interface C2SPartyInvitePayload {
+  targetPlayerId?: string;
+  targetPlayerName?: string;
+}
+
+export interface S2CPartyInviteReceivedPayload {
+  partyId?: string;
+  inviterId: string;
+  inviterName: string;
+  inviterLevel: number;
+  inviterClass: CharacterClass;
+}
+
+export interface C2SPartyInviteResponsePayload {
+  inviterId: string;
+  accept: boolean;
+}
+
+export interface C2SPartyKickPayload {
+  targetPlayerId: string;
+}
+
+export interface C2SPartyPromoteLeaderPayload {
+  targetPlayerId: string;
+}
+
+export interface C2SPartyLeavePayload {}
+
+export interface C2SPartyDisbandPayload {}
+
+export interface S2CPartyActionResultPayload {
+  action: 'INVITE' | 'JOIN' | 'LEAVE' | 'KICK' | 'PROMOTE' | 'DISBAND';
+  success: boolean;
+  reason?: string;
+  message: string;
+}
+
+
+
 

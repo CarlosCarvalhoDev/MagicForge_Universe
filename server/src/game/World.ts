@@ -77,12 +77,14 @@ import { SERVER_CONFIG } from '../config';
 import { DatabaseManager } from '../database/DatabaseManager';
 import { SocialAuthService } from '../auth/SocialAuthService';
 import { DungeonManager } from './DungeonManager';
+import { PartyManager } from './PartyManager';
 
 export class World {
   public readonly entityManager = new EntityManager();
   public readonly spatialGrid = new SpatialGrid(20.0);
   public readonly db: DatabaseManager;
   public readonly dungeonManager: DungeonManager;
+  public partyManager?: PartyManager;
   public currentTick: number = 0;
   public castSequence: number = 0;
   public statusSequence: number = 0;
@@ -102,6 +104,11 @@ export class World {
   public activeBossId: string | null = null;
   public activeBossName: string = '';
 
+  // Channel & Instance Configuration
+  public channelId: number = 1;
+  public maxPlayers: number = 30;
+  public instanceId: string = 'world_1_ch_1';
+
   public getWorldName(world: number): string {
     switch (world) {
       case 1: return 'Floresta da Forja';
@@ -111,8 +118,12 @@ export class World {
     }
   }
 
-  constructor(customDb?: DatabaseManager) {
+  constructor(customDb?: DatabaseManager, worldIndex: number = 1, channelId: number = 1, maxPlayers: number = 30) {
     this.db = customDb || new DatabaseManager();
+    this.currentWorld = worldIndex;
+    this.channelId = channelId;
+    this.maxPlayers = maxPlayers;
+    this.instanceId = `world_${worldIndex}_ch_${channelId}`;
     this.dungeonManager = new DungeonManager(this);
     this.spawnWorldMonsters(this.currentWorld);
   }
@@ -213,10 +224,37 @@ export class World {
   }
 
   public unregisterConnection(connection: Connection): void {
+    this.removePlayerFromWorld(connection, true);
+  }
+
+  /**
+   * Remove o jogador desta instância com opção de persistir estado.
+   * Usado para desconexões e transferências suaves entre canais.
+   */
+  public removePlayerFromWorld(connection: Connection, saveToDb: boolean = true): Player | null {
     this.connections.delete(connection.id);
-    if (connection.playerId) {
-      this.handlePlayerDisconnect(connection.playerId);
+    if (!connection.playerId) return null;
+    const playerId = connection.playerId;
+    const player = this.entityManager.removePlayer(playerId);
+    this.spatialGrid.removeEntity(playerId);
+    if (player) {
+      const clearedStatuses = player.clearAllStatuses();
+      for (const st of clearedStatuses) {
+        this.broadcastStatusTransition('CLEARED_ON_DISCONNECT', st, {
+          targetRemainingHp: player.currentHp,
+          isTargetDead: player.isDead,
+        });
+      }
+      if (saveToDb) {
+        this.db.savePlayer(player);
+        console.log(`[World] Player "${player.name}" salvo no SQLite ao sair da instância ${this.instanceId}.`);
+      }
+      this.broadcast(Opcode.S2C_ENTITY_DESPAWN, {
+        entityId: playerId,
+        reason: 'DISCONNECTED',
+      } as S2CEntityDespawnPayload);
     }
+    return player || null;
   }
 
   public createPlayer(connection: Connection, name: string, classType: CharacterClass): Player {
@@ -543,6 +581,10 @@ export class World {
       this.spawnWorldMonsters(this.currentWorld);
     }
 
+    this.registerConnection(connection);
+    connection.currentWorldInstance = this;
+    connection.currentChannelId = this.channelId;
+    connection.currentWorldIndex = this.currentWorld;
     this.entityManager.addPlayer(player);
     this.spatialGrid.updateEntity(player);
     connection.playerId = player.id;
@@ -678,6 +720,43 @@ export class World {
       this.db.savePlayer(p);
     }
     console.log(`[World] Todos os ${players.length} jogadores foram salvos no banco de dados.`);
+  }
+
+  public sendExpUpdate(player: Player, expGained: number, sourceName: string = 'Monstro'): void {
+    const conn = this.connections.get(player.id);
+    if (conn) {
+      conn.send(Opcode.S2C_PLAYER_EXP_UPDATE, {
+        playerId: player.id,
+        currentXp: player.currentXp,
+        xpToNextLevel: player.xpToNextLevel,
+        level: player.level,
+        expGained,
+        source: sourceName,
+      } as S2CPlayerExpUpdatePayload);
+    }
+  }
+
+  public handlePlayerLevelUp(player: Player): void {
+    this.broadcast(Opcode.S2C_PLAYER_LEVEL_UP, {
+      playerId: player.id,
+      newLevel: player.level,
+      newAttributes: player.attributes,
+      newMaxHp: player.maxHp,
+      newMaxResource: player.maxResource,
+      totalCombatPower: player.CombatPower,
+      rebornCount: player.rebornCount,
+      honorTitle: player.HonorTitle,
+    } as S2CPlayerLevelUpPayload);
+
+    const conn = this.connections.get(player.id);
+    if (conn) {
+      conn.send(Opcode.S2C_INVENTORY_UPDATE, {
+        slots: player.inventory,
+        gold: player.gold,
+        maxSlots: player.maxInventorySlots,
+        totalCombatPower: player.CombatPower,
+      } as S2CInventoryUpdatePayload);
+    }
   }
 
   /**
@@ -2000,41 +2079,15 @@ export class World {
     // 1. Authoritative Experience (EXP) & Level Up Progression
     if (killer && !killer.isDead && killer instanceof Player) {
       const expReward = monster.expReward;
-      const progress = killer.addExperience(expReward);
-      this.db.savePlayer(killer);
+      if (this.partyManager) {
+        this.partyManager.distributePartyExp(killer, expReward, this);
+      } else {
+        const progress = killer.addExperience(expReward);
+        this.db.savePlayer(killer);
+        this.sendExpUpdate(killer, expReward, monster.name);
 
-      const killerConn = this.connections.get(killer.id);
-      if (killerConn) {
-        killerConn.send(Opcode.S2C_PLAYER_EXP_UPDATE, {
-          playerId: killer.id,
-          currentXp: killer.currentXp,
-          xpToNextLevel: killer.xpToNextLevel,
-          level: killer.level,
-          expGained: expReward,
-          source: monster.name,
-        } as S2CPlayerExpUpdatePayload);
-      }
-
-      if (progress.leveledUp) {
-        this.broadcast(Opcode.S2C_PLAYER_LEVEL_UP, {
-          playerId: killer.id,
-          newLevel: killer.level,
-          newAttributes: killer.attributes,
-          newMaxHp: killer.maxHp,
-          newMaxResource: killer.maxResource,
-          totalCombatPower: killer.CombatPower,
-          rebornCount: killer.rebornCount,
-          honorTitle: killer.HonorTitle,
-        } as S2CPlayerLevelUpPayload);
-
-        // Notify killer with fresh inventory / CP
-        if (killerConn) {
-          killerConn.send(Opcode.S2C_INVENTORY_UPDATE, {
-            slots: killer.inventory,
-            gold: killer.gold,
-            maxSlots: killer.maxInventorySlots,
-            totalCombatPower: killer.CombatPower,
-          } as S2CInventoryUpdatePayload);
+        if (progress.leveledUp) {
+          this.handlePlayerLevelUp(killer);
         }
       }
     }

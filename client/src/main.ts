@@ -38,9 +38,12 @@ import { setupInventoryExpansion } from './ui/InventoryExpansion';
 import { setupLeaderboard } from './ui/Leaderboard';
 import { setupCinematicIntro } from './ui/CinematicIntro';
 import { setupBossNarrative } from './ui/BossNarrative';
+import { PartyHUD } from './ui/PartyHUD';
+import { ChannelSelector } from './ui/ChannelSelector';
 import './ui/auth-selection.css';
 import './ui/progression.css';
 import './ui/narrative.css';
+import './ui/party-hud.css';
 
 // DOM Elements
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -1639,6 +1642,8 @@ inventoryExpansion = setupInventoryExpansion({
 network.onExpandInventoryResult = result => inventoryExpansion!.onResult(result);
 network.onLeaderboardUpdate = data => leaderboard.onUpdate(data);
 const bossNarrative = setupBossNarrative();
+const partyHUD = new PartyHUD(network);
+const channelSelector = new ChannelSelector(network);
 
 // Resize handling
 function handleResize() {
@@ -1737,10 +1742,10 @@ canvas.addEventListener(
 const chatInputForm = document.getElementById('chat-input-form') as HTMLFormElement | null;
 const chatInputField = document.getElementById('chat-input-field') as HTMLInputElement | null;
 
-function addChatMessage(tag: string, message: string, type: 'sys' | 'auto' | 'loot' | 'combat' | 'user' | 'malak' = 'sys') {
+function addChatMessage(tag: string, message: string, type: 'sys' | 'auto' | 'loot' | 'combat' | 'user' | 'malak' | 'party' = 'sys') {
   if (!chatMessagesContainer) return;
   const row = document.createElement('div');
-  row.className = 'chat-msg' + (type === 'malak' ? ' chat-msg-malak' : '');
+  row.className = 'chat-msg' + (type === 'malak' ? ' chat-msg-malak' : '') + (type === 'party' ? ' chat-msg-party' : '');
   const label = document.createElement('span'); label.className = 'chat-tag-' + type; label.textContent = '[' + (type === 'malak' ? '⚒ ' : '') + tag + ']';
   const body = document.createElement('span'); body.className = 'chat-body'; body.textContent = message;
   row.append(label, body);
@@ -1766,7 +1771,39 @@ if (chatInputForm && chatInputField) {
     }
 
     if (text === '/help' || text === '/ajuda') {
-      addChatMessage('Ajuda', 'Comandos disponíveis: /limpar, /help', 'sys');
+      addChatMessage('Ajuda', 'Comandos disponíveis: /limpar, /help, /canal <id>, /grupo convidar <nome>, /grupo sair', 'sys');
+      chatInputField.value = '';
+      return;
+    }
+
+    if (text.startsWith('/ch ') || text.startsWith('/canal ')) {
+      const parts = text.split(' ');
+      const chNum = parseInt(parts[1] || '1', 10);
+      if (!isNaN(chNum)) {
+        network.sendChangeChannel(chNum);
+        addChatMessage('Sistema', `Solicitando troca para o Canal ${chNum}...`, 'sys');
+      }
+      chatInputField.value = '';
+      return;
+    }
+
+    if (text.startsWith('/party ') || text.startsWith('/grupo ') || text.startsWith('/p ')) {
+      const parts = text.split(' ');
+      const subCmd = parts[1]?.toLowerCase();
+      if (subCmd === 'convidar' || subCmd === 'invite') {
+        const target = parts.slice(2).join(' ');
+        if (target) {
+          network.sendPartyInvite(target);
+          addChatMessage('Grupo', `Enviando convite para "${target}"...`, 'sys');
+        }
+      } else if (subCmd === 'sair' || subCmd === 'leave') {
+        network.sendPartyLeave();
+      } else if (subCmd === 'desfazer' || subCmd === 'disband') {
+        network.sendPartyDisband();
+      } else if (subCmd) {
+        network.sendPartyInvite(subCmd);
+        addChatMessage('Grupo', `Enviando convite para "${subCmd}"...`, 'sys');
+      }
       chatInputField.value = '';
       return;
     }
@@ -2096,7 +2133,8 @@ network.onStageUpdate = (payload) => {
 
 network.onChatMessage = (payload) => {
   if (skillRejectionEcho.suppress(payload.senderId, payload.message, performance.now())) return;
-  addChatMessage(payload.senderName, payload.message, /^Malakor\b/i.test(payload.senderName) ? 'malak' : payload.channel === 'system' ? 'sys' : 'combat');
+  const channelType = payload.channel === 'party' ? 'party' : /^Malakor\b/i.test(payload.senderName) ? 'malak' : payload.channel === 'system' ? 'sys' : 'combat';
+  addChatMessage(payload.senderName, payload.message, channelType as any);
 };
 
 network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
@@ -2157,6 +2195,7 @@ network.onLoginSuccess = (payload) => {
 
   renderCharacterModal();
   updateQuickPotionsUI();
+  partyHUD.setLocalPlayer(network.myPlayerId, payload.characterName);
   network.sendRequestCardAlbum();
   addChatMessage('Sistema', `Logado com sucesso como [${payload.characterName}]. Nv. ${playerLevel}!`, 'sys');
 
@@ -2281,6 +2320,32 @@ network.onRebornResult = (payload) => {
   renderCharacterModal();
   updateExpBarUI(playerLevel, 0, 250);
   addChatMessage('Sistema', payload.message, 'sys');
+};
+
+network.onPartyUpdate = (payload) => {
+  partyHUD.onPartyUpdate(payload);
+};
+
+network.onPartyInviteReceived = (payload) => {
+  partyHUD.onPartyInviteReceived(payload);
+};
+
+network.onPartyActionResult = (payload) => {
+  partyHUD.onPartyActionResult(payload);
+};
+
+network.onChannelList = (payload) => {
+  channelSelector.onChannelList(payload);
+};
+
+network.onChangeChannelResult = (payload) => {
+  channelSelector.onChangeChannelResult(payload);
+  if (payload.success) {
+    addChatMessage('Sistema', `Você ingressou no Canal ${payload.channelId}.`, 'sys');
+    partyHUD.showToast(`Conectado ao Canal ${payload.channelId}`, 'success');
+  } else {
+    partyHUD.showToast(`Falha ao trocar de canal: ${payload.message}`, 'error');
+  }
 };
 
 // Skill Casting Action

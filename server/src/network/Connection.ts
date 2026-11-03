@@ -11,6 +11,11 @@ export class Connection {
   public lastPingTime: number = Date.now();
   public latencyMs: number = 0;
 
+  // Associação de Canal / Instância
+  public currentWorldInstance: any | null = null;
+  public currentChannelId: number = 1;
+  public currentWorldIndex: number = 1;
+
   constructor(id: string, socket: WebSocket) {
     this.id = id;
     this.socket = socket;

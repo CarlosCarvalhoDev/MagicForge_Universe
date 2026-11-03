@@ -1,6 +1,6 @@
 import http from 'http';
 import { SERVER_CONFIG } from './config';
-import { World } from './game/World';
+import { WorldManager } from './game/WorldManager';
 import { GameLoop } from './game/GameLoop';
 import { ServerNetwork } from './network/ServerNetwork';
 
@@ -29,16 +29,16 @@ const httpServer = http.createServer((req, res) => {
   res.end();
 });
 
-// 2. Initialize Game World
-const world = new World();
+// 2. Initialize Game World Manager (Channels & Worlds)
+const worldManager = new WorldManager();
 
-// 3. Initialize Authoritative 20Hz Game Loop
+// 3. Initialize Authoritative 20Hz Game Loop (Ticking all active channels)
 const gameLoop = new GameLoop((deltaTimeSec) => {
-  world.update(deltaTimeSec);
+  worldManager.update(deltaTimeSec);
 });
 
 // 4. Initialize Network Layer (WebSockets)
-const network = new ServerNetwork(httpServer, world);
+const network = new ServerNetwork(httpServer, worldManager);
 
 // 5. Start Server (bind 0.0.0.0 for LAN / Mobile access)
 httpServer.listen(SERVER_CONFIG.PORT, '0.0.0.0', () => {
@@ -55,7 +55,7 @@ httpServer.listen(SERVER_CONFIG.PORT, '0.0.0.0', () => {
 // Graceful Shutdown
 function handleShutdown(signal: string) {
   console.log(`\n[Server] Received ${signal}. Gracefully stopping server...`);
-  world.saveAllPlayers();
+  worldManager.saveAllPlayers();
   gameLoop.stop();
   network.close();
   httpServer.close(() => {

@@ -67,6 +67,16 @@ import {
   DailyDungeonInfoPayload,
   DungeonType,
   Vector3,
+  C2SChangeChannelPayload,
+  S2CChannelListPayload,
+  S2CChangeChannelResultPayload,
+  C2SPartyInvitePayload,
+  C2SPartyInviteResponsePayload,
+  C2SPartyKickPayload,
+  C2SPartyPromoteLeaderPayload,
+  S2CPartyUpdatePayload,
+  S2CPartyInviteReceivedPayload,
+  S2CPartyActionResultPayload,
 } from '@magicforge/shared';
 
 export type MessageListener<T> = (data: T) => void;
@@ -117,6 +127,11 @@ export class ClientNetwork {
   public onSocketResult: MessageListener<S2CSocketResultPayload> | null = null;
   public onCardsUpdate: MessageListener<S2CCardsUpdatePayload> | null = null;
   public onChatMessage: MessageListener<S2CChatMessagePayload> | null = null;
+  public onChannelList: MessageListener<S2CChannelListPayload> | null = null;
+  public onChangeChannelResult: MessageListener<S2CChangeChannelResultPayload> | null = null;
+  public onPartyUpdate: MessageListener<S2CPartyUpdatePayload> | null = null;
+  public onPartyInviteReceived: MessageListener<S2CPartyInviteReceivedPayload> | null = null;
+  public onPartyActionResult: MessageListener<S2CPartyActionResultPayload> | null = null;
   public onLatencyUpdated: ((pingMs: number) => void) | null = null;
   public onConnectionStateChange: ((connected: boolean) => void) | null = null;
 
@@ -446,6 +461,43 @@ export class ClientNetwork {
     this.send(Opcode.C2S_LEAVE_DUNGEON, {});
   }
 
+  public sendRequestChannelList(): void {
+    this.send(Opcode.C2S_REQUEST_CHANNEL_LIST, {});
+  }
+
+  public sendChangeChannel(targetChannelId: number): void {
+    const payload: C2SChangeChannelPayload = { targetChannelId };
+    this.send(Opcode.C2S_CHANGE_CHANNEL, payload);
+  }
+
+  public sendPartyInvite(targetPlayerName: string): void {
+    const payload: C2SPartyInvitePayload = { targetPlayerName };
+    this.send(Opcode.C2S_PARTY_INVITE, payload);
+  }
+
+  public sendPartyRespondInvite(inviterId: string, accept: boolean): void {
+    const payload: C2SPartyInviteResponsePayload = { inviterId, accept };
+    this.send(Opcode.C2S_PARTY_INVITE_RESPONSE, payload);
+  }
+
+  public sendPartyLeave(): void {
+    this.send(Opcode.C2S_PARTY_LEAVE, {});
+  }
+
+  public sendPartyKick(targetPlayerId: string): void {
+    const payload: C2SPartyKickPayload = { targetPlayerId };
+    this.send(Opcode.C2S_PARTY_KICK, payload);
+  }
+
+  public sendPartyPromote(targetPlayerId: string): void {
+    const payload: C2SPartyPromoteLeaderPayload = { targetPlayerId };
+    this.send(Opcode.C2S_PARTY_PROMOTE_LEADER, payload);
+  }
+
+  public sendPartyDisband(): void {
+    this.send(Opcode.C2S_PARTY_DISBAND, {});
+  }
+
   private startPingHeartbeat(): void {
     this.stopPingHeartbeat();
     this.pingIntervalId = window.setInterval(() => {
@@ -627,6 +679,31 @@ export class ClientNetwork {
 
         case Opcode.S2C_BUY_DUNGEON_TICKET_RESULT: {
           this.onBuyDungeonTicketResult?.(packet.data as S2CBuyDungeonTicketResultPayload);
+          break;
+        }
+
+        case Opcode.S2C_CHANNEL_LIST: {
+          this.onChannelList?.(packet.data as S2CChannelListPayload);
+          break;
+        }
+
+        case Opcode.S2C_CHANGE_CHANNEL_RESULT: {
+          this.onChangeChannelResult?.(packet.data as S2CChangeChannelResultPayload);
+          break;
+        }
+
+        case Opcode.S2C_PARTY_UPDATE: {
+          this.onPartyUpdate?.(packet.data as S2CPartyUpdatePayload);
+          break;
+        }
+
+        case Opcode.S2C_PARTY_INVITE_RECEIVED: {
+          this.onPartyInviteReceived?.(packet.data as S2CPartyInviteReceivedPayload);
+          break;
+        }
+
+        case Opcode.S2C_PARTY_ACTION_RESULT: {
+          this.onPartyActionResult?.(packet.data as S2CPartyActionResultPayload);
           break;
         }
 

@@ -23,6 +23,16 @@ import {
   C2SAutoSalvagePayload,
   C2SRequestLeaderboardPayload,
   C2SEnterDungeonPayload,
+  C2SRequestChannelListPayload,
+  C2SChangeChannelPayload,
+  S2CChannelListPayload,
+  S2CChangeChannelResultPayload,
+  C2SPartyInvitePayload,
+  C2SPartyInviteResponsePayload,
+  C2SPartyKickPayload,
+  C2SPartyPromoteLeaderPayload,
+  C2SPartyLeavePayload,
+  C2SPartyDisbandPayload,
   NetworkMessage,
   Opcode,
   S2CLoginSuccessPayload,
@@ -32,13 +42,24 @@ import {
 } from '@magicforge/shared';
 import { Connection } from './Connection';
 import { World } from '../game/World';
+import { WorldManager } from '../game/WorldManager';
 import { SERVER_CONFIG } from '../config';
 
 export class PacketHandler {
-  private world: World;
+  private worldManager: WorldManager | World;
 
-  constructor(world: World) {
-    this.world = world;
+  constructor(worldOrManager: WorldManager | World) {
+    this.worldManager = worldOrManager;
+  }
+
+  public getActiveWorld(connection: Connection): World {
+    if (connection.currentWorldInstance) {
+      return connection.currentWorldInstance as World;
+    }
+    if (this.worldManager instanceof World) {
+      return this.worldManager;
+    }
+    return this.worldManager.getOrCreateChannel(connection.currentWorldIndex || 1, connection.currentChannelId || 1);
   }
 
   public handlePacket(connection: Connection, rawData: string): void {
@@ -57,19 +78,19 @@ export class PacketHandler {
     switch (message.op) {
       // --- Autenticação de Contas & Multi-Provider ---
       case Opcode.C2S_AUTH_LOGIN:
-        this.world.handleAuthLogin(connection, message.data as C2SAuthLoginPayload);
+        this.worldManager.handleAuthLogin(connection, message.data as C2SAuthLoginPayload);
         break;
 
       case Opcode.C2S_AUTH_REGISTER:
-        this.world.handleAuthRegister(connection, message.data as C2SAuthRegisterPayload);
+        this.worldManager.handleAuthRegister(connection, message.data as C2SAuthRegisterPayload);
         break;
 
       case Opcode.C2S_AUTH_SOCIAL:
-        this.world.handleAuthSocial(connection, message.data as C2SAuthSocialPayload);
+        this.worldManager.handleAuthSocial(connection, message.data as C2SAuthSocialPayload);
         break;
 
       case Opcode.C2S_AUTH_CLAIM_LEGACY:
-        this.world.handleAuthClaimLegacy(connection, message.data as C2SAuthClaimLegacyPayload);
+        this.worldManager.handleAuthClaimLegacy(connection, message.data as C2SAuthClaimLegacyPayload);
         break;
 
       case Opcode.C2S_LOGIN:
@@ -86,6 +107,40 @@ export class PacketHandler {
 
       case Opcode.C2S_SELECT_CHARACTER_SLOT:
         this.handleSelectCharacterSlot(connection, message.data as C2SSelectCharacterSlotPayload);
+        break;
+
+      // --- Channels, Worlds & Instances ---
+      case Opcode.C2S_REQUEST_CHANNEL_LIST:
+        this.handleRequestChannelList(connection, message.data as C2SRequestChannelListPayload);
+        break;
+
+      case Opcode.C2S_CHANGE_CHANNEL:
+        this.handleChangeChannel(connection, message.data as C2SChangeChannelPayload);
+        break;
+
+      // --- Party & Social Systems ---
+      case Opcode.C2S_PARTY_INVITE:
+        this.handlePartyInvite(connection, message.data as C2SPartyInvitePayload);
+        break;
+
+      case Opcode.C2S_PARTY_INVITE_RESPONSE:
+        this.handlePartyInviteResponse(connection, message.data as C2SPartyInviteResponsePayload);
+        break;
+
+      case Opcode.C2S_PARTY_LEAVE:
+        this.handlePartyLeave(connection);
+        break;
+
+      case Opcode.C2S_PARTY_KICK:
+        this.handlePartyKick(connection, message.data as C2SPartyKickPayload);
+        break;
+
+      case Opcode.C2S_PARTY_PROMOTE_LEADER:
+        this.handlePartyPromoteLeader(connection, message.data as C2SPartyPromoteLeaderPayload);
+        break;
+
+      case Opcode.C2S_PARTY_DISBAND:
+        this.handlePartyDisband(connection);
         break;
 
       case Opcode.C2S_MOVE_INPUT:
@@ -154,16 +209,16 @@ export class PacketHandler {
 
       // --- Idle Farm Helper & Bag Automation ---
       case Opcode.C2S_UPDATE_FARM_SETTINGS:
-        this.world.handleUpdateFarmSettings(connection, message.data as C2SUpdateFarmSettingsPayload);
+        this.getActiveWorld(connection).handleUpdateFarmSettings(connection, message.data as C2SUpdateFarmSettingsPayload);
         break;
 
       case Opcode.C2S_AUTO_SALVAGE:
-        this.world.handleAutoSalvage(connection, message.data as C2SAutoSalvagePayload);
+        this.getActiveWorld(connection).handleAutoSalvage(connection, message.data as C2SAutoSalvagePayload);
         break;
 
       // --- Rankings & Leaderboards ---
       case Opcode.C2S_REQUEST_LEADERBOARD:
-        this.world.handleRequestLeaderboard(connection, message.data as C2SRequestLeaderboardPayload);
+        this.getActiveWorld(connection).handleRequestLeaderboard(connection, message.data as C2SRequestLeaderboardPayload);
         break;
 
       // --- Daily Dungeons & Boss Rush ---
@@ -199,22 +254,105 @@ export class PacketHandler {
       return;
     }
 
-    this.world.createPlayer(connection, payload.characterName, payload.classType);
+    if (this.worldManager instanceof WorldManager) {
+      const account = this.worldManager.db.getOrCreateAccount(payload.characterName);
+      connection.accountId = account.id;
+      connection.accountUsername = account.username;
+      const player = this.worldManager.db.loadOrCreatePlayer(connection.id, account.id, payload.characterName, payload.classType);
+      this.worldManager.assignPlayerToChannel(connection, player);
+    } else {
+      this.worldManager.createPlayer(connection, payload.characterName, payload.classType);
+    }
   }
 
   private handleRequestCharacterList(connection: Connection, payload: C2SRequestCharacterListPayload): void {
-    const username = payload?.accountUsername || 'Aventureiro';
-    this.world.handleRequestCharacterList(connection, username);
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handleRequestCharacterList(connection);
+    } else {
+      const username = payload?.accountUsername || 'Aventureiro';
+      this.worldManager.handleRequestCharacterList(connection, username);
+    }
   }
 
   private handleCreateCharacterSlot(connection: Connection, payload: C2SCreateCharacterSlotPayload): void {
     if (!payload || typeof payload.slotIndex !== 'number' || !payload.characterName || !payload.classType) return;
-    this.world.handleCreateCharacterSlot(connection, payload.slotIndex, payload.characterName, payload.classType);
+    this.worldManager.handleCreateCharacterSlot(connection, payload.slotIndex, payload.characterName, payload.classType);
   }
 
   private handleSelectCharacterSlot(connection: Connection, payload: C2SSelectCharacterSlotPayload): void {
     if (!payload || typeof payload.slotIndex !== 'number') return;
-    this.world.handleSelectCharacterSlot(connection, payload.slotIndex);
+    this.worldManager.handleSelectCharacterSlot(connection, payload.slotIndex);
+  }
+
+  private handleRequestChannelList(connection: Connection, payload?: C2SRequestChannelListPayload): void {
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handleRequestChannelList(connection, payload);
+    } else {
+      connection.send(Opcode.S2C_CHANNEL_LIST, {
+        worldIndex: this.worldManager.currentWorld,
+        worldName: this.worldManager.getWorldName(this.worldManager.currentWorld),
+        currentChannelId: this.worldManager.channelId,
+        channels: [
+          {
+            channelId: this.worldManager.channelId,
+            worldIndex: this.worldManager.currentWorld,
+            worldName: this.worldManager.getWorldName(this.worldManager.currentWorld),
+            activePlayers: this.worldManager.entityManager.getAllPlayers().length,
+            maxPlayers: this.worldManager.maxPlayers,
+            loadStatus: 'LIVRE',
+            isCurrentChannel: true,
+          },
+        ],
+      } as S2CChannelListPayload);
+    }
+  }
+
+  private handleChangeChannel(connection: Connection, payload: C2SChangeChannelPayload): void {
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handleChangeChannel(connection, payload);
+    } else {
+      connection.send(Opcode.S2C_CHANGE_CHANNEL_RESULT, {
+        success: false,
+        reason: 'SINGLE_WORLD_MODE',
+        message: 'Servidor operando em modo de instância única.',
+      } as S2CChangeChannelResultPayload);
+    }
+  }
+
+  private handlePartyInvite(connection: Connection, payload: C2SPartyInvitePayload): void {
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handlePartyInvite(connection, payload);
+    }
+  }
+
+  private handlePartyInviteResponse(connection: Connection, payload: C2SPartyInviteResponsePayload): void {
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handlePartyInviteResponse(connection, payload);
+    }
+  }
+
+  private handlePartyLeave(connection: Connection): void {
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handlePartyLeave(connection);
+    }
+  }
+
+  private handlePartyKick(connection: Connection, payload: C2SPartyKickPayload): void {
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handlePartyKick(connection, payload);
+    }
+  }
+
+  private handlePartyPromoteLeader(connection: Connection, payload: C2SPartyPromoteLeaderPayload): void {
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handlePartyPromoteLeader(connection, payload);
+    }
+  }
+
+  private handlePartyDisband(connection: Connection): void {
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handlePartyDisband(connection);
+    }
   }
 
   private handleMoveInput(connection: Connection, payload: C2SMoveInputPayload): void {
@@ -222,17 +360,16 @@ export class PacketHandler {
       return;
     }
 
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) {
       return;
     }
 
-    // Anticheat: Check if client claims to be radically far away from server authoritative position
     if (payload.currentClientPosition) {
       const clientServerDrift = distance(player.position, payload.currentClientPosition);
-      const maxAllowedDrift = 5.0; // 5 meters tolerance for latency
+      const maxAllowedDrift = 5.0;
       if (clientServerDrift > maxAllowedDrift) {
-        // Force client position reconciliation / snap-back
         connection.send(Opcode.S2C_POSITION_CORRECTION, {
           lastProcessedInputSeq: payload.inputSequence,
           authoritativePosition: player.position,
@@ -241,13 +378,11 @@ export class PacketHandler {
       }
     }
 
-    // 1. Mobile Virtual Joystick continuous direction
     if (payload.moveDirection) {
       player.setMoveDirection(payload.moveDirection, payload.inputSequence);
       return;
     }
 
-    // 2. Click/Touch-to-Move destination
     if (payload.targetPosition) {
       player.setMoveDestination(payload.targetPosition, payload.inputSequence);
     }
@@ -256,7 +391,8 @@ export class PacketHandler {
   private handleAttackTarget(connection: Connection, payload: C2SAttackTargetPayload): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
 
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
 
     player.targetId = payload.targetEntityId || null;
@@ -265,19 +401,21 @@ export class PacketHandler {
   private handleCastSkill(connection: Connection, payload: C2SCastSkillPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slot !== 'number') return;
 
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
 
-    this.world.castPlayerSkill(player, payload.slot, payload.targetEntityId, payload.targetPosition);
+    world.castPlayerSkill(player, payload.slot, payload.targetEntityId, payload.targetPosition);
   }
 
   private handleEquipSkill(connection: Connection, payload: C2SEquipSkillPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slot !== 'number' || !payload.skillId) return;
 
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
 
-    this.world.equipPlayerSkill(player, payload.slot, payload.skillId);
+    world.equipPlayerSkill(player, payload.slot, payload.skillId);
   }
 
   private handlePing(connection: Connection, payload: C2SPingPayload): void {
@@ -297,113 +435,130 @@ export class PacketHandler {
 
   private handleLootItem(connection: Connection, payload: C2SLootItemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || !payload.dropId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.lootItem(player, payload.dropId);
+    world.lootItem(player, payload.dropId);
   }
 
   private handleUseItem(connection: Connection, payload: C2SUseItemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.usePlayerItem(player, payload.slotIndex);
+    world.usePlayerItem(player, payload.slotIndex);
   }
 
   private handleSellItem(connection: Connection, payload: C2SSellItemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.sellPlayerItem(player, payload.slotIndex);
+    world.sellPlayerItem(player, payload.slotIndex);
   }
 
   private handleChallengeBoss(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.challengeStageBoss(player);
+    world.challengeStageBoss(player);
   }
 
   private handleEnterPortal(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.enterPortal(player);
+    world.enterPortal(player);
   }
 
   private handleExpandInventory(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.expandPlayerInventory(player);
+    world.expandPlayerInventory(player);
   }
 
   private handleDiscardItem(connection: Connection, payload: C2SDiscardItemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.discardOrRecyclePlayerItem(player, payload.slotIndex);
+    world.discardOrRecyclePlayerItem(player, payload.slotIndex);
   }
 
   private handlePerformReborn(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.performPlayerReborn(player);
+    world.performPlayerReborn(player);
   }
 
   private handleRefineEquipment(connection: Connection, payload: C2SRefineEquipmentPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.refinePlayerEquipment(player, payload.slotIndex);
+    world.refinePlayerEquipment(player, payload.slotIndex);
   }
 
   private handleSocketGem(connection: Connection, payload: C2SSocketGemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.equipmentSlotIndex !== 'number' || typeof payload.socketIndex !== 'number' || !payload.gemItemId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.socketPlayerGem(player, payload.equipmentSlotIndex, payload.socketIndex, payload.gemItemId);
+    world.socketPlayerGem(player, payload.equipmentSlotIndex, payload.socketIndex, payload.gemItemId);
   }
 
   private handleEquipCard(connection: Connection, payload: C2SEquipCardPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || !payload.cardId || !payload.targetSlot) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.equipPlayerCard(player, payload.cardId, payload.targetSlot, payload.isEquip);
+    world.equipPlayerCard(player, payload.cardId, payload.targetSlot, payload.isEquip);
   }
 
   private handleRequestCardAlbum(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.sendPlayerCardAlbum(player);
+    world.sendPlayerCardAlbum(player);
   }
 
   private handleRequestDungeonInfo(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player) return;
-    this.world.handleRequestDungeonInfo(player);
+    world.handleRequestDungeonInfo(player);
   }
 
   private handleEnterDungeon(connection: Connection, payload: C2SEnterDungeonPayload): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.handleEnterDungeon(player, payload);
+    world.handleEnterDungeon(player, payload);
   }
 
   private handleBuyDungeonTicket(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    this.world.handleBuyDungeonTicket(player);
+    world.handleBuyDungeonTicket(player);
   }
 
   private handleLeaveDungeon(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.world.entityManager.getPlayer(connection.playerId);
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
     if (!player) return;
-    this.world.handleLeaveDungeon(player);
+    world.handleLeaveDungeon(player);
   }
 }
+

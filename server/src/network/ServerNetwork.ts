@@ -3,19 +3,20 @@ import { Server as HttpServer } from 'http';
 import { Connection } from './Connection';
 import { PacketHandler } from './PacketHandler';
 import { World } from '../game/World';
+import { WorldManager } from '../game/WorldManager';
 import { SERVER_CONFIG } from '../config';
 
 export class ServerNetwork {
   private wss: WebSocketServer;
-  private world: World;
+  private worldManager: WorldManager | World;
   private packetHandler: PacketHandler;
   private connections = new Map<string, Connection>();
   private connectionCounter: number = 0;
   private heartbeatInterval: NodeJS.Timeout | null = null;
 
-  constructor(server: HttpServer, world: World) {
-    this.world = world;
-    this.packetHandler = new PacketHandler(world);
+  constructor(server: HttpServer, worldOrManager: WorldManager | World) {
+    this.worldManager = worldOrManager;
+    this.packetHandler = new PacketHandler(worldOrManager);
 
     this.wss = new WebSocketServer({ server });
     this.setupListeners();
@@ -29,7 +30,7 @@ export class ServerNetwork {
       const connection = new Connection(connId, socket);
 
       this.connections.set(connId, connection);
-      this.world.registerConnection(connection);
+      this.worldManager.registerConnection(connection);
 
       const ip = req.socket.remoteAddress;
       console.log(`[ServerNetwork] Client connected: ${connId} (IP: ${ip}). Active connections: ${this.connections.size}`);
@@ -42,7 +43,7 @@ export class ServerNetwork {
       socket.on('close', (code, reason) => {
         console.log(`[ServerNetwork] Client disconnected: ${connId} (code: ${code}, reason: ${reason || 'none'})`);
         this.connections.delete(connId);
-        this.world.unregisterConnection(connection);
+        this.worldManager.unregisterConnection(connection);
       });
 
       socket.on('error', (err) => {
@@ -59,7 +60,7 @@ export class ServerNetwork {
           console.warn(`[ServerNetwork] Client ${id} timed out. Terminating connection.`);
           conn.close(1001, 'Heartbeat timeout');
           this.connections.delete(id);
-          this.world.unregisterConnection(conn);
+          this.worldManager.unregisterConnection(conn);
         }
       }
     }, SERVER_CONFIG.PING_INTERVAL_MS);
@@ -72,3 +73,4 @@ export class ServerNetwork {
     this.wss.close();
   }
 }
+

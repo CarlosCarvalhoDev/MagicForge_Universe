@@ -96,6 +96,23 @@ export enum Opcode {
   S2C_BUY_DUNGEON_TICKET_RESULT = 0x8D,
   C2S_LEAVE_DUNGEON = 0x8E,
 
+  // --- Channels, Worlds & Instances (0x90 - 0x99) ---
+  C2S_REQUEST_CHANNEL_LIST = 0x90,
+  S2C_CHANNEL_LIST = 0x91,
+  C2S_CHANGE_CHANNEL = 0x92,
+  S2C_CHANGE_CHANNEL_RESULT = 0x93,
+
+  // --- Party & Social Systems (0xA0 - 0xAF) ---
+  C2S_PARTY_INVITE = 0xA0,
+  S2C_PARTY_INVITE_RECEIVED = 0xA1,
+  C2S_PARTY_INVITE_RESPONSE = 0xA2,
+  C2S_PARTY_LEAVE = 0xA3,
+  C2S_PARTY_KICK = 0xA4,
+  C2S_PARTY_PROMOTE_LEADER = 0xA5,
+  C2S_PARTY_DISBAND = 0xA6,
+  S2C_PARTY_UPDATE = 0xA7,
+  S2C_PARTY_ACTION_RESULT = 0xA8,
+
   // --- Heartbeat & Quality of Service (0xF0 - 0xFF) ---
   C2S_PING = 0xF0,
   S2C_PONG = 0xF1,
