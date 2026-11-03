@@ -801,6 +801,41 @@ export interface S2CPartyActionResultPayload {
   message: string;
 }
 
+// ==========================================
+// Offline Progress & AFK Rewards Payloads (0xB0 - 0xB2)
+// ==========================================
+export interface OfflineLootItem {
+  itemId: string;
+  name: string;
+  rarity: string;
+  quantity: number;
+}
+
+export interface S2COfflineRewardInfoPayload {
+  offlineSeconds: number;
+  cappedSeconds: number; // Máximo 12h (43200s)
+  accumulatedGold: number;
+  accumulatedExp: number;
+  lootPreview: OfflineLootItem[];
+  minThresholdSeconds: number; // 300s (5 min)
+}
+
+export interface C2SClaimOfflineRewardsPayload {
+  multiplier?: number;
+}
+
+export interface S2COfflineRewardsClaimedPayload {
+  success: boolean;
+  claimedGold: number;
+  claimedExp: number;
+  lootClaimed: OfflineLootItem[];
+  newGold: number;
+  newLevel: number;
+  newExp: number;
+  message: string;
+}
+
+
 
 
 

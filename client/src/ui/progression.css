@@ -2528,3 +2528,174 @@
     padding-bottom: max(env(safe-area-inset-bottom, 0px), 28px) !important;
   }
 }
+
+
+/* ==========================================================================
+   BAÚ DO TEMPO — MODAL DE RECOMPENSAS OFFLINE / AFK PROGRESSION
+   ========================================================================== */
+#offline-reward-dialog {
+  border: 2px solid #d97706 !important;
+  border-radius: 8px !important;
+  background: #0d111e !important;
+  color: #fef3c7 !important;
+  max-width: 440px;
+  width: 92vw;
+  padding: 24px 20px;
+  margin: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(217, 119, 6, 0.3) !important;
+}
+
+#offline-reward-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.offline-reward-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.offline-header .offline-icon-crest {
+  font-size: 38px;
+  line-height: 1;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6));
+}
+
+.offline-header .offline-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fbbf24;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
+}
+
+.offline-header .offline-subtitle {
+  font-size: 12px;
+  color: #a3a3a3;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.offline-time-banner {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.offline-time-value {
+  font-weight: 700;
+  color: #60a5fa;
+}
+
+.offline-time-cap {
+  font-size: 11px;
+  color: #71717a;
+}
+
+.offline-rewards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.offline-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.offline-card .reward-icon {
+  font-size: 26px;
+}
+
+.offline-card .reward-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.offline-card .reward-label {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.offline-card .reward-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fef08a;
+}
+
+.reward-exp .reward-amount {
+  color: #93c5fd;
+}
+
+.offline-loot-section {
+  background: rgba(17, 24, 39, 0.5);
+  border: 1px dashed rgba(217, 119, 6, 0.3);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: left;
+}
+
+.offline-loot-title {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+.offline-loot-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.offline-loot-item {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  display: flex;
+  gap: 6px;
+}
+
+.offline-loot-item .item-qty {
+  color: #fbbf24;
+  font-weight: bold;
+}
+
+.btn-claim-offline {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0b0f19;
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  border: 1px solid #fef08a;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.btn-claim-offline:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-claim-offline:active {
+  transform: translateY(1px);

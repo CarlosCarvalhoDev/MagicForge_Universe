@@ -33,6 +33,7 @@ import {
   C2SPartyPromoteLeaderPayload,
   C2SPartyLeavePayload,
   C2SPartyDisbandPayload,
+  C2SClaimOfflineRewardsPayload,
   NetworkMessage,
   Opcode,
   S2CLoginSuccessPayload,
@@ -236,6 +237,11 @@ export class PacketHandler {
 
       case Opcode.C2S_LEAVE_DUNGEON:
         this.handleLeaveDungeon(connection);
+        break;
+
+      // --- Offline Progress & AFK Rewards (Baú do Tempo) ---
+      case Opcode.C2S_CLAIM_OFFLINE_REWARDS:
+        this.handleClaimOfflineRewards(connection, message.data as C2SClaimOfflineRewardsPayload);
         break;
 
       case Opcode.C2S_PING:
@@ -559,6 +565,14 @@ export class PacketHandler {
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player) return;
     world.handleLeaveDungeon(player);
+  }
+
+  private handleClaimOfflineRewards(connection: Connection, payload?: C2SClaimOfflineRewardsPayload): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const world = this.getActiveWorld(connection);
+    const player = world.entityManager.getPlayer(connection.playerId);
+    if (!player) return;
+    world.claimOfflineRewards(player, payload?.multiplier);
   }
 }
 
