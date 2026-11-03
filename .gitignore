@@ -73,3 +73,6 @@ Thumbs.db
 ehthumbs.db
 [Dd]esktop.ini
 $RECYCLE.BIN/
+
+# Scripts locais de inicializacao
+*.bat
