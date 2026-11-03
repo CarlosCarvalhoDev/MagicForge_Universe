@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite';
 import path from 'path';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
+  plugins: [
+    basicSsl(),
+  ],
   build: {
     rollupOptions: {
       input: {
@@ -17,8 +21,29 @@ export default defineConfig({
     },
   },
   server: {
-    host: true,
+    host: '0.0.0.0',
     port: 5173,
     open: false,
+    allowedHosts: true,
+    proxy: {
+      '/ws': {
+        target: 'ws://127.0.0.1:3000',
+        ws: true,
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
+            const code = (err as any).code;
+            if (code === 'ECONNRESET' || code === 'ETIMEDOUT' || code === 'EPIPE') {
+              return;
+            }
+            console.warn('[vite-ws-proxy-warning]', err.message);
+          });
+        },
+      },
+      '/health': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true,
+      },
+    },
   },
 });

@@ -79,7 +79,10 @@ import {
   S2CPartyActionResultPayload,
 } from '@magicforge/shared';
 
+import { resolveServerUrl } from './NetworkConfig';
+
 export type MessageListener<T> = (data: T) => void;
+
 
 export class ClientNetwork {
   private ws: WebSocket | null = null;
@@ -137,18 +140,14 @@ export class ClientNetwork {
 
   private reconnectTimeoutId: number | null = null;
   public autoReconnect: boolean = true;
+  private useProxyFallback: boolean = false;
 
   constructor(serverUrl?: string) {
-    if (serverUrl) {
-      this.serverUrl = serverUrl;
-    } else if (import.meta.env?.VITE_SERVER_URL) {
-      this.serverUrl = import.meta.env.VITE_SERVER_URL;
-    } else if (typeof window !== 'undefined' && window.location?.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      this.serverUrl = `${protocol}//${window.location.hostname}:3000`;
-    } else {
-      this.serverUrl = 'ws://192.168.1.12:3000';
-    }
+    this.serverUrl = resolveServerUrl(serverUrl, import.meta.env?.VITE_SERVER_URL);
+  }
+
+  public getServerUrl(): string {
+    return this.serverUrl;
   }
 
   public connect(): void {
@@ -166,9 +165,18 @@ export class ClientNetwork {
       this.disconnect(false);
     }
 
-    console.log(`[ClientNetwork] Connecting to ${this.serverUrl}...`);
+    let targetUrl = this.serverUrl;
+    if (typeof window !== 'undefined' && window.location?.host) {
+      const isHttps = window.location.protocol === 'https:';
+      const isTunnelHost = !/^(localhost|127\.0\.0\.1|192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(window.location.hostname);
+      if (isHttps || isTunnelHost || this.useProxyFallback) {
+        const proto = isHttps ? 'wss:' : 'ws:';
+        targetUrl = `${proto}//${window.location.host}/ws`;
+      }
+    }
+    console.log(`[ClientNetwork] Connecting to ${targetUrl}...`);
     try {
-      this.ws = new WebSocket(this.serverUrl);
+      this.ws = new WebSocket(targetUrl);
     } catch (err) {
       console.error('[ClientNetwork] Erro ao instanciar WebSocket:', err);
       if (this.autoReconnect) this.scheduleReconnect();
@@ -198,6 +206,9 @@ export class ClientNetwork {
 
     this.ws.onerror = (err) => {
       console.error('[ClientNetwork] WebSocket error:', err);
+      if (!this.isConnected) {
+        this.useProxyFallback = !this.useProxyFallback;
+      }
       if (this.autoReconnect && !this.isConnected) {
         this.scheduleReconnect();
       }
