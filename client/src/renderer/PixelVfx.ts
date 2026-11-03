@@ -54,15 +54,19 @@ export function planWarriorCastFx(event: WarriorCastFx, entities: readonly FxEnt
   const impact = result?.impactPosition ?? (finitePosition(event.targetPosition) ? event.targetPosition : target?.position);
   const origin = finitePosition(event.originPosition) ? event.originPosition : caster?.position;
   const yaw = Number.isFinite(event.headingYaw) ? event.headingYaw! : origin && impact ? Math.atan2(impact.x - origin.x, impact.z - origin.z) * 180 / Math.PI : caster?.headingYaw ?? 0;
-  if (['guerreiro_truque_1', 'guerreiro_truque_2', 'guerreiro_truque_3', 'guerreiro_nv1_2', 'guerreiro_nv1_3'].includes(event.skillId) && impact) {
-    const variants: Record<string, SlashVariant> = { guerreiro_truque_2: 'bleed', guerreiro_truque_3: 'rupture', guerreiro_nv1_2: 'haste', guerreiro_nv1_3: 'stun' };
+  if (['guerreiro_truque_1', 'guerreiro_truque_2', 'guerreiro_truque_3', 'guerreiro_nv1_2', 'guerreiro_nv1_3', 'barbaro_truque_1', 'barbaro_truque_2', 'barbaro_truque_3', 'barbaro_nv1_3'].includes(event.skillId) && impact) {
+    const variants: Record<string, SlashVariant> = {
+      guerreiro_truque_2: 'bleed', guerreiro_truque_3: 'rupture', guerreiro_nv1_2: 'haste', guerreiro_nv1_3: 'stun',
+      barbaro_truque_2: 'stun', barbaro_truque_3: 'bleed', barbaro_nv1_3: 'rupture',
+    };
     return [{ kind: 'slash', position: impact, yaw, variant: variants[event.skillId] }];
   }
   const center = event.geometry === 'CIRCLE_SELF' ? origin : finitePosition(event.targetPosition) ? event.targetPosition : origin;
   radius = event.radius ?? radius;
-  if (event.skillId === 'guerreiro_nv2_1' && center) return [{ kind: 'whirlwind', position: center, radius }];
-  if (event.skillId === 'guerreiro_nv3_1' && center) return [{ kind: 'avatar', position: center, radius }];
+  if (['guerreiro_nv2_1', 'barbaro_nv2_1', 'barbaro_nv3_3'].includes(event.skillId) && center) return [{ kind: 'whirlwind', position: center, radius }];
+  if (['guerreiro_nv3_1', 'barbaro_nv1_1', 'barbaro_nv1_2', 'barbaro_nv3_1'].includes(event.skillId) && center) return [{ kind: 'avatar', position: center, radius }];
+  if (event.skillId === 'barbaro_nv2_2' && center) return [{ kind: 'shield', position: center, radius }];
   if (event.skillId === 'guerreiro_nv2_3' && origin) return [{ kind: 'line', position: origin, yaw, lineLength: event.lineLength, lineWidth: event.lineWidth }];
-  if (event.skillId === 'guerreiro_nv3_2' && center) return [{ kind: 'judgment', position: center, radius }];
+  if (['guerreiro_nv3_2', 'barbaro_nv2_3', 'barbaro_nv3_2'].includes(event.skillId) && center) return [{ kind: 'judgment', position: center, radius }];
   return [];
 }

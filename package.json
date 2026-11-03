@@ -11,7 +11,7 @@
     "build": "npm run build --workspace=@magicforge/server && npm run build --workspace=@magicforge/client",
     "dev:client": "npm run dev --workspace=@magicforge/client",
     "dev:server": "npm run dev --workspace=@magicforge/server",
-    "test": "node client/tests/guest-session.test.mjs && node client/tests/hero-animations.test.mjs && node client/tests/runic-ui-layout.test.mjs && node client/tests/client-network-url.test.mjs"
+    "test": "node client/tests/guest-session.test.mjs && node client/tests/hero-animations.test.mjs && node client/tests/runic-ui-layout.test.mjs && node client/tests/client-network-url.test.mjs && node client/tests/barbarian-presentation.test.mjs"
   }
 }
 
