@@ -2949,3 +2949,1013 @@
     background-size: 5px 5px !important;
   }
 }
+
+/* ==========================================================================
+   CAPA E LOGIN — SUPERFÍCIE MODERNA IDLE (DARK GLASSMORPHISM)
+   Paleta unificada, superfícies translúcidas, drawer lateral e layout responsivo.
+   ========================================================================== */
+#modal-auth-selection {
+  --mf-ink: #080c13;
+  --mf-gold: #c9a36a;
+  --mf-gold-strong: #e4c48a;
+  --mf-gold-glow: rgba(201, 163, 106, 0.28);
+  --mf-text: #f3eee4;
+  --mf-muted: #9da6b4;
+  --mf-line: rgba(201, 163, 106, 0.2);
+  --mf-line-subtle: rgba(243, 238, 228, 0.08);
+  --mf-surface: rgba(10, 14, 22, 0.65);
+  --mf-surface-card: rgba(12, 16, 26, 0.72);
+  background:
+    linear-gradient(180deg, rgba(6, 9, 14, 0.35) 0%, rgba(6, 9, 14, 0.55) 100%),
+    url('/assets/ui/login/bg_cover_astral.jpg') center / cover no-repeat;
+  color: var(--mf-text);
+  overflow-x: hidden;
+}
+
+#modal-auth-selection [hidden] {
+  display: none !important;
+}
+
+/* Camadas de estrelas e vinhetas */
+#modal-auth-selection .layer-stars,
+#modal-auth-selection .layer-runes {
+  opacity: 0.15;
+}
+
+#modal-auth-selection .layer-vignette {
+  background: linear-gradient(180deg, rgba(6, 9, 14, 0.3), transparent 25%, transparent 65%, rgba(6, 9, 14, 0.6));
+}
+
+/* Remoção de pseudo-elementos decorativos pesados / cantoneiras repetitivas */
+.forge-cover-masthead::after,
+.forge-masthead::after,
+.forge-cover-classes-showcase::before,
+.forge-entry::before,
+.forge-entry::after,
+.forge-social-login::before,
+#modal-auth-selection[data-screen="login"] .forge-intro h1::after,
+.forge-eyebrow::before,
+.forge-eyebrow::after,
+.forge-entry label::before,
+.forge-entry button[type="submit"]::before,
+.forge-entry button[type="submit"]::after,
+.cta-pulse-ring,
+.forge-intro::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Capa: layout e transição */
+#modal-auth-selection .forge-cover-hero {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: clamp(14px, 2vh, 24px) clamp(16px, 3.5vw, 40px);
+  z-index: 10;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 163, 106, 0.3) transparent;
+  background:
+    linear-gradient(180deg, rgba(6, 9, 14, 0.4) 0%, rgba(6, 9, 14, 0.1) 32%, rgba(6, 9, 14, 0.22) 65%, rgba(6, 9, 14, 0.6) 100%),
+    url('/assets/ui/login/bg_cover_astral.jpg') center / cover no-repeat;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  transform: none;
+  opacity: 1;
+}
+
+#modal-auth-selection.in-auth-mode .forge-cover-hero {
+  transform: translateX(-36px);
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+/* Masthead da Capa e Login */
+.forge-cover-masthead,
+.forge-masthead {
+  border-bottom: 1px solid var(--mf-line-subtle);
+  width: 100%;
+  max-width: 1180px;
+}
+
+.forge-wordmark {
+  background: none;
+  -webkit-text-fill-color: var(--mf-gold-strong);
+  color: var(--mf-gold-strong);
+  filter: none;
+  letter-spacing: 0.18em;
+}
+
+.forge-wordmark small {
+  color: var(--mf-muted);
+  -webkit-text-fill-color: var(--mf-muted);
+  letter-spacing: 0.42em;
+}
+
+.forge-cover-server-pill {
+  background: rgba(10, 14, 22, 0.55);
+  border: 1px solid rgba(143, 184, 154, 0.35);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.pulse-dot {
+  background: #8fb89a;
+  box-shadow: 0 0 8px rgba(143, 184, 154, 0.6);
+}
+
+.pill-title {
+  color: #d7e6da;
+  letter-spacing: 0.12em;
+}
+
+/* Container Central e Textos */
+#modal-auth-selection .forge-cover-container {
+  flex: 1;
+  max-width: 960px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-height: 0;
+  margin: 0 auto;
+}
+
+#modal-auth-selection .forge-cover-centerpiece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.forge-cover-badge-top,
+.forge-eyebrow,
+.showcase-badge,
+.stage-badge {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  color: var(--mf-gold);
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+#modal-auth-selection .forge-cover-title {
+  font-size: clamp(26px, 3.2vw, 44px);
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+  margin: 0;
+}
+
+.title-highlight,
+.forge-intro h1,
+.forge-entry h2 {
+  background: none;
+  -webkit-text-fill-color: var(--mf-gold-strong);
+  color: var(--mf-gold-strong);
+  filter: none;
+}
+
+#modal-auth-selection .forge-cover-tagline {
+  max-width: 660px;
+  font-size: clamp(12px, 1.1vw, 14px);
+  line-height: 1.5;
+  color: var(--mf-muted);
+  margin: 0;
+}
+
+/* Ticker de Destaques */
+.ticker-item {
+  background: transparent;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0 4px;
+  color: var(--mf-text);
+  font-weight: 500;
+}
+
+.ticker-item + .ticker-item::before {
+  content: "·";
+  margin-right: 8px;
+  color: var(--mf-gold);
+}
+
+.ticker-icon {
+  color: var(--mf-gold);
+}
+
+/* 3 Cards de Mecânicas (Glassmorphism Moderno) */
+#modal-auth-selection .forge-mechanics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 14px !important;
+  width: 100%;
+  max-width: 840px;
+  margin: 2px auto 0;
+}
+
+#modal-auth-selection .mechanic-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px !important;
+  background: rgba(10, 14, 22, 0.52) !important;
+  border: 1px solid var(--mf-line) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
+  text-align: left;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#modal-auth-selection .mechanic-card:hover {
+  background: rgba(14, 20, 32, 0.76) !important;
+  border-color: rgba(228, 196, 138, 0.45) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+}
+
+#modal-auth-selection .mechanic-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+#modal-auth-selection .mechanic-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(201, 163, 106, 0.12);
+  color: var(--mf-gold);
+  border: 0;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+#modal-auth-selection .mechanic-card-header h4 {
+  font: 600 12px 'Cinzel', serif;
+  letter-spacing: 0.05em;
+  color: var(--mf-text);
+  margin: 0;
+}
+
+#modal-auth-selection .mechanic-sub {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mf-gold);
+  opacity: 0.9;
+}
+
+#modal-auth-selection .mechanic-card p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--mf-muted);
+  margin: 0;
+}
+
+/* Showcase Centralizado de Classes */
+#modal-auth-selection .forge-cover-showcase-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 840px;
+  margin: 2px auto 0;
+}
+
+#modal-auth-selection .forge-cover-classes-showcase {
+  width: 100%;
+  background: rgba(10, 14, 22, 0.65);
+  border: 1px solid var(--mf-line);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#modal-auth-selection .classes-showcase-heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#modal-auth-selection .classes-showcase-heading h2 {
+  font: 700 clamp(16px, 1.8vw, 22px) 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  color: var(--mf-text);
+  margin: 0;
+}
+
+#modal-auth-selection .classes-showcase-heading p {
+  font-size: 11px;
+  color: var(--mf-muted);
+  margin: 0;
+}
+
+#modal-auth-selection .classes-showcase-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+#modal-auth-selection .classes-selector-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#modal-auth-selection .class-rail-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  background-image: none;
+  color: var(--mf-muted);
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+  transform: none;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+#modal-auth-selection .class-rail-btn:hover {
+  background: rgba(243, 238, 228, 0.05);
+  color: var(--mf-text);
+  border-color: rgba(243, 238, 228, 0.08);
+}
+
+#modal-auth-selection .class-rail-btn.active {
+  background: rgba(201, 163, 106, 0.14);
+  border-color: rgba(201, 163, 106, 0.38);
+  color: var(--mf-gold-strong);
+  box-shadow: inset 0 0 12px rgba(201, 163, 106, 0.08);
+}
+
+#modal-auth-selection .rail-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(243, 238, 228, 0.06);
+  color: var(--mf-gold);
+  border: 0;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+#modal-auth-selection .class-rail-btn.active .rail-icon {
+  background: rgba(201, 163, 106, 0.25);
+  color: #fff;
+}
+
+#modal-auth-selection .rail-name {
+  font: 700 12px 'Cinzel', serif;
+  letter-spacing: 0.06em;
+}
+
+#modal-auth-selection .rail-role {
+  font-size: 10px;
+  color: var(--mf-muted);
+  opacity: 0.85;
+}
+
+#modal-auth-selection .class-stage-display {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 18px;
+  align-items: center;
+  background: rgba(8, 12, 18, 0.32);
+  border: 1px solid var(--mf-line-subtle);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: none;
+}
+
+#modal-auth-selection .stage-pedestal-platform {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#modal-auth-selection .hero-sprite-actor img {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 2px solid rgba(228, 196, 138, 0.55);
+  box-shadow: 0 0 24px rgba(201, 163, 106, 0.35);
+  object-fit: cover;
+}
+
+#modal-auth-selection .stage-info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#modal-auth-selection .stage-card-header h3 {
+  font: 700 17px 'Cinzel', serif;
+  letter-spacing: 0.05em;
+  color: var(--mf-text);
+  margin: 0;
+}
+
+#modal-auth-selection .stage-card-header p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--mf-muted);
+  margin: 4px 0 0;
+}
+
+#modal-auth-selection .stage-stats-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#modal-auth-selection .stat-bar-group {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+#modal-auth-selection .stat-name {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mf-muted);
+}
+
+#modal-auth-selection .stat-meter {
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(243, 238, 228, 0.08);
+  border: 0;
+  overflow: hidden;
+}
+
+#modal-auth-selection .meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #c9a36a, #e4c48a);
+  box-shadow: none;
+}
+
+#modal-auth-selection .stage-traits-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+#modal-auth-selection .trait-tag {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(201, 163, 106, 0.1);
+  border: 1px solid rgba(201, 163, 106, 0.22);
+  color: var(--mf-gold-strong);
+  letter-spacing: 0.04em;
+  box-shadow: none;
+}
+
+/* Botão Flutuante Lateral na Capa (Drawer Pull-Tab) */
+#modal-auth-selection .forge-cover-cta {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 18px 12px 20px;
+  border: 1px solid rgba(201, 163, 106, 0.35);
+  border-right: none;
+  border-radius: 16px 0 0 16px;
+  background: rgba(10, 14, 22, 0.65);
+  color: var(--mf-text);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.45);
+  opacity: 0.65;
+  cursor: pointer;
+  transition: opacity 0.25s ease, background 0.25s ease, border-color 0.25s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+#modal-auth-selection .forge-cover-cta:hover,
+#modal-auth-selection .forge-cover-cta:focus-visible {
+  opacity: 1;
+  background: rgba(14, 20, 32, 0.9);
+  border-color: rgba(228, 196, 138, 0.65);
+  transform: translate(-6px, -50%);
+  box-shadow: -6px 0 28px rgba(201, 163, 106, 0.3);
+  outline: none;
+}
+
+#modal-auth-selection.in-auth-mode .forge-cover-cta {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(36px, -50%);
+}
+
+.cta-text-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.cta-super {
+  color: var(--mf-gold);
+  font: 600 10px 'Cinzel', serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cta-main {
+  color: var(--mf-text);
+  font: 700 13px 'Cinzel', serif;
+  letter-spacing: 0.05em;
+}
+
+.cta-arrow-icon {
+  color: var(--mf-gold-strong);
+  transition: transform 0.2s ease;
+  animation: ctaChevronPulse 2s ease-in-out infinite;
+}
+
+@keyframes ctaChevronPulse {
+  0%, 100% { transform: translateX(0); opacity: 0.8; }
+  50% { transform: translateX(-4px); opacity: 1; }
+}
+
+.forge-cover-cta:hover .cta-arrow-icon {
+  animation: none;
+  transform: translateX(-4px);
+}
+
+/* Tela de Login: Gaveta deslizando da direita para a esquerda */
+#modal-auth-selection .forge-auth {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  padding: clamp(14px, 2.2vh, 26px) clamp(16px, 3.5vw, 40px);
+  z-index: 20;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 163, 106, 0.3) transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  transform: translateX(104%);
+  opacity: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(7, 10, 16, 0.22) 0%, rgba(7, 10, 16, 0.65) 44%, rgba(7, 10, 16, 0.9) 100%),
+    url('/assets/ui/login/bg_cover_astral.jpg') center / cover no-repeat;
+  box-shadow: -24px 0 48px rgba(0, 0, 0, 0.35);
+  transition: transform 0.62s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#modal-auth-selection.in-auth-mode .forge-auth {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Card de Login (.forge-entry) e Sessão */
+#modal-auth-selection .forge-entry,
+#modal-auth-selection .forge-account-session,
+#modal-auth-selection .forge-class-preview {
+  border: 1px solid var(--mf-line);
+  outline: none;
+  border-radius: 16px;
+  background: rgba(10, 14, 22, 0.72);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background-image: none;
+}
+
+#modal-auth-selection .forge-entry {
+  padding: 26px 26px 22px;
+}
+
+#modal-auth-selection .forge-entry label {
+  color: var(--mf-muted);
+  letter-spacing: 0.08em;
+  font-size: 11px;
+}
+
+#modal-auth-selection .forge-entry input,
+#modal-auth-selection .forge-entry select,
+#modal-auth-selection #forge-account-password,
+#modal-auth-selection #forge-password-confirm {
+  border: 1px solid var(--mf-line);
+  outline: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: rgba(6, 9, 14, 0.65);
+  background-image: none;
+  color: var(--mf-text);
+  box-shadow: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#modal-auth-selection .forge-entry input:focus,
+#modal-auth-selection .forge-entry select:focus,
+#modal-auth-selection .forge-entry input:focus-visible,
+#modal-auth-selection .forge-entry select:focus-visible {
+  border-color: rgba(201, 163, 106, 0.7) !important;
+  outline: 2px solid rgba(201, 163, 106, 0.25) !important;
+  outline-offset: 1px !important;
+  box-shadow: 0 0 12px rgba(201, 163, 106, 0.2) !important;
+}
+
+#modal-auth-selection .forge-entry button[type="submit"] {
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #e4c48a 0%, #c9a36a 100%);
+  color: #1a1208;
+  font: 700 12px 'Cinzel', serif;
+  letter-spacing: 0.12em;
+  box-shadow: 0 4px 18px rgba(201, 163, 106, 0.3);
+  text-shadow: none;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#modal-auth-selection .forge-entry button[type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(201, 163, 106, 0.45);
+}
+
+#modal-auth-selection #forge-toggle-register,
+#modal-auth-selection #forge-cancel-create {
+  background: transparent;
+  border: 1px solid var(--mf-line);
+  border-radius: 10px;
+  color: var(--mf-text);
+  cursor: pointer;
+  font: 600 11px 'Cinzel', serif;
+  letter-spacing: 0.08em;
+  transition: all 0.2s ease;
+}
+
+#modal-auth-selection #forge-toggle-register:hover:not(:disabled),
+#modal-auth-selection #forge-cancel-create:hover:not(:disabled) {
+  background: rgba(243, 238, 228, 0.06);
+  border-color: rgba(201, 163, 106, 0.45);
+  color: #fff;
+}
+
+#modal-auth-selection .forge-social-login {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--mf-line);
+}
+
+#modal-auth-selection .forge-social-login h3,
+#modal-auth-selection .forge-provider-copy strong {
+  color: var(--mf-muted);
+}
+
+#modal-auth-selection .forge-social-buttons button {
+  border-radius: 10px;
+  min-height: 42px;
+  background: rgba(8, 12, 18, 0.45);
+  border: 1px solid var(--mf-line-subtle);
+  color: var(--mf-text);
+  transition: all 0.2s ease;
+}
+
+#modal-auth-selection .forge-social-buttons button:hover:not(:disabled) {
+  border-color: rgba(201, 163, 106, 0.35);
+  background: rgba(14, 20, 32, 0.65);
+}
+
+#modal-auth-selection .forge-provider-icon {
+  border: 0;
+  background: rgba(243, 238, 228, 0.06);
+  box-shadow: none;
+  border-radius: 8px;
+}
+
+#modal-auth-selection .runic-crest-pill {
+  background: rgba(10, 14, 22, 0.6) !important;
+  border: 1px solid var(--mf-line) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 10px !important;
+  color: var(--mf-muted) !important;
+  box-shadow: none !important;
+}
+
+/* Padronização Elegante dos Botões de Ação (< CONHECER O JOGO, ✦ Início, 📜 Rever história) */
+#modal-auth-selection .forge-back-cover-btn,
+#modal-auth-selection .forge-footer-actions button:not([hidden]),
+#modal-auth-selection .btn-back-cover,
+#modal-auth-selection #btn-replay-story {
+  background-image: none !important;
+  background: rgba(12, 16, 26, 0.65) !important;
+  border: 1px solid var(--mf-line) !important;
+  border-radius: 10px !important;
+  outline: none !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  color: var(--mf-text) !important;
+  font: 600 11px 'Cinzel', serif !important;
+  letter-spacing: 0.08em !important;
+  padding: 8px 16px !important;
+  min-height: 36px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#modal-auth-selection .forge-back-cover-btn:hover,
+#modal-auth-selection .forge-footer-actions button:not([hidden]):hover,
+#modal-auth-selection .btn-back-cover:hover,
+#modal-auth-selection #btn-replay-story:hover {
+  background: rgba(20, 28, 44, 0.85) !important;
+  border-color: rgba(228, 196, 138, 0.5) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 12px rgba(201, 163, 106, 0.2) !important;
+}
+
+#modal-auth-selection .forge-world-tag {
+  background-image: none;
+  background: transparent;
+  border: 1px solid var(--mf-line);
+  border-radius: 10px;
+  color: var(--mf-muted);
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE MOBILE & TABLET (< 900px)
+   ========================================================================== */
+@media (max-width: 900px) {
+  #modal-auth-selection .forge-cover-hero {
+    padding: 10px 12px 85px !important; /* 85px garante rolagem completa sem sobreposição do botão flutuante */
+  }
+
+  #modal-auth-selection .forge-cover-masthead {
+    margin-bottom: 2px;
+  }
+
+  #modal-auth-selection .forge-cover-server-pill {
+    padding: 3px 8px;
+    font-size: 9.5px;
+  }
+
+  #modal-auth-selection .forge-cover-badge-top {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  #modal-auth-selection .forge-cover-title {
+    font-size: 21px !important;
+    line-height: 1.15;
+  }
+
+  #modal-auth-selection .forge-cover-tagline {
+    font-size: 10.5px;
+    line-height: 1.35;
+    max-width: 340px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Oculta ticker na capa mobile para economizar altura vertical e evidenciar o showcase */
+  #modal-auth-selection .forge-cover-ticker,
+  #modal-auth-selection .forge-cover-stats-ticker {
+    display: none !important;
+  }
+
+  /* Botão na Capa no Mobile: Barra flutuante inferior elegante e acessível */
+  #modal-auth-selection .forge-cover-cta {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 12px !important;
+    left: 14px !important;
+    right: 14px !important;
+    width: calc(100% - 28px) !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(228, 196, 138, 0.45) !important;
+    justify-content: center !important;
+    padding: 11px 18px !important;
+    background: rgba(10, 14, 22, 0.92) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    opacity: 0.96 !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.75), 0 0 16px rgba(201, 163, 106, 0.22) !important;
+    z-index: 99 !important;
+  }
+
+  #modal-auth-selection .forge-cover-cta:hover,
+  #modal-auth-selection .forge-cover-cta:focus-visible {
+    transform: translateY(-2px) !important;
+    opacity: 1 !important;
+    background: rgba(14, 20, 32, 0.98) !important;
+  }
+
+  #modal-auth-selection.in-auth-mode .forge-cover-cta {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(60px) !important;
+  }
+
+  /* 3 Cards de Mecânica no Mobile: Chips horizontais compactos */
+  #modal-auth-selection .forge-mechanics-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+    margin: 2px auto 0 !important;
+  }
+
+  #modal-auth-selection .mechanic-card {
+    padding: 6px !important;
+    gap: 3px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+
+  #modal-auth-selection .mechanic-card-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2px !important;
+  }
+
+  #modal-auth-selection .mechanic-icon-badge {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 10px !important;
+  }
+
+  #modal-auth-selection .mechanic-icon-badge svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  #modal-auth-selection .mechanic-card-header h4 {
+    font-size: 8.5px !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+  }
+
+  #modal-auth-selection .mechanic-sub {
+    font-size: 7.5px !important;
+    text-align: center !important;
+  }
+
+  #modal-auth-selection .mechanic-card p {
+    display: none !important;
+  }
+
+  /* Showcase de Classes no Mobile */
+  #modal-auth-selection .forge-cover-classes-showcase {
+    padding: 12px 14px !important;
+    gap: 8px !important;
+    border-radius: 14px !important;
+  }
+
+  #modal-auth-selection .classes-showcase-heading h2 {
+    font-size: 16px !important;
+  }
+
+  #modal-auth-selection .classes-showcase-layout {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  #modal-auth-selection .classes-selector-rail {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding-bottom: 4px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+  }
+
+  #modal-auth-selection .class-rail-btn {
+    flex-shrink: 0 !important;
+    min-width: 110px !important;
+    padding: 5px 8px !important;
+  }
+
+  #modal-auth-selection .class-stage-display {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    gap: 8px !important;
+    padding: 12px !important;
+  }
+
+  #modal-auth-selection .hero-sprite-actor img {
+    width: 96px !important;
+    height: 96px !important;
+  }
+
+  #modal-auth-selection .stage-card-header h3 {
+    font-size: 15px !important;
+  }
+
+  #modal-auth-selection .stage-card-header p {
+    font-size: 10.5px !important;
+    line-height: 1.4 !important;
+  }
+
+  #modal-auth-selection .stat-bar-group {
+    grid-template-columns: 100px 1fr !important;
+  }
+
+  #modal-auth-selection .stage-traits-tags {
+    justify-content: center !important;
+  }
+
+  /* Tela de Login no Mobile */
+  #modal-auth-selection .forge-auth {
+    padding: 12px 14px 18px !important;
+  }
+
+  #modal-auth-selection .forge-masthead {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  #modal-auth-selection .forge-masthead .forge-world-tag {
+    display: none !important;
+  }
+
+  #modal-auth-selection .forge-entry {
+    padding: 18px 14px 16px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #modal-auth-selection .forge-auth,
+  #modal-auth-selection .forge-cover-hero,
+  #modal-auth-selection .forge-cover-cta,
+  #modal-auth-selection .cta-arrow-icon {
+    transition: none !important;
+    animation: none !important;
+  }
+}
