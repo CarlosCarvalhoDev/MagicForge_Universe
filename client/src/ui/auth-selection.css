@@ -44,9 +44,9 @@
    MASTHEAD RÚNICO SUPERIOR COM DIVISOR ORNAMENTAL SVG
    ========================================================================== */
 .forge-masthead {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
   padding-bottom: clamp(10px, 1.5vh, 16px);
   border-bottom: 1px solid rgba(251, 191, 36, 0.35);
@@ -66,6 +66,7 @@
 }
 
 .forge-wordmark {
+  justify-self: start;
   font: 700 clamp(21px, 2.5vw, 30px) 'Cinzel', serif;
   letter-spacing: 0.15em;
   background: linear-gradient(180deg, #fffbeb 0%, #fde68a 42%, #f59e0b 75%, #92400e 100%);
@@ -85,19 +86,21 @@
 }
 
 .forge-world-tag {
+  justify-self: end;
   position: relative;
   color: #f3dfa6;
   font: 700 10.5px 'Cinzel', serif;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-align: right;
-  padding: 7px 16px;
+  line-height: 1.35;
+  padding: 6px 14px;
   border: 1.5px solid rgba(251, 191, 36, 0.55);
   border-radius: 4px;
   background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 18px 18px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 18px 18px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 18px 18px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 18px 18px no-repeat,
+    url('/assets/ui/frames/corner-tl.svg') top left / 14px 14px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 14px 14px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 14px 14px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 14px 14px no-repeat,
     linear-gradient(180deg, rgba(30, 24, 38, 0.94), rgba(11, 15, 28, 0.98));
   box-shadow:
     inset 0 0 0 1px rgba(254, 240, 138, 0.22),
@@ -1242,13 +1245,21 @@
   font-size: 11px;
 }
 
-.forge-footer span {
+.forge-footer span,
+.forge-footer-legend {
   font: 700 11px 'Cinzel', serif;
   letter-spacing: 0.08em;
   color: #e2c887;
 }
 
-.forge-footer button {
+.forge-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.forge-footer button,
+.forge-footer-actions button {
   min-height: 36px;
   padding: 6px 16px;
   background:
@@ -1268,7 +1279,8 @@
   transition: all 0.18s ease;
 }
 
-.forge-footer button:hover {
+.forge-footer button:hover,
+.forge-footer-actions button:hover {
   border-color: #fde047;
   box-shadow: 0 0 14px rgba(251, 191, 36, 0.4);
   transform: translateY(-1px);
@@ -1342,6 +1354,10 @@
   }
 
   .forge-masthead {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
     padding-bottom: 4px;
   }
 
@@ -1351,17 +1367,37 @@
   }
 
   .forge-wordmark {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .forge-wordmark small {
-    font-size: 7.5px;
-    letter-spacing: 0.36em;
+    font-size: 7px;
+    letter-spacing: 0.28em;
+  }
+
+  .forge-back-cover-btn {
+    justify-self: center;
+    padding: 4px 8px;
+    font-size: 9px;
+    gap: 4px;
+    background-size: 8px 8px;
+  }
+
+  .forge-back-cover-btn svg {
+    width: 12px;
+    height: 12px;
   }
 
   .forge-world-tag {
-    font-size: 8.5px;
-    padding: 3px 8px;
+    font-size: 7.5px;
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    padding: 3px 6px;
+    border-width: 1px;
+    background-size: 8px 8px;
+    max-width: 105px;
+    text-align: right;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   }
 
   .forge-intro {
@@ -1611,16 +1647,27 @@
   }
 
   .forge-footer {
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
     gap: 6px;
     padding: 4px 0 0;
     font-size: 9px;
   }
 
-  .forge-footer button {
+  .forge-footer-actions {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .forge-footer button,
+  .forge-footer-actions button {
+    flex: 1;
+    max-width: 160px;
     min-height: 28px;
     padding: 4px 10px;
     font-size: 9.5px;
+    background-size: 10px 10px;
   }
 }
 
@@ -1649,5 +1696,1256 @@
   #modal-auth-selection *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+
+/* ==========================================================================
+   PORTAL ANCESTRAL / COVER HERO — PÁGINA DE ROSTO & TRANSIÇÃO CINEMÁTICA
+   Layout fiel aos benchmarks profissionais (Ravox, OT Idle, Lootera, RagnaIdle).
+   - Linha dupla: Showcase de Classes + Ranking de Servidores ao lado.
+   - Grid de 3 colunas para os destaques mecânicos.
+   - Molduras rúnicas elegantes do sistema em todos os cards.
+   - Encerra milímetros abaixo do botão CTA.
+   - Animação de subida suave para a tela de login ao clicar.
+   ========================================================================== */
+
+#modal-auth-selection {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 72% 42%, rgba(245, 158, 11, 0.16), transparent 46%),
+    radial-gradient(circle at 22% 55%, rgba(168, 85, 247, 0.14), transparent 50%),
+    linear-gradient(105deg, rgba(4, 7, 15, 0.96) 0%, rgba(9, 13, 24, 0.8) 50%, rgba(5, 8, 17, 0.94) 100%),
+    url('/assets/ui/login/bg_login_forja_astral.jpg') center / cover fixed;
+  color: #f1ead8;
+}
+
+/* ==========================================================================
+   PÁGINA DE ROSTO (COVER HERO) - TRANSIÇÃO SUAVE
+   ========================================================================== */
+.forge-cover-hero {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: clamp(12px, 1.8vh, 22px) clamp(16px, 3.5vw, 48px) 14px; /* Termina alguns milímetros abaixo do botão */
+  z-index: 10;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 158, 11, 0.4) transparent;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 18%, rgba(245, 158, 11, 0.18), transparent 70%),
+    radial-gradient(circle at 15% 85%, rgba(139, 92, 246, 0.22), transparent 50%),
+    radial-gradient(circle at 85% 85%, rgba(225, 29, 72, 0.18), transparent 50%),
+    linear-gradient(180deg, rgba(4, 7, 15, 0.72) 0%, rgba(6, 10, 20, 0.88) 50%, rgba(3, 5, 12, 0.98) 100%),
+    url('/assets/portraits/world_magicforge_anvil.jpg') center / cover no-repeat;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#modal-auth-selection.in-auth-mode .forge-cover-hero {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Camadas Paralaxe Decorativas */
+.forge-cover-bg-wrap {
+  position: absolute;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.forge-cover-parallax-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+}
+
+.layer-stars {
+  background-image: radial-gradient(1px 1px at 20px 30px, #ffffff, transparent),
+                    radial-gradient(1.5px 1.5px at 140px 90px, #fbbf24, transparent),
+                    radial-gradient(1px 1px at 220px 180px, #60a5fa, transparent),
+                    radial-gradient(2px 2px at 320px 260px, #f59e0b, transparent);
+  background-size: 380px 380px;
+  opacity: 0.6;
+  animation: starsTwinkle 6s ease-in-out infinite alternate;
+}
+
+@keyframes starsTwinkle {
+  0% { opacity: 0.35; transform: translateY(0); }
+  100% { opacity: 0.75; transform: translateY(-12px); }
+}
+
+.layer-runes {
+  background-image: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 65%);
+  animation: runesGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes runesGlow {
+  0% { transform: scale(0.98); opacity: 0.5; }
+  100% { transform: scale(1.03); opacity: 0.85; }
+}
+
+.layer-vignette {
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(3, 5, 12, 0.85) 90%);
+}
+
+/* Container Centralizado da Capa */
+.forge-cover-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 26px);
+}
+
+/* Topo / Masthead */
+.forge-cover-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  position: relative;
+}
+
+.forge-cover-masthead::after {
+  content: '';
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(340px, 60vw);
+  height: 22px;
+  background: url('/assets/ui/frames/divider-runic-ornate.svg') center / contain no-repeat;
+  pointer-events: none;
+}
+
+/* Pill de Status do Servidor 20Hz */
+.forge-cover-server-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 16, 28, 0.88);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulseDot 1.8s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.pill-title {
+  font: 700 11px 'Cinzel', serif;
+  color: #34d399;
+  letter-spacing: 0.1em;
+}
+
+.pill-meta {
+  font: 500 11px system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.6);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 8px;
+}
+
+/* Centerpiece */
+.forge-cover-centerpiece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(8px, 1.4vh, 16px);
+  margin-top: clamp(4px, 1vh, 12px);
+}
+
+.forge-cover-badge-top {
+  font: 700 11px 'Cinzel', serif;
+  letter-spacing: 0.22em;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 4px 16px;
+  border-radius: 999px;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.forge-cover-title {
+  font: 800 clamp(26px, 3.8vw, 50px) 'Cinzel', serif;
+  line-height: 1.15;
+  letter-spacing: 0.08em;
+  margin: 0;
+  color: #f8fafc;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.2);
+}
+
+.title-highlight {
+  background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));
+}
+
+.forge-cover-tagline {
+  max-width: 820px;
+  font: 400 clamp(12.5px, 1.2vw, 14.5px) system-ui, -apple-system, sans-serif;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+
+/* Ticker de Destaques */
+.forge-cover-stats-ticker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  margin-top: 2px;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font: 600 11.5px 'Cinzel', serif;
+  color: #e2e8f0;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(4px);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.ticker-item:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fef08a;
+}
+
+.ticker-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+}
+
+/* ==========================================================================
+   GRID DE MECÂNICAS: 3 COLUNAS ALINHADAS COM MOLDURA RÚNICA
+   ========================================================================== */
+.forge-mechanics-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: clamp(12px, 1.6vw, 20px) !important;
+  width: 100%;
+  max-width: 1260px;
+  margin: 4px auto 0;
+}
+
+.mechanic-card {
+  position: relative;
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat,
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.12), transparent 70%),
+    linear-gradient(165deg, rgba(20, 24, 40, 0.94) 0%, rgba(9, 13, 25, 0.98) 100%);
+  border: 1.5px solid #d97706;
+  outline: 1px solid rgba(254, 240, 138, 0.3);
+  outline-offset: -5px;
+  border-radius: 6px;
+  padding: clamp(12px, 1.4vw, 18px);
+  text-align: left;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 18px rgba(0, 0, 0, 0.8),
+    0 10px 24px rgba(0, 0, 0, 0.6),
+    0 0 16px rgba(245, 158, 11, 0.1);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.mechanic-card:hover {
+  transform: translateY(-2px);
+  border-color: #fbbf24;
+  outline-color: rgba(254, 240, 138, 0.6);
+  box-shadow:
+    inset 0 0 20px rgba(245, 158, 11, 0.15),
+    0 14px 30px rgba(0, 0, 0, 0.8),
+    0 0 24px rgba(245, 158, 11, 0.25);
+}
+
+.mechanic-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.mechanic-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 10px 10px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 10px 10px no-repeat,
+    rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  flex-shrink: 0;
+}
+
+.mechanic-card-header h4 {
+  font: 700 clamp(12.5px, 1.1vw, 14.5px) 'Cinzel', serif;
+  color: #fef08a;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.mechanic-sub {
+  font: 600 9.5px system-ui, sans-serif;
+  color: #fbbf24;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mechanic-card p {
+  font: 400 11.5px system-ui, sans-serif;
+  line-height: 1.5;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+/* ==========================================================================
+   LINHA DUPLA: SHOWCASE DE CLASSES + RANKING DE SERVIDORES AO LADO
+   ========================================================================== */
+.forge-cover-showcase-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: clamp(14px, 1.8vw, 24px);
+  width: 100%;
+  max-width: 1260px;
+  margin: 6px auto 0;
+  align-items: stretch;
+}
+
+/* 1. Container do Showcase de Classes */
+.forge-cover-classes-showcase {
+  position: relative;
+  width: 100%;
+  padding: clamp(14px, 1.8vw, 20px);
+  border: 2px solid #d97706;
+  outline: 1.5px solid rgba(254, 240, 138, 0.35);
+  outline-offset: -7px;
+  border-radius: 8px;
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 40px 40px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 40px 40px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 40px 40px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 40px 40px no-repeat,
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.16), transparent 60%),
+    linear-gradient(165deg, rgba(22, 26, 42, 0.95) 0%, rgba(8, 12, 23, 0.98) 100%);
+  box-shadow:
+    inset 0 0 32px rgba(0, 0, 0, 0.85),
+    0 16px 42px rgba(0, 0, 0, 0.8),
+    0 0 28px rgba(245, 158, 11, 0.15);
+}
+
+.forge-cover-classes-showcase::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin: -6px auto 4px;
+  background: url('/assets/ui/frames/crest-header-ornament.svg') center / contain no-repeat;
+  pointer-events: none;
+}
+
+.classes-showcase-heading {
+  text-align: center;
+  margin-bottom: clamp(8px, 1.2vh, 14px);
+}
+
+.showcase-badge {
+  font: 700 9.5px 'Cinzel', serif;
+  letter-spacing: 0.2em;
+  color: #fbbf24;
+  text-transform: uppercase;
+}
+
+.classes-showcase-heading h2 {
+  font: 700 clamp(17px, 2vw, 24px) 'Cinzel', serif;
+  color: #f8fafc;
+  margin: 2px 0;
+  letter-spacing: 0.1em;
+}
+
+.classes-showcase-heading p {
+  font: 400 11.5px system-ui, sans-serif;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.classes-showcase-layout {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: clamp(10px, 1.5vw, 18px);
+  align-items: center;
+}
+
+/* Trilho Seletor de Classes */
+.classes-selector-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.class-rail-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 10px 10px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 10px 10px no-repeat,
+    rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #cbd5e1;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.class-rail-btn:hover {
+  background-color: rgba(245, 158, 11, 0.18);
+  border-color: #fbbf24;
+  transform: translateX(3px);
+  color: #fff;
+}
+
+.class-rail-btn.active {
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 12px 12px no-repeat,
+    linear-gradient(90deg, rgba(245, 158, 11, 0.28) 0%, rgba(245, 158, 11, 0.1) 100%);
+  border: 1.5px solid #d97706;
+  outline: 1px solid rgba(254, 240, 138, 0.4);
+  outline-offset: -3px;
+  color: #fef08a;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
+}
+
+.rail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+
+.rail-name {
+  font: 700 11.5px 'Cinzel', serif;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.rail-role {
+  font: 400 9.5px system-ui, sans-serif;
+  color: #94a3b8;
+  display: block;
+}
+
+/* Palco de Apresentação da Classe */
+.class-stage-display {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: clamp(10px, 1.5vw, 18px);
+  border: 1.5px solid rgba(217, 119, 6, 0.6);
+  outline: 1px solid rgba(254, 240, 138, 0.25);
+  outline-offset: -5px;
+  border-radius: 8px;
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 18px 18px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 18px 18px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 18px 18px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 18px 18px no-repeat,
+    linear-gradient(180deg, rgba(14, 18, 32, 0.9) 0%, rgba(7, 10, 20, 0.95) 100%);
+  padding: clamp(12px, 1.5vw, 16px);
+  align-items: center;
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.8);
+}
+
+/* Pedestal com Animação */
+.stage-pedestal-platform {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pedestal-rune-glow {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
+  animation: runePulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes runePulse {
+  0% { transform: scale(0.9); opacity: 0.4; }
+  100% { transform: scale(1.15); opacity: 0.85; }
+}
+
+.pedestal-shadow {
+  position: absolute;
+  bottom: 8px;
+  width: 120px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.75) 0%, transparent 75%);
+}
+
+.hero-sprite-actor {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-actor-animated {
+  animation: heroActorBreathe 3s ease-in-out infinite alternate;
+}
+
+@keyframes heroActorBreathe {
+  0% { transform: translateY(0) scale(1); filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.6)); }
+  50% { transform: translateY(-5px) scale(1.02); filter: drop-shadow(0 16px 20px rgba(245, 158, 11, 0.35)); }
+  100% { transform: translateY(-2px) scale(1.01); filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.7)); }
+}
+
+.hero-sprite-actor img {
+  width: 135px;
+  height: 135px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(245, 158, 11, 0.75);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  transition: transform 0.3s ease;
+}
+
+/* Card de Informações da Classe */
+.stage-info-card {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stage-badge {
+  font: 700 9.5px 'Cinzel', serif;
+  letter-spacing: 0.15em;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+.stage-card-header h3 {
+  font: 700 clamp(15px, 1.6vw, 20px) 'Cinzel', serif;
+  color: #fef08a;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.stage-card-header p {
+  font: 400 11.5px system-ui, sans-serif;
+  line-height: 1.45;
+  color: #cbd5e1;
+  margin: 3px 0 0;
+}
+
+/* Barras de Atributos D&D */
+.stage-stats-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 2px 0;
+}
+
+.stat-bar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-name {
+  font: 600 10.5px 'Cinzel', serif;
+  color: #cbd5e1;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.stat-meter {
+  flex: 1;
+  height: 5px;
+  background: rgba(30, 41, 59, 0.85);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 3px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+/* Tags de Habilidades e Traços com Moldura Rúnica */
+.stage-traits-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.trait-tag {
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 8px 8px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 8px 8px no-repeat,
+    rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font: 600 10px system-ui, sans-serif;
+  color: #e2e8f0;
+  letter-spacing: 0.03em;
+}
+
+/* ==========================================================================
+   CARD LATERAL: RANKING DE SERVIDORES (BENCHMARKS RAVOX / OT IDLE / GACHA)
+   ========================================================================== */
+.forge-cover-ranking-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(14px, 1.8vw, 18px);
+  border: 2px solid #d97706;
+  outline: 1.5px solid rgba(254, 240, 138, 0.35);
+  outline-offset: -7px;
+  border-radius: 8px;
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 36px 36px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 36px 36px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 36px 36px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 36px 36px no-repeat,
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.14), transparent 60%),
+    linear-gradient(165deg, rgba(20, 24, 38, 0.95) 0%, rgba(7, 10, 20, 0.98) 100%);
+  box-shadow:
+    inset 0 0 28px rgba(0, 0, 0, 0.85),
+    0 16px 42px rgba(0, 0, 0, 0.8),
+    0 0 24px rgba(245, 158, 11, 0.12);
+}
+
+.ranking-card-header {
+  text-align: center;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  padding-bottom: 8px;
+  position: relative;
+}
+
+.ranking-header-badge {
+  font: 700 9px 'Cinzel', serif;
+  letter-spacing: 0.18em;
+  color: #fbbf24;
+  text-transform: uppercase;
+  display: block;
+}
+
+.ranking-card-header h3 {
+  font: 700 16px 'Cinzel', serif;
+  color: #f8fafc;
+  margin: 3px 0 6px;
+  letter-spacing: 0.08em;
+}
+
+.ranking-live-beacon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.beacon-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseDot 1.8s infinite;
+}
+
+.beacon-text {
+  font: 700 9px 'Cinzel', serif;
+  color: #34d399;
+  letter-spacing: 0.1em;
+}
+
+/* Lista de Rankings */
+.ranking-list-mock {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 10px 0;
+}
+
+.ranking-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(245, 158, 11, 0.18);
+  border-radius: 6px;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+}
+
+.ranking-row:hover {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.45);
+  transform: translateX(2px);
+}
+
+.ranking-row.top-1 {
+  border-color: rgba(251, 191, 36, 0.6);
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.2) 0%, rgba(15, 23, 42, 0.7) 100%);
+}
+
+.ranking-pos {
+  font: 800 13px 'Cinzel', serif;
+  color: #fbbf24;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ranking-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid rgba(245, 158, 11, 0.6);
+  flex-shrink: 0;
+}
+
+.ranking-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ranking-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.ranking-name {
+  font: 700 11px 'Cinzel', serif;
+  color: #fef08a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ranking-details {
+  font: 400 9.5px system-ui, sans-serif;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ranking-status-tag {
+  font: 600 8.5px 'Cinzel', serif;
+  letter-spacing: 0.05em;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.ranking-footer-note {
+  border-top: 1px solid rgba(245, 158, 11, 0.2);
+  padding-top: 6px;
+  text-align: center;
+  font: 500 9.5px system-ui, sans-serif;
+  color: rgba(203, 213, 225, 0.6);
+}
+
+/* ==========================================================================
+   RODAPÉ DO COVER COM BOTÃO CTA — TERMINA ALGUNS MM ABAIXO DO BOTÃO
+   ========================================================================== */
+.forge-cover-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: clamp(14px, 2vh, 26px);
+  padding-bottom: 8px; /* Termina alguns milímetros abaixo do botão */
+}
+
+.forge-cover-cta {
+  position: relative;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  max-width: 100%;
+}
+
+.cta-pulse-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 12px;
+  border: 2px solid rgba(245, 158, 11, 0.4);
+  animation: ctaRingPulse 2s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes ctaRingPulse {
+  0% { transform: scale(0.96); opacity: 0.8; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+
+.cta-inner {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.5vw, 16px);
+  padding: clamp(11px, 1.5vh, 15px) clamp(22px, 2.8vw, 36px);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  border: 1.5px solid #fef08a;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.forge-cover-cta:hover .cta-inner {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  box-shadow: 0 12px 32px rgba(245, 158, 11, 0.55), inset 0 1px 0 #ffffff;
+}
+
+.cta-text-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.cta-super {
+  font: 700 9.5px 'Cinzel', serif;
+  letter-spacing: 0.18em;
+  color: #451a03;
+  text-transform: uppercase;
+}
+
+.cta-main {
+  font: 800 clamp(13px, 1.3vw, 16px) 'Cinzel', serif;
+  letter-spacing: 0.08em;
+  color: #0f172a;
+}
+
+.cta-arrow-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  color: #451a03;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.forge-cover-cta:hover .cta-arrow-box {
+  transform: translateY(3px);
+  background: rgba(0, 0, 0, 0.25);
+  color: #000;
+}
+
+/* ==========================================================================
+   TELA DE LOGIN (.forge-auth) - DESLIZA DE BAIXO PARA CIMA
+   ========================================================================== */
+.forge-auth {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: 1260px;
+  height: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: clamp(14px, 2vh, 26px) clamp(16px, 3.5vw, 48px);
+  z-index: 20;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 158, 11, 0.4) transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(8px, 1.4vh, 16px);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#modal-auth-selection.in-auth-mode .forge-auth {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (min-width: 960px) {
+  #modal-auth-selection[data-screen="login"] .forge-auth,
+  #modal-auth-selection.in-auth-mode[data-screen="login"] .forge-auth {
+    display: grid !important;
+    grid-template-columns: minmax(360px, 1.06fr) minmax(415px, 460px);
+    grid-template-rows: auto 1fr auto auto;
+    column-gap: clamp(32px, 5vw, 68px);
+    row-gap: 8px;
+    align-items: center;
+  }
+
+  #modal-auth-selection[data-screen="characters"] .forge-auth,
+  #modal-auth-selection.in-auth-mode[data-screen="characters"] .forge-auth {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto 1fr auto auto;
+    column-gap: 24px;
+    row-gap: 8px;
+  }
+}
+
+/* Botão de Retorno para a Capa — Moldura Rúnica Padronizada */
+.forge-back-cover-btn {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 12px 12px no-repeat,
+    linear-gradient(180deg, rgba(35, 30, 48, 0.94) 0%, rgba(12, 16, 29, 0.98) 100%);
+  border: 1.5px solid rgba(251, 191, 36, 0.55);
+  outline: 1px solid rgba(254, 240, 138, 0.22);
+  outline-offset: -3px;
+  border-radius: 4px;
+  color: #fef08a;
+  padding: 6px 16px;
+  font: 700 11px 'Cinzel', serif;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    inset 0 0 10px rgba(0, 0, 0, 0.7),
+    0 4px 14px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(245, 158, 11, 0.12);
+  white-space: nowrap;
+}
+
+.forge-back-cover-btn:hover {
+  background:
+    url('/assets/ui/frames/corner-tl.svg') top left / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 12px 12px no-repeat,
+    linear-gradient(180deg, rgba(45, 38, 62, 0.96) 0%, rgba(18, 24, 42, 0.98) 100%);
+  border-color: #fde047;
+  outline-color: rgba(254, 240, 138, 0.45);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 12px rgba(245, 158, 11, 0.2),
+    0 6px 18px rgba(0, 0, 0, 0.65),
+    0 0 18px rgba(245, 158, 11, 0.35);
+}
+
+.forge-back-cover-btn svg {
+  color: #fbbf24;
+  transition: transform 0.2s ease;
+}
+
+.forge-back-cover-btn:hover svg {
+  color: #fef08a;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE MOBILE & TABLET
+   ========================================================================== */
+@media (max-width: 1080px) {
+  .forge-cover-showcase-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .forge-cover-hero {
+    padding: 14px 12px 14px;
+  }
+
+  .forge-mechanics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .classes-showcase-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .classes-selector-rail {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .class-rail-btn {
+    flex-shrink: 0;
+    min-width: 130px;
+    padding: 6px 10px;
+  }
+
+  .class-stage-display {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .stage-pedestal-platform {
+    height: 160px;
+  }
+
+  .hero-sprite-actor img {
+    width: 120px;
+    height: 120px;
+  }
+
+  .stage-info-card {
+    text-align: center;
+  }
+
+  .stat-name {
+    width: 110px;
+    font-size: 10px;
+  }
+
+  .stage-traits-tags {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 540px) {
+  .forge-cover-masthead {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .forge-cover-title {
+    font-size: 24px;
+  }
+
+  .forge-cover-tagline {
+    font-size: 12px;
+  }
+
+  .cta-inner {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+
+  .cta-main {
+    font-size: 13px;
+  }
+
+  .cta-arrow-box {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cta-arrow-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
+/* ==========================================================================
+   POLIMENTO RESPONSIVO FINAL DO MASTHEAD & CARD FORJA ANCESTRAL NO MOBILE
+   ========================================================================== */
+@media (max-width: 768px) {
+  .forge-masthead {
+    display: grid !important;
+    grid-template-columns: auto 1fr auto !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .forge-masthead::after {
+    height: 14px !important;
+    bottom: -7px !important;
+  }
+
+  .forge-wordmark {
+    font-size: 13.5px !important;
+  }
+
+  .forge-wordmark small {
+    font-size: 6.5px !important;
+    letter-spacing: 0.22em !important;
+  }
+
+  .forge-back-cover-btn {
+    justify-self: center !important;
+    padding: 4px 8px !important;
+    font-size: 8.5px !important;
+    letter-spacing: 0.04em !important;
+    gap: 4px !important;
+    background-size: 8px 8px !important;
+    white-space: nowrap !important;
+  }
+
+  .forge-back-cover-btn svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .forge-world-tag {
+    justify-self: end !important;
+    font-size: 7.5px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.03em !important;
+    padding: 3px 6px !important;
+    border-width: 1px !important;
+    background-size: 7px 7px !important;
+    max-width: 95px !important;
+    text-align: right !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+    white-space: normal !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .forge-masthead {
+    gap: 4px !important;
+  }
+
+  .forge-wordmark {
+    font-size: 12px !important;
+  }
+
+  .forge-wordmark small {
+    font-size: 5.5px !important;
+    letter-spacing: 0.18em !important;
+  }
+
+  .forge-back-cover-btn {
+    padding: 3px 6px !important;
+    font-size: 8px !important;
+    gap: 3px !important;
+    background-size: 6px 6px !important;
+  }
+
+  .forge-back-cover-btn svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .forge-world-tag {
+    font-size: 7px !important;
+    line-height: 1.15 !important;
+    padding: 2px 5px !important;
+    max-width: 84px !important;
+    background-size: 5px 5px !important;
   }
 }
