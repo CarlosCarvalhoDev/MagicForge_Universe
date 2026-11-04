@@ -3,28 +3,104 @@
 /* 1. Left Party HUD Container */
 #party-hud-card {
   position: absolute;
-  top: 104px;
-  left: 14px;
+  top: 120px !important;
+  left: 14px !important;
   width: 230px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 10px 12px;
   border-radius: 14px;
-  z-index: 24;
+  z-index: 35 !important;
   pointer-events: auto;
   user-select: none;
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 1.5px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   transition: all 0.2s ease-in-out;
 }
 
+/* Compact Pill Mode (Padrão: Apenas ícone de grupo + indicativo +5%, sempre visível abaixo do card de perfil) */
+#party-hud-card.collapsed {
+  width: auto;
+  padding: 0;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  top: 120px !important;
+  left: 14px !important;
+  z-index: 35 !important;
+}
+
 #party-hud-card.collapsed .party-members-list,
-#party-hud-card.collapsed .party-footer-actions {
+#party-hud-card.collapsed .party-footer-actions,
+#party-hud-card.collapsed .party-solo-view,
+#party-hud-card.collapsed .party-hud-header {
   display: none !important;
+}
+
+.party-pill-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #0b101e;
+  border: 1.5px solid rgba(251, 191, 36, 0.75);
+  outline: 1px solid rgba(254, 240, 138, 0.25);
+  outline-offset: -2px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.75), 0 0 8px rgba(251, 191, 36, 0.18);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  width: auto !important;
+  max-width: none !important;
+  overflow: visible !important;
+}
+
+.party-pill-view:hover {
+  transform: translateY(-1px);
+  border-color: #fde047;
+  outline-color: rgba(254, 240, 138, 0.45);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.85), 0 0 10px rgba(251, 191, 36, 0.35);
+}
+
+.party-pill-view:active {
+  transform: scale(0.96);
+}
+
+.party-pill-icon {
+  font-size: 0.68rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+  flex-shrink: 0;
+}
+
+.party-pill-bonus {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.50rem;
+  font-weight: 800;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  padding: 0 3px;
+  border-radius: 3px;
+  white-space: nowrap !important;
+  display: inline-block;
+  line-height: 1.1;
+  animation: pulseXp 2s infinite ease-in-out;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+@keyframes pulseXp {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
 }
 
 .party-hud-header {
@@ -561,35 +637,111 @@
 
 /* 4. Party Floating Toasts */
 #party-toast-container {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   z-index: 1000;
   pointer-events: none;
+  width: 100%;
+  max-width: min(380px, 92vw);
 }
 
 .party-toast {
-  background: rgba(15, 23, 42, 0.92);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(251, 191, 36, 0.5);
-  border-radius: 8px;
-  padding: 8px 14px;
+  position: relative;
+  background: radial-gradient(circle at 50% 50%, rgba(20, 27, 45, 0.97), rgba(11, 16, 30, 0.99));
+  border: 1.5px solid #fbbf24;
+  box-shadow: 0 0 0 2px #070a14, 0 0 0 3.5px rgba(245, 158, 11, 0.75), 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 14px rgba(251, 191, 36, 0.25);
+  outline: 1px solid rgba(254, 240, 138, 0.4);
+  outline-offset: -3.5px;
+  border-radius: 4px;
+  padding: 8px 18px;
   color: #fef08a;
-  font-size: 0.78rem;
-  font-weight: 600;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-  animation: partyToastFade 3s forwards;
+  font-family: 'Cinzel', serif, system-ui;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  text-align: center;
+  box-sizing: border-box;
+  animation: partyToastFade 3.2s forwards;
   pointer-events: auto;
 }
 
+.party-toast.toast-error {
+  border-color: #f87171;
+  box-shadow: 0 0 0 2px #070a14, 0 0 0 3.5px rgba(239, 68, 68, 0.75), 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 14px rgba(239, 68, 68, 0.3);
+  color: #fecaca;
+}
+
+.party-toast.toast-success {
+  border-color: #34d399;
+  box-shadow: 0 0 0 2px #070a14, 0 0 0 3.5px rgba(16, 185, 129, 0.75), 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 14px rgba(16, 185, 129, 0.3);
+  color: #a7f3d0;
+}
+
+.toast-corner-spike {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #fbbf24;
+  border: 1px solid #78350f;
+  transform: rotate(45deg);
+  box-shadow: 0 0 3px rgba(251, 191, 36, 0.85);
+  pointer-events: none;
+  z-index: 3;
+}
+.toast-corner-spike.top-left { top: -3.5px; left: -3.5px; }
+.toast-corner-spike.top-right { top: -3.5px; right: -3.5px; }
+.toast-corner-spike.bottom-left { bottom: -3.5px; left: -3.5px; }
+.toast-corner-spike.bottom-right { bottom: -3.5px; right: -3.5px; }
+
 @keyframes partyToastFade {
-  0% { opacity: 0; transform: translateY(10px); }
-  10% { opacity: 1; transform: translateY(0); }
+  0% { opacity: 0; transform: translateY(-8px); }
+  12% { opacity: 1; transform: translateY(0); }
   85% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+@media (max-width: 768px) {
+  #party-hud-card {
+    top: calc(82px + var(--safe-top, 0px)) !important;
+    left: calc(8px + var(--safe-left, 0px)) !important;
+    z-index: 35 !important;
+    max-width: calc(100vw - 20px);
+  }
+  #party-hud-card.collapsed {
+    top: calc(82px + var(--safe-top, 0px)) !important;
+    left: calc(8px + var(--safe-left, 0px)) !important;
+    z-index: 35 !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  .party-pill-view {
+    padding: 1px 4px !important;
+    gap: 2px !important;
+    border-radius: 3px !important;
+    width: auto !important;
+    max-width: none !important;
+    overflow: visible !important;
+  }
+  .party-pill-icon {
+    font-size: 0.62rem !important;
+    line-height: 1 !important;
+  }
+  .party-pill-bonus {
+    font-size: 0.46rem !important;
+    padding: 0 2px !important;
+    white-space: nowrap !important;
+    line-height: 1.1 !important;
+  }
+  #party-toast-container {
+    gap: 6px !important;
+    max-width: min(300px, 86vw) !important;
+  }
+  .party-toast {
+    font-size: 0.68rem !important;
+    padding: 6px 14px !important;
+  }
 }
 

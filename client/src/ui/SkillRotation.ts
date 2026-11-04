@@ -21,7 +21,12 @@ export function setupSkillRotation(transport: {
   const cycleTab = document.getElementById('grimorio-tab-rotation') as HTMLButtonElement;
   const skills = document.getElementById('skillbook-slots-container')!;
   const cycle = document.getElementById('skill-rotation-panel')!;
-  const quick = document.getElementById('btn-toggle-auto-cast') as HTMLButtonElement;
+  const quick = (document.getElementById('btn-toggle-auto-cast') ?? document.getElementById('btn-combat-auto-active')) as HTMLButtonElement;
+  const quickLabel = quick.querySelector('.auto-btn-title') ?? quick;
+  const reactivate = document.getElementById('btn-combat-auto-reactivate') as HTMLButtonElement | null;
+  const combatContainer = document.getElementById('mobile-combat-arc-container');
+  const autoView = document.getElementById('combat-auto-view');
+  const manualView = document.getElementById('combat-manual-view');
   const autoCast = document.getElementById('chk-auto-cast-enabled') as HTMLInputElement;
   let confirmedAutoCast = true;
   let draftAutoCast = true;
@@ -41,7 +46,12 @@ export function setupSkillRotation(transport: {
   function render() {
     autoCast.checked = draftAutoCast;
     autoCast.disabled = quick.disabled = !loaded || !transport.isReady() || pending;
-    quick.textContent = confirmedAutoCast ? 'Magias: AUTO' : 'Magias: MANUAL';
+    quickLabel.textContent = quickLabel === quick ? (confirmedAutoCast ? 'Magias: AUTO' : 'Magias: MANUAL') : 'AUTO ON';
+    quick.title = 'Desativar conjuração automática de magias [A]. Movimento e ataque básico continuam automáticos.';
+    if (reactivate) reactivate.disabled = quick.disabled;
+    combatContainer?.setAttribute('data-combat-mode', confirmedAutoCast ? 'auto' : 'manual');
+    if (autoView) autoView.style.display = confirmedAutoCast ? 'flex' : 'none';
+    if (manualView) manualView.style.display = confirmedAutoCast ? 'none' : 'flex';
     quick.setAttribute('aria-pressed', String(confirmedAutoCast));
     root.replaceChildren();
     draft.forEach((slot, position) => {
@@ -68,6 +78,7 @@ export function setupSkillRotation(transport: {
   }
   autoCast.addEventListener('change', () => { draftAutoCast = autoCast.checked; });
   quick.addEventListener('click', () => persist(confirmed, !confirmedAutoCast));
+  reactivate?.addEventListener('click', () => persist(confirmed, true));
   save.addEventListener('click', () => persist(draft, draftAutoCast));
   function persist(order: number[], enabled: boolean) {
     if (!loaded || !transport.isReady() || pending) return;
@@ -97,6 +108,7 @@ export function setupSkillRotation(transport: {
   tab(false);
   clear();
   return {
+    toggleAutoCast: () => persist(confirmed, !confirmedAutoCast),
     refreshSkills: render,
     onDisconnected: clear,
     onLogin: clear,

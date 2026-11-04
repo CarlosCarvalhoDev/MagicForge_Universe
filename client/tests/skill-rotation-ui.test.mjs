@@ -12,23 +12,26 @@ test('Reordenar o ciclo preserva os quatro slots e suporta ida e volta', () => {
   assert.deepEqual(moveRotationSlot(initial, 0, -1), initial);
 });
 
-test('Cliente automático expõe quatro habilidades em linha e configuração no Grimório sem joystick', () => {
+test('Cliente automático preserva quatro habilidades no layout do colaborador e Grimório sem joystick', () => {
   const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const main = fs.readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-  const css = fs.readFileSync(new URL('../src/ui/automatic-play.css', import.meta.url), 'utf8');
+  const css = fs.readFileSync(new URL('../src/ui/progression.css', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /id="virtual-joystick-zone"/);
   assert.doesNotMatch(main, /sendMoveDirection\(|sendMoveInput\(/);
   assert.doesNotMatch(main, /for \(let slot = 4; slot >= 1; slot--\)/);
   assert.match(html, /id="grimorio-tab-rotation"/);
   assert.match(html, /id="skill-rotation-panel"/);
-  assert.match(html, /class="automatic-skill-bar"/);
-  assert.match(css, /repeat\(4, minmax\(0, 1fr\)\)/);
+  assert.match(html, /class="combat-action-container"/);
+  assert.match(html, /class="skills-square-row"/);
+  assert.match(html, /id="btn-combat-auto-active"/);
+  assert.match(css, /\.skills-square-row/);
   for (const slot of [1, 2, 3, 4]) assert.match(html, new RegExp(`id="skill-btn-${slot}"`));
 });
 
 test('Botão aguarda confirmação, preserva ordem e sincroniza preferência do Grimório', t => {
   class Element {
-    listeners = {}; children = []; attributes = {}; checked = false; disabled = false;
+    listeners = {}; children = []; attributes = {}; checked = false; disabled = false; style = {};
+    querySelector() { return null; }
     addEventListener(name, fn) { this.listeners[name] = fn; }
     setAttribute(name, value) { this.attributes[name] = value; }
     replaceChildren() { this.children = []; }
@@ -50,13 +53,18 @@ test('Botão aguarda confirmação, preserva ordem e sincroniza preferência do 
   assert.deepEqual(sent, [[[3,1,4,2],false]]);
   assert.equal(quick.textContent, 'Magias: AUTO');
   assert.equal(quick.disabled, true);
+  assert.equal(elements.get('combat-auto-view').style.display, 'flex');
   ui.onUpdate({order:[3,1,4,2],autoCastEnabled:false,success:true});
   assert.equal(quick.textContent, 'Magias: MANUAL');
   assert.equal(checkbox.checked, false);
+  assert.equal(elements.get('combat-auto-view').style.display, 'none');
+  assert.equal(elements.get('combat-manual-view').style.display, 'flex');
   checkbox.checked = true; checkbox.listeners.change();
   elements.get('btn-save-skill-rotation').click();
   assert.deepEqual(sent.at(-1), [[3,1,4,2],true]);
   ui.onUpdate({order:[3,1,4,2],autoCastEnabled:false,success:false,message:'Falha ao salvar'});
   assert.equal(quick.textContent, 'Magias: MANUAL');
   assert.equal(checkbox.checked, false);
+  elements.get('btn-combat-auto-reactivate').click();
+  assert.deepEqual(sent.at(-1), [[3,1,4,2],true]);
 });

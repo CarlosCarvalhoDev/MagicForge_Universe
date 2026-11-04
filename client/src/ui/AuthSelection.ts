@@ -416,7 +416,173 @@ export function setupAuthSelection(
     if (raw) storedSession = JSON.parse(raw);
   } catch {}
 
-  root.dataset.ready = 'true';
+  
+  // Dados de Showcase / Mock de Classes para a Página de Rosto (UTF-8 Garantido)
+  const COVER_CLASS_MOCKS: Record<string, {
+    title: string;
+    roleBadge: string;
+    description: string;
+    portrait: string;
+    stats: { forca: number; const: number; destreza: number };
+    traits: string[];
+  }> = {
+    GUERREIRO: {
+      title: 'Guerreiro da Bigorna',
+      roleBadge: 'D&D 5E · COMBATE CORPO A CORPO & TANQUE',
+      description: 'Mestre absoluto em armas forjadas e armaduras pesadas. Absorve o impacto dos golpes inimigos e desfere contra-ataques devastadores no calor da batalha.',
+      portrait: '/assets/portraits/GUERREIRO.jpg',
+      stats: { forca: 92, const: 88, destreza: 62 },
+      traits: ['Provocação & Defesa', 'Golpe Fulminante', 'Linha de Frente']
+    },
+    BARBARO: {
+      title: 'Bárbaro Totêmico',
+      roleBadge: 'D&D 5E · FÚRIA PRIMAL & DANO MASSIVO',
+      description: 'Guerreiro selvagem imbuído com o espírito dos ursos ancestrais. Quanto mais ferido em combate, mais avassaladores e velozes se tornam seus golpes.',
+      portrait: '/assets/portraits/BARBARO.jpg',
+      stats: { forca: 98, const: 94, destreza: 55 },
+      traits: ['Fúria Incontrolável', 'Resistência Primal', 'Crítico Brutal']
+    },
+    ARQUEIRO: {
+      title: 'Patrulheiro Astral',
+      roleBadge: 'D&D 5E · ATAQUE À DISTÂNCIA & CRÍTICOS',
+      description: 'Atirador de elite que canaliza flechas de energia rúnica à longa distância. Especialista em armadilhas de campo e dano contínuo acelerado.',
+      portrait: '/assets/portraits/ARQUEIRO.jpg',
+      stats: { forca: 58, const: 65, destreza: 96 },
+      traits: ['Chuva de Flechas', 'Mira Crítica Letal', 'Passo Evasivo']
+    },
+    CLERIGO: {
+      title: 'Clérigo da Luz',
+      roleBadge: 'D&D 5E · MILAGRES DIVINOS & SUPORTE',
+      description: 'Emissário dos deuses da forja que regenera instantaneamente os pontos de vida da party e purifica maldições e enfraquecimentos cósmicos.',
+      portrait: '/assets/portraits/CLERIGO.jpg',
+      stats: { forca: 68, const: 82, destreza: 60 },
+      traits: ['Cura Milagrosa', 'Escudo da Fé', 'Prece de Guerra']
+    },
+    MAGO: {
+      title: 'Evocador Elemental',
+      roleBadge: 'D&D 5E · DESTRUIÇÃO EM ÁREA & ARCANO',
+      description: 'Estudioso dos segredos arcanos capaz de incinerar hordas inteiras com tempestades de gelo, meteoros estelares e manipulação do fluxo temporal.',
+      portrait: '/assets/portraits/MAGO.jpg',
+      stats: { forca: 42, const: 60, destreza: 72 },
+      traits: ['Chuva de Meteoros', 'Congelamento Rúnico', 'Teleporte Arcano']
+    },
+    MONGE: {
+      title: 'Mestre do Ki',
+      roleBadge: 'D&D 5E · ARTES MARCIAIS & COMBOS VELOZES',
+      description: 'Condensa a energia espiritual nos punhos para desferir sequências ultra-rápidas de golpes capazes de atordoar até os monstros mais colossais.',
+      portrait: '/assets/portraits/MONGE.jpg',
+      stats: { forca: 78, const: 76, destreza: 92 },
+      traits: ['Rajada de Golpes', 'Palma Vibratória', 'Evasão Sobrenatural']
+    },
+    BRUXO: {
+      title: 'Arauto do Pacto',
+      roleBadge: 'D&D 5E · ENERGIA SINISTRA & DRENO',
+      description: 'Firmou um juramento proibido com entidades do vazio astral. Seus feitiços drenam a vitalidade dos alvos para alimentar seus próprios atributos.',
+      portrait: '/assets/portraits/BRUXO.jpg',
+      stats: { forca: 50, const: 74, destreza: 78 },
+      traits: ['Rajada Mística', 'Dreno de Vitalidade', 'Maldição Ancestral']
+    }
+  };
+
+  function setupCoverPageInteractions() {
+    const coverSection = document.getElementById('forge-cover-hero');
+    const btnEnterGate = document.getElementById('btn-enter-gate');
+    const btnBackToCover = document.getElementById('btn-back-to-cover');
+    const btnFooterBackToCover = document.getElementById('btn-footer-back-to-cover');
+    const authMain = root.querySelector('.forge-auth');
+
+    // 1. Botão de alternar para a tela de login
+    const showLoginScreen = () => {
+      root.classList.add('in-auth-mode');
+      root.scrollTop = 0;
+      setTimeout(() => {
+        accountInput?.focus();
+      }, 200);
+    };
+
+    // 2. Botão de voltar para a página de apresentação (capa)
+    const showCoverScreen = () => {
+      root.classList.remove('in-auth-mode');
+      root.scrollTop = 0;
+    };
+
+    btnEnterGate?.addEventListener('click', showLoginScreen);
+    btnBackToCover?.addEventListener('click', showCoverScreen);
+    btnFooterBackToCover?.addEventListener('click', showCoverScreen);
+    root.querySelectorAll('.btn-back-cover, .forge-back-cover-btn').forEach(btn => {
+      btn.addEventListener('click', showCoverScreen);
+    });
+
+    // 3. Efeito Paralaxe sutil ao mover o mouse dentro da capa
+    if (coverSection) {
+      coverSection.addEventListener('mousemove', (e) => {
+        const rect = coverSection.getBoundingClientRect();
+        const normX = (e.clientX - rect.left) / rect.width - 0.5;
+        const normY = (e.clientY - rect.top) / rect.height - 0.5;
+
+        coverSection.style.setProperty('--parallax-y-back', `${normY * -24}px`);
+        coverSection.style.setProperty('--parallax-y-mid', `${normY * -12}px`);
+        coverSection.style.setProperty('--parallax-y-front', `${normY * -6}px`);
+      });
+    }
+
+    // 4. Showcase Interativo de Classes com Mock de Movimento
+    const railButtons = root.querySelectorAll<HTMLButtonElement>('.class-rail-btn');
+    const spriteActor = document.getElementById('cover-hero-sprite-actor');
+    const spriteImg = document.getElementById('cover-hero-sprite-img') as HTMLImageElement | null;
+    const classBadge = document.getElementById('cover-class-badge');
+    const classTitle = document.getElementById('cover-class-title');
+    const classDesc = document.getElementById('cover-class-desc');
+    const meterForca = document.getElementById('meter-forca');
+    const meterConst = document.getElementById('meter-const');
+    const meterDestreza = document.getElementById('meter-destreza');
+    const traitsContainer = document.getElementById('cover-class-tags');
+
+    railButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const classId = btn.dataset.classId || 'GUERREIRO';
+        const data = COVER_CLASS_MOCKS[classId];
+        if (!data) return;
+
+        // Atualiza estado ativo dos botões
+        railButtons.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+
+        // Transição suave no mock de sprite em movimento
+        if (spriteActor && spriteImg) {
+          spriteActor.dataset.actorClass = classId;
+          spriteImg.style.opacity = '0.3';
+          spriteImg.style.transform = 'scale(0.92)';
+
+          setTimeout(() => {
+            spriteImg.src = data.portrait;
+            spriteImg.alt = 'Apresentação do ' + data.title;
+            spriteImg.style.opacity = '1';
+            spriteImg.style.transform = 'scale(1)';
+          }, 150);
+        }
+
+        // Atualiza card de informações e atributos
+        if (classBadge) classBadge.textContent = data.roleBadge;
+        if (classTitle) classTitle.textContent = data.title;
+        if (classDesc) classDesc.textContent = data.description;
+        if (meterForca) meterForca.style.width = data.stats.forca + '%';
+        if (meterConst) meterConst.style.width = data.stats.const + '%';
+        if (meterDestreza) meterDestreza.style.width = data.stats.destreza + '%';
+
+        if (traitsContainer) {
+          traitsContainer.innerHTML = data.traits.map(t => `<span class="trait-tag">${t}</span>`).join('');
+        }
+      });
+    });
+  }
+
+root.dataset.ready = 'true';
+  setupCoverPageInteractions();
 
   if (storedSession && storedSession.account) {
     account = storedSession.account;

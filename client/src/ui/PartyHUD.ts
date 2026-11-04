@@ -17,7 +17,7 @@ export class PartyHUD {
   public localPlayerId: string | null = null;
   public localPlayerName: string | null = null;
 
-  private isCollapsed: boolean = false;
+  private isCollapsed: boolean = true;
   private inviteTimerId: number | null = null;
 
   constructor(network: ClientNetwork) {
@@ -33,7 +33,7 @@ export class PartyHUD {
     // Party HUD Card
     this.rootCard = document.createElement('div');
     this.rootCard.id = 'party-hud-card';
-    this.rootCard.className = 'glass-panel';
+    this.rootCard.className = 'glass-panel collapsed';
     document.body.appendChild(this.rootCard);
 
     // Toast Container
@@ -80,8 +80,14 @@ export class PartyHUD {
   public showToast(message: string, _type: 'success' | 'error' | 'info' = 'info'): void {
     if (!this.toastContainer) return;
     const toast = document.createElement('div');
-    toast.className = 'party-toast';
-    toast.textContent = message;
+    toast.className = `party-toast toast-${_type}`;
+    toast.innerHTML = `
+      <span class="toast-corner-spike top-left" aria-hidden="true"></span>
+      <span class="toast-corner-spike top-right" aria-hidden="true"></span>
+      <span class="toast-corner-spike bottom-left" aria-hidden="true"></span>
+      <span class="toast-corner-spike bottom-right" aria-hidden="true"></span>
+      <span class="toast-content-text">${message}</span>
+    `;
     this.toastContainer.appendChild(toast);
     setTimeout(() => {
       if (toast.parentElement) toast.parentElement.removeChild(toast);
@@ -147,11 +153,8 @@ export class PartyHUD {
     }
   }
 
-  private toggleCollapse(): void {
+  public toggleCollapse(): void {
     this.isCollapsed = !this.isCollapsed;
-    if (this.rootCard) {
-      this.rootCard.classList.toggle('collapsed', this.isCollapsed);
-    }
     this.render();
   }
 
@@ -178,14 +181,29 @@ export class PartyHUD {
     const isLeader = party ? party.leaderId === this.localPlayerId : false;
     const memberCount = party ? party.members.length : 0;
 
+    // Estado Compacto / Minimizado: Pílula Rúnica com Indicativo +XP (Apenas Ícone e Tag 5% XP, sem texto)
+    if (this.isCollapsed) {
+      this.rootCard.classList.add('collapsed');
+      this.rootCard.innerHTML = `
+        <div class="party-pill-view" id="party-pill-btn" role="button" tabindex="0" title="Grupo: +5% EXP compartilhada (Toque para abrir)">
+          <span class="party-pill-icon">👥</span>
+          <span class="party-pill-bonus">+5%</span>
+        </div>
+      `;
+      this.rootCard.querySelector('#party-pill-btn')?.addEventListener('click', () => this.toggleCollapse());
+      return;
+    }
+
+    // Estado Expandido: Painel Rúnico Completo
+    this.rootCard.classList.remove('collapsed');
+
     let headerHtml = `
       <div class="party-hud-header">
         <div class="party-hud-title">
-          <span>👥</span> ${party ? `GRUPO (${memberCount}/4)` : 'GRUPO'}
+          <span>👥</span> ${party && memberCount > 1 ? `GRUPO (${memberCount}/4)` : 'GRUPO'}
+          <span class="party-badge-exp">+10% XP</span>
         </div>
-        <button id="party-btn-toggle" class="party-hud-toggle-btn" title="Minimizar/Expandir">
-          ${this.isCollapsed ? '▾' : '▴'}
-        </button>
+        <button id="party-btn-toggle" class="party-hud-toggle-btn" title="Minimizar para ícone">▾</button>
       </div>
     `;
 

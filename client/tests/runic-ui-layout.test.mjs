@@ -95,8 +95,8 @@ test('In-game viewport frame, session navigation buttons, top-right selectors, c
   // 4. Hero class characteristics & differentiated Primary Attack button
   assert.match(html, /id="hud-class-trait-pill"/, 'Expected #hud-class-trait-pill in Hero Status Card');
   assert.match(html, /id="hud-hero-honor-tag"/, 'Expected #hud-hero-honor-tag in Hero Status Card');
-  assert.match(html, /class="automatic-skill-bar"/, 'Expected four inline skills for automatic gameplay');
-  assert.doesNotMatch(html, /id="btn-primary-attack"/, 'Basic attacks are automatic');
+  assert.match(html, /class="combat-action-container"/, 'Expected collaborator combat layout');
+  assert.match(html, /title="Ataque básico automático"/, 'Basic attack presentation must describe server automation');
   assert.ok(
     fs.existsSync(path.join(clientRoot, 'public/assets/ui/frames/attack-runic-ring.svg')),
     'Expected attack-runic-ring.svg to exist on disk',
@@ -116,10 +116,11 @@ test('In-game viewport frame, session navigation buttons, top-right selectors, c
   assert.match(progCss, /@media \(max-width: 900px\)/, 'Expected responsive mobile / portrait rules in progression.css');
 });
 
-test('HUD responsiveness preserves the dock and uses four inline automatic skills', () => {
+test('HUD responsiveness preserves collaborator dock and square skill stack', () => {
   const progCss = fs.readFileSync(path.join(clientRoot, 'src/ui/progression.css'), 'utf8');
   const automaticCss = fs.readFileSync(path.join(clientRoot, 'src/ui/automatic-play.css'), 'utf8');
   assert.match(progCss, /#right-vertical-dock[^{]*\{[^}]*flex-direction:\s*column\s*!important/s, 'Expected dock rail to stay flex-direction column on all screens');
-  assert.match(automaticCss, /grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/, 'Expected four skills side by side');
-  assert.match(automaticCss, /position:\s*relative\s*!important/, 'Skill buttons must no longer use radial absolute positions');
+  assert.match(progCss, /\.skills-square-row\s*\{[^}]*flex-direction:\s*column-reverse/s, 'Expected collaborator vertical square skill layout');
+  assert.doesNotMatch(automaticCss, /#bottom-center-zone|#mobile-combat-arc-container/, 'Mechanics CSS must preserve collaborator HUD positioning');
+  assert.match(progCss, /#skill-btn-4\s*\{[^}]*position:\s*relative\s*!important/s, 'Square skills must not use radial positioning');
 });

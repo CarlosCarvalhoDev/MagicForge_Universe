@@ -1685,7 +1685,7 @@ skillRotationUI = setupSkillRotation({
   getSkill: slot => skillSlots[slot]?.definition ?? undefined,
   getLevel: () => playerLevel,
   applyHudOrder: order => {
-    const bar = document.getElementById('mobile-combat-arc-container');
+    const bar = document.querySelector('#mobile-combat-arc-container .skills-square-row') ?? document.getElementById('mobile-combat-arc-container');
     for (const slot of order) { const button = document.getElementById(`skill-btn-${slot}`); if (button && bar) bar.appendChild(button); }
   },
 });
@@ -1991,6 +1991,73 @@ if (btnQuickMp) {
 if (btnToggleAuto) { btnToggleAuto.disabled = true; btnToggleAuto.title = 'Combate e movimento automáticos'; }
 if (autoStatusText) autoStatusText.textContent = '100% AUTO';
 if (autoStatusIcon) autoStatusIcon.textContent = '⚔️';
+document.getElementById('btn-open-skillbook-shortcut')?.addEventListener('click', () => openSkillbook());
+
+// ----------------------------------------------------
+// Chat Box Toggle & Channel Tabs (Collapsible & Mock Channels)
+// ----------------------------------------------------
+const btnToggleChat = document.getElementById('btn-toggle-chat');
+const gameChatBox = document.getElementById('game-chat-box');
+const chatToggleIcon = document.getElementById('chat-toggle-icon');
+
+function toggleChatBox(force?: boolean) {
+  if (!gameChatBox) return;
+  const willCollapse = force !== undefined ? force : !gameChatBox.classList.contains('collapsed');
+  gameChatBox.classList.toggle('collapsed', willCollapse);
+  if (chatToggleIcon) {
+    chatToggleIcon.textContent = willCollapse ? '▲' : '▼';
+  }
+}
+
+if (btnToggleChat) {
+  btnToggleChat.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleChatBox();
+  });
+}
+
+// Click on header bar outside tabs toggles chat collapse (especially on mobile)
+const chatHeaderBar = document.querySelector('.chat-header-bar');
+if (chatHeaderBar) {
+  chatHeaderBar.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement)?.closest('.chat-channel-tab')) {
+      e.stopPropagation();
+      toggleChatBox();
+    }
+  });
+}
+
+// Click anywhere on collapsed chat box expands it
+if (gameChatBox) {
+  gameChatBox.addEventListener('click', () => {
+    if (gameChatBox.classList.contains('collapsed')) {
+      toggleChatBox(false);
+    }
+  });
+}
+
+const chatTabs = document.querySelectorAll('.chat-channel-tab');
+chatTabs.forEach((tab) => {
+  tab.addEventListener('click', (e) => {
+    e.preventDefault();
+    const channel = tab.getAttribute('data-channel');
+    if (channel === 'geral') {
+      chatTabs.forEach((t) => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+    } else {
+      const channelNames: Record<string, string> = {
+        local: 'Local',
+        servidor: 'Servidor Global',
+        party: 'Grupo (Party)',
+      };
+      partyHUD.showToast('Canal ' + (channelNames[channel || ''] || channel) + ' em manutenção. Utilize o canal Geral.', 'info');
+    }
+  });
+});
 
 if (btnOpenFarmGear) {
   btnOpenFarmGear.addEventListener('click', (e) => {
@@ -2180,6 +2247,7 @@ network.onBossEvent = (payload) => {
   }
 };
 
+let lastPortalOpenState = false;
 network.onStageUpdate = (payload) => {
   renderer.setStagePresentation(payload);
   const biomeIcon = document.getElementById('zone-biome-icon');
@@ -2232,6 +2300,10 @@ network.onStageUpdate = (payload) => {
   if (btnEnterPortal) {
     btnEnterPortal.style.display = payload.portalOpen ? 'flex' : 'none';
   }
+  if (payload.portalOpen && !lastPortalOpenState) {
+    partyHUD.showToast('🌀 PORTAL DIMENSIONAL ABERTO! Avance para o Mundo ' + (payload.world + 1) + '!', 'success');
+  }
+  lastPortalOpenState = !!payload.portalOpen;
 };
 
 network.onChatMessage = (payload) => {
@@ -2529,6 +2601,8 @@ window.addEventListener('keydown', (e) => {
 
   if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
     castSkill(parseInt(e.key, 10));
+  } else if (e.key === 'a' || e.key === 'A') {
+    skillRotationUI?.toggleAutoCast();
   } else if (e.key === 'k' || e.key === 'K') {
     if (skillbookModal && skillbookModal.style.display === 'flex') {
       closeSkillbook();

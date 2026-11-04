@@ -2334,6 +2334,31 @@
          NOVA HUD MOBILE (STICKMAN GO / IDLE MMORPG)
          ========================================= */
 
+      /* Party HUD Card & Group Icon (+5% Pill) - Strictly visible below Hero Status Card */
+      #party-hud-card {
+        position: absolute;
+        top: 120px !important;
+        left: 14px !important;
+        z-index: 35 !important;
+      }
+      #party-hud-card.collapsed {
+        top: 120px !important;
+        left: 14px !important;
+        z-index: 35 !important;
+      }
+      @media (max-width: 768px) {
+        #party-hud-card {
+          top: calc(82px + var(--safe-top, 0px)) !important;
+          left: calc(8px + var(--safe-left, 0px)) !important;
+          z-index: 35 !important;
+        }
+        #party-hud-card.collapsed {
+          top: calc(82px + var(--safe-top, 0px)) !important;
+          left: calc(8px + var(--safe-left, 0px)) !important;
+          z-index: 35 !important;
+        }
+      }
+
       /* 1. Top-Left Hero Status Card */
       #hero-status-card {
         position: absolute;
@@ -2739,11 +2764,31 @@
         transform: translateY(-1px);
       }
 
-      #boss-timer-banner {
+      /* Central Notification & Drops Queue (Em fila centralizados abaixo do card de luta) */
+      #center-notification-queue {
         position: absolute;
-        top: 80px;
+        top: 76px;
         left: 50%;
         transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        pointer-events: none;
+        max-width: min(420px, 92vw);
+        width: auto;
+      }
+
+      @media (max-width: 960px), (max-height: 560px) {
+        #center-notification-queue {
+          top: 48px;
+          gap: 6px;
+        }
+      }
+
+      #boss-timer-banner {
+        position: relative;
         background: linear-gradient(135deg, rgba(127, 29, 29, 0.95), rgba(69, 10, 10, 0.95));
         border: 2px solid #ef4444;
         border-radius: 30px;
@@ -2754,32 +2799,86 @@
         z-index: 40;
         box-shadow: 0 0 25px rgba(239, 68, 68, 0.8);
         animation: pulseBoss 1.5s infinite;
+        pointer-events: auto;
       }
 
       #btn-enter-portal {
-        position: absolute;
-        bottom: 120px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, #7c3aed, #4c1d95);
-        border: 2px solid #c084fc;
-        color: #fff;
-        border-radius: 30px;
-        padding: 10px 24px;
-        font-size: 0.88rem;
+        position: relative;
+        background: radial-gradient(circle at 50% 50%, rgba(35, 23, 64, 0.97) 0%, rgba(11, 16, 30, 0.99) 100%);
+        border: 1.5px solid #fbbf24;
+        box-shadow: 0 0 0 2px #070a14, 0 0 0 3.5px rgba(245, 158, 11, 0.8), 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 16px rgba(168, 85, 247, 0.35);
+        outline: 1px solid rgba(254, 240, 138, 0.45);
+        outline-offset: -4px;
+        color: #fef08a;
+        font-family: 'Cinzel', serif, system-ui;
+        border-radius: 4px;
+        padding: 8px 22px;
+        font-size: 0.80rem;
         font-weight: 800;
+        letter-spacing: 0.06em;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(251, 191, 36, 0.5);
         cursor: pointer;
         display: none;
         align-items: center;
         gap: 8px;
-        z-index: 40;
-        box-shadow: 0 0 25px rgba(192, 132, 252, 0.8);
-        animation: pulsePortal 2s infinite;
+        z-index: 32;
+        pointer-events: auto;
+        animation: pulseRunicPortal 2.2s infinite ease-in-out;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+        box-sizing: border-box;
+        white-space: nowrap;
+        margin-bottom: 2px;
       }
 
-      @keyframes pulsePortal {
-        0%, 100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 15px rgba(192, 132, 252, 0.5); }
-        50% { transform: translateX(-50%) scale(1.05); box-shadow: 0 0 30px rgba(192, 132, 252, 0.9); }
+      #btn-enter-portal:hover {
+        border-color: #fde047;
+        box-shadow: 0 0 0 2px #070a14, 0 0 0 4px #fde047, 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 24px rgba(168, 85, 247, 0.6);
+        transform: translateY(-2px);
+      }
+
+      #btn-enter-portal:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .portal-corner-spike {
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        background: #fbbf24;
+        border: 1px solid #78350f;
+        transform: rotate(45deg);
+        box-shadow: 0 0 4px rgba(251, 191, 36, 0.9);
+        pointer-events: none;
+        z-index: 3;
+      }
+      .portal-corner-spike.top-left { top: -4.5px; left: -4.5px; }
+      .portal-corner-spike.top-right { top: -4.5px; right: -4.5px; }
+      .portal-corner-spike.bottom-left { bottom: -4.5px; left: -4.5px; }
+      .portal-corner-spike.bottom-right { bottom: -4.5px; right: -4.5px; }
+
+      @keyframes pulseRunicPortal {
+        0%, 100% {
+          box-shadow: 0 0 0 2px #070a14, 0 0 0 3.5px rgba(245, 158, 11, 0.8), 0 6px 20px rgba(0, 0, 0, 0.85), 0 0 12px rgba(168, 85, 247, 0.35);
+        }
+        50% {
+          box-shadow: 0 0 0 2px #070a14, 0 0 0 4px #fbbf24, 0 8px 26px rgba(0, 0, 0, 0.9), 0 0 22px rgba(168, 85, 247, 0.6);
+        }
+      }
+
+      @media (max-width: 1180px) {
+        #btn-enter-portal {
+          padding: 7px 18px !important;
+          font-size: 0.74rem !important;
+          max-width: 320px !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        #btn-enter-portal {
+          padding: 6px 14px !important;
+          font-size: 0.68rem !important;
+          max-width: min(290px, 86vw) !important;
+        }
       }
 
       /* AAA Server & 3-Slot Character Selection Modal Styles */
@@ -3089,26 +3188,34 @@
         text-align: center;
       }
 
-      /* 6. Quick Use Toast */
+      /* 6. Quick Use Toast (Drops Action Card) */
       #quick-use-toast {
-        position: absolute;
-        bottom: 110px;
-        right: 24px;
-        background: rgba(15, 23, 42, 0.95);
+        position: relative;
+        background: radial-gradient(circle at 50% 50%, rgba(20, 27, 45, 0.97), rgba(11, 16, 30, 0.99));
         border: 1.5px solid #fbbf24;
-        border-radius: 14px;
-        padding: 10px 14px;
-        display: flex;
+        box-shadow: 0 0 0 2px #070a14, 0 0 0 3.5px rgba(245, 158, 11, 0.75), 0 8px 24px rgba(0, 0, 0, 0.85);
+        outline: 1px solid rgba(254, 240, 138, 0.4);
+        outline-offset: -3.5px;
+        border-radius: 4px;
+        padding: 8px 16px;
+        display: none;
         align-items: center;
         gap: 12px;
         z-index: 40;
-        box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
-        animation: slideInRight 0.3s ease-out;
+        pointer-events: auto;
+        animation: queueCardSlideIn 0.3s ease-out;
       }
 
-      @keyframes slideInRight {
-        from { transform: translateX(50px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+      @media (max-width: 768px) {
+        #quick-use-toast {
+          padding: 6px 12px !important;
+          max-width: min(280px, 86vw) !important;
+        }
+      }
+
+      @keyframes queueCardSlideIn {
+        from { transform: translateY(-8px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
       }
 
       /* =====================================================
@@ -3700,20 +3807,34 @@
       </div>
     </div>
 
-    <!-- Active Boss Challenge Banner & Countdown -->
-    <div id="boss-timer-banner">
-      <span style="font-size: 1.2rem;">💀</span>
-      <div style="display: flex; flex-direction: column;">
-        <span id="boss-banner-name" style="font-size: 0.8rem; font-weight: 900; color: #fecaca; letter-spacing: 0.05em;">CHEFÃO DA FASE EM COMBATE</span>
-        <span id="boss-banner-timer" style="font-size: 0.75rem; font-weight: 800; color: #fef08a;">TEMPO RESTANTE: 60s</span>
+    <!-- Central Notification & Drops Queue (Em fila centralizados abaixo do card de luta) -->
+    <div id="center-notification-queue">
+      <!-- Active Boss Challenge Banner & Countdown -->
+      <div id="boss-timer-banner">
+        <span style="font-size: 1.2rem;">💀</span>
+        <div style="display: flex; flex-direction: column;">
+          <span id="boss-banner-name" style="font-size: 0.8rem; font-weight: 900; color: #fecaca; letter-spacing: 0.05em;">CHEFÃO DA FASE EM COMBATE</span>
+          <span id="boss-banner-timer" style="font-size: 0.75rem; font-weight: 800; color: #fef08a;">TEMPO RESTANTE: 60s</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Portal Prompt (Appears when boss is defeated or stage cleared) -->
-    <button id="btn-enter-portal">
-      <span>🌀</span>
-      <span id="enter-portal-label">ENTRAR NO PORTAL RÚNICO (FASE 2)</span>
-    </button>
+      <!-- Quick Use Toast / Drops Action Card (Novo Drop Obtido!) -->
+      <div id="quick-use-toast" style="display: none;">
+        <span class="toast-corner-spike top-left" aria-hidden="true"></span>
+        <span class="toast-corner-spike top-right" aria-hidden="true"></span>
+        <span class="toast-corner-spike bottom-left" aria-hidden="true"></span>
+        <span class="toast-corner-spike bottom-right" aria-hidden="true"></span>
+        <div id="quick-use-icon" style="font-size: 1.4rem;">📦</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 0.66rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Novo Drop Obtido!</span>
+          <span id="quick-use-name" style="font-size: 0.78rem; font-weight: 800; color: #fbbf24;">Baú de Equipamento</span>
+        </div>
+        <button id="btn-quick-use-action" class="btn-action-primary" style="padding: 5px 14px; font-size: 0.72rem;">Usar</button>
+      </div>
+
+      <!-- Floating Toasts Container (PartyHUD.ts appends .party-toast here) -->
+      <div id="party-toast-container"></div>
+    </div>
 
     <!-- 3. Top-Right Location, Session Navigation & Luxury Runic Status Bar -->
     <div id="top-right-location-card">
@@ -3870,11 +3991,6 @@
     <!-- Left Tactical Drawer -->
     <aside class='bottom-center-toolbar runic-tactical-bar' id='tactical-action-bar' data-drawer-open='true' aria-label='Menu Tático Lateral'>
       <div class='tactical-drawer-items' id='tactical-drawer-items'>
-        <button id='btn-toggle-auto' class='btn-auto-toggle' type='button' title='Combate e movimento automáticos' disabled>
-          <span id='auto-status-icon'>⚔️</span>
-          <span id='auto-status-text'>AUTO ON</span>
-        </button>
-
         <button id='btn-open-farm-gear' class='btn-farm-gear' type='button' title='Configurar Farm Helper [F]'>
           <img src='/assets/ui/icons/icon-farm-anvil.svg' alt='' class='tactical-btn-svg' />
           <span>Farm</span>
@@ -3920,17 +4036,30 @@
       })();
     </script>
 
-    <!-- Bottom Center In-Game Chat Box -->
+    <!-- Bottom Center In-Game Chat Box & Phase Transition Card -->
     <div id='bottom-center-zone'>
+      <!-- Phase Transition Portal Card (Referenciado sempre a cima do chat, nunca em cima dele) -->
+      <button id="btn-enter-portal" style="display: none;">
+        <span class="portal-corner-spike top-left" aria-hidden="true"></span>
+        <span class="portal-corner-spike top-right" aria-hidden="true"></span>
+        <span class="portal-corner-spike bottom-left" aria-hidden="true"></span>
+        <span class="portal-corner-spike bottom-right" aria-hidden="true"></span>
+        <span class="portal-btn-icon" aria-hidden="true">🌀</span>
+        <span id="enter-portal-label">ENTRAR NO PORTAL RÚNICO (MUNDO 2)</span>
+      </button>
+
       <!-- In-Game Chat Box with History & Typing Input (Collapsible) -->
       <div id="game-chat-box">
         <div class="chat-header-bar">
-          <div class="chat-tabs">
-            <span class="chat-channel-tab active">💬 Geral</span>
+          <div class="chat-tabs" role="tablist" aria-label="Canais de Chat">
+            <button type="button" class="chat-channel-tab active" data-channel="geral" role="tab" aria-selected="true">💬 Geral</button>
+            <button type="button" class="chat-channel-tab locked" data-channel="local" role="tab" aria-selected="false" title="Canal Local (Em breve)">📍 Local <span class="tab-lock-icon">🔒</span></button>
+            <button type="button" class="chat-channel-tab locked" data-channel="servidor" role="tab" aria-selected="false" title="Canal Servidor Global (Em breve)">🌐 Servidor <span class="tab-lock-icon">🔒</span></button>
+            <button type="button" class="chat-channel-tab locked" data-channel="party" role="tab" aria-selected="false" title="Canal do Grupo (Em breve)">👥 Party <span class="tab-lock-icon">🔒</span></button>
           </div>
-          <button id="btn-toggle-chat" class="chat-toggle-btn" type="button" title="Recolher / Expandir Chat [C]">
+          <button id="btn-toggle-chat" class="chat-toggle-btn" type="button" title="Recolher / Expandir Chat [C]" aria-label="Alternar Chat">
             <span id="chat-toggle-icon">▼</span>
-            <span style="font-size: 0.65rem; color: #94a3b8;">Chat</span>
+            <span class="chat-toggle-text" style="font-size: 0.65rem; color: #94a3b8;">Chat</span>
           </button>
         </div>
         <div id="chat-messages-container">
@@ -3948,56 +4077,102 @@
       </div>
     </div>
 
-    <!-- Combat Arc (Bottom-Right) -->
-    <div id="mobile-combat-arc-container" class="automatic-skill-bar" aria-label="Ciclo de habilidades da esquerda para a direita">
-      <button id="btn-toggle-auto-cast" type="button" aria-pressed="true" disabled>Magias: AUTO</button>
-      <!-- Slot 1 -->
-      <button class="skill-arc-btn" id="skill-btn-1" data-slot="1" title="Habilidade Slot 1 [1]">
-        <span class="skill-key-badge">1</span>
-        <img class="skill-img" id="skill-img-1" src="/assets/skills/guerreiro_1.png" alt="Slot 1" />
-        <div class="skill-footer-gradient">
-          <span class="skill-cost" id="skill-cost-1">15 EN</span>
-        </div>
-        <div class="cooldown-overlay" id="skill-cd-overlay-1">
-          <span class="cooldown-text" id="skill-cd-text-1"></span>
-        </div>
-      </button>
+    <!-- Combat Action Container (Bottom-Right: Dynamic AUTO / Square Skills Transition) -->
+    <div id="mobile-combat-arc-container" class="combat-action-container" data-combat-mode="auto">
+      <!-- 1. AUTO ON View (Idle ARPG Prominent Action: Apenas Ícone e AUTO ON) -->
+      <div id="combat-auto-view" class="combat-auto-view">
+        <button id="btn-combat-auto-active" class="combat-auto-big-btn" type="button" title="Magias automáticas ativas [A]. Movimento e ataque básico permanecem automáticos." aria-label="Combate Automático Ativo">
+          <span class="auto-pulse-aura" aria-hidden="true"></span>
+          <span class="auto-runic-orbit" aria-hidden="true"></span>
+          <span class="auto-btn-main-icon">⚔️</span>
+          <span class="auto-btn-title">AUTO ON</span>
+        </button>
+      </div>
 
-      <!-- Slot 2 -->
-      <button class="skill-arc-btn" id="skill-btn-2" data-slot="2" title="Habilidade Slot 2 [2]">
-        <span class="skill-key-badge">2</span>
-        <img class="skill-img" id="skill-img-2" src="/assets/skills/guerreiro_2.png" alt="Slot 2" />
-        <div class="skill-footer-gradient">
-          <span class="skill-cost" id="skill-cost-2">25 EN</span>
+      <!-- 2. AUTO OFF / Manual View (Square RPG Skills Bar) -->
+      <div id="combat-manual-view" class="combat-manual-view" style="display: none;">
+        <!-- Header with Auto Reactivate Button and Grimório: Apenas os dois ícones -->
+        <div class="combat-manual-header">
+          <button id="btn-combat-auto-reactivate" class="combat-auto-reactivate-btn" type="button" title="Reativar magias automáticas [A]" aria-label="Reativar Modo Automático">
+            <span class="reactivate-icon">⚡</span>
+          </button>
+          <button id="btn-open-skillbook-shortcut" class="combat-grimorio-btn" type="button" title="Grimório de Habilidades [K]" aria-label="Grimório de Habilidades">
+            <span>📖</span>
+          </button>
         </div>
-        <div class="cooldown-overlay" id="skill-cd-overlay-2">
-          <span class="cooldown-text" id="skill-cd-text-2"></span>
-        </div>
-      </button>
 
-      <!-- Slot 3 -->
-      <button class="skill-arc-btn" id="skill-btn-3" data-slot="3" title="Habilidade Slot 3 [3]">
-        <span class="skill-key-badge">3</span>
-        <img class="skill-img" id="skill-img-3" src="/assets/skills/guerreiro_3.png" alt="Slot 3" />
-        <div class="skill-footer-gradient">
-          <span class="skill-cost" id="skill-cost-3">40 EN</span>
-        </div>
-        <div class="cooldown-overlay" id="skill-cd-overlay-3">
-          <span class="cooldown-text" id="skill-cd-text-3"></span>
-        </div>
-      </button>
+        <!-- Square Skills Row -->
+        <div class="skills-square-row">
+          <!-- Primary Attack Slot -->
+          <button class="skill-square-btn attack-slot" id="btn-primary-attack" type="button" title="Ataque básico automático">
+            <span class="skill-square-key">AUTO</span>
+            <div class="skill-square-icon-box">
+              <img id="attack-btn-svg" src="/assets/ui/icons/icon-attack-crest.svg" alt="" class="skill-square-svg" />
+            </div>
+            <div class="skill-square-footer">
+              <span class="skill-square-label" id="attack-btn-label">Atacar</span>
+              <span class="attack-class-trait" id="attack-class-trait" hidden>Corte Rúnico</span>
+            </div>
+          </button>
 
-      <!-- Slot 4 (Ultimate) -->
-      <button class="skill-arc-btn" id="skill-btn-4" data-slot="4" title="Habilidade Suprema [4]">
-        <span class="skill-key-badge">4</span>
-        <img class="skill-img" id="skill-img-4" src="/assets/skills/guerreiro_4.png" alt="Slot 4" />
-        <div class="skill-footer-gradient">
-          <span class="skill-cost" id="skill-cost-4">70 EN</span>
+          <!-- Slot 1 -->
+          <button class="skill-square-btn" id="skill-btn-1" data-slot="1" title="Habilidade Slot 1 [1]">
+            <span class="skill-square-key">1</span>
+            <div class="skill-square-icon-box">
+              <img class="skill-img" id="skill-img-1" src="/assets/skills/guerreiro_1.png" alt="Slot 1" />
+            </div>
+            <div class="skill-square-footer">
+              <span class="skill-cost" id="skill-cost-1">15 EN</span>
+            </div>
+            <div class="cooldown-overlay" id="skill-cd-overlay-1">
+              <span class="cooldown-text" id="skill-cd-text-1"></span>
+            </div>
+          </button>
+
+          <!-- Slot 2 -->
+          <button class="skill-square-btn" id="skill-btn-2" data-slot="2" title="Habilidade Slot 2 [2]">
+            <span class="skill-square-key">2</span>
+            <div class="skill-square-icon-box">
+              <img class="skill-img" id="skill-img-2" src="/assets/skills/guerreiro_2.png" alt="Slot 2" />
+            </div>
+            <div class="skill-square-footer">
+              <span class="skill-cost" id="skill-cost-2">25 EN</span>
+            </div>
+            <div class="cooldown-overlay" id="skill-cd-overlay-2">
+              <span class="cooldown-text" id="skill-cd-text-2"></span>
+            </div>
+          </button>
+
+          <!-- Slot 3 -->
+          <button class="skill-square-btn" id="skill-btn-3" data-slot="3" title="Habilidade Slot 3 [3]">
+            <span class="skill-square-key">3</span>
+            <div class="skill-square-icon-box">
+              <img class="skill-img" id="skill-img-3" src="/assets/skills/guerreiro_3.png" alt="Slot 3" />
+            </div>
+            <div class="skill-square-footer">
+              <span class="skill-cost" id="skill-cost-3">40 EN</span>
+            </div>
+            <div class="cooldown-overlay" id="skill-cd-overlay-3">
+              <span class="cooldown-text" id="skill-cd-text-3"></span>
+            </div>
+          </button>
+
+          <!-- Slot 4 (Ultimate) -->
+          <button class="skill-square-btn ultimate-slot" id="skill-btn-4" data-slot="4" title="Habilidade Suprema [4]">
+            <span class="skill-square-key">4</span>
+            <span class="ultimate-crown-badge">👑</span>
+            <div class="skill-square-icon-box">
+              <img class="skill-img" id="skill-img-4" src="/assets/skills/guerreiro_4.png" alt="Slot 4" />
+            </div>
+            <div class="skill-square-footer">
+              <span class="skill-cost" id="skill-cost-4">70 EN</span>
+            </div>
+            <div class="cooldown-overlay" id="skill-cd-overlay-4">
+              <span class="cooldown-text" id="skill-cd-text-4"></span>
+            </div>
+          </button>
         </div>
-        <div class="cooldown-overlay" id="skill-cd-overlay-4">
-          <span class="cooldown-text" id="skill-cd-text-4"></span>
-        </div>
-      </button>
+      </div>
     </div>
 
     <!-- Bottom Global Experience (EXP) Bar -->
@@ -4467,15 +4642,7 @@
       </div>
     </div>
 
-    <!-- Quick Use Toast Notification -->
-    <div id="quick-use-toast" style="display: none;">
-      <div id="quick-use-icon" style="font-size: 1.5rem;">📦</div>
-      <div style="display: flex; flex-direction: column; gap: 2px;">
-        <span style="font-size: 0.68rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Novo Drop Obtido!</span>
-        <span id="quick-use-name" style="font-size: 0.78rem; font-weight: 800; color: #fbbf24;">Baú de Equipamento</span>
-      </div>
-      <button id="btn-quick-use-action" class="btn-action-primary" style="padding: 6px 14px; font-size: 0.72rem;">Usar</button>
-    </div>
+
 
     <!-- Sala dos Forjados: slots await the authoritative character list. -->
     <dialog id="leaderboard-dialog" aria-labelledby="leaderboard-title">
@@ -4493,9 +4660,282 @@
       </section>
     </dialog>
     <div id="modal-auth-selection" hidden>
+            <!-- ========================================================
+           PORTAL ANCESTRAL — PÁGINA DE ROSTO (COVER HERO)
+           Inspirada nos benchmarks líderes (RagnaIdle, Lootera, OT Idle, Ravox)
+           com paralaxe em camadas, showcase de classes e transição suave
+           ======================================================== -->
+      <section id="forge-cover-hero" class="forge-cover-hero" aria-labelledby="forge-cover-title">
+        <div class="forge-cover-bg-wrap" aria-hidden="true">
+          <div class="forge-cover-parallax-layer layer-back"></div>
+          <div class="forge-cover-parallax-layer layer-stars"></div>
+          <div class="forge-cover-parallax-layer layer-runes"></div>
+          <div class="forge-cover-parallax-layer layer-mid"></div>
+          <div class="forge-cover-parallax-layer layer-vignette"></div>
+        </div>
+
+        <div class="forge-cover-container">
+          <header class="forge-cover-masthead">
+            <div class="forge-wordmark">MAGICFORGE<small>U N I V E R S E</small></div>
+            <div class="forge-cover-server-pill">
+              <span class="pulse-dot"></span>
+              <span class="pill-title">SERVIDOR 20HZ AUTORITATIVO</span>
+              <span class="pill-meta">TEMPORADA I · ZERO LATÊNCIA</span>
+            </div>
+          </header>
+
+          <div class="forge-cover-centerpiece">
+            <div class="forge-cover-badge-top">✦ A GRANDE PROFECIA DOS MUNDOS FRAGMENTADOS ✦</div>
+            <h1 id="forge-cover-title" class="forge-cover-title">
+              SUA PARTY LUTA.<br>
+              <span class="title-highlight">VOCÊ FORJA A LENDA.</span>
+            </h1>
+            <p class="forge-cover-tagline">
+              O MMORPG autoritativo e idle em pixel art com progressão profunda D&amp;D 5E, combate rúnico tático, masmorras diárias, álbum de cartas e chefes mitológicos. Desperte a Forja Ancestral.
+            </p>
+
+            <!-- Ticker de Características Exclusivas -->
+            <div class="forge-cover-stats-ticker" role="region" aria-label="Destaques do Jogo">
+              <span class="ticker-item"><span class="ticker-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></span> 7 Classes Únicas</span>
+              <span class="ticker-item"><span class="ticker-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path></svg></span> Sistema D&amp;D 5E</span>
+              <span class="ticker-item"><span class="ticker-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17V5a2 2 0 0 0-2-2H4"></path><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1z"></path></svg></span> Cartas de Monstros</span>
+              <span class="ticker-item"><span class="ticker-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span> Boss Rush Diário</span>
+              <span class="ticker-item"><span class="ticker-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 18 3 22 9 12 22 2 9"></polygon></svg></span> Refino &amp; Gemas</span>
+              <span class="ticker-item"><span class="ticker-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span> Sem Download (PC &amp; Mobile)</span>
+            </div>
+
+            <!-- Grid de Mecânicas Profundas (Diferenciais Únicos) -->
+            <div class="forge-mechanics-grid" role="region" aria-label="Sistemas Principais">
+              <div class="mechanic-card">
+                <div class="mechanic-card-header">
+                  <span class="mechanic-icon-badge"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path></svg></span>
+                  <div>
+                    <h4>Atributos &amp; Reborn D&amp;D 5E</h4>
+                    <span class="mechanic-sub">Progressão Real</span>
+                  </div>
+                </div>
+                <p>Distribua FOR, DES, CON, INT, SAB e CAR. Cada nível eleva atributos reais e o sistema de Reborn desbloqueia títulos astrais com multiplicadores exponenciais.</p>
+              </div>
+
+              <div class="mechanic-card">
+                <div class="mechanic-card-header">
+                  <span class="mechanic-icon-badge"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg></span>
+                  <div>
+                    <h4>Álbum de Cartas &amp; Refino</h4>
+                    <span class="mechanic-sub">Colecionismo e Forja</span>
+                  </div>
+                </div>
+                <p>Derrote monstros e chefes para selar cartas no seu grimório, engaste gemas nos equipamentos e refine suas armas até +20 na Bigorna Ancestral.</p>
+              </div>
+
+              <div class="mechanic-card">
+                <div class="mechanic-card-header">
+                  <span class="mechanic-icon-badge"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
+                  <div>
+                    <h4>Boss Rush &amp; Ranking 20Hz</h4>
+                    <span class="mechanic-sub">Competitividade</span>
+                  </div>
+                </div>
+                <p>Enfrente ondas ininterruptas de chefes mundiais, dispute o Ranking Astral atualizado em tempo real com ticks autoritativos de 20Hz.</p>
+              </div>
+            </div>
+
+            <!-- Linha Dupla de Destaque: Showcase de Classes + Ranking de Servidores (Benchmarks Ravox, OT Idle, Gacha Heroes) -->
+            <div class="forge-cover-showcase-row">
+              <!-- Showcase Interativo de Classes -->
+              <div class="forge-cover-classes-showcase" role="region" aria-label="Showcase de Classes">
+                <div class="classes-showcase-heading">
+                  <span class="showcase-badge">ESCOLHA SEU DESTINO</span>
+                  <h2>VOCAS &amp; ARQUÉTIPOS</h2>
+                  <p>Selecione uma classe para inspecionar seus atributos e estilo de combate</p>
+                </div>
+
+                <div class="classes-showcase-layout">
+                  <!-- Seletor de Classes em Lista Lateral -->
+                  <div class="classes-selector-rail" role="tablist" aria-label="Seleção de Classes">
+                    <button type="button" class="class-rail-btn active" data-class-id="GUERREIRO" role="tab" aria-selected="true">
+                      <span class="rail-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></span>
+                      <span class="rail-name">Guerreiro</span>
+                      <span class="rail-role">Tanque / Dano</span>
+                    </button>
+                    <button type="button" class="class-rail-btn" data-class-id="BARBARO" role="tab" aria-selected="false">
+                      <span class="rail-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 12-8.5 8.5a2.12 2.12 0 1 1-3-3L11 9"></path><path d="M15 13 9 7l4-4 6 6h3a8 8 0 0 1-7 7z"></path></svg></span>
+                      <span class="rail-name">Bárbaro</span>
+                      <span class="rail-role">Fúria Bruta</span>
+                    </button>
+                    <button type="button" class="class-rail-btn" data-class-id="ARQUEIRO" role="tab" aria-selected="false">
+                      <span class="rail-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m22 2-7.5 7.5"></path><path d="M12 2a10 10 0 0 1 10 10"></path><path d="m8 16-6 6"></path></svg></span>
+                      <span class="rail-name">Arqueiro</span>
+                      <span class="rail-role">Precisão / Crítico</span>
+                    </button>
+                    <button type="button" class="class-rail-btn" data-class-id="CLERIGO" role="tab" aria-selected="false">
+                      <span class="rail-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M5 9h14"></path></svg></span>
+                      <span class="rail-name">Clérigo</span>
+                      <span class="rail-role">Cura / Suporte</span>
+                    </button>
+                    <button type="button" class="class-rail-btn" data-class-id="MAGO" role="tab" aria-selected="false">
+                      <span class="rail-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 11-8-8-8.5 8.5a2.12 2.12 0 1 0 3 3L11 9l8 8a2.12 2.12 0 1 0 3-3z"></path><path d="m5 2 5 5"></path><path d="m2 5 5 5"></path></svg></span>
+                      <span class="rail-name">Mago</span>
+                      <span class="rail-role">Magia Elemental</span>
+                    </button>
+                    <button type="button" class="class-rail-btn" data-class-id="MONGE" role="tab" aria-selected="false">
+                      <span class="rail-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg></span>
+                      <span class="rail-name">Monge</span>
+                      <span class="rail-role">Ki / Artes Marciais</span>
+                    </button>
+                    <button type="button" class="class-rail-btn" data-class-id="BRUXO" role="tab" aria-selected="false">
+                      <span class="rail-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></span>
+                      <span class="rail-name">Bruxo</span>
+                      <span class="rail-role">Pacto Sinistro</span>
+                    </button>
+                  </div>
+
+                  <!-- Palco Interativo de Apresentação da Classe -->
+                  <div class="class-stage-display">
+                    <div class="stage-pedestal-platform" aria-hidden="true">
+                      <div class="pedestal-rune-glow"></div>
+                      <div class="pedestal-shadow"></div>
+                      <div id="cover-hero-sprite-actor" class="hero-sprite-actor hero-actor-animated" data-actor-class="GUERREIRO">
+                        <div class="actor-inner-halo"></div>
+                        <img id="cover-hero-sprite-img" src="/assets/portraits/GUERREIRO.jpg" alt="Apresentação do Guerreiro" width="160" height="160">
+                        <div class="actor-dust-particles" aria-hidden="true"></div>
+                      </div>
+                    </div>
+
+                    <div class="stage-info-card">
+                      <div class="stage-card-header">
+                        <span id="cover-class-badge" class="stage-badge">D&amp;D 5E · COMBATE CORPO A CORPO</span>
+                        <h3 id="cover-class-title">Guerreiro da Bigorna</h3>
+                        <p id="cover-class-desc">Mestre absoluto em armas forjadas e armaduras pesadas. Absorve o impacto dos golpes inimigos e desfere contra-ataques devastadores no calor da batalha.</p>
+                      </div>
+
+                      <div class="stage-stats-preview">
+                        <div class="stat-bar-group">
+                          <span class="stat-name">Poder Físico (FOR)</span>
+                          <div class="stat-meter"><div id="meter-forca" class="meter-fill" style="width: 90%;"></div></div>
+                        </div>
+                        <div class="stat-bar-group">
+                          <span class="stat-name">Resistência (CON)</span>
+                          <div class="stat-meter"><div id="meter-const" class="meter-fill" style="width: 85%;"></div></div>
+                        </div>
+                        <div class="stat-bar-group">
+                          <span class="stat-name">Agilidade &amp; Tática</span>
+                          <div class="stat-meter"><div id="meter-destreza" class="meter-fill" style="width: 60%;"></div></div>
+                        </div>
+                      </div>
+
+                      <div id="cover-class-tags" class="stage-traits-tags">
+                        <span class="trait-tag">Provocação &amp; Defesa</span>
+                        <span class="trait-tag">Golpe Fulminante</span>
+                        <span class="trait-tag">Linha de Frente</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Lateral: Ranking de Servidores & Temporada (Mock Inspirado em Ravox / OT Idle / Gacha Heroes) -->
+              <aside class="forge-cover-ranking-card" role="region" aria-label="Ranking de Servidores">
+                <div class="ranking-card-header">
+                  <span class="ranking-header-badge">TEMPORADA I · RANKING ASTRAL</span>
+                  <h3>PIONEIROS DA FORJA</h3>
+                  <div class="ranking-live-beacon">
+                    <span class="beacon-pulse"></span>
+                    <span class="beacon-text">LIVE TICK 20HZ</span>
+                  </div>
+                </div>
+
+                <div class="ranking-list-mock">
+                  <div class="ranking-row top-1">
+                    <span class="ranking-pos">1º</span>
+                    <div class="ranking-avatar"><img src="/assets/portraits/GUERREIRO.jpg" alt="" width="32" height="32"></div>
+                    <div class="ranking-info">
+                      <strong class="ranking-name">Aegis Forjador</strong>
+                      <span class="ranking-details">Guerreiro · Nv. 142 · CP 38.450</span>
+                    </div>
+                    <span class="ranking-status-tag">No Altar</span>
+                  </div>
+
+                  <div class="ranking-row top-2">
+                    <span class="ranking-pos">2º</span>
+                    <div class="ranking-avatar"><img src="/assets/portraits/BARBARO.jpg" alt="" width="32" height="32"></div>
+                    <div class="ranking-info">
+                      <strong class="ranking-name">Krag Fúria Primal</strong>
+                      <span class="ranking-details">Bárbaro · Nv. 138 · CP 36.800</span>
+                    </div>
+                    <span class="ranking-status-tag">Boss Rush</span>
+                  </div>
+
+                  <div class="ranking-row top-3">
+                    <span class="ranking-pos">3º</span>
+                    <div class="ranking-avatar"><img src="/assets/portraits/MAGO.jpg" alt="" width="32" height="32"></div>
+                    <div class="ranking-info">
+                      <strong class="ranking-name">Eldrin Astromante</strong>
+                      <span class="ranking-details">Mago · Nv. 135 · CP 35.120</span>
+                    </div>
+                    <span class="ranking-status-tag">Masmorra</span>
+                  </div>
+
+                  <div class="ranking-row">
+                    <span class="ranking-pos">4º</span>
+                    <div class="ranking-avatar"><img src="/assets/portraits/ARQUEIRO.jpg" alt="" width="32" height="32"></div>
+                    <div class="ranking-info">
+                      <strong class="ranking-name">Sylvan Vento Noturno</strong>
+                      <span class="ranking-details">Arqueiro · Nv. 131 · CP 33.900</span>
+                    </div>
+                    <span class="ranking-status-tag">Farm Idle</span>
+                  </div>
+
+                  <div class="ranking-row">
+                    <span class="ranking-pos">5º</span>
+                    <div class="ranking-avatar"><img src="/assets/portraits/CLERIGO.jpg" alt="" width="32" height="32"></div>
+                    <div class="ranking-info">
+                      <strong class="ranking-name">Solaria da Alvorada</strong>
+                      <span class="ranking-details">Clérigo · Nv. 129 · CP 32.740</span>
+                    </div>
+                    <span class="ranking-status-tag">Farm Idle</span>
+                  </div>
+                </div>
+
+                <div class="ranking-footer-note">
+                  <span>Atualização contínua a cada tick do servidor</span>
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          <!-- Rodapé com Botão e Seta para Descer para o Login -->
+          <footer class="forge-cover-footer">
+            <button id="btn-enter-gate" class="forge-cover-cta" type="button" aria-label="Acessar Forja Astral e ir para a tela de login">
+              <span class="cta-pulse-ring" aria-hidden="true"></span>
+              <span class="cta-inner">
+                <span class="cta-text-group">
+                  <span class="cta-super">ENTRAR NO UNIVERSO</span>
+                  <strong class="cta-main">ACESSAR FORJA ASTRAL</strong>
+                </span>
+                <span class="cta-arrow-box" aria-hidden="true">
+                  <svg class="cta-arrow-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                  </svg>
+                </span>
+              </span>
+            </button>
+
+          </footer>
+        </div>
+      </section>
+
       <main class="forge-auth" aria-labelledby="forge-auth-title">
         <header class="forge-masthead">
           <div class="forge-wordmark">MAGICFORGE<small>U N I V E R S E</small></div>
+          <button id="btn-back-to-cover" class="forge-back-cover-btn" type="button" aria-label="Voltar para a página de apresentação">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+            <span>CONHECER O JOGO</span>
+          </button>
           <span class="forge-world-tag">FORJA ANCESTRAL<br>O início da sua jornada</span>
         </header>
         <div class="forge-intro">
@@ -4578,7 +5018,14 @@
           </section>
         </div>
         <p id="forge-auth-status" class="forge-auth-status" role="status" aria-live="polite">O acesso por conta e senha ainda não está disponível.</p>
-        <footer class="forge-footer"><span>Sete classes. Mundos fragmentados. Uma nova lenda.</span><button id="btn-replay-story" type="button">📜 Rever história</button><button id="btn-auth-switch-dev" type="button" hidden>Abrir painel de rede</button></footer>
+        <footer class="forge-footer">
+          <span class="forge-footer-legend">Sete classes. Mundos fragmentados. Uma nova lenda.</span>
+          <div class="forge-footer-actions">
+            <button id="btn-footer-back-to-cover" type="button" class="btn-back-cover" aria-label="Voltar para a tela inicial">✦ Início</button>
+            <button id="btn-replay-story" type="button">📜 Rever história</button>
+            <button id="btn-auth-switch-dev" type="button" hidden>Abrir painel de rede</button>
+          </div>
+        </footer>
       </main>
     </div>
 

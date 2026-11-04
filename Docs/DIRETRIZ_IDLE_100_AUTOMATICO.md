@@ -6,7 +6,7 @@ Aprovada pelo usuário em 03/11/2026. Esta direção substitui propostas anterio
 
 - O jogador administra sua build, equipamentos e seleção de habilidades. O herói busca alvos, se move e luta automaticamente.
 - Não há joystick, movimento por toque/clique no chão ou botão para alternar para controle manual.
-- O HUD apresenta quatro habilidades lado a lado, da esquerda para a direita. Conjuração manual opcional por toque ou teclas 1–4 continua sujeita às regras do servidor.
+- O HUD segue prioritariamente o layout do colaborador, conforme orientação de 04/11/2026: botão AUTO na apresentação compacta e habilidades quadradas na apresentação expandida. A pilha de habilidades segue a disposição visual do colaborador, com o ataque básico automático separado. A ordem de conjuração é a sequência configurada da esquerda para a direita no Grimório. Os controles AUTO/MANUAL alternam somente a conjuração de magias e sincronizam a preferência no servidor. Conjuração manual opcional por toque ou teclas 1–4 continua sujeita às regras do servidor.
 - O Grimório mantém a escolha entre habilidades permitidas em cada categoria. A aba **Ciclo automático** configura somente a ordem de execução das quatro habilidades escolhidas.
 - Reordenar o ciclo não muda categorias, classe, nível de desbloqueio, recurso ou cooldown. A progressão dos slots continua em níveis 1, 10, 25 e 50, com três escolhas por categoria.
 

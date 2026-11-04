@@ -31,6 +31,7 @@ Este repositório contém o MagicForge: Universe, incluindo cliente Unity, clien
 - Priorize mudanças incrementais e verificáveis.
 
 ## 5. Regras para Unity, Web e assets
+- Em integrações, o layout contribuído pelo colaborador do usuário tem prioridade sobre versões de layout do Codex, conforme orientação de 04/11/2026. Adapte as mecânicas aprovadas aos controles e à apresentação desse layout.
 - Preserve referências de GUID e os `.meta` existentes. Nunca duplique GUIDs de Unity.
 - Não mova ou renomeie assets referenciados sem cuidar das referências e obter aprovação para alterações de escopo amplo.
 - Imagens de gameplay e sprite sheets devem ter nomenclatura consistente e ser importadas conforme a grade real de cada arquivo; não deduza dimensões sem verificar.
