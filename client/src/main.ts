@@ -25,6 +25,7 @@ import {
   S2CSocketResultPayload,
   S2CCardsUpdatePayload,
   S2CFarmSettingsUpdatePayload,
+  bagItems,
 } from '@magicforge/shared';
 import { ClientNetwork } from './network/ClientNetwork';
 import { SnapshotBuffer, InterpolatedEntity } from './interpolation/SnapshotBuffer';
@@ -44,6 +45,9 @@ import { OfflineRewardModal } from './ui/OfflineRewardModal';
 import { setupHuntReport } from './ui/HuntReport';
 import { setupSkillRotation } from './ui/SkillRotation';
 import { setupSkillUpgrades } from './ui/SkillUpgrades';
+import { DEFAULT_INVENTORY_VIEW, selectBagView, itemBonuses, type InventoryViewState } from './ui/InventoryView';
+import './ui/inventory-view.css';
+import { setupInventoryTooltip } from './ui/InventoryTooltip';
 import './ui/hunt-report.css';
 import './ui/auth-selection.css';
 import './ui/progression.css';
@@ -423,9 +427,11 @@ function openSkillbook() {
   const currentClass = myPlayerClass || (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
   renderGrimorioSkills(currentClass);
   if (skillbookModal) skillbookModal.style.display = 'flex';
+  skillUpgradeUI?.onOpen();
 }
 
 function closeSkillbook() {
+  skillUpgradeUI?.onClose();
   if (skillbookModal) skillbookModal.style.display = 'none';
 }
 
@@ -1012,7 +1018,7 @@ function openUnifiedHeroModal(defaultTab: 'mochila' | 'refino' | 'pedras' | 'car
     characterModal.style.display = 'none';
   }
   if (selectedSlotIndex === null && playerInventory.length > 0) {
-    selectedSlotIndex = playerInventory[0].slotIndex;
+    selectedSlotIndex = (bagItems(playerInventory)[0] ?? playerInventory[0]).slotIndex;
   }
   renderInventorySlots();
   renderCharacterModal();
@@ -1023,6 +1029,7 @@ function openUnifiedHeroModal(defaultTab: 'mochila' | 'refino' | 'pedras' | 'car
 }
 
 function closeUnifiedHeroModal() {
+  inventoryTooltip?.hide();
   if (inventoryModal) inventoryModal.style.display = 'none';
   if (characterModal) characterModal.style.display = 'none';
 }
@@ -1148,31 +1155,59 @@ if (btnSocketCard) {
   });
 }
 
+const inventoryViewState: InventoryViewState = { ...DEFAULT_INVENTORY_VIEW };
+const inventorySearch = document.getElementById('inventory-search') as HTMLInputElement;
+const inventoryTypeFilter = document.getElementById('inventory-type-filter') as HTMLSelectElement;
+const inventoryTooltip = inventorySlotsGrid ? setupInventoryTooltip(inventorySlotsGrid, () => playerInventory) : null;
+function updateInventoryView() {
+  inventoryViewState.query = inventorySearch.value;
+  inventoryViewState.type = inventoryTypeFilter.value;
+  renderInventorySlots();
+}
+inventorySearch.addEventListener('input', updateInventoryView);
+inventoryTypeFilter.addEventListener('change', updateInventoryView);
+
 function renderInventorySlots() {
   if (!inventorySlotsGrid) return;
   inventorySlotsGrid.innerHTML = '';
 
   if (inventoryCapacityText) {
-    inventoryCapacityText.textContent = `CAPACIDADE: ${playerInventory.length} / ${playerMaxInventorySlots} SLOTS`;
+    inventoryCapacityText.textContent = `MOCHILA: ${bagItems(playerInventory).length} / ${playerMaxInventorySlots} · EQUIPADOS: ${playerInventory.filter(item => item.isEquipped).length}`;
   }
   refreshExpansionContext();
+  const visibleItems = selectBagView(playerInventory, inventoryViewState);
+  const filtered = inventoryViewState.query.trim() !== '' || inventoryViewState.type !== 'all' || inventoryViewState.rarity !== 'all' || inventoryViewState.sort !== 'slot';
+  document.getElementById('inventory-view-summary')!.textContent = `${visibleItems.length} itens · Equipados ficam fora da mochila.`;
 
   // Render up to 50 slots
-  const totalSlotsToDisplay = Math.min(50, Math.max(playerMaxInventorySlots + 5, 20));
+  const totalSlotsToDisplay = filtered ? visibleItems.length : Math.max(20, playerMaxInventorySlots + (playerMaxInventorySlots < 100 ? 5 : 0));
+  if (!totalSlotsToDisplay) {
+    const empty = document.createElement('p'); empty.className = 'inventory-view-empty'; empty.textContent = 'Nenhum item corresponde à busca. Limpe ou ajuste os filtros.'; inventorySlotsGrid.appendChild(empty);
+  }
 
   for (let slot = 0; slot < totalSlotsToDisplay; slot++) {
     const slotEl = document.createElement('div');
     slotEl.className = 'inventory-slot';
-    if (slot === selectedSlotIndex) slotEl.classList.add('selected');
+    const displayedItem = filtered ? visibleItems[slot] : playerInventory.find(item => !item.isEquipped && item.slotIndex === slot);
+    const actualSlot = displayedItem?.slotIndex ?? slot;
+    if (actualSlot === selectedSlotIndex) slotEl.classList.add('selected');
 
     if (slot < playerMaxInventorySlots) {
       // Active slot (filled or empty)
-      const item = playerInventory.find((i) => i.slotIndex === slot);
+      const item = displayedItem;
       const itemDef = item ? ITEMS_DATABASE[item.itemId] : null;
 
       if (item && itemDef) {
         const rarityTheme = RARITY_COLORS[itemDef.rarity] || { border: '#ffffff', glow: 'rgba(255,255,255,0.3)', text: '#ffffff', bg: 'rgba(30,41,59,0.6)' };
         slotEl.style.borderColor = rarityTheme.border;
+        slotEl.title = `${itemDef.name}${item.refineLevel ? ` +${item.refineLevel}` : ''} · ${itemDef.rarity} · posição ${actualSlot + 1}`;
+        slotEl.setAttribute('aria-label', slotEl.title);
+        slotEl.dataset.instanceId = item.instanceId ?? `slot:${item.slotIndex}`;
+        slotEl.style.setProperty('--item-color', rarityTheme.border);
+        slotEl.removeAttribute('title');
+        slotEl.setAttribute('role', 'button');
+        slotEl.tabIndex = 0;
+        slotEl.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectInventorySlot(actualSlot); } });
 
         if (item.isEquipped) {
           slotEl.classList.add('equipped');
@@ -1186,6 +1221,10 @@ function renderInventorySlots() {
         iconEl.className = 'slot-icon-text';
         iconEl.textContent = getItemEmoji(item.itemId, itemDef.type);
         slotEl.appendChild(iconEl);
+        const nameEl = document.createElement('span');
+        nameEl.className = 'inventory-tile-name';
+        nameEl.textContent = itemDef.name;
+        slotEl.appendChild(nameEl);
 
         if (item.quantity > 1) {
           const qtyBadge = document.createElement('span');
@@ -1206,7 +1245,7 @@ function renderInventorySlots() {
       }
 
       slotEl.addEventListener('click', () => {
-        selectInventorySlot(slot);
+        selectInventorySlot(actualSlot);
       });
     } else {
       // Locked slot
@@ -1225,6 +1264,7 @@ function renderInventorySlots() {
 
     inventorySlotsGrid.appendChild(slotEl);
   }
+  inventoryTooltip?.refresh();
 }
 
 function selectInventorySlot(slotIndex: number) {
@@ -1232,6 +1272,7 @@ function selectInventorySlot(slotIndex: number) {
   renderInventorySlots();
 
   const item = playerInventory.find((i) => i.slotIndex === slotIndex);
+
   const itemDef = item ? ITEMS_DATABASE[item.itemId] : null;
 
   if (item && itemDef && itemDef.type === ItemType.EQUIPAMENTO) {
@@ -1311,7 +1352,7 @@ function selectInventorySlot(slotIndex: number) {
 
     // Class Proficiencies
     if (itemDef.allowedClasses && itemDef.allowedClasses.length > 0) {
-      const userClass = (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
+      const userClass = myPlayerClass;
       const isProficient = itemDef.allowedClasses.includes(userClass);
       const row = document.createElement('div');
       row.className = 'inspector-stat-row';
@@ -1340,7 +1381,7 @@ function selectInventorySlot(slotIndex: number) {
 
     // Bonus Stats
     if (itemDef.type === ItemType.EQUIPAMENTO && itemDef.statsBonus) {
-      const bonus = itemDef.statsBonus;
+      const bonus = itemBonuses(item);
       const statRows: Array<{ label: string; val?: number; color: string }> = [
         { label: 'Força (STR)', val: bonus.forca, color: '#f87171' },
         { label: 'Destreza (DEX)', val: bonus.destreza, color: '#fbbf24' },
@@ -1376,7 +1417,7 @@ function selectInventorySlot(slotIndex: number) {
   if (btnInventoryAction) {
     if (itemDef.type === ItemType.EQUIPAMENTO) {
       btnInventoryAction.style.display = 'block';
-      const userClass = (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
+      const userClass = myPlayerClass;
       const cannotEquip = (itemDef.allowedClasses && !itemDef.allowedClasses.includes(userClass)) || (itemDef.minLevel && playerLevel < itemDef.minLevel);
 
       if (cannotEquip && !item.isEquipped) {
@@ -1412,6 +1453,8 @@ function selectInventorySlot(slotIndex: number) {
 
   if (btnInventoryDiscard) {
     btnInventoryDiscard.style.display = 'flex';
+    btnInventoryDiscard.disabled = item.isEquipped;
+    btnInventoryDiscard.title = item.isEquipped ? 'Desequipe antes de reciclar.' : 'Reciclar item selecionado';
     btnInventoryDiscard.onclick = () => {
       network.sendDiscardItem(item.slotIndex);
       addChatMessage('Forja', `♻️ Enviando [${itemDef.name}] para reciclagem na Forja Astral...`, 'sys');
@@ -1456,7 +1499,7 @@ const defaultSlotIcons: Record<PaperdollSlotKey, { emoji: string; label: string 
 };
 
 function renderCharacterModal(): void {
-  const chosenClass = (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
+  const chosenClass = myPlayerClass;
   const classDef = CLASS_DEFINITIONS[chosenClass];
   if (!classDef) return;
 
@@ -1472,33 +1515,32 @@ function renderCharacterModal(): void {
   if (growth.sabedoria) currentAttrs.sabedoria += growth.sabedoria * levelMult;
   if (growth.carisma) currentAttrs.carisma += growth.carisma * levelMult;
 
-  // Equipment bonuses
+  const attributeKeys = ['forca', 'destreza', 'constituicao', 'inteligencia', 'sabedoria', 'carisma'] as const;
+  for (const key of attributeKeys) currentAttrs[key] += playerRebornCount * 10;
   let bonusMaxHp = 0;
-  playerInventory.forEach((item) => {
-    if (item.isEquipped) {
-      const def = ITEMS_DATABASE[item.itemId];
-      if (def && def.statsBonus) {
-        if (def.statsBonus.forca) currentAttrs.forca += def.statsBonus.forca;
-        if (def.statsBonus.destreza) currentAttrs.destreza += def.statsBonus.destreza;
-        if (def.statsBonus.constituicao) currentAttrs.constituicao += def.statsBonus.constituicao;
-        if (def.statsBonus.inteligencia) currentAttrs.inteligencia += def.statsBonus.inteligencia;
-        if (def.statsBonus.sabedoria) currentAttrs.sabedoria += def.statsBonus.sabedoria;
-        if (def.statsBonus.carisma) currentAttrs.carisma += def.statsBonus.carisma;
-        if (def.statsBonus.maxHp) bonusMaxHp += def.statsBonus.maxHp;
-      }
-    }
-  });
+  for (const item of playerInventory.filter(item => item.isEquipped)) {
+    const bonus = itemBonuses(item);
+    for (const key of attributeKeys) currentAttrs[key] += bonus[key] ?? 0;
+    bonusMaxHp += bonus.maxHp ?? 0;
+  }
+  for (const card of playerCards) {
+    const bonus = CARDS_DATABASE[card.cardId]?.statsBonus;
+    if (!bonus) continue;
+    const multiplier = card.isEquipped ? 2 : 1;
+    for (const key of attributeKeys) currentAttrs[key] += Math.round((bonus[key] ?? 0) * multiplier);
+    bonusMaxHp += Math.round((bonus.maxHp ?? 0) * multiplier);
+  }
 
-  // Derived Stats
-  const calculatedMaxHp = currentAttrs.constituicao * 35 + 450 + bonusMaxHp;
+  // Permanent stats follow the server; temporary combat buffs are excluded.
+  const calculatedMaxHp = currentAttrs.constituicao * 35 + 450 + levelMult * 60 + playerRebornCount * 500 + bonusMaxHp;
   let primeStat = currentAttrs.forca;
   if (classDef.mainStat === PrimaryStatType.DESTREZA) primeStat = currentAttrs.destreza;
   else if (classDef.mainStat === PrimaryStatType.INTELIGENCIA) primeStat = currentAttrs.inteligencia;
   else if (classDef.mainStat === PrimaryStatType.SABEDORIA) primeStat = currentAttrs.sabedoria;
   else if (classDef.mainStat === PrimaryStatType.CARISMA) primeStat = currentAttrs.carisma;
   else if (classDef.mainStat === PrimaryStatType.FORCA_E_CARISMA) primeStat = currentAttrs.forca + currentAttrs.carisma;
-  const baseDmg = primeStat * 3 + 5;
-  const critPct = Math.min(60, 5 + Math.floor(currentAttrs.destreza * 0.8));
+  const baseDmg = Math.round((primeStat * 3 + playerLevel * 5) * (1 + playerRebornCount * 0.15));
+  const critPct = Math.round(Math.min(100, currentAttrs.destreza * 1.5) * 10) / 10;
 
   // Update DOM values
   if (statForca) statForca.textContent = `${currentAttrs.forca}`;
@@ -1517,7 +1559,7 @@ function renderCharacterModal(): void {
   if (hudCpBig) hudCpBig.textContent = playerCombatPower.toLocaleString('pt-BR');
 
   // Center stage avatar
-  const charName = charNameInput.value.trim() || 'Aventureiro';
+  const charName = hudHeroName?.textContent?.trim() || 'Aventureiro';
   if (paperdollPortrait) paperdollPortrait.src = `/assets/portraits/${chosenClass}.jpg`;
   if (paperdollHeroName) paperdollHeroName.textContent = charName;
   if (paperdollHeroClass) paperdollHeroClass.textContent = `${classDef.displayName} (Nv. ${playerLevel})`;
@@ -1543,9 +1585,9 @@ function renderCharacterModal(): void {
         <span class="slot-placeholder-icon" style="font-size: 1.5rem;">${getItemEmoji(def.itemId, def.type)}</span>
         <span class="slot-label" style="color: ${rarityTheme.text}; font-weight: 700;">${def.name}${refineStr}</span>
       `;
-      slotEl.title = `[Equipado] ${def.name}${refineStr} (${def.rarity})\nClique para Desequipar`;
+      slotEl.title = `[Equipado] ${def.name}${refineStr} (${def.rarity})\nClique para inspecionar, refinar ou desequipar`;
       slotEl.onclick = () => {
-        network.sendUseItem(equippedItem.slotIndex);
+        selectInventorySlot(equippedItem.slotIndex);
       };
     } else {
       const defSlot = defaultSlotIcons[slotKey];
@@ -1694,6 +1736,7 @@ skillUpgradeUI = setupSkillUpgrades({
   isReady: () => network.isConnected && network.isAuthenticated && farmPlayerReady,
   send: (skillId, level) => network.sendUpgradeSkill(skillId, level),
   changed: updateEquippedSkillsUI,
+  requestRates: () => network.sendRequestHuntReport(),
 });
 network.onSkillUpgradeResult = payload => skillUpgradeUI?.onResult(payload);
 let farmPlayerReady = false;
@@ -1708,7 +1751,7 @@ const huntReportUI = setupHuntReport({
   request: () => network.sendRequestHuntReport(),
   reset: () => network.sendResetHuntReport(),
 });
-network.onHuntReport = report => huntReportUI.onReport(report);
+network.onHuntReport = report => { huntReportUI.onReport(report); skillUpgradeUI?.onFarmSample(report); };
 network.onFarmSettingsUpdate = payload => {
   // enterWorld sends preferences before S2C_LOGIN_SUCCESS.
   if (!farmPlayerReady) { pendingFarmSettings = payload; return; }

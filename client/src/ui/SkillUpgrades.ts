@@ -1,21 +1,28 @@
 import {
   type SkillDefinition, type S2CSkillUpgradeResultPayload,
   SKILL_MAX_LEVEL, getSkillLevel, getSkillUpgradeCost, getSkillUpgradeMultiplier, canUpgradeSkillPower,
+  estimateUpgradeSeconds, type UpgradeFarmSample,
 } from '@magicforge/shared';
 
 export function setupSkillUpgrades(transport: {
   isReady(): boolean;
   send(skillId: string, expectedLevel: number): void;
   changed(): void;
+  requestRates?(): void;
 }) {
   let levels: Record<string, number> = {};
   let loaded = false;
   let pending: string | undefined;
   let timeout: ReturnType<typeof setTimeout> | undefined;
+  let polling: ReturnType<typeof setInterval> | undefined;
+  let sample: UpgradeFarmSample | null = null;
+  let sampleReceivedAt = 0;
   const status = document.getElementById('skill-upgrade-status')!;
 
   function reset() {
     clearTimeout(timeout);
+    clearInterval(polling);
+    sample = null;
     levels = {};
     loaded = false;
     pending = undefined;
@@ -25,6 +32,19 @@ export function setupSkillUpgrades(transport: {
 
   return {
     reset,
+    onOpen() {
+      clearInterval(polling);
+      if (!transport.requestRates || !transport.isReady()) return;
+      transport.requestRates();
+      polling = setInterval(() => { if (transport.isReady()) transport.requestRates?.(); }, 15000);
+    },
+    onClose() { clearInterval(polling); },
+    onFarmSample(value: UpgradeFarmSample) {
+      if (!transport.isReady()) return;
+      sample = value;
+      sampleReceivedAt = Date.now();
+      transport.changed();
+    },
     getLevel: (skillId: string) => getSkillLevel(levels, skillId),
     onSkillsUpdate(value?: Record<string, number>) {
       if (!loaded && value !== undefined) {
@@ -82,6 +102,19 @@ export function setupSkillUpgrades(transport: {
         transport.send(skill.skillId, level);
       });
       root.append(summary, price, button);
+      if (cost && supported && context.equipped && context.heroLevel >= skill.unlockLevel) {
+        const forecast = document.createElement('p');
+        forecast.className = 'skill-upgrade-estimate';
+        const estimate = estimateUpgradeSeconds(cost, context, Date.now() - sampleReceivedAt <= 30000 ? sample : null);
+        const minutes = Math.max(1, Math.ceil((estimate.seconds ?? 0) / 60));
+        const duration = minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}min` : `${minutes}min`;
+        forecast.textContent = estimate.state === 'ready' ? 'Recursos disponíveis para melhorar agora.' :
+          estimate.state === 'sampling' ? 'Previsão disponível após medir ao menos 1 minuto de caça.' :
+            estimate.state === 'no-dust-rate' ? 'Sem taxa de Pó Arcano medida. Obtenha no farm ou na reciclagem; confira espaço na mochila.' :
+              estimate.state === 'no-gold-rate' ? 'Sem taxa de ouro medida nesta caçada.' :
+                `Pela média desta caçada: cerca de ${duration}. Drops e gastos podem mudar esse tempo.`;
+        root.append(forecast);
+      }
       return root;
     },
   };

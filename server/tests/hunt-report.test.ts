@@ -48,11 +48,14 @@ test('Taxas esperam 1 min, incluem tempo sem abates e resetam sem alterar econom
   hunt.add('combatExp', 120);
   hunt.add('lootGold', 60);
   hunt.add('autoSaleGold', 1000);
+  hunt.addArcaneDust(2);
   hunt.advance(59);
   assert.equal(hunt.snapshot().expPerHour, null);
+  assert.equal(hunt.snapshot().arcaneDustPerHour, null);
   hunt.advance(1);
   assert.equal(hunt.snapshot().expPerHour, 7200);
   assert.equal(hunt.snapshot().goldPerHour, 3600);
+  assert.equal(hunt.snapshot().arcaneDustPerHour, 120);
   hunt.advance(60);
   assert.equal(hunt.snapshot().expPerHour, 3600);
   hunt.add('combatExp', -100);
@@ -62,6 +65,37 @@ test('Taxas esperam 1 min, incluem tempo sem abates e resetam sem alterar econom
   assert.equal(hunt.snapshot().elapsedSeconds, 0);
   assert.equal(hunt.snapshot().combatExp, 0);
   assert.equal(hunt.snapshot().goldPerHour, null);
+  assert.equal(hunt.snapshot().arcaneDustLoot, 0);
+});
+
+test('Auto-venda e venda de lixo preservam pó, pedras e poções; só coleta real conta para previsão', t => {
+  const { db, world, player, conn } = setup(t);
+  player.farmSettings.autoSellCommon = player.farmSettings.autoSellUncommon = true;
+  const dust = killWithLoot(world, player, 'arcane_dust', 3);
+  assert.equal(world.lootItem(player, dust.dropId), false);
+  killWithLoot(world, player, 'stone_forge_common', 1);
+  killWithLoot(world, player, 'potion_hp_minor', 1);
+  assert.equal(player.huntSession.snapshot().arcaneDustLoot, 3);
+  assert.equal(player.huntSession.snapshot().autoSaleGold, 0);
+  world.handleAutoSalvage(conn);
+  assert.ok(db.hasItemQuantity(player.dbCharacterId, 'arcane_dust', 3));
+  assert.ok(db.hasItemQuantity(player.dbCharacterId, 'stone_forge_common', 1));
+  assert.ok(db.hasItemQuantity(player.dbCharacterId, 'potion_hp_minor', 4));
+  world.deliverRewardItemToPlayer(player, 'arcane_dust', 2);
+  assert.equal(player.huntSession.snapshot().arcaneDustLoot, 3);
+});
+
+test('Mochila sem espaço não soma pó não coletado à taxa', t => {
+  const { db, world, player } = setup(t);
+  player.maxInventorySlots = player.inventory.length;
+  const monster = new Monster('dust_full', 'Alvo', createVector3(0, 0, 0));
+  monster.lootTable = [{ itemId: 'arcane_dust', dropChance: 1, minQty: 3, maxQty: 3 }];
+  monster.takeDamage(monster.maxHp, player);
+  world.handleMonsterDeath(monster, player);
+  const drop = [...world.activeItemDrops.values()].find(item => item.itemId === 'arcane_dust')!;
+  assert.equal(world.lootItem(player, drop.dropId), false);
+  assert.equal(player.huntSession.snapshot().arcaneDustLoot, 0);
+  assert.equal(db.hasItemQuantity(player.dbCharacterId, 'arcane_dust', 1), false);
 });
 
 test('Combate, loot e vendas são separados; baú e prêmio direto não inflam taxas', (t) => {
@@ -70,14 +104,15 @@ test('Combate, loot e vendas são separados; baú e prêmio direto não inflam t
   const goldDrop = killWithLoot(world, player, 'gold', 100);
   assert.equal(world.lootItem(player, goldDrop.dropId), false, 'Drop já coletado não pode contar novamente');
   player.farmSettings.autoSellCommon = true;
-  killWithLoot(world, player, 'potion_hp_minor', 1);
+  player.farmSettings.autoSellUncommon = true;
+  killWithLoot(world, player, 'sword_iron_broadsword', 1);
   const material = player.inventory.find(item => item.itemId === 'potion_mp_minor')!;
   assert.equal(world.sellPlayerItem(player, material.slotIndex), true);
   const beforeOffline = player.huntSession.snapshot();
   assert.equal(beforeOffline.kills, 2);
   assert.equal(beforeOffline.combatExp, 40);
   assert.equal(beforeOffline.lootGold, 100);
-  assert.equal(beforeOffline.autoSaleGold, 10);
+  assert.equal(beforeOffline.autoSaleGold, 80);
   assert.equal(beforeOffline.manualSaleGold, 30);
   player.lastLogoutTime = Date.now() - 3600_000;
   player.offlineRewardsEvaluated = false;

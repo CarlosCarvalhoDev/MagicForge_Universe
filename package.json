@@ -9,11 +9,13 @@
   ],
   "scripts": {
     "benchmark:progression": "npm run benchmark:progression --workspace=@magicforge/server --",
+    "benchmark:economy": "npm run benchmark:economy --workspace=@magicforge/server --",
     "test:server": "npm run test --workspace=@magicforge/server",
     "test:offline": "npm run test:offline --workspace=@magicforge/server && node --test client/tests/offline-rewards-ui.test.mjs",
     "test:hunt": "npm run test:hunt --workspace=@magicforge/server && node --test client/tests/hunt-report-ui.test.mjs",
     "test:automatic": "npm run test:automatic --workspace=@magicforge/server && node --test client/tests/skill-rotation-ui.test.mjs",
     "test:skills": "npm run test:skills --workspace=@magicforge/server",
+    "test:inventory": "npm run test:inventory --workspace=@magicforge/server",
     "build": "npm run build --workspace=@magicforge/server && npm run build --workspace=@magicforge/client",
     "dev:client": "npm run dev --workspace=@magicforge/client",
     "dev:server": "npm run dev --workspace=@magicforge/server",

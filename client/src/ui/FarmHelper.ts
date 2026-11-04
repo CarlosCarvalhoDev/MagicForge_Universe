@@ -79,8 +79,8 @@ export function setupFarmHelper(transport: FarmTransport) {
   sell.addEventListener('click', () => {
     if (!confirmed || pending || !transport.isReady()) return;
     reviewingSale = true; saleIncludesRare = includeRare.checked;
-    document.getElementById('farm-salvage-summary')!.textContent = 'Confirmar venda de todos os itens ' +
-      (saleIncludesRare ? 'comuns, incomuns e raros' : 'comuns e incomuns') + ' não equipados? Inclui consumíveis e materiais dessas raridades.';
+    document.getElementById('farm-salvage-summary')!.textContent = 'Confirmar venda dos equipamentos ' +
+      (saleIncludesRare ? 'comuns, incomuns e raros' : 'comuns e incomuns') + ' não equipados? Materiais e poções serão preservados.';
     render(); cancel.focus();
   });
   cancel.addEventListener('click', () => { reviewingSale = false; render(); sell.focus(); });

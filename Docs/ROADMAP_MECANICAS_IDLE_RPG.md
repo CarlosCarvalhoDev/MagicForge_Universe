@@ -104,7 +104,8 @@ flowchart TD
   - Compra autoritativa e atômica: ouro, material e nível são gravados juntos. Pedido repetido com o mesmo nível esperado não cobra novamente.
   - Melhorias acompanham a habilidade ao trocar escolhas, reconectar e mudar de mundo; categorias, desbloqueios e ordem automática são preservados.
   - Habilidades de suporte sem efeito de potência implementado exibem evolução indisponível e não cobram recursos.
-  - Próximo bloco: medir tempo até as melhorias e comparar habilidade, equipamento e sustentação contra chefes antes de fechar a economia.
+  - Economia inicial medida em 04/11/2026: primeira melhoria por 300 ouro + 1 Pó Arcano; previsão de tempo no Grimório e proteção de materiais na auto-venda. Ver [entrega e limitações](ENTREGA_ECONOMIA_2026-11-04.md).
+  - Comparação controlada comprovou que habilidade e refino mudam resultados limítrofes. Balanceamento de DPS do Clérigo, sobrevivência do Bárbaro, mochila e progressão além dos primeiros 30 minutos continuam pendentes antes de considerar o ciclo completo equilibrado.
 
 ---
 

@@ -14,6 +14,6 @@ for (const classType of [CharacterClass.GUERREIRO, CharacterClass.BARBARO, Chara
     const weapons = inventory.filter(item => ITEMS_DATABASE[item.itemId].type === ItemType.EQUIPAMENTO);
     assert.equal(weapons.length, 1, 'Herói deve receber uma arma inicial');
     assert.equal(db.toggleEquipItem(player.dbCharacterId, weapons[0].slotIndex, classType, 1, player.attributes).success, true);
-    assert.ok(db.getInventory(player.dbCharacterId).find(item => item.slotIndex === weapons[0].slotIndex)!.isEquipped);
+    assert.ok(db.getInventory(player.dbCharacterId).find(item => item.instanceId === weapons[0].instanceId)!.isEquipped);
   });
 }

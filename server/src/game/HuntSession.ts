@@ -8,6 +8,7 @@ type Counters = Pick<S2CHuntReportPayload,
 export class HuntSession {
   public elapsedSeconds = 0;
   private totals: Counters = this.emptyCounters();
+  private arcaneDustLoot = 0;
 
   private emptyCounters(): Counters {
     return { kills: 0, combatExp: 0, lootGold: 0, autoSaleGold: 0, manualSaleGold: 0,
@@ -25,13 +26,21 @@ export class HuntSession {
   public reset(): void {
     this.elapsedSeconds = 0;
     this.totals = this.emptyCounters();
+    this.arcaneDustLoot = 0;
   }
 
-  public snapshot(): Counters & Pick<S2CHuntReportPayload, 'elapsedSeconds' | 'expPerHour' | 'goldPerHour'> {
+  public addArcaneDust(quantity: number): void {
+    if (Number.isFinite(quantity) && quantity > 0) this.arcaneDustLoot += Math.floor(quantity);
+  }
+
+  public snapshot(): Counters & Pick<S2CHuntReportPayload, 'elapsedSeconds' | 'expPerHour' | 'goldPerHour'> & {
+    arcaneDustLoot: number; arcaneDustPerHour: number | null;
+  } {
     // Millisecond rounding avoids 1,200 ticks of 0.05s being displayed as 59 seconds.
     const elapsed = Math.round(this.elapsedSeconds * 1000) / 1000;
     const rate = (amount: number) => elapsed >= 60 ? Math.round(amount * 3600 / elapsed) : null;
-    return { ...this.totals, elapsedSeconds: elapsed,
+    return { ...this.totals, elapsedSeconds: elapsed, arcaneDustLoot: this.arcaneDustLoot,
+      arcaneDustPerHour: rate(this.arcaneDustLoot),
       expPerHour: rate(this.totals.combatExp), goldPerHour: rate(this.totals.lootGold) };
   }
 }

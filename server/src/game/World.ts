@@ -2447,7 +2447,7 @@ export class World {
       }
     } else {
       const itemDef = ITEMS_DATABASE[drop.itemId];
-      const shouldAutoSell = itemDef && (
+      const shouldAutoSell = itemDef?.type === ItemType.EQUIPAMENTO && (
         (itemDef.rarity === ItemRarity.COMUM && player.farmSettings.autoSellCommon) ||
         (itemDef.rarity === ItemRarity.INCOMUM && player.farmSettings.autoSellUncommon) ||
         (itemDef.rarity === ItemRarity.RARO && player.farmSettings.autoSellRare)
@@ -2476,6 +2476,7 @@ export class World {
           return false;
         }
         player.inventory = this.db.getInventory(player.dbCharacterId);
+        if (drop.itemId === 'arcane_dust') player.huntSession.addArcaneDust(drop.quantity);
         player.recalculateStatsFromEquipment();
       }
     }
@@ -2569,11 +2570,15 @@ export class World {
     if (!itemDef) return false;
 
     const earnedGold = (itemDef.sellPrice || 1) * item.quantity;
-    this.db.removeItemFromInventory(player.dbCharacterId, slotIndex, item.quantity);
     const previousGold = player.gold;
-    player.gold = this.db.updateCharacterGold(player.dbCharacterId, earnedGold);
+    const result = this.db.runInTransaction(() => {
+      if (!this.db.removeItemFromInventory(player.dbCharacterId, slotIndex, item.quantity)) throw new Error('ITEM_CHANGED');
+      const gold = this.db.updateCharacterGold(player.dbCharacterId, earnedGold);
+      return { gold, inventory: this.db.getInventory(player.dbCharacterId) };
+    });
+    player.gold = result.gold;
+    player.inventory = result.inventory;
     player.huntSession.add('manualSaleGold', player.gold - previousGold);
-    player.inventory = this.db.getInventory(player.dbCharacterId);
 
     const conn = this.connections.get(player.id);
     if (conn) {
@@ -2675,6 +2680,7 @@ export class World {
       const def = ITEMS_DATABASE[item.itemId];
       if (!def) continue;
 
+      if (def.type !== ItemType.EQUIPAMENTO) continue;
       const isCommon = def.rarity === ItemRarity.COMUM;
       const isUncommon = def.rarity === ItemRarity.INCOMUM;
       const isRare = includeRare && def.rarity === ItemRarity.RARO;
@@ -3537,13 +3543,6 @@ export class World {
       return;
     }
 
-    // Consumo de materiais e ouro
-    player.gold = this.db.updateCharacterGold(player.dbCharacterId, -goldCost);
-    this.db.consumeItemQuantity(player.dbCharacterId, stoneId, stoneQty);
-    if (extraMatId && extraMatQty > 0) {
-      this.db.consumeItemQuantity(player.dbCharacterId, extraMatId, extraMatQty);
-    }
-
     // Rolagem do Sucesso
     const isSuccess = Math.random() <= successRate;
     let newLevel = currLevel;
@@ -3555,15 +3554,7 @@ export class World {
       newLevel = currLevel + 1;
       isLevelUp = true;
       feedbackMessage = `🎉 SUCESSO CELESTIAL! "${itemDef.name}" foi aprimorado para +${newLevel}!`;
-      if (newLevel >= 10) {
-        this.broadcast(Opcode.S2C_CHAT_MESSAGE, {
-          senderId: 'Forja Celestial',
-          senderName: '⚒️ Sucesso Lendário',
-          message: `🔥 O herói ${player.name} forjou com maestria [${itemDef.name}] +${newLevel}!`,
-          channel: 'system',
-          timestamp: Date.now(),
-        });
-      }
+
     } else {
       if (currLevel >= 9) {
         newLevel = Math.max(0, currLevel - 1);
@@ -3575,9 +3566,30 @@ export class World {
       }
     }
 
-    this.db.refineEquipmentItem(player.dbCharacterId, slotIndex, newLevel);
-    player.inventory = this.db.getInventory(player.dbCharacterId);
+    try {
+      if (!item.instanceId) throw new Error('REFINEMENT_CHANGED');
+      const result = this.db.commitRefinement(player.dbCharacterId, item.instanceId, currLevel, newLevel, goldCost,
+        [{ itemId: stoneId, quantity: stoneQty }, ...(extraMatId ? [{ itemId: extraMatId, quantity: extraMatQty }] : [])]);
+      player.gold = result.gold;
+      player.inventory = result.inventory;
+    } catch {
+      conn?.send(Opcode.S2C_REFINE_RESULT, { success: false, slotIndex, oldRefineLevel: currLevel,
+        newRefineLevel: currLevel, isLevelUp: false, isLevelDown: false, gold: player.gold,
+        totalCombatPower: player.CombatPower, message: 'Refino não concluído. Ouro, materiais e equipamento foram preservados; atualize a mochila.' } as S2CRefineResultPayload);
+      return;
+    }
     player.recalculateStatsFromEquipment();
+    if (isSuccess) {
+      if (newLevel >= 10) {
+        this.broadcast(Opcode.S2C_CHAT_MESSAGE, {
+          senderId: 'Forja Celestial',
+          senderName: '⚒️ Sucesso Lendário',
+          message: `🔥 O herói ${player.name} forjou com maestria [${itemDef.name}] +${newLevel}!`,
+          channel: 'system',
+          timestamp: Date.now(),
+        });
+      }
+    }
 
     if (conn) {
       conn.send(Opcode.S2C_REFINE_RESULT, {

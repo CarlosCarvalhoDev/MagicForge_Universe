@@ -48,7 +48,7 @@ test('Compra usa preço do servidor, persiste por habilidade e rejeita pedido re
   const loadout = { ...f.player.equippedSkills };
   f.player.skillCastOrder = [4, 2, 1, 3];
   assert.equal(f.upgrade().success, true);
-  assert.equal(f.player.gold, old.gold - 100);
+  assert.equal(f.player.gold, old.gold - 300);
   assert.equal(f.player.skillLevels.guerreiro_truque_1, 2);
   assert.equal(f.db.hasItemQuantity(f.player.dbCharacterId, 'arcane_dust', 500), false);
   assert.equal(f.db.hasItemQuantity(f.player.dbCharacterId, 'arcane_dust', 499), true);
@@ -183,7 +183,7 @@ test('Banco fechado e reaberto mantém nível, consumo e escolha sem repetir mig
     db = new DatabaseManager(filename);
     const loaded = db.loadPlayerFromRecord('after', db.getCharacterByName('DiskHero')!);
     assert.equal(loaded.skillLevels.guerreiro_truque_1, 2);
-    assert.equal(loaded.gold, 950);
+    assert.equal(loaded.gold, 750);
     assert.equal(loaded.getEquippedSkill(1), 'guerreiro_truque_1');
     assert.equal(loaded.inventory.find(item => item.itemId === 'arcane_dust')!.quantity, 2);
   } finally { db.close(); }

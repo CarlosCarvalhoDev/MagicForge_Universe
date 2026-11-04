@@ -32,7 +32,7 @@ test('Upgrade só altera nível após confirmação e impede clique duplicado', 
   f.ui.onSkillsUpdate({});
   const root = f.controls();
   assert.match(root.children[0].textContent, /Nv. 1\/20/);
-  assert.match(root.children[1].textContent, /100 ouro \+ 1 Pó Arcano/);
+  assert.match(root.children[1].textContent, /300 ouro \+ 1 Pó Arcano/);
   root.children[2].click();
   root.children[2].click();
   assert.deepEqual(f.sent, [['guerreiro_truque_1', 1]]);
@@ -70,4 +70,19 @@ test('Erro mantém nível confirmado e reconexão limpa o estado do herói anter
   assert.equal(f.controls().children[2].disabled, true);
   f.ui.onResult({ skillId: 'guerreiro_truque_1', success: true, skillLevels: { guerreiro_truque_1: 5 }, message: 'ACK atrasado' });
   assert.equal(f.ui.getLevel('guerreiro_truque_1'), 1);
+});
+
+test('Previsão espera medição, usa pó como gargalo e descarta amostra antiga', t => {
+  t.mock.timers.enable({ apis: ['Date'], now: 100000 });
+  const f = setup(t);
+  f.ui.onSkillsUpdate({});
+  assert.match(f.controls({ gold: 0, dust: 0 }).children[3].textContent, /1 minuto/);
+  f.ui.onFarmSample({ elapsedSeconds: 60, goldPerHour: 3600, arcaneDustPerHour: 10 });
+  assert.match(f.controls({ gold: 0, dust: 0 }).children[3].textContent, /6min/);
+  t.mock.timers.tick(31000);
+  assert.match(f.controls({ gold: 0, dust: 0 }).children[3].textContent, /1 minuto/);
+  f.ui.onFarmSample({ elapsedSeconds: 60, goldPerHour: 3600, arcaneDustPerHour: 0 });
+  assert.match(f.controls({ gold: 300, dust: 0 }).children[3].textContent, /Sem taxa de Pó Arcano/);
+  f.disconnect();
+  assert.match(f.controls({ gold: 0, dust: 0 }).children[3].textContent, /1 minuto/);
 });

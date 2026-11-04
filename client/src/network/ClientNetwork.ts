@@ -15,6 +15,7 @@ import {
   Opcode,
   S2CCombatEventPayload,
   S2CInventoryUpdatePayload,
+  InventoryItemPayload,
   S2CItemDropDespawnPayload,
   S2CItemDropSpawnPayload,
   C2SRequestCharacterListPayload,
@@ -128,6 +129,7 @@ export class ClientNetwork {
   public onItemDropSpawn: MessageListener<S2CItemDropSpawnPayload> | null = null;
   public onItemDropDespawn: MessageListener<S2CItemDropDespawnPayload> | null = null;
   public onInventoryUpdate: MessageListener<S2CInventoryUpdatePayload> | null = null;
+  private inventorySnapshot = new Map<number, InventoryItemPayload>();
   public onPlayerExpUpdate: MessageListener<S2CPlayerExpUpdatePayload> | null = null;
   public onPlayerLevelUp: MessageListener<S2CPlayerLevelUpPayload> | null = null;
   public onBossEvent: MessageListener<S2CBossEventPayload> | null = null;
@@ -208,6 +210,7 @@ export class ClientNetwork {
     this.ws.onclose = () => {
       console.warn('[ClientNetwork] Disconnected from WebSocket server.');
       this.isConnected = false;
+      this.inventorySnapshot.clear();
       this.onConnectionStateChange?.(false);
       this.stopPingHeartbeat();
       if (this.autoReconnect) {
@@ -259,6 +262,7 @@ export class ClientNetwork {
       this.ws = null;
     }
     this.isConnected = false;
+      this.inventorySnapshot.clear();
   }
 
   public send<T>(op: Opcode, data: T): void {
@@ -402,17 +406,17 @@ export class ClientNetwork {
   }
 
   public sendUseItem(slotIndex: number): void {
-    const payload: C2SUseItemPayload = { slotIndex };
+    const payload: C2SUseItemPayload = { slotIndex, expectedInstanceId: this.inventorySnapshot.get(slotIndex)?.instanceId };
     this.send(Opcode.C2S_USE_ITEM, payload);
   }
 
   public sendSellItem(slotIndex: number): void {
-    const payload: C2SSellItemPayload = { slotIndex };
+    const payload: C2SSellItemPayload = { slotIndex, expectedInstanceId: this.inventorySnapshot.get(slotIndex)?.instanceId };
     this.send(Opcode.C2S_SELL_ITEM, payload);
   }
 
   public sendDiscardItem(slotIndex: number): void {
-    const payload: C2SDiscardItemPayload = { slotIndex };
+    const payload: C2SDiscardItemPayload = { slotIndex, expectedInstanceId: this.inventorySnapshot.get(slotIndex)?.instanceId };
     this.send(Opcode.C2S_DISCARD_ITEM, payload);
   }
 
@@ -433,12 +437,14 @@ export class ClientNetwork {
   }
 
   public sendRefineEquipment(slotIndex: number): void {
-    const payload: C2SRefineEquipmentPayload = { slotIndex };
+    const payload: C2SRefineEquipmentPayload = { slotIndex, expectedInstanceId: this.inventorySnapshot.get(slotIndex)?.instanceId,
+      expectedRefineLevel: this.inventorySnapshot.get(slotIndex)?.refineLevel ?? 0 };
     this.send(Opcode.C2S_REFINE_EQUIPMENT, payload);
   }
 
   public sendSocketGem(equipmentSlotIndex: number, socketIndex: number, gemItemId: string): void {
-    const payload: C2SSocketGemPayload = { equipmentSlotIndex, socketIndex, gemItemId };
+    const payload: C2SSocketGemPayload = { equipmentSlotIndex, socketIndex, gemItemId,
+      expectedInstanceId: this.inventorySnapshot.get(equipmentSlotIndex)?.instanceId };
     this.send(Opcode.C2S_SOCKET_GEM, payload);
   }
 
@@ -610,6 +616,7 @@ export class ClientNetwork {
         }
 
         case Opcode.S2C_INVENTORY_UPDATE: {
+          this.inventorySnapshot = new Map((packet.data as S2CInventoryUpdatePayload).slots.map(item => [item.slotIndex, item]));
           this.onInventoryUpdate?.(packet.data as S2CInventoryUpdatePayload);
           break;
         }

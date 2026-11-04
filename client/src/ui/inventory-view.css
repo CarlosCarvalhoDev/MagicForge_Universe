@@ -1,0 +1,68 @@
+#inventory-view-tools { display: grid; grid-template-columns: minmax(120px, 1fr) 1fr; gap: 8px; margin: 10px 0; }
+#inventory-view-tools label { display: flex; flex-direction: column; gap: 4px; color: #fef08a; font: 700 10px 'Cinzel', serif; letter-spacing: .05em; min-width: 0; }
+#inventory-view-tools input, #inventory-view-tools select, #inventory-view-tools button {
+  min-width: 0; width: 100%; min-height: 38px; padding: 6px 9px; box-sizing: border-box; color: #eee7d3;
+  border: 1.5px solid rgba(251,191,36,.55); outline: 1px solid rgba(254,240,138,.2); outline-offset: -3px; border-radius: 4px;
+  background: url('/assets/ui/frames/corner-tl.svg') top left / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-tr.svg') top right / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-bl.svg') bottom left / 12px 12px no-repeat,
+    url('/assets/ui/frames/corner-br.svg') bottom right / 12px 12px no-repeat, linear-gradient(180deg,#231e30,#0c101d);
+  font: 12px system-ui, sans-serif;
+}
+#inventory-view-tools option { background: #0c101d; color: #eee7d3; }
+#inventory-view-tools .inventory-search { grid-column: 1 / -1; }
+#inventory-view-tools button { align-self: end; font-family: 'Cinzel', serif; cursor: pointer; }
+#inventory-view-summary, .inventory-equipment-note { color: #b9c4d4; font: 12px/1.45 system-ui, sans-serif; margin: 6px 0; }
+#inventory-comparison { border-top: 1px solid rgba(251,191,36,.4); padding-top: 10px; margin-top: 10px; }
+#inventory-comparison h4 { color: #fef08a; font: 700 12px 'Cinzel', serif; margin: 0 0 7px; }
+#inventory-comparison p { font: 12px/1.45 system-ui, sans-serif; margin: 4px 0; color: #cbd5e1; }
+#inventory-comparison [data-delta="gain"] { color: #34d399; }
+#inventory-comparison [data-delta="loss"] { color: #f87171; }
+.inventory-slot[aria-label] { touch-action: manipulation; }
+.inventory-view-empty { grid-column: 1 / -1; padding: 16px 8px; text-align: center; color: #cbd5e1; font: 13px/1.5 system-ui, sans-serif; }
+@media (max-width: 480px) { #inventory-view-tools { gap: 6px; } #inventory-view-tools input, #inventory-view-tools select { font-size: 12px; } }
+/* The bag occupies the center; details and actions stay below the items. */
+#tab-mochila .mochila-panel-layout { flex-direction: column; min-width: 0; gap: 12px; }
+#tab-mochila .inventory-grid-wrap { min-width: 0; flex: none; }
+#inventory-view-tools { grid-template-columns: minmax(0, 1fr) minmax(112px, 150px); gap: 8px; margin: 4px 0; }
+#inventory-view-summary { margin: 0; font-size: 11px; }
+.inventory-equipment-note { margin: 0 0 8px; font-size: 11px; }
+#inventory-slots-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; align-content: start; }
+#inventory-slots-grid .inventory-slot { min-width: 0; aspect-ratio: .95; flex-direction: column; gap: 5px; padding: 8px 3px 17px; box-sizing: border-box; border-color: var(--item-color, rgba(251,191,36,.2)) !important; }
+#inventory-slots-grid .slot-icon-text { font-size: 29px; line-height: 1.1; }
+.inventory-tile-name { font: 10px/1.15 system-ui,sans-serif; color: #e4dfd1; text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; padding: 0 2px; }
+#inventory-slots-grid .inventory-slot.selected { outline: 2px solid #fef08a; outline-offset: 1px; }
+#inventory-slots-grid [data-instance-id] { -webkit-touch-callout: none; touch-action: pan-y; }
+#inventory-inspector { width: auto; min-width: 0; padding: 12px; flex: none; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 10px; }
+#inventory-inspector .inspector-item-header { flex: 1 1 230px; }
+#inventory-inspector .inspector-item-name { font-size: 12px; }
+#inventory-inspector #inspector-stats-list, #inventory-inspector #inspector-desc, #inventory-inspector .inspector-stat-row:has(#inspector-sell-price) { display: none; }
+#inventory-inspector .inspector-stat-row { flex: 1 1 190px; }
+#inventory-inspector .inspector-actions { flex: 1 1 100%; margin-top: 0 !important; }
+#inventory-item-tooltip { position: fixed; z-index: 2147483000; width: min(490px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); overflow: hidden; pointer-events: none; padding: 12px; box-sizing: border-box;
+  border: 1.5px solid #d97706; outline: 1px solid rgba(254,240,138,.3); outline-offset: -5px; border-radius: 6px;
+  background: url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat, url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat, url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat, url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat, linear-gradient(165deg,#141828,#080c17);
+  box-shadow: 0 10px 30px #000b, inset 0 0 20px #0008; color: #e4dfd1; font: 12px/1.45 system-ui,sans-serif; }
+#inventory-item-tooltip[hidden] { display: none; }
+.item-tooltip-cards { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+.item-tooltip-cards.single { grid-template-columns: 1fr; }
+.item-tooltip-cards section + section { border-left: 1px solid #d9770655; padding-left: 12px; }
+.item-tooltip-cards h4 { font: 700 11px 'Cinzel',serif; color: #fef08a; margin: 2px 0 9px; }
+.item-tooltip-name { display: block; font-size: 13px; min-height: 40px; overflow-wrap: anywhere; }
+.item-tooltip-cards small { display: block; color: #aab6c8; font-size: 10px; min-height: 18px; }
+.item-tooltip-cards p { margin: 6px 0; }
+#inventory-item-tooltip [data-delta="gain"] { color: #34d399; }
+#inventory-item-tooltip [data-delta="loss"] { color: #f87171; }
+.item-tooltip-note { margin: 8px 0 0; padding-top: 8px; border-top: 1px solid #d9770644; font-size: 10px; color: #aab6c8; }
+@media (max-width: 480px) {
+  #inventory-slots-grid { grid-template-columns: repeat(5,minmax(0,1fr)); gap: 5px; }
+  #inventory-slots-grid .slot-icon-text { font-size: 24px; }
+  .inventory-tile-name { font-size: 9px; }
+  #inventory-inspector .inspector-actions { flex-wrap: wrap; }
+  #inventory-view-tools { grid-template-columns: minmax(0,1fr) 115px; }
+  .item-tooltip-cards { gap: 8px; }
+  .item-tooltip-cards section + section { padding-left: 8px; }
+  .item-tooltip-name { font-size: 12px; }
+}
+.item-tooltip-name { height: 54px; min-height: 54px; }
+.item-tooltip-cards small { min-height: 28px; }

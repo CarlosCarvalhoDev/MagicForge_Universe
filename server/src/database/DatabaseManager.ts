@@ -23,6 +23,8 @@ import {
   SKILL_UPGRADE_MATERIAL,
   canUpgradeSkillPower,
   getSkillUpgradeCost,
+  EQUIPMENT_ADDRESSES,
+  ItemType,
 } from '@magicforge/shared';
 import { Player } from '../entities/Player';
 import { VerifiedSocialProfile } from '../auth/SocialAuthService';
@@ -339,6 +341,7 @@ export class DatabaseManager {
       this.db.exec(`UPDATE accounts SET is_activated = 0 WHERE (password_hash IS NULL OR password_hash = '') AND is_activated = 1;`);
     } catch {}
 
+    this.migrateEquipmentLocations();
     console.log('[Database] Tabelas do banco de dados verificadas e prontas!');
   }
 
@@ -1059,16 +1062,49 @@ export class DatabaseManager {
     if (result.changes !== 1) throw new Error('CHARACTER_NOT_FOUND');
   }
 
+  private transactionDepth = 0;
+  private transactionSequence = 0;
   public runInTransaction<T>(action: () => T): T {
-    this.db.exec('BEGIN IMMEDIATE');
+    const outer = this.transactionDepth === 0;
+    const savepoint = `inventory_tx_${++this.transactionSequence}`;
+    this.db.exec(outer ? 'BEGIN IMMEDIATE' : `SAVEPOINT ${savepoint}`);
+    this.transactionDepth++;
     try {
       const result = action();
-      this.db.exec('COMMIT');
+      this.db.exec(outer ? 'COMMIT' : `RELEASE SAVEPOINT ${savepoint}`);
       return result;
     } catch (error) {
-      this.db.exec('ROLLBACK');
+      if (outer) this.db.exec('ROLLBACK');
+      else { this.db.exec(`ROLLBACK TO SAVEPOINT ${savepoint}`); this.db.exec(`RELEASE SAVEPOINT ${savepoint}`); }
       throw error;
-    }
+    } finally { this.transactionDepth--; }
+  }
+
+  private migrateEquipmentLocations(): void {
+    if (this.db.prepare("SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'idx_inventory_character_location'").get()) return;
+    this.runInTransaction(() => {
+      const rows = this.db.prepare('SELECT id, character_id, item_id, slot_index, is_equipped FROM inventory ORDER BY character_id, slot_index, id')
+        .all() as Array<{ id: string; character_id: string; item_id: string; slot_index: number; is_equipped: number }>;
+      const used = new Map<string, Set<number>>();
+      for (const row of rows) {
+        const locations = used.get(row.character_id) ?? new Set<number>();
+        used.set(row.character_id, locations);
+        const def = ITEMS_DATABASE[row.item_id];
+        const target = row.is_equipped && def?.equipmentSlot ? EQUIPMENT_ADDRESSES[def.equipmentSlot] : undefined;
+        if (target !== undefined && !locations.has(target)) {
+          locations.add(target);
+          this.db.prepare('UPDATE inventory SET slot_index = ?, is_equipped = 1 WHERE id = ?').run(target, row.id);
+        } else {
+          let slot = row.slot_index >= 0 && !locations.has(row.slot_index) ? row.slot_index : 0;
+          while (locations.has(slot)) slot++;
+          locations.add(slot);
+          this.db.prepare('UPDATE inventory SET slot_index = ?, is_equipped = 0 WHERE id = ?').run(slot, row.id);
+          // Legacy duplicates/overflow remain recoverable; no item is deleted to repair locations.
+          this.db.prepare('UPDATE characters SET max_inventory_slots = MAX(max_inventory_slots, ?) WHERE id = ?').run(slot + 1, row.character_id);
+        }
+      }
+      this.db.exec('CREATE UNIQUE INDEX idx_inventory_character_location ON inventory(character_id, slot_index)');
+    });
   }
 
   public getSkillLevels(characterId: string): Record<string, number> {
@@ -1176,6 +1212,8 @@ export class DatabaseManager {
     }
 
     return rows.map((r) => ({
+      instanceId: r.id,
+      location: r.is_equipped === 1 ? 'equipment' as const : 'bag' as const,
       slotIndex: r.slot_index,
       itemId: r.item_id,
       quantity: r.quantity,
@@ -1186,55 +1224,38 @@ export class DatabaseManager {
   }
 
   public addItemToInventory(characterId: string, itemId: string, quantity: number = 1, maxSlots: number = 20): boolean {
-    const itemDef = ITEMS_DATABASE[itemId];
-    if (!itemDef) return false;
-
-    // Se for stackable, procura slot existente
-    if (itemDef.maxStack > 1) {
-      const existingQuery = this.db.prepare(
-        'SELECT id, slot_index, quantity FROM inventory WHERE character_id = ? AND item_id = ? AND quantity < ?'
-      );
-      const existing = existingQuery.get(characterId, itemId, itemDef.maxStack) as {
-        id: string;
-        slot_index: number;
-        quantity: number;
-      } | undefined;
-
-      if (existing) {
-        const newQty = existing.quantity + quantity;
-        this.db.prepare('UPDATE inventory SET quantity = ? WHERE id = ?').run(newQty, existing.id);
-        return true;
+    const def = ITEMS_DATABASE[itemId];
+    if (!def || !Number.isSafeInteger(quantity) || quantity < 1 || !Number.isSafeInteger(maxSlots) || maxSlots < 1) return false;
+    return this.runInTransaction(() => {
+      const rows = this.db.prepare('SELECT id, slot_index, item_id, quantity FROM inventory WHERE character_id = ? AND is_equipped = 0 ORDER BY slot_index')
+        .all(characterId) as Array<{ id: string; slot_index: number; item_id: string; quantity: number }>;
+      const used = new Set(rows.map(row => row.slot_index));
+      const free: number[] = [];
+      for (let slot = 0; slot < maxSlots; slot++) if (!used.has(slot)) free.push(slot);
+      const stacks = def.maxStack > 1 ? rows.filter(row => row.item_id === itemId && row.quantity < def.maxStack) : [];
+      const capacity = stacks.reduce((sum, row) => sum + def.maxStack - row.quantity, 0) + free.length * def.maxStack;
+      if (capacity < quantity) return false;
+      let remaining = quantity;
+      for (const row of stacks) {
+        const added = Math.min(remaining, def.maxStack - row.quantity);
+        this.db.prepare('UPDATE inventory SET quantity = quantity + ? WHERE id = ?').run(added, row.id);
+        remaining -= added;
+        if (!remaining) return true;
       }
-    }
-
-    // Acha primeiro slot livre entre 0 e maxSlots - 1
-    const usedSlotsQuery = this.db.prepare('SELECT slot_index FROM inventory WHERE character_id = ?');
-    const usedRows = usedSlotsQuery.all(characterId) as Array<{ slot_index: number }>;
-    const usedSlots = new Set(usedRows.map((r) => r.slot_index));
-
-    let freeSlot = -1;
-    for (let i = 0; i < maxSlots; i++) {
-      if (!usedSlots.has(i)) {
-        freeSlot = i;
-        break;
+      for (const slot of free) {
+        if (!remaining) break;
+        const added = Math.min(remaining, def.maxStack);
+        this.db.prepare('INSERT INTO inventory (id, character_id, item_id, quantity, slot_index, is_equipped) VALUES (?, ?, ?, ?, ?, 0)')
+          .run('inv_' + randomBytes(16).toString('hex'), characterId, itemId, added, slot);
+        remaining -= added;
       }
-    }
-
-    if (freeSlot === -1) {
-      return false; // Inventário cheio!
-    }
-
-    const rowId = `inv_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    this.db.prepare(`
-      INSERT INTO inventory (id, character_id, item_id, quantity, slot_index, is_equipped)
-      VALUES (?, ?, ?, ?, ?, 0)
-    `).run(rowId, characterId, itemId, quantity, freeSlot);
-
-    return true;
+      return true;
+    });
   }
 
   public removeItemFromInventory(characterId: string, slotIndex: number, quantity: number = 1): boolean {
-    const query = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND slot_index = ?');
+    if (!Number.isSafeInteger(quantity) || quantity < 1) return false;
+    const query = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND slot_index = ? AND is_equipped = 0');
     const existing = query.get(characterId, slotIndex) as { id: string; quantity: number } | undefined;
     if (!existing) return false;
 
@@ -1247,71 +1268,38 @@ export class DatabaseManager {
   }
 
   public toggleEquipItem(
-    characterId: string,
-    slotIndex: number,
-    playerClass?: CharacterClass,
-    playerLevel?: number,
-    playerAttrs?: CharacterAttributes
+    characterId: string, slotIndex: number, playerClass?: CharacterClass,
+    playerLevel?: number, playerAttrs?: CharacterAttributes
   ): { success: boolean; reason?: string } {
-    const query = this.db.prepare('SELECT id, item_id, is_equipped FROM inventory WHERE character_id = ? AND slot_index = ?');
-    const item = query.get(characterId, slotIndex) as { id: string; item_id: string; is_equipped: number } | undefined;
-    if (!item) return { success: false, reason: 'Item não encontrado!' };
-
-    const itemDef = ITEMS_DATABASE[item.item_id];
-    if (!itemDef || itemDef.type !== 'EQUIPAMENTO') return { success: false, reason: 'Item não é um equipamento!' };
-
-    if (item.is_equipped === 1) {
-      // Desequipar o item atual
-      this.db.prepare('UPDATE inventory SET is_equipped = 0 WHERE id = ?').run(item.id);
+    if (!Number.isInteger(slotIndex)) return { success: false, reason: 'Posição inválida.' };
+    return this.runInTransaction(() => {
+      const item = this.db.prepare('SELECT id, item_id, is_equipped FROM inventory WHERE character_id = ? AND slot_index = ?')
+        .get(characterId, slotIndex) as { id: string; item_id: string; is_equipped: number } | undefined;
+      if (!item) return { success: false, reason: 'Item não encontrado!' };
+      const def = ITEMS_DATABASE[item.item_id];
+      if (def?.type !== ItemType.EQUIPAMENTO || !def.equipmentSlot) return { success: false, reason: 'Item não é um equipamento!' };
+      if (item.is_equipped) {
+        const capacity = (this.db.prepare('SELECT max_inventory_slots FROM characters WHERE id = ?').get(characterId) as { max_inventory_slots: number }).max_inventory_slots;
+        const used = new Set((this.db.prepare('SELECT slot_index FROM inventory WHERE character_id = ? AND is_equipped = 0').all(characterId) as Array<{slot_index: number}>).map(row => row.slot_index));
+        let free = 0;
+        while (used.has(free)) free++;
+        if (free >= capacity) return { success: false, reason: 'Mochila cheia. Libere um espaço para desequipar; você ainda pode trocar por outro equipamento da bag.' };
+        this.db.prepare('UPDATE inventory SET slot_index = ?, is_equipped = 0 WHERE id = ?').run(free, item.id);
+        return { success: true };
+      }
+      if (playerClass && def.allowedClasses && !def.allowedClasses.includes(playerClass)) return { success: false, reason: 'Sua classe não pode equipar ' + def.name + '.' };
+      if (playerLevel !== undefined && playerLevel < (def.minLevel ?? 1)) return { success: false, reason: 'Nível insuficiente! Requer Nível ' + def.minLevel + '.' };
+      for (const [key, value] of Object.entries(def.requiredAttributes ?? {})) {
+        if (playerAttrs && (playerAttrs[key as keyof CharacterAttributes] ?? 0) < (value ?? 0)) return { success: false, reason: 'Atributos insuficientes: ' + key + '.' };
+      }
+      const target = EQUIPMENT_ADDRESSES[def.equipmentSlot];
+      const previous = this.db.prepare('SELECT id FROM inventory WHERE character_id = ? AND slot_index = ? AND is_equipped = 1').get(characterId, target) as {id: string} | undefined;
+      // A temporary address permits a swap under the unique location index. No intermediate state is broadcast.
+      this.db.prepare('UPDATE inventory SET slot_index = -1000 WHERE id = ?').run(item.id);
+      if (previous) this.db.prepare('UPDATE inventory SET slot_index = ?, is_equipped = 0 WHERE id = ?').run(slotIndex, previous.id);
+      this.db.prepare('UPDATE inventory SET slot_index = ?, is_equipped = 1 WHERE id = ?').run(target, item.id);
       return { success: true };
-    }
-
-    // Validação rígida de Classe (ex: Guerreiro não usa Cajado)
-    if (playerClass && itemDef.allowedClasses && !itemDef.allowedClasses.includes(playerClass)) {
-      return {
-        success: false,
-        reason: `Sua classe (${playerClass}) não possui proficiência com ${itemDef.name}!`,
-      };
-    }
-
-    // Validação de Nível Mínimo
-    if (playerLevel !== undefined && itemDef.minLevel && playerLevel < itemDef.minLevel) {
-      return {
-        success: false,
-        reason: `Nível insuficiente! Requer Nível ${itemDef.minLevel} para empunhar este item.`,
-      };
-    }
-
-    // Validação de Atributos Requeridos
-    if (playerAttrs && itemDef.requiredAttributes) {
-      for (const [attrKey, minVal] of Object.entries(itemDef.requiredAttributes)) {
-        const currentVal = (playerAttrs as any)[attrKey] || 0;
-        if (currentVal < (minVal || 0)) {
-          return {
-            success: false,
-            reason: `Atributos insuficientes! Requer ${attrKey.toUpperCase()}: ${minVal}.`,
-          };
-        }
-      }
-    }
-
-    // Ao equipar um novo item: desequipa automaticamente qualquer outro item do MESMO slot de equipamento
-    const targetSlot = itemDef.equipmentSlot;
-    if (targetSlot) {
-      const equippedItemsQuery = this.db.prepare('SELECT id, item_id FROM inventory WHERE character_id = ? AND is_equipped = 1');
-      const equippedItems = equippedItemsQuery.all(characterId) as Array<{ id: string; item_id: string }>;
-
-      for (const eq of equippedItems) {
-        const def = ITEMS_DATABASE[eq.item_id];
-        if (def && def.equipmentSlot === targetSlot) {
-          this.db.prepare('UPDATE inventory SET is_equipped = 0 WHERE id = ?').run(eq.id);
-        }
-      }
-    }
-
-    // Equipa o novo item selecionado
-    this.db.prepare('UPDATE inventory SET is_equipped = 1 WHERE id = ?').run(item.id);
-    return { success: true };
+    });
   }
 
   public expandInventorySlots(characterId: string, currentSlots: number, cost: number): number | null {
@@ -1332,6 +1320,7 @@ export class DatabaseManager {
     characterId: string,
     slotIndex: number
   ): { success: true; goldGained: number; dustGained: number } | { success: false; reason: string } {
+    return this.runInTransaction(() => {
     const query = this.db.prepare('SELECT id, item_id, quantity, is_equipped FROM inventory WHERE character_id = ? AND slot_index = ?');
     const item = query.get(characterId, slotIndex) as { id: string; item_id: string; quantity: number; is_equipped: number } | undefined;
     if (!item) return { success: false, reason: 'Item não encontrado no slot' };
@@ -1347,10 +1336,12 @@ export class DatabaseManager {
 
     // Se for equipamento ou material mágico, concede pó arcano na bag
     if (dustGained > 0) {
-      this.addItemToInventory(characterId, 'arcane_dust', dustGained);
+      const capacity = (this.db.prepare('SELECT max_inventory_slots FROM characters WHERE id = ?').get(characterId) as {max_inventory_slots: number}).max_inventory_slots;
+      if (!this.addItemToInventory(characterId, 'arcane_dust', dustGained, capacity)) throw new Error('RECYCLE_SPACE');
     }
 
     return { success: true, goldGained, dustGained };
+    });
   }
 
   public getCharactersByAccount(accountId: string): CharacterRecord[] {
@@ -1392,6 +1383,20 @@ export class DatabaseManager {
     return res.changes > 0;
   }
 
+  public commitRefinement(characterId: string, instanceId: string, expectedLevel: number, newLevel: number,
+    goldCost: number, materials: Array<{ itemId: string; quantity: number }>) {
+    return this.runInTransaction(() => {
+      const row = this.db.prepare('SELECT refine_level FROM inventory WHERE character_id = ? AND id = ?')
+        .get(characterId, instanceId) as { refine_level: number } | undefined;
+      if (!row || row.refine_level !== expectedLevel) throw new Error('REFINEMENT_CHANGED');
+      if (this.getCharacterGold(characterId) < goldCost) throw new Error('REFINEMENT_GOLD');
+      for (const material of materials) if (!this.consumeItemQuantity(characterId, material.itemId, material.quantity)) throw new Error('REFINEMENT_MATERIAL');
+      const gold = this.updateCharacterGold(characterId, -goldCost);
+      this.db.prepare('UPDATE inventory SET refine_level = ? WHERE character_id = ? AND id = ?').run(newLevel, characterId, instanceId);
+      return { gold, inventory: this.getInventory(characterId) };
+    });
+  }
+
   // --- SUBMENU 3: ENGASTE DE GEMAS (SOCKETS) ---
   public socketGem(
     characterId: string,
@@ -1399,12 +1404,17 @@ export class DatabaseManager {
     socketIndex: number,
     gemItemId: string
   ): { success: boolean; reason?: string } {
-    if (socketIndex < 0 || socketIndex > 2) return { success: false, reason: 'Soquete inválido (deve ser 0, 1 ou 2)!' };
+    return this.runInTransaction(() => {
+    if (!Number.isInteger(socketIndex) || socketIndex < 0 || socketIndex > 2) return { success: false, reason: 'Soquete inválido (deve ser 0, 1 ou 2)!' };
 
     // 1. Encontra o item de equipamento no slotIndex
     const itemQuery = this.db.prepare('SELECT id, item_id, is_equipped FROM inventory WHERE character_id = ? AND slot_index = ?');
     const item = itemQuery.get(characterId, slotIndex) as { id: string; item_id: string; is_equipped: number } | undefined;
-    if (!item) return { success: false, reason: 'Equipamento não encontrado!' };
+    if (!item || ITEMS_DATABASE[item.item_id]?.type !== ItemType.EQUIPAMENTO) return { success: false, reason: 'Equipamento não encontrado!' };
+    if (ITEMS_DATABASE[gemItemId]?.type !== ItemType.GEMA) return { success: false, reason: 'Item não é uma gema.' };
+    if (this.db.prepare('SELECT id FROM equipment_gems WHERE inventory_id = ? AND socket_index = ?').get(item.id, socketIndex)) {
+      return { success: false, reason: 'Soquete ocupado. Remova a gema atual antes de engastar outra.' };
+    }
 
     // 2. Verifica se a gema existe no inventário do jogador
     const gemQuery = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND item_id = ? AND quantity >= 1');
@@ -1426,6 +1436,7 @@ export class DatabaseManager {
     `).run(gemSocketId, characterId, item.id, socketIndex, gemItemId, Date.now());
 
     return { success: true };
+    });
   }
 
   public unsocketGem(
@@ -1433,6 +1444,7 @@ export class DatabaseManager {
     slotIndex: number,
     socketIndex: number
   ): { success: boolean; gemId?: string; reason?: string } {
+    return this.runInTransaction(() => {
     const itemQuery = this.db.prepare('SELECT id FROM inventory WHERE character_id = ? AND slot_index = ?');
     const item = itemQuery.get(characterId, slotIndex) as { id: string } | undefined;
     if (!item) return { success: false, reason: 'Equipamento não encontrado!' };
@@ -1442,10 +1454,12 @@ export class DatabaseManager {
     if (!socket) return { success: false, reason: 'Nenhuma gema engastada neste soquete!' };
 
     // Remove do soquete e devolve para o inventário
+    const capacity = (this.db.prepare('SELECT max_inventory_slots FROM characters WHERE id = ?').get(characterId) as {max_inventory_slots: number}).max_inventory_slots;
+    if (!this.addItemToInventory(characterId, socket.gem_id, 1, capacity)) return { success: false, reason: 'Mochila cheia. A gema permanece no soquete.' };
     this.db.prepare('DELETE FROM equipment_gems WHERE id = ?').run(socket.id);
-    this.addItemToInventory(characterId, socket.gem_id, 1);
 
     return { success: true, gemId: socket.gem_id };
+    });
   }
 
   // --- SUBMENU 4: ÁLBUM DE CARTAS DE MONSTROS ---
@@ -1520,7 +1534,7 @@ export class DatabaseManager {
 
   // --- CONTROLE DE MATERIAIS PARA FORJA ---
   public hasItemQuantity(characterId: string, itemId: string, requiredQuantity: number): boolean {
-    const query = this.db.prepare('SELECT SUM(quantity) as total FROM inventory WHERE character_id = ? AND item_id = ?');
+    const query = this.db.prepare('SELECT SUM(quantity) as total FROM inventory WHERE character_id = ? AND item_id = ? AND is_equipped = 0');
     const row = query.get(characterId, itemId) as { total: number | null } | undefined;
     return (row?.total || 0) >= requiredQuantity;
   }
@@ -1528,7 +1542,7 @@ export class DatabaseManager {
   public consumeItemQuantity(characterId: string, itemId: string, quantityToConsume: number): boolean {
     if (!this.hasItemQuantity(characterId, itemId, quantityToConsume)) return false;
 
-    const query = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND item_id = ? ORDER BY quantity ASC');
+    const query = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND item_id = ? AND is_equipped = 0 ORDER BY quantity ASC');
     const rows = query.all(characterId, itemId) as Array<{ id: string; quantity: number }>;
 
     let remaining = quantityToConsume;

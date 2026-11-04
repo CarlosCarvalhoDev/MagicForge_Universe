@@ -272,6 +272,8 @@ export interface C2SLootItemPayload {
 }
 
 export interface InventoryItemPayload {
+  instanceId?: string;
+  location?: 'bag' | 'equipment';
   slotIndex: number;
   itemId: string;
   quantity: number;
@@ -290,21 +292,26 @@ export interface S2CInventoryUpdatePayload {
 
 export interface C2SUseItemPayload {
   slotIndex: number;
+  expectedInstanceId?: string;
 }
 
 export interface C2SSellItemPayload {
   slotIndex: number;
+  expectedInstanceId?: string;
 }
 
 export interface C2SExpandInventoryPayload {}
 
 export interface C2SDiscardItemPayload {
   slotIndex: number;
+  expectedInstanceId?: string;
 }
 
 // --- SUBMENU 2: REFINAMENTO DE EQUIPAMENTOS (+1 A +15) ---
 export interface C2SRefineEquipmentPayload {
   slotIndex: number;
+  expectedInstanceId?: string;
+  expectedRefineLevel?: number;
 }
 
 export interface S2CRefineResultPayload {
@@ -322,6 +329,7 @@ export interface S2CRefineResultPayload {
 // --- SUBMENU 3: ENGASTE DE GEMAS (SOCKETS) ---
 export interface C2SSocketGemPayload {
   equipmentSlotIndex: number;
+  expectedInstanceId?: string;
   socketIndex: number;
   gemItemId: string;
 }
@@ -864,6 +872,7 @@ export interface S2CHuntReportPayload {
   kills: number; // Own final blows; party members still receive their actual EXP share.
   combatExp: number;
   lootGold: number;
+  arcaneDustLoot?: number; // Only successfully collected combat drops; excludes rewards and recycling.
   autoSaleGold: number;
   manualSaleGold: number;
   hpPotionsUsed: number;
@@ -871,6 +880,7 @@ export interface S2CHuntReportPayload {
   deaths: number;
   expPerHour: number | null; // null until a full minute has been simulated
   goldPerHour: number | null;
+  arcaneDustPerHour?: number | null;
 }
 
 export interface C2SClaimOfflineRewardsPayload {

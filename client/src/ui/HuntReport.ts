@@ -19,6 +19,8 @@ export function formatHuntReport(report: S2CHuntReportPayload): Record<string, s
     kills: number(report.kills), exp: number(report.combatExp), gold: number(report.lootGold),
     expRate: report.expPerHour === null ? 'Aguardando 1 min' : `${number(report.expPerHour)}/h`,
     goldRate: report.goldPerHour === null ? 'Aguardando 1 min' : `${number(report.goldPerHour)}/h`,
+    dust: number(report.arcaneDustLoot ?? 0),
+    dustRate: report.arcaneDustPerHour == null ? 'Aguardando 1 min' : `${number(report.arcaneDustPerHour)}/h`,
     hp: number(report.hpPotionsUsed), resource: number(report.resourcePotionsUsed), deaths: number(report.deaths),
     autoSales: number(report.autoSaleGold), manualSales: number(report.manualSaleGold),
   };
@@ -40,6 +42,8 @@ export function setupHuntReport(transport: HuntReportTransport) {
       <div><dt>Ouro coletado</dt><dd data-hunt="gold">—</dd></div>
       <div><dt>EXP por hora</dt><dd data-hunt="expRate">—</dd></div>
       <div><dt>Ouro por hora</dt><dd data-hunt="goldRate">—</dd></div>
+      <div><dt>Pó Arcano coletado</dt><dd data-hunt="dust">—</dd></div>
+      <div><dt>Pó Arcano por hora</dt><dd data-hunt="dustRate">—</dd></div>
       <div><dt>Poções de HP usadas</dt><dd data-hunt="hp">—</dd></div>
       <div><dt>Poções de recurso usadas</dt><dd data-hunt="resource">—</dd></div>
       <div><dt>Mortes</dt><dd data-hunt="deaths">—</dd></div>

@@ -6,3 +6,5 @@ export * from './skills';
 export * from './items';
 export * from './automation';
 export * from './skill-progression';
+export * from './upgrade-estimate';
+export * from './inventory';
