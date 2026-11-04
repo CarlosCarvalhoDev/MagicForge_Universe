@@ -482,6 +482,7 @@ export class PartyManager {
     if (!party) {
       // Sem grupo: killer recebe EXP normal
       killer.addExperience(baseExp);
+      killer.huntSession.add('combatExp', baseExp);
       world.sendExpUpdate(killer, baseExp);
       return;
     }
@@ -498,6 +499,7 @@ export class PartyManager {
     if (nearbyMembers.length <= 1) {
       // Nenhum companheiro próximo: killer ganha EXP normal
       killer.addExperience(baseExp);
+      killer.huntSession.add('combatExp', baseExp);
       world.sendExpUpdate(killer, baseExp);
       return;
     }
@@ -509,6 +511,7 @@ export class PartyManager {
 
     for (const member of nearbyMembers) {
       member.addExperience(expPerMember);
+      member.huntSession.add('combatExp', expPerMember);
       world.sendExpUpdate(member, expPerMember);
     }
   }

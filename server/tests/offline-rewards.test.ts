@@ -1,5 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
+import { rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { World } from '../src/game/World';
 import { Connection } from '../src/network/Connection';
 import { DatabaseManager } from '../src/database/DatabaseManager';
@@ -47,6 +51,7 @@ function setupTestWorld(): { world: World; conn: Connection; mockSocket: MockSoc
 
   world.handleCreateCharacterSlot(conn, 0, `AfkHero_${testCounter}`, CharacterClass.GUERREIRO);
   world.handleSelectCharacterSlot(conn, 0);
+  world.entityManager.getPlayer(conn.playerId!)!.offlineRewardsEvaluated = false;
 
   return { world, conn, mockSocket, db };
 }
@@ -97,7 +102,7 @@ test('2. Ausência de 1 hora acumula Ouro, EXP e Suprimentos conforme Mundo, Fas
 
   // Itens: a cada 900s (15 min) -> 4 intervalos de 15 min em 1 hora
   assert.ok(player.pendingOfflineReward.loot.length >= 2);
-  const ironOre = player.pendingOfflineReward.loot.find((l) => l.itemId === 'iron_ore');
+  const ironOre = player.pendingOfflineReward.loot.find((l) => l.itemId === 'ore_iron_arcane');
   assert.ok(ironOre);
   assert.equal(ironOre.quantity, 4 * 2); // 8 minérios de ferro
 
@@ -108,7 +113,7 @@ test('2. Ausência de 1 hora acumula Ouro, EXP e Suprimentos conforme Mundo, Fas
   assert.equal(pkt.cappedSeconds, 3600);
 });
 
-test('3. Limite de 12 horas (43.200s) limita o ganho mesmo após 24 horas offline', () => {
+test('3. Limite gratuito de 8 horas limita o ganho mesmo após 24 horas offline', () => {
   const { world, conn, mockSocket } = setupTestWorld();
   const player = world.entityManager.getPlayer(conn.playerId!)!;
 
@@ -124,15 +129,16 @@ test('3. Limite de 12 horas (43.200s) limita o ganho mesmo após 24 horas offlin
 
   assert.ok(player.pendingOfflineReward);
   assert.equal(player.pendingOfflineReward.offlineSeconds, 86400);
-  assert.equal(player.pendingOfflineReward.cappedSeconds, 43200, 'Deve aplicar teto máximo de 12 horas');
+  assert.equal(player.pendingOfflineReward.cappedSeconds, 28800, 'Deve aplicar teto gratuito de 8 horas');
 
   // goldPerSec = 1*15 + 1*5 + 1*3 = 23
-  const expectedGold = 43200 * 23;
+  const expectedGold = 28800 * 23;
   assert.equal(player.pendingOfflineReward.accumulatedGold, expectedGold);
 
   const pkt = mockSocket.getLastPacket(Opcode.S2C_OFFLINE_REWARD_INFO) as S2COfflineRewardInfoPayload;
   assert.ok(pkt);
-  assert.equal(pkt.cappedSeconds, 43200);
+  assert.equal(pkt.cappedSeconds, 28800);
+  assert.equal(pkt.maxOfflineSeconds, 28800);
   assert.equal(pkt.accumulatedGold, expectedGold);
 });
 
@@ -141,7 +147,7 @@ test('4. Resgate autoritativo (C2S_CLAIM_OFFLINE_REWARDS) credita Ouro, EXP, ite
   const player = world.entityManager.getPlayer(conn.playerId!)!;
 
   player.gold = 500;
-  const initialExp = player.currentXp;
+  db.savePlayer(player);
 
   // Gera recompensa AFK pendente (30 minutos = 1800s)
   player.lastLogoutTime = Date.now() - 1800 * 1000;
@@ -178,4 +184,142 @@ test('4. Resgate autoritativo (C2S_CLAIM_OFFLINE_REWARDS) credita Ouro, EXP, ite
   // Proteção contra double-claim
   const doubleClaimRes = world.claimOfflineRewards(player);
   assert.equal(doubleClaimRes.success, false, 'Segundo resgate deve falhar');
+});
+
+test('5. Multiplicadores enviados pelo cliente não aumentam a recompensa', (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: 1_800_000_000_000 });
+  const { world, conn, db } = setupTestWorld();
+  const player = world.entityManager.getPlayer(conn.playerId!)!;
+  player.lastLogoutTime = Date.now() - 1800_000;
+  world.checkAndNotifyOfflineRewards(conn, player);
+  const expectedGold = player.pendingOfflineReward!.accumulatedGold;
+  const initialGold = player.gold;
+  assert.equal(world.claimOfflineRewards(player, 3).success, true);
+  assert.equal(db.getCharacterByName(player.name)!.gold, initialGold + expectedGold);
+});
+
+test('6. Mochila cheia desfaz inclusive inserções parciais e permite tentar novamente', () => {
+  const { world, conn, db, mockSocket } = setupTestWorld();
+  const player = world.entityManager.getPlayer(conn.playerId!)!;
+  player.lastLogoutTime = Date.now() - 1800_000;
+  world.checkAndNotifyOfflineRewards(conn, player);
+  const reward = structuredClone(player.pendingOfflineReward!);
+  // Leave exactly one slot: ore inserts first, potion needs another slot.
+  const potion = player.inventory.find(item => item.itemId === 'potion_hp_minor')!;
+  db.removeItemFromInventory(player.dbCharacterId, potion.slotIndex, potion.quantity);
+  player.inventory = db.getInventory(player.dbCharacterId);
+  player.maxInventorySlots = player.inventory.length + 1;
+  const inventoryBefore = db.getInventory(player.dbCharacterId);
+  const characterBefore = db.getCharacterByName(player.name)!;
+  const originalHp = player.currentHp;
+  const result = world.claimOfflineRewards(player);
+  assert.equal(result.success, false);
+  assert.match(result.message, /mochila/);
+  assert.deepEqual(db.getInventory(player.dbCharacterId), inventoryBefore);
+  assert.deepEqual(player.pendingOfflineReward, reward);
+  assert.equal(player.level, characterBefore.level);
+  assert.equal(player.gold, characterBefore.gold);
+  assert.equal(player.currentHp, originalHp);
+  assert.equal(mockSocket.getLastPacket(Opcode.S2C_OFFLINE_REWARDS_CLAIMED).success, false);
+  player.maxInventorySlots = 25;
+  assert.equal(world.claimOfflineRewards(player).success, true);
+  assert.equal(player.pendingOfflineReward, null);
+});
+
+test('7. Baú persiste no SQLite; reconexão acumula somente a nova ausência e resgata uma vez', (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: 1_800_000_000_000 });
+  const { world, conn, db } = setupTestWorld();
+  const player = world.entityManager.getPlayer(conn.playerId!)!;
+  player.lastLogoutTime = Date.now() - 3600_000;
+  world.checkAndNotifyOfflineRewards(conn, player);
+  const first = structuredClone(player.pendingOfflineReward!);
+  // Spend 2h online; repeated checks/channel transfers must not add offline time.
+  t.mock.timers.tick(7200_000);
+  world.checkAndNotifyOfflineRewards(conn, player);
+  assert.deepEqual(player.pendingOfflineReward, first);
+  world.removePlayerFromWorld(conn, true, true);
+  t.mock.timers.tick(3600_000);
+  const loaded = db.loadPlayerFromRecord(conn.id, db.getCharacterByName(player.name)!);
+  assert.deepEqual(loaded.pendingOfflineReward, first);
+  world.enterWorld(conn, loaded);
+  assert.equal(loaded.pendingOfflineReward!.cappedSeconds, 7200);
+  assert.equal(loaded.pendingOfflineReward!.accumulatedGold, first.accumulatedGold * 2);
+  assert.equal(world.claimOfflineRewards(loaded).success, true);
+  const saved = db.getCharacterByName(player.name)!;
+  assert.equal(saved.pending_offline_reward, null);
+  assert.equal(world.claimOfflineRewards(loaded).success, false);
+});
+
+test('8. Falha no save reverte ouro, itens, nível, atributos e mantém o baú persistido', (t) => {
+  const { world, conn, db } = setupTestWorld();
+  const player = world.entityManager.getPlayer(conn.playerId!)!;
+  player.lastLogoutTime = Date.now() - 1800_000;
+  world.checkAndNotifyOfflineRewards(conn, player);
+  const savedBefore = db.getCharacterByName(player.name)!;
+  const inventoryBefore = db.getInventory(player.dbCharacterId);
+  const attrsBefore = { ...player.baseAttributes };
+  const save = t.mock.method(db, 'savePlayer', () => { throw new Error('SIMULATED_DISK_FAILURE'); });
+  assert.equal(world.claimOfflineRewards(player).success, false);
+  assert.equal(player.level, savedBefore.level);
+  assert.deepEqual(player.baseAttributes, attrsBefore);
+  assert.deepEqual(db.getInventory(player.dbCharacterId), inventoryBefore);
+  assert.deepEqual(db.getCharacterByName(player.name), savedBefore);
+  assert.ok(player.pendingOfflineReward);
+  save.mock.restore();
+  assert.equal(world.claimOfflineRewards(player).success, true);
+});
+
+test('9. Materiais usam slots expandidos e respeitam o limite de cada pilha', () => {
+  const { world, conn, db } = setupTestWorld();
+  const player = world.entityManager.getPlayer(conn.playerId!)!;
+  player.maxInventorySlots = 25;
+  const potion = player.inventory.find(item => item.itemId === 'potion_hp_minor')!;
+  db.addItemToInventory(player.dbCharacterId, 'potion_hp_minor', 98 - potion.quantity, 25);
+  // Fill remaining original slots with non-stackable swords.
+  while (db.getInventory(player.dbCharacterId).length < 20) {
+    assert.equal(db.addItemToInventory(player.dbCharacterId, 'sword_iron_broadsword', 1, 25), true);
+  }
+  player.inventory = db.getInventory(player.dbCharacterId);
+  player.lastLogoutTime = Date.now() - 9000_000;
+  world.checkAndNotifyOfflineRewards(conn, player);
+  assert.equal(world.claimOfflineRewards(player).success, true);
+  const inventory = db.getInventory(player.dbCharacterId);
+  assert.ok(inventory.some(item => item.slotIndex >= 20 && item.itemId === 'ore_iron_arcane'));
+  const potions = inventory.filter(item => item.itemId === 'potion_hp_minor');
+  assert.equal(potions.reduce((sum, item) => sum + item.quantity, 0), 113);
+  assert.ok(potions.every(item => item.quantity <= 99));
+});
+
+test('10. Cópia antiga do mesmo baú em outra sessão não pode resgatar novamente', () => {
+  const { world, conn, db } = setupTestWorld();
+  const player = world.entityManager.getPlayer(conn.playerId!)!;
+  player.lastLogoutTime = Date.now() - 1800_000;
+  world.checkAndNotifyOfflineRewards(conn, player);
+  const stale = db.loadPlayerFromRecord('stale_connection', db.getCharacterByName(player.name)!);
+  assert.equal(world.claimOfflineRewards(player).success, true);
+  const gold = db.getCharacterByName(player.name)!.gold;
+  assert.equal(world.claimOfflineRewards(stale).success, false);
+  assert.equal(db.getCharacterByName(player.name)!.gold, gold);
+  assert.equal(db.getCharacterByName(player.name)!.pending_offline_reward, null);
+});
+
+test('11. Reinício do SQLite mantém o baú e a migração pode executar novamente', (t) => {
+  const databasePath = join(tmpdir(), `magicforge-offline-${randomUUID()}.sqlite`);
+  let database: DatabaseManager | undefined;
+  t.after(() => {
+    database?.close();
+    for (const suffix of ['', '-wal', '-shm']) rmSync(databasePath + suffix, { force: true });
+  });
+  database = new DatabaseManager(databasePath);
+  const account = database.getOrCreateAccount('offline_restart');
+  const player = database.createCharacterInSlot('restart_connection', account.id, 0, 'RestartHero', CharacterClass.GUERREIRO);
+  const world = new World(database);
+  const conn = new Connection('restart_connection', new MockSocket() as any);
+  player.lastLogoutTime = Date.now() - 3600_000;
+  world.checkAndNotifyOfflineRewards(conn, player);
+  const expected = structuredClone(player.pendingOfflineReward);
+  database.close();
+  database = new DatabaseManager(databasePath);
+  const loaded = database.loadPlayerFromRecord('new_connection', database.getCharacterByName(player.name)!);
+  assert.deepEqual(loaded.pendingOfflineReward, expected);
 });

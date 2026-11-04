@@ -41,10 +41,15 @@ import { setupBossNarrative } from './ui/BossNarrative';
 import { PartyHUD } from './ui/PartyHUD';
 import { ChannelSelector } from './ui/ChannelSelector';
 import { OfflineRewardModal } from './ui/OfflineRewardModal';
+import { setupHuntReport } from './ui/HuntReport';
+import { setupSkillRotation } from './ui/SkillRotation';
+import { setupSkillUpgrades } from './ui/SkillUpgrades';
+import './ui/hunt-report.css';
 import './ui/auth-selection.css';
 import './ui/progression.css';
 import './ui/narrative.css';
 import './ui/party-hud.css';
+import './ui/automatic-play.css';
 
 // DOM Elements
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -131,9 +136,6 @@ const btnQuickMp = document.getElementById('btn-quick-mp') as HTMLDivElement | n
 const quickMpCount = document.getElementById('quick-mp-count') as HTMLSpanElement | null;
 const btnPrimaryAttack = document.getElementById('btn-primary-attack') as HTMLButtonElement | null;
 const chatMessagesContainer = document.getElementById('chat-messages-container') as HTMLDivElement | null;
-const virtualJoystickZone = document.getElementById('virtual-joystick-zone') as HTMLDivElement | null;
-const joystickBase = document.getElementById('joystick-base') as HTMLDivElement | null;
-const joystickThumb = document.getElementById('joystick-thumb') as HTMLDivElement | null;
 
 // Top-Center Stage Progression & Top-Right Cards
 const stageWorldTitle = document.getElementById('stage-world-title') as HTMLSpanElement | null;
@@ -335,6 +337,8 @@ const btnOpenSkillbook = document.getElementById('btn-open-skillbook') as HTMLBu
 const btnCloseSkillbook = document.getElementById('btn-close-skillbook') as HTMLButtonElement | null;
 const skillbookClassBadge = document.getElementById('skillbook-class-badge') as HTMLSpanElement | null;
 const skillbookSlotsContainer = document.getElementById('skillbook-slots-container') as HTMLDivElement | null;
+let skillRotationUI: ReturnType<typeof setupSkillRotation> | undefined;
+let skillUpgradeUI: ReturnType<typeof setupSkillUpgrades> | undefined;
 
 const SLOT_CONFIGS = [
   { slot: 1, circleName: '1º Círculo — Habilidades Iniciais', unlockLevel: 1, tierClass: 'tier-1' },
@@ -395,7 +399,7 @@ function updateEquippedSkillsUI() {
         if (lockOverlay) lockOverlay.remove();
         slotUI.cost.textContent = `${s.cost} ${s.resourceType === 'Energia' ? 'EN' : 'MP'}`;
         slotUI.cost.style.color = s.resourceType === 'Energia' ? '#facc15' : '#38bdf8';
-        slotUI.button.title = `[Slot ${s.slot} • ${s.tierName || `Tier ${s.tier}`}] ${s.name}\nCusto: ${s.cost} ${s.resourceType} • Recarga: ${s.cooldownSec}s • Alcance: ${s.range}m\n${s.description}`;
+        slotUI.button.title = `[Slot ${s.slot} • ${s.tierName || `Tier ${s.tier}`}] ${s.name} · Habilidade Nv. ${skillUpgradeUI?.getLevel(s.skillId) ?? 1}\nCusto: ${s.cost} ${s.resourceType} • Recarga: ${s.cooldownSec}s • Alcance: ${s.range}m\n${s.description}`;
       }
     }
   }
@@ -404,6 +408,7 @@ function updateEquippedSkillsUI() {
   if (skillbookModal && skillbookModal.style.display === 'flex') {
     renderGrimorioSkills(currentClass);
   }
+  skillRotationUI?.refreshSkills();
 }
 
 function updateSkillsForClass(chosenClass: CharacterClass) {
@@ -474,7 +479,7 @@ function renderGrimorioSkills(classType: CharacterClass) {
     cardsRow.className = 'slot-cards-row';
 
     slotSkills.forEach((s) => {
-      const isEquipped = isUnlocked && equippedSkillId === s.skillId;
+      const isEquipped = isUnlocked && equippedSkill?.skillId === s.skillId;
       const canEquip = isUnlocked;
 
       let role = 'Ofensivo';
@@ -525,6 +530,12 @@ function renderGrimorioSkills(classType: CharacterClass) {
         });
       }
 
+      if (skillUpgradeUI) card.appendChild(skillUpgradeUI.createControls(s, {
+        equipped: isEquipped,
+        heroLevel: playerLevel,
+        gold: playerGold,
+        dust: playerInventory.filter(item => item.itemId === 'arcane_dust').reduce((total, item) => total + item.quantity, 0),
+      }));
       cardsRow.appendChild(card);
     });
 
@@ -1578,6 +1589,7 @@ function renderCharacterModal(): void {
 function openFarmHelper(): void {
   if (!farmHelperModal) return;
   farmHelperUI.onOpen();
+  huntReportUI.onOpen();
   farmHelperModal.style.display = 'flex';
 }
 
@@ -1667,6 +1679,23 @@ if (btnPowerSave) {
 
 // Core Game Client Systems
 const network = new ClientNetwork();
+skillRotationUI = setupSkillRotation({
+  isReady: () => network.isConnected && network.isAuthenticated && Boolean(network.myPlayerId),
+  save: (order, autoCastEnabled) => network.sendSkillRotation(order, autoCastEnabled),
+  getSkill: slot => skillSlots[slot]?.definition ?? undefined,
+  getLevel: () => playerLevel,
+  applyHudOrder: order => {
+    const bar = document.getElementById('mobile-combat-arc-container');
+    for (const slot of order) { const button = document.getElementById(`skill-btn-${slot}`); if (button && bar) bar.appendChild(button); }
+  },
+});
+network.onSkillRotation = payload => skillRotationUI?.onUpdate(payload);
+skillUpgradeUI = setupSkillUpgrades({
+  isReady: () => network.isConnected && network.isAuthenticated && farmPlayerReady,
+  send: (skillId, level) => network.sendUpgradeSkill(skillId, level),
+  changed: updateEquippedSkillsUI,
+});
+network.onSkillUpgradeResult = payload => skillUpgradeUI?.onResult(payload);
 let farmPlayerReady = false;
 let pendingFarmSettings: S2CFarmSettingsUpdatePayload | null = null;
 const farmHelperUI = setupFarmHelper({
@@ -1674,6 +1703,12 @@ const farmHelperUI = setupFarmHelper({
   save: settings => network.sendUpdateFarmSettings(settings),
   salvage: includeRare => network.sendAutoSalvage(includeRare),
 });
+const huntReportUI = setupHuntReport({
+  isReady: () => network.isConnected && network.isAuthenticated && farmPlayerReady,
+  request: () => network.sendRequestHuntReport(),
+  reset: () => network.sendResetHuntReport(),
+});
+network.onHuntReport = report => huntReportUI.onReport(report);
 network.onFarmSettingsUpdate = payload => {
   // enterWorld sends preferences before S2C_LOGIN_SUCCESS.
   if (!farmPlayerReady) { pendingFarmSettings = payload; return; }
@@ -1714,12 +1749,25 @@ const channelSelector = new ChannelSelector(network);
 const offlineRewardModal = new OfflineRewardModal({
   isReady: () => network.isConnected && network.isAuthenticated,
   claim: (multiplier) => network.sendClaimOfflineRewards(multiplier),
+  openInventory: () => openInventory(),
+});
+const offlineChestButton = document.createElement('button');
+offlineChestButton.type = 'button';
+offlineChestButton.className = 'dock-btn';
+offlineChestButton.textContent = '⏳ Baú do Tempo';
+offlineChestButton.style.display = 'none';
+btnDockFarm?.insertAdjacentElement('afterend', offlineChestButton);
+offlineChestButton.addEventListener('click', () => {
+  closeInventory();
+  offlineRewardModal.reopen();
 });
 network.onOfflineRewardInfo = (payload) => {
+  offlineChestButton.style.display = '';
   offlineRewardModal.show(payload);
 };
 network.onOfflineRewardsClaimed = (payload) => {
   offlineRewardModal.onClaimed(payload);
+  if (payload.success) offlineChestButton.style.display = 'none';
   addChatMessage('Baú do Tempo', payload.message, 'sys');
 };
 
@@ -1939,36 +1987,10 @@ if (btnQuickMp) {
 }
 
 // ----------------------------------------------------
-// Auto-Play & Manual Override System
-// ----------------------------------------------------
-let isAutoPlayActive = true;
-let isManualMovement = false;
-let manualOverrideTimeout: number | null = null;
-let lastAutoCombatTick = 0;
-
-function toggleAutoPlay(force?: boolean) {
-  isAutoPlayActive = force !== undefined ? force : !isAutoPlayActive;
-  if (btnToggleAuto && autoStatusText && autoStatusIcon) {
-    if (isAutoPlayActive) {
-      btnToggleAuto.classList.remove('inactive');
-      autoStatusText.textContent = 'AUTO ON';
-      autoStatusIcon.textContent = '⚔️';
-      addChatMessage('Auto', 'Farm Automático ATIVADO! Caçando monstros da fase...', 'auto');
-    } else {
-      btnToggleAuto.classList.add('inactive');
-      autoStatusText.textContent = 'AUTO OFF';
-      autoStatusIcon.textContent = '⏸️';
-      addChatMessage('Auto', 'Farm Automático PAUSADO. Controle manual ativo.', 'auto');
-    }
-  }
-}
-
-if (btnToggleAuto) {
-  btnToggleAuto.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleAutoPlay();
-  });
-}
+// Automatic gameplay is owned by the server.
+if (btnToggleAuto) { btnToggleAuto.disabled = true; btnToggleAuto.title = 'Combate e movimento automáticos'; }
+if (autoStatusText) autoStatusText.textContent = '100% AUTO';
+if (autoStatusIcon) autoStatusIcon.textContent = '⚔️';
 
 if (btnOpenFarmGear) {
   btnOpenFarmGear.addEventListener('click', (e) => {
@@ -1997,6 +2019,9 @@ network.onConnectionStateChange = (connected) => {
     pendingFarmSettings = null;
     farmHelperUI.onDisconnected();
     closeFarmHelper();
+    huntReportUI.onDisconnected();
+    skillRotationUI?.onDisconnected();
+    skillUpgradeUI?.reset();
     leaderboard.onDisconnected();
     inventoryExpansion?.onDisconnected();
     bossNarrative.reset();
@@ -2218,6 +2243,7 @@ network.onChatMessage = (payload) => {
 network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
   playerInventory = payload.slots;
   playerGold = payload.gold;
+  if (skillbookModal?.style.display === 'flex') renderGrimorioSkills(myPlayerClass);
   playerCombatPower = payload.totalCombatPower;
   if (payload.maxSlots) {
     playerMaxInventorySlots = payload.maxSlots;
@@ -2246,6 +2272,9 @@ network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
 network.onLoginSuccess = (payload) => {
   farmPlayerReady = true;
   farmHelperUI.onCharacterLogin();
+  huntReportUI.onCharacterLogin();
+  skillRotationUI?.onLogin();
+  skillUpgradeUI?.reset();
   if (pendingFarmSettings) { farmHelperUI.onSettingsUpdate(pendingFarmSettings); pendingFarmSettings = null; }
   authSelection.onLogin();
   playerLevel = payload.level ?? 1;
@@ -2287,6 +2316,7 @@ network.onLoginSuccess = (payload) => {
 
 network.onSkillsUpdate = (payload: S2CSkillsUpdatePayload) => {
   playerEquippedSkills = { ...payload.equippedSkills };
+  skillUpgradeUI?.onSkillsUpdate(payload.skillLevels);
   updateEquippedSkillsUI();
   if (skillbookModal && skillbookModal.style.display === 'flex') {
     renderGrimorioSkills(myPlayerClass);
@@ -2478,45 +2508,7 @@ Object.entries(skillSlots).forEach(([slotStr, slotUI]) => {
   });
 });
 
-// Primary Basic Attack button & Space key
-function executePrimaryAttack() {
-  if (!network.isConnected || !network.myPlayerId) return;
-  const entities = snapshotBuffer.getInterpolatedEntities();
-  const myPlayer = entities.find((e) => e.id === network.myPlayerId);
-  if (!myPlayer || myPlayer.currentHp <= 0) return;
-
-  let targetId = renderer.selectedTargetId;
-  if (!targetId) {
-    let closest: InterpolatedEntity | null = null;
-    let minD = 25;
-    for (const ent of entities) {
-      if (ent.type === 'MONSTER' && ent.currentHp > 0) {
-        const d = distance(myPlayer.position, ent.position);
-        if (d < minD) {
-          minD = d;
-          closest = ent;
-        }
-      }
-    }
-    if (closest) {
-      renderer.selectedTargetId = closest.id;
-      targetId = closest.id;
-    }
-  }
-
-  if (targetId) {
-    network.sendAttackTarget(targetId);
-  }
-}
-
-if (btnPrimaryAttack) {
-  btnPrimaryAttack.addEventListener('click', (e) => {
-    e.stopPropagation();
-    executePrimaryAttack();
-  });
-}
-
-// Bind keyboard shortcuts (1, 2, 3, 4, Space, K, I, C, F, Escape, Enter)
+// Bind keyboard shortcuts (1, 2, 3, 4, K, I, C, F, Escape, Enter)
 window.addEventListener('keydown', (e) => {
   if (authSelection.isOpen() || leaderboard.isOpen() || cinematic.isOpen()) return;
   // Ignore game shortcuts while typing in any input field
@@ -2537,9 +2529,6 @@ window.addEventListener('keydown', (e) => {
 
   if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
     castSkill(parseInt(e.key, 10));
-  } else if (e.code === 'Space') {
-    e.preventDefault();
-    executePrimaryAttack();
   } else if (e.key === 'k' || e.key === 'K') {
     if (skillbookModal && skillbookModal.style.display === 'flex') {
       closeSkillbook();
@@ -2656,7 +2645,7 @@ function enterLegacyWorld(name: string, classType: CharacterClass): void {
 const authSelection = setupAuthSelection({
   isConnected: () => network.isConnected,
   connect: () => { legacyLoginRequested = false; network.connect(); },
-  disconnect: () => { farmPlayerReady = false; pendingFarmSettings = null; farmHelperUI.onDisconnected(); network.disconnect(); },
+  disconnect: () => { farmPlayerReady = false; pendingFarmSettings = null; farmHelperUI.onDisconnected(); huntReportUI.onDisconnected(); network.disconnect(); },
   authenticate: (username, password) => { legacyLoginRequested = false; network.sendAuthLogin(username, password); },
   register: (username, password, email) => { legacyLoginRequested = false; network.sendAuthRegister(username, password, email); },
   authenticateSocial: provider => { legacyLoginRequested = false; network.sendAuthSocial(provider, getGuestCredential(localStorage, () => crypto.randomUUID())); },
@@ -2677,6 +2666,7 @@ network.onAuthError = error => {
     pendingFarmSettings = null;
     authSelection.onDisconnected();
     farmHelperUI.onDisconnected();
+    huntReportUI.onDisconnected();
     network.disconnect();
     return;
   }
@@ -2686,93 +2676,6 @@ network.onAuthError = error => {
 };
 
 // ----------------------------------------------------
-// Dynamic Floating Joystick (Mobile / Touch / Drag)
-// ----------------------------------------------------
-let isJoystickActive = false;
-let joystickDir = { x: 0, y: 0, z: 0 };
-let joystickCenter = { x: 0, y: 0 };
-const maxJoystickRadius = 45; // px
-
-function handleJoystickStart(clientX: number, clientY: number) {
-  if (!virtualJoystickZone || !joystickThumb) return;
-  joystickCenter = { x: clientX, y: clientY };
-  virtualJoystickZone.style.left = `${clientX}px`;
-  virtualJoystickZone.style.top = `${clientY}px`;
-  virtualJoystickZone.style.display = 'block';
-  virtualJoystickZone.style.opacity = '1';
-  joystickThumb.style.transform = 'translate(0px, 0px)';
-  isJoystickActive = true;
-  isManualMovement = true;
-  if (manualOverrideTimeout) {
-    clearTimeout(manualOverrideTimeout);
-    manualOverrideTimeout = null;
-  }
-}
-
-function handleJoystickMove(clientX: number, clientY: number) {
-  if (!isJoystickActive || !joystickThumb) return;
-  const dx = clientX - joystickCenter.x;
-  const dy = clientY - joystickCenter.y;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-
-  let clampedX = dx;
-  let clampedY = dy;
-  if (dist > maxJoystickRadius) {
-    clampedX = (dx / dist) * maxJoystickRadius;
-    clampedY = (dy / dist) * maxJoystickRadius;
-  }
-
-  joystickThumb.style.transform = `translate(${clampedX}px, ${clampedY}px)`;
-  joystickDir = {
-    x: clampedX / maxJoystickRadius,
-    y: 0,
-    z: clampedY / maxJoystickRadius,
-  };
-}
-
-function handleJoystickEnd() {
-  if (!isJoystickActive) return;
-  isJoystickActive = false;
-  joystickDir = { x: 0, y: 0, z: 0 };
-  if (joystickThumb) joystickThumb.style.transform = 'translate(0px, 0px)';
-  if (virtualJoystickZone) virtualJoystickZone.style.display = 'none';
-
-  // Send stop command
-  const entities = snapshotBuffer.getInterpolatedEntities();
-  const myPlayer = entities.find((e) => e.id === network.myPlayerId);
-  const currentPos = myPlayer ? myPlayer.position : { x: 0, y: 0, z: 0 };
-  network.sendMoveDirection({ x: 0, y: 0, z: 0 }, currentPos);
-
-  // Resume auto-navigation smoothly after releasing
-  if (manualOverrideTimeout) clearTimeout(manualOverrideTimeout);
-  manualOverrideTimeout = window.setTimeout(() => {
-    isManualMovement = false;
-  }, 400);
-}
-
-// Global pointer events for floating joystick on left screen area
-window.addEventListener('pointerdown', (e) => {
-  if (authSelection.isOpen() || leaderboard.isOpen() || cinematic.isOpen()) return;
-  const target = e.target as HTMLElement | null;
-  if (target && (target.closest('.modal-backdrop') || target.closest('#inspector-panel') || target.closest('#hero-status-card') || target.closest('#mobile-combat-arc-container') || target.closest('#bottom-center-zone') || target.closest('#top-right-location-card') || target.closest('#top-center-wave-card') || target.closest('#dock-navigation-bar') || target.closest('#right-vertical-dock'))) {
-    return;
-  }
-
-  // Floating joystick activates on left screen touch/drag
-  if (e.clientX < window.innerWidth * 0.52 && e.clientY > 110) {
-    handleJoystickStart(e.clientX, e.clientY);
-  }
-});
-
-window.addEventListener('pointermove', (e) => {
-  if (isJoystickActive) {
-    handleJoystickMove(e.clientX, e.clientY);
-  }
-});
-
-window.addEventListener('pointerup', handleJoystickEnd);
-window.addEventListener('pointercancel', handleJoystickEnd);
-
 // Canvas Hover Feedback (Hand cursor over ground item drops)
 canvas.addEventListener('pointermove', (e) => {
   const hoveredDrop = renderer.getDropAtScreenPos(e.clientX, e.clientY, 32);
@@ -2785,65 +2688,19 @@ canvas.addEventListener('pointermove', (e) => {
   }
 });
 
-// Canvas Interaction (Targeting, Manual Click-to-Move & Looting)
-canvas.addEventListener('pointerdown', (e) => {
+// Optional target selection and loot clicks never control movement.
+canvas.addEventListener('pointerdown', (event) => {
   if (!network.isConnected || !network.myPlayerId) return;
-
-  // 1. Direct check: Ground item drop clicked (Screen-space & World-space)
-  const screenDrop = renderer.getDropAtScreenPos(e.clientX, e.clientY, 34);
-  const clickWorldPos = renderer.screenToWorld(e.clientX, e.clientY);
-  const nearestDrop = screenDrop || renderer.findDropNearWorldPos(clickWorldPos, 3.5);
-
-  if (nearestDrop) {
-    network.sendLootItem(nearestDrop.dropId);
-    addChatMessage('Saque', `🖐️ Coletando [${nearestDrop.name}] do chão...`, 'sys');
-    const entities = snapshotBuffer.getInterpolatedEntities();
-    const myPlayer = entities.find((e) => e.id === network.myPlayerId);
-    const currentPos = myPlayer ? myPlayer.position : { x: 0, y: 0, z: 0 };
-    network.sendMoveInput(nearestDrop.position, currentPos);
-    isManualMovement = true;
-    if (manualOverrideTimeout) clearTimeout(manualOverrideTimeout);
-    manualOverrideTimeout = window.setTimeout(() => { isManualMovement = false; }, 2000);
-    return;
-  }
-
-  // Prevent virtual joystick zone conflicts for movement on touch devices
-  if (e.pointerType === 'touch' && e.clientX < window.innerWidth * 0.52 && e.clientY > 110) return;
-
-  const entities = snapshotBuffer.getInterpolatedEntities();
-
-  // 2. Check if clicked on a monster to target
-  let clickedMonsterId: string | null = null;
-  let minDistance = 2.8;
-
-  for (const ent of entities) {
-    if (ent.type === 'MONSTER' && ent.currentHp > 0) {
-      const d = distance(clickWorldPos, ent.position);
-      if (d < minDistance) {
-        minDistance = d;
-        clickedMonsterId = ent.id;
-      }
-    }
-  }
-
-  if (clickedMonsterId) {
-    renderer.selectedTargetId = clickedMonsterId;
-    network.sendAttackTarget(clickedMonsterId);
-  } else {
-    // Manual click-to-move overrides auto temporarily
-    const myPlayer = entities.find((e) => e.id === network.myPlayerId);
-    const currentPos = myPlayer ? myPlayer.position : { x: 0, y: 0, z: 0 };
-    network.sendMoveInput(clickWorldPos, currentPos);
-    isManualMovement = true;
-    if (manualOverrideTimeout) clearTimeout(manualOverrideTimeout);
-    manualOverrideTimeout = window.setTimeout(() => { isManualMovement = false; }, 2500);
-  }
+  const drop = renderer.getDropAtScreenPos(event.clientX, event.clientY, 34);
+  if (drop) { network.sendLootItem(drop.dropId); return; }
+  const position = renderer.screenToWorld(event.clientX, event.clientY);
+  const target = snapshotBuffer.getInterpolatedEntities().find(entity => entity.type === 'MONSTER' && entity.currentHp > 0 && distance(position, entity.position) < 2.8);
+  if (target) renderer.selectedTargetId = target.id;
 });
 
 // Render Loop (60Hz / 120Hz native display rate)
 let frameCount = 0;
 let lastFpsTime = performance.now();
-let lastJoystickSendTime = 0;
 
 function gameLoop() {
   requestAnimationFrame(gameLoop);
@@ -2856,115 +2713,11 @@ function gameLoop() {
     lastFpsTime = now;
   }
 
-  // If joystick is active, stream continuous direction at 20Hz (every 50ms)
-  if (isJoystickActive && (joystickDir.x !== 0 || joystickDir.z !== 0)) {
-    if (now - lastJoystickSendTime >= 50) {
-      const entities = snapshotBuffer.getInterpolatedEntities();
-      const myPlayer = entities.find((e) => e.id === network.myPlayerId);
-      const currentPos = myPlayer ? myPlayer.position : { x: 0, y: 0, z: 0 };
-      network.sendMoveDirection(joystickDir, currentPos);
-      lastJoystickSendTime = now;
-    }
-  }
-
   // Retrieve interpolated states from snapshot buffer
   const useInterpolation = toggleInterpolation.checked;
   const entities = snapshotBuffer.getInterpolatedEntities(useInterpolation);
 
   // ----------------------------------------------------
-  // Fluid Auto-Play & Navigation Loop
-  // ----------------------------------------------------
-  if (isAutoPlayActive && !isManualMovement && network.isConnected && network.myPlayerId) {
-    if (now - lastAutoCombatTick >= 100) {
-      lastAutoCombatTick = now;
-      const myPlayer = entities.find((e) => e.id === network.myPlayerId);
-
-      if (myPlayer && myPlayer.currentHp > 0) {
-        const chosenClass = (charClassSelect.value as CharacterClass) || CharacterClass.GUERREIRO;
-        const classDef = CLASS_DEFINITIONS[chosenClass];
-        const attackRange = classDef ? classDef.attackRange : 2.5;
-
-        // 1. Auto-collect nearby drops
-        const nearbyDrop = renderer.findDropNearWorldPos(myPlayer.position, 6.0);
-        if (nearbyDrop) {
-          network.sendLootItem(nearbyDrop.dropId);
-        }
-
-        // 2. Target validation
-        let targetEnt: (typeof entities)[0] | undefined = undefined;
-        if (renderer.selectedTargetId) {
-          targetEnt = entities.find((e) => e.id === renderer.selectedTargetId && e.currentHp > 0);
-          if (!targetEnt) renderer.selectedTargetId = null;
-        }
-
-        // 3. Find closest living monster if no target
-        if (!targetEnt) {
-          let closestDist = 9999;
-          for (const ent of entities) {
-            if (ent.type === 'MONSTER' && ent.currentHp > 0) {
-              const d = distance(myPlayer.position, ent.position);
-              if (d < closestDist) {
-                closestDist = d;
-                targetEnt = ent;
-              }
-            }
-          }
-          if (targetEnt) {
-            renderer.selectedTargetId = targetEnt.id;
-          }
-        }
-
-        // 4. Auto pathing and combat execution
-        if (targetEnt) {
-          const d = distance(myPlayer.position, targetEnt.position);
-          const stopDist = Math.max(1.4, attackRange - 0.35);
-
-          if (d > stopDist) {
-            const dx = targetEnt.position.x - myPlayer.position.x;
-            const dz = targetEnt.position.z - myPlayer.position.z;
-            const len = Math.sqrt(dx * dx + dz * dz) || 1;
-            network.sendMoveDirection({ x: dx / len, y: 0, z: dz / len }, myPlayer.position);
-          } else {
-            network.sendMoveDirection({ x: 0, y: 0, z: 0 }, myPlayer.position);
-
-            // Try casting ready unlocked skills 4 -> 3 -> 2 -> 1
-            let castedSkill = false;
-            for (let slot = 4; slot >= 1; slot--) {
-              const slotCfg = SLOT_CONFIGS.find((c) => c.slot === slot);
-              const cd = cooldownMap.get(slot);
-              const slotUI = skillSlots[slot];
-              if ((!cd || cd <= now) && slotUI && slotUI.definition) {
-                const def = slotUI.definition;
-                const unlockLvl = slotCfg ? slotCfg.unlockLevel : def.unlockLevel;
-                if (playerLevel < unlockLvl) continue;
-                const currentRes = myPlayer.currentResource ?? 100;
-                if (currentRes >= def.cost) {
-                  castSkill(slot);
-                  castedSkill = true;
-                  break;
-                }
-              }
-            }
-
-            if (!castedSkill) {
-              network.sendAttackTarget(targetEnt.id);
-            }
-          }
-        } else {
-          // Fallback: If no living monster found (during brief respawn interval), move towards central battle arena (0,0)
-          const distToCenter = Math.hypot(myPlayer.position.x, myPlayer.position.z);
-          if (distToCenter > 3.0) {
-            const dirX = -myPlayer.position.x / distToCenter;
-            const dirZ = -myPlayer.position.z / distToCenter;
-            network.sendMoveDirection({ x: dirX, y: 0, z: dirZ }, myPlayer.position);
-          } else {
-            network.sendMoveDirection({ x: 0, y: 0, z: 0 }, myPlayer.position);
-          }
-        }
-      }
-    }
-  }
-
   // 1. Update Cooldown UI overlays
   for (const [slotStr, slotUI] of Object.entries(skillSlots)) {
     const slot = parseInt(slotStr, 10);

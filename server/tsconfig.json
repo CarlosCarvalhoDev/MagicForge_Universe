@@ -17,6 +17,7 @@
   },
   "include": [
     "src/**/*",
+    "tools/**/*",
     "../shared/src/**/*"
   ]
 }

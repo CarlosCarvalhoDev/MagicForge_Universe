@@ -56,6 +56,7 @@ class MockConnection {
 function createTestWorld(): { world: World; db: DatabaseManager } {
   const db = new DatabaseManager(':memory:');
   const world = new World(db);
+  world.automationEnabled = false; // Isolate manual geometry/status tests from the automatic controller.
   // Limpa monstros da arena inicial para testes isolados
   for (const m of world.entityManager.getAllMonsters()) {
     world.entityManager.removeMonster(m.id);

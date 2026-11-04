@@ -3,6 +3,7 @@
 ## 1. Visão Geral
 *   **Nome:** MagicForge: Universe
 *   **Gênero:** Auto-MMO / Idle RPG
+*   **Diretriz aprovada em 03/11/2026:** gameplay 100% automático, com movimento e ciclo de habilidades no servidor, sem joystick ou movimento por toque. Quatro habilidades em linha; ordem configurável no Grimório, preservando as categorias dos slots. Chefes e portais avançam automaticamente. Detalhes em [DIRETRIZ_IDLE_100_AUTOMATICO.md](DIRETRIZ_IDLE_100_AUTOMATICO.md).
 *   **Motor Gráfico:** Unity 3D
 
 ## 2. Atributos Base (Estilo D&D)

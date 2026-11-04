@@ -1,5 +1,6 @@
 import {
   CharacterClass,
+  createVector3,
   Opcode,
   ChannelSummaryPayload,
   ChannelLoadStatus,
@@ -57,6 +58,7 @@ export class WorldManager {
     if (!world) {
       world = new World(this.db, worldIndex, channelId);
       world.partyManager = this.partyManager;
+      world.automaticPortalHandler = player => this.advancePlayerAutomatically(player, world!);
       this.channels.set(key, world);
       console.log(`[WorldManager] Novo canal instanciado: Mundo ${worldIndex} (${world.getWorldName(worldIndex)}) - Canal ${channelId} (ID: ${world.instanceId})`);
     } else if (!world.partyManager) {
@@ -70,6 +72,26 @@ export class WorldManager {
    */
   public getAllChannels(): World[] {
     return Array.from(this.channels.values());
+  }
+
+  public advancePlayerAutomatically(player: Player, source: World): boolean {
+    const connection = this.connections.get(player.id);
+    if (!connection || connection.currentWorldInstance !== source || player.isDead ||
+      player.unlockedWorld <= player.currentWorld || source.dungeonManager.isPlayerInDungeon(player.id)) return false;
+    const nextWorld = player.currentWorld + 1;
+    const preferredChannel = source.channelId;
+    this.getOrCreateChannel(nextWorld, preferredChannel);
+    source.removePlayerFromWorld(connection, false);
+    player.currentWorld = nextWorld;
+    player.currentStage = 1;
+    player.position = createVector3(0, 0, -10);
+    player.stopMoving();
+    player.targetId = null;
+    this.db.savePlayer(player);
+    this.assignPlayerToChannel(connection, player, preferredChannel);
+    const party = this.partyManager.getPlayerParty(player.id);
+    if (party) this.partyManager.broadcastPartyUpdate(party, 'Avanço automático de mundo.');
+    return true;
   }
 
   /**
@@ -129,7 +151,7 @@ export class WorldManager {
     const worldChannels = Array.from(this.channels.values()).filter((w) => w.currentWorld === worldIndex);
     worldChannels.sort((a, b) => a.entityManager.getAllPlayers().length - b.entityManager.getAllPlayers().length);
 
-    let chosenWorld = worldChannels[0];
+    let chosenWorld = worldChannels[0] ?? this.getOrCreateChannel(worldIndex, 1);
     // Se o canal mais vazio estiver cheio, cria dinamicamente o próximo canal
     if (chosenWorld.entityManager.getAllPlayers().length >= chosenWorld.maxPlayers) {
       const nextChannelId = worldChannels.length + 1;
@@ -207,7 +229,7 @@ export class WorldManager {
       this.partyManager.handlePlayerDisconnect(connection.playerId);
     }
     if (connection.currentWorldInstance) {
-      (connection.currentWorldInstance as World).removePlayerFromWorld(connection, true);
+      (connection.currentWorldInstance as World).removePlayerFromWorld(connection, true, true);
       connection.currentWorldInstance = null;
     }
   }
@@ -553,7 +575,7 @@ export class WorldManager {
    * Ciclo de atualização autoritativo (20Hz): atualiza todas as instâncias em execução
    */
   public update(deltaTimeSec: number): void {
-    for (const channel of this.channels.values()) {
+    for (const channel of [...this.channels.values()]) {
       channel.update(deltaTimeSec);
     }
   }

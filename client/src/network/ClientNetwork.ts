@@ -31,6 +31,7 @@ import {
   S2CSkillCastRejectedPayload,
   CombatStatusTransitionPayload,
   S2CSkillsUpdatePayload,
+  S2CSkillUpgradeResultPayload,
   S2CWorldSnapshotPayload,
   S2CBossEventPayload,
   S2CStageUpdatePayload,
@@ -80,6 +81,8 @@ import {
   S2COfflineRewardInfoPayload,
   C2SClaimOfflineRewardsPayload,
   S2COfflineRewardsClaimedPayload,
+  S2CHuntReportPayload,
+  S2CSkillRotationPayload,
 } from '@magicforge/shared';
 
 import { resolveServerUrl } from './NetworkConfig';
@@ -105,6 +108,8 @@ export class ClientNetwork {
   public onAuthSuccess: MessageListener<S2CAuthSuccessPayload> | null = null;
   public onAuthError: MessageListener<S2CAuthErrorPayload> | null = null;
   public onFarmSettingsUpdate: MessageListener<S2CFarmSettingsUpdatePayload> | null = null;
+  public onHuntReport: MessageListener<S2CHuntReportPayload> | null = null;
+  public onSkillRotation: MessageListener<S2CSkillRotationPayload> | null = null;
   public onAutoSalvageResult: MessageListener<S2CAutoSalvageResultPayload> | null = null;
   public onExpandInventoryResult: MessageListener<S2CExpandInventoryResultPayload> | null = null;
   public onLeaderboardUpdate: MessageListener<S2CLeaderboardUpdatePayload> | null = null;
@@ -128,6 +133,7 @@ export class ClientNetwork {
   public onBossEvent: MessageListener<S2CBossEventPayload> | null = null;
   public onStageUpdate: MessageListener<S2CStageUpdatePayload> | null = null;
   public onSkillsUpdate: MessageListener<S2CSkillsUpdatePayload> | null = null;
+  public onSkillUpgradeResult: MessageListener<S2CSkillUpgradeResultPayload> | null = null;
   public onRebornResult: MessageListener<S2CRebornResultPayload> | null = null;
   public onRefineResult: MessageListener<S2CRefineResultPayload> | null = null;
   public onSocketResult: MessageListener<S2CSocketResultPayload> | null = null;
@@ -455,6 +461,22 @@ export class ClientNetwork {
     this.send(Opcode.C2S_AUTO_SALVAGE, payload);
   }
 
+  public sendRequestHuntReport(): void {
+    this.send(Opcode.C2S_REQUEST_HUNT_REPORT, {});
+  }
+
+  public sendResetHuntReport(): void {
+    this.send(Opcode.C2S_RESET_HUNT_REPORT, {});
+  }
+
+  public sendSkillRotation(order: number[], autoCastEnabled: boolean): void {
+    this.send(Opcode.C2S_UPDATE_SKILL_ROTATION, { order, autoCastEnabled });
+  }
+
+  public sendUpgradeSkill(skillId: string, expectedLevel: number): void {
+    this.send(Opcode.C2S_UPGRADE_SKILL, { skillId, expectedLevel });
+  }
+
   public sendRequestLeaderboard(category: LeaderboardCategory = 'COMBAT_POWER', limit = 20): void {
     const payload: C2SRequestLeaderboardPayload = { category, limit };
     this.send(Opcode.C2S_REQUEST_LEADERBOARD, payload);
@@ -617,6 +639,11 @@ export class ClientNetwork {
           break;
         }
 
+        case Opcode.S2C_SKILL_UPGRADE_RESULT: {
+          this.onSkillUpgradeResult?.(packet.data as S2CSkillUpgradeResultPayload);
+          break;
+        }
+
         case Opcode.S2C_REBORN_RESULT: {
           this.onRebornResult?.(packet.data as S2CRebornResultPayload);
           break;
@@ -670,6 +697,15 @@ export class ClientNetwork {
           const farmData = packet.data as S2CFarmSettingsUpdatePayload;
           this.farmSettings = farmData.settings;
           this.onFarmSettingsUpdate?.(farmData);
+          break;
+        }
+
+        case Opcode.S2C_HUNT_REPORT: {
+          this.onHuntReport?.(packet.data as S2CHuntReportPayload);
+          break;
+        }
+        case Opcode.S2C_SKILL_ROTATION: {
+          this.onSkillRotation?.(packet.data as S2CSkillRotationPayload);
           break;
         }
 

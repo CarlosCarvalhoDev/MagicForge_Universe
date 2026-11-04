@@ -17,6 +17,12 @@ import {
   LeaderboardEntryPayload,
   DailyDungeonInfoPayload,
   DungeonType,
+  isValidSkillCastOrder,
+  SKILLS_DATABASE,
+  SKILL_MAX_LEVEL,
+  SKILL_UPGRADE_MATERIAL,
+  canUpgradeSkillPower,
+  getSkillUpgradeCost,
 } from '@magicforge/shared';
 import { Player } from '../entities/Player';
 import { VerifiedSocialProfile } from '../auth/SocialAuthService';
@@ -72,6 +78,10 @@ export interface CharacterRecord {
   carisma: number;
   combat_power: number;
   last_logout?: number;
+  pending_offline_reward?: string | null;
+  skill_cast_order?: string;
+  auto_cast_enabled?: number;
+  unlocked_world?: number;
   created_at: number;
   updated_at: number;
 }
@@ -142,6 +152,16 @@ export class DatabaseManager {
       CREATE INDEX IF NOT EXISTS idx_characters_name ON characters(name);
     `);
 
+    // Skill ranks are independent of the selected slot, so changing a choice retains investment.
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS character_skills (
+        character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+        skill_id TEXT NOT NULL,
+        level INTEGER NOT NULL CHECK(level BETWEEN 1 AND 20),
+        PRIMARY KEY(character_id, skill_id)
+      );
+    `);
+
     // 3. Tabela de Inventário
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS inventory (
@@ -204,6 +224,22 @@ export class DatabaseManager {
       this.db.exec('ALTER TABLE characters ADD COLUMN last_logout INTEGER NOT NULL DEFAULT 0;');
     } catch {
       // Ignora se a coluna já existir
+    }
+
+    // Migração aditiva: o baú não resgatado sobrevive a reconexões/reinícios.
+    const characterColumns = this.db.prepare('PRAGMA table_info(characters)').all() as Array<{ name: string }>;
+    if (!characterColumns.some(column => column.name === 'pending_offline_reward')) {
+      this.db.exec('ALTER TABLE characters ADD COLUMN pending_offline_reward TEXT;');
+    }
+    if (!characterColumns.some(column => column.name === 'auto_cast_enabled')) {
+      this.db.exec('ALTER TABLE characters ADD COLUMN auto_cast_enabled INTEGER NOT NULL DEFAULT 1;');
+    }
+    if (!characterColumns.some(column => column.name === 'skill_cast_order')) {
+      this.db.exec("ALTER TABLE characters ADD COLUMN skill_cast_order TEXT NOT NULL DEFAULT '[1,2,3,4]';");
+    }
+    if (!characterColumns.some(column => column.name === 'unlocked_world')) {
+      this.db.exec('ALTER TABLE characters ADD COLUMN unlocked_world INTEGER NOT NULL DEFAULT 1;');
+      this.db.exec('UPDATE characters SET unlocked_world = MAX(1, current_world);');
     }
 
     // Configurações do Farm Helper (Automação Idle)
@@ -772,6 +808,7 @@ export class DatabaseManager {
     };
 
     player.inventory = this.getInventory(player.dbCharacterId);
+    player.skillLevels = this.getSkillLevels(player.dbCharacterId);
     player.cards = this.getCharacterCards(player.dbCharacterId);
     player.farmSettings = {
       autoHpPotionEnabled: existing.auto_hp_enabled !== undefined ? Boolean(existing.auto_hp_enabled) : true,
@@ -786,6 +823,15 @@ export class DatabaseManager {
     player.recalculateStatsFromEquipment();
     player.currentHp = existing.current_hp > 0 ? Math.min(player.maxHp, existing.current_hp) : player.maxHp;
     player.lastLogoutTime = existing.last_logout || existing.updated_at || Date.now();
+    player.unlockedWorld = Math.max(existing.current_world ?? 1, existing.unlocked_world ?? 1);
+    player.pendingOfflineReward = existing.pending_offline_reward
+      ? JSON.parse(existing.pending_offline_reward)
+      : null;
+    try {
+      player.autoCastEnabled = existing.auto_cast_enabled !== 0;
+      const order: unknown = JSON.parse(existing.skill_cast_order ?? '[1,2,3,4]');
+      if (isValidSkillCastOrder(order)) player.skillCastOrder = [...order];
+    } catch { /* Corrupt preference falls back to the default cycle. */ }
     player.isDead = false;
     return player;
   }
@@ -876,9 +922,9 @@ export class DatabaseManager {
     } else if (classType === CharacterClass.CLERIGO) {
       this.addItemToInventory(charId, 'mace_cleric_dawn', 1);
     } else if (classType === CharacterClass.ARQUEIRO) {
-      this.addItemToInventory(charId, 'bow_short_apprentice', 1);
+      this.addItemToInventory(charId, 'bow_hunting', 1);
     } else {
-      this.addItemToInventory(charId, 'sword_novice', 1);
+      this.addItemToInventory(charId, 'sword_iron_broadsword', 1);
     }
 
     player.inventory = this.getInventory(charId);
@@ -914,7 +960,7 @@ export class DatabaseManager {
   /**
    * Salva o estado atualizado do jogador (posição, vida, nível, atributos, ouro)
    */
-  public savePlayer(player: Player): void {
+  public savePlayer(player: Player, throwOnError: boolean = false): void {
     const now = Date.now();
     try {
       this.db.prepare(`
@@ -929,6 +975,7 @@ export class DatabaseManager {
           pos_y = ?,
           pos_z = ?,
           current_world = ?,
+          unlocked_world = ?,
           current_stage = ?,
           forca = ?,
           destreza = ?,
@@ -951,6 +998,7 @@ export class DatabaseManager {
           auto_loot = ?,
           max_inventory_slots = ?,
           last_logout = ?,
+          pending_offline_reward = ?,
           updated_at = ?
         WHERE name = ?
       `).run(
@@ -964,6 +1012,7 @@ export class DatabaseManager {
         player.position.y,
         player.position.z,
         player.currentWorld,
+        player.unlockedWorld,
         player.currentStage,
         player.attributes.forca,
         player.attributes.destreza,
@@ -986,12 +1035,75 @@ export class DatabaseManager {
         player.farmSettings.autoLootEnabled ? 1 : 0,
         player.maxInventorySlots,
         player.lastLogoutTime || now,
+        player.pendingOfflineReward ? JSON.stringify(player.pendingOfflineReward) : null,
         now,
         player.name
       );
     } catch (err) {
       console.error(`[Database] Erro ao salvar personagem "${player.name}":`, err);
+      if (throwOnError) throw err;
     }
+  }
+
+  public saveOfflineRewardState(player: Player): void {
+    this.db.prepare('UPDATE characters SET pending_offline_reward = ?, last_logout = ? WHERE id = ?').run(
+      player.pendingOfflineReward ? JSON.stringify(player.pendingOfflineReward) : null,
+      player.lastLogoutTime,
+      player.dbCharacterId,
+    );
+  }
+
+  public updateSkillCastOrder(characterId: string, order: number[], autoCastEnabled?: boolean): void {
+    if (!isValidSkillCastOrder(order)) throw new Error('INVALID_SKILL_CAST_ORDER');
+    const result = this.db.prepare('UPDATE characters SET skill_cast_order = ?, auto_cast_enabled = COALESCE(?, auto_cast_enabled) WHERE id = ?').run(JSON.stringify(order), autoCastEnabled === undefined ? null : Number(autoCastEnabled), characterId);
+    if (result.changes !== 1) throw new Error('CHARACTER_NOT_FOUND');
+  }
+
+  public runInTransaction<T>(action: () => T): T {
+    this.db.exec('BEGIN IMMEDIATE');
+    try {
+      const result = action();
+      this.db.exec('COMMIT');
+      return result;
+    } catch (error) {
+      this.db.exec('ROLLBACK');
+      throw error;
+    }
+  }
+
+  public getSkillLevels(characterId: string): Record<string, number> {
+    const rows = this.db.prepare('SELECT skill_id, level FROM character_skills WHERE character_id = ?')
+      .all(characterId) as Array<{ skill_id: string; level: number }>;
+    return Object.fromEntries(rows.filter(row => SKILLS_DATABASE[row.skill_id]?.skillId === row.skill_id &&
+      Number.isInteger(row.level) && row.level >= 1 && row.level <= SKILL_MAX_LEVEL)
+      .map(row => [row.skill_id, row.level]));
+  }
+
+  public upgradeCharacterSkill(player: Player, skillId: string, expectedLevel: number) {
+    const skill = SKILLS_DATABASE[skillId];
+    if (!skill || skill.skillId !== skillId || skill.classType !== player.classType ||
+      SKILLS_DATABASE[player.getEquippedSkill(skill.slot)]?.skillId !== skillId || player.level < skill.unlockLevel ||
+      !canUpgradeSkillPower(skill)) throw new Error('INVALID_SKILL');
+    if (!Number.isInteger(expectedLevel) || expectedLevel < 1 || expectedLevel >= SKILL_MAX_LEVEL) {
+      throw new Error('INVALID_LEVEL');
+    }
+    return this.runInTransaction(() => {
+      const levels = this.getSkillLevels(player.dbCharacterId);
+      const currentLevel = levels[skillId] ?? 1;
+      if (currentLevel !== expectedLevel) throw new Error('STALE_LEVEL');
+      const cost = getSkillUpgradeCost(skill, currentLevel)!;
+      if (this.getCharacterGold(player.dbCharacterId) < cost.gold) throw new Error('INSUFFICIENT_GOLD');
+      if (!this.consumeItemQuantity(player.dbCharacterId, SKILL_UPGRADE_MATERIAL, cost.dust)) {
+        throw new Error('INSUFFICIENT_MATERIAL');
+      }
+      const gold = this.updateCharacterGold(player.dbCharacterId, -cost.gold);
+      this.db.prepare(`INSERT INTO character_skills (character_id, skill_id, level) VALUES (?, ?, ?)
+        ON CONFLICT(character_id, skill_id) DO UPDATE SET level = excluded.level`)
+        .run(player.dbCharacterId, skillId, currentLevel + 1);
+      levels[skillId] = currentLevel + 1;
+      // Read before COMMIT: a failed inventory refresh must roll back the whole purchase.
+      return { skillLevels: levels, gold, inventory: this.getInventory(player.dbCharacterId) };
+    });
   }
 
   /**

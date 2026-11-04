@@ -19,9 +19,10 @@ import {
   CardAlbumEntryPayload,
   CARDS_DATABASE,
   FarmHelperSettingsPayload,
-  OfflineLootItem,
+  OfflineRewardState,
 } from '@magicforge/shared';
-import { Entity } from './Entity';
+import { Entity, TakeDamageResult } from './Entity';
+import { HuntSession } from '../game/HuntSession';
 import { SERVER_CONFIG } from '../config';
 
 export class Player extends Entity {
@@ -44,6 +45,7 @@ export class Player extends Entity {
   public slotIndex: number = 0;
   public rebornCount: number = 0;
   public currentWorld: number = 1;
+  public unlockedWorld: number = 1;
   public currentStage: number = 1;
   public gold: number = 0;
   public maxInventorySlots: number = 20;
@@ -65,13 +67,15 @@ export class Player extends Entity {
 
   // Offline Progress / AFK Rewards (Baú do Tempo)
   public lastLogoutTime: number = 0;
-  public pendingOfflineReward: {
-    accumulatedGold: number;
-    accumulatedExp: number;
-    loot: OfflineLootItem[];
-    offlineSeconds: number;
-    cappedSeconds: number;
-  } | null = null;
+  public pendingOfflineReward: OfflineRewardState | null = null;
+  public offlineRewardsEvaluated: boolean = false;
+  public skillCastOrder: number[] = [1, 2, 3, 4];
+  public skillRotationCursor = 0;
+  public autoSkillDecisionTimerSec = 0;
+  public autoCastEnabled = true;
+  public readonly huntSession = new HuntSession();
+  public lastHuntReportRequestAt: number = 0;
+  public lastHuntReportResetAt: number = 0;
 
   // Resource & Skills
   public currentResource: number;
@@ -80,6 +84,7 @@ export class Player extends Entity {
   public resourceRegenPerSec: number = 8.0;
   public skillCooldowns = new Map<number, number>(); // slot -> remaining seconds
   public equippedSkills: Record<number, string>;
+  public skillLevels: Record<string, number> = {};
 
   public targetDestination: Vector3 | null = null;
   public moveDirection: Vector3 | null = null;
@@ -315,6 +320,8 @@ export class Player extends Entity {
   }
 
   public override update(deltaTimeSec: number): void {
+    // Includes travel, idle, stun and respawn downtime in the measured online rate.
+    this.huntSession.advance(deltaTimeSec);
     // Se estiver morto, avança timer de auto-revive e renasce no altar
     if (this.isDead) {
       this.deathTimer += deltaTimeSec;
@@ -437,6 +444,12 @@ export class Player extends Entity {
 
   public restoreResource(amount: number): void {
     this.currentResource = Math.min(this.maxResource, this.currentResource + amount);
+  }
+
+  public override takeDamage(damage: number, source?: Entity, isReflected = false): TakeDamageResult {
+    const result = super.takeDamage(damage, source, isReflected);
+    if (result.killed) this.huntSession.add('deaths');
+    return result;
   }
 
   public addExperience(amount: number): { leveledUp: boolean; newLevel: number; levelsGained: number } {

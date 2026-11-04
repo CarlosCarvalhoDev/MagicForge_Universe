@@ -4,3 +4,5 @@ export * from './entities';
 export * from './messages';
 export * from './skills';
 export * from './items';
+export * from './automation';
+export * from './skill-progression';

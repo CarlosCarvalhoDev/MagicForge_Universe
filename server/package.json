@@ -4,6 +4,12 @@
   "description": "MagicForge: Universe - 20Hz Authoritative Game Server",
   "main": "dist/server/src/index.js",
   "scripts": {
+    "benchmark:progression": "tsx tools/benchmark-progression.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "test:offline": "tsx --test tests/offline-rewards.test.ts tests/offline-policy.test.ts",
+    "test:hunt": "tsx --test tests/hunt-report.test.ts",
+    "test:automatic": "tsx --test tests/automatic-gameplay.test.ts",
+    "test:skills": "tsx --test tests/skill-upgrades.test.ts ../client/tests/skill-upgrades-ui.test.ts",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/server/src/index.js"

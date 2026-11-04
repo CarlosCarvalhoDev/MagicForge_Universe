@@ -232,7 +232,20 @@ export interface C2SEquipSkillPayload {
 
 export interface S2CSkillsUpdatePayload {
   equippedSkills: Record<number, string>;
+  skillLevels?: Record<string, number>;
   message?: string;
+}
+
+export interface C2SUpgradeSkillPayload {
+  skillId: string;
+  expectedLevel: number;
+}
+
+export interface S2CSkillUpgradeResultPayload {
+  skillId: string;
+  success: boolean;
+  skillLevels: Record<string, number>;
+  message: string;
 }
 
 // ==========================================
@@ -566,6 +579,14 @@ export interface C2SUpdateFarmSettingsPayload {
   settings: Partial<FarmHelperSettingsPayload>;
 }
 
+export interface C2SUpdateSkillRotationPayload { order: number[]; autoCastEnabled?: boolean; }
+export interface S2CSkillRotationPayload {
+  order: number[];
+  autoCastEnabled?: boolean;
+  success: boolean;
+  message?: string;
+}
+
 export interface S2CFarmSettingsUpdatePayload {
   settings: FarmHelperSettingsPayload;
   message?: string;
@@ -813,14 +834,47 @@ export interface OfflineLootItem {
 
 export interface S2COfflineRewardInfoPayload {
   offlineSeconds: number;
-  cappedSeconds: number; // Máximo 12h (43200s)
+  cappedSeconds: number; // Tempo efetivamente recompensado
+  maxOfflineSeconds?: number; // Limite decidido pelo servidor
   accumulatedGold: number;
   accumulatedExp: number;
   lootPreview: OfflineLootItem[];
   minThresholdSeconds: number; // 300s (5 min)
 }
 
+export interface OfflineRewardState {
+  accumulatedGold: number;
+  accumulatedExp: number;
+  loot: OfflineLootItem[];
+  offlineSeconds: number;
+  cappedSeconds: number;
+  maxOfflineSeconds: number;
+}
+
+/** Online session only. Sales, offline chests and dungeon completion prizes are excluded from hourly rates. */
+export interface S2CHuntReportPayload {
+  characterId: string;
+  characterName: string;
+  classType: CharacterClass;
+  level: number;
+  world: number;
+  stage: number;
+  channel: number;
+  elapsedSeconds: number;
+  kills: number; // Own final blows; party members still receive their actual EXP share.
+  combatExp: number;
+  lootGold: number;
+  autoSaleGold: number;
+  manualSaleGold: number;
+  hpPotionsUsed: number;
+  resourcePotionsUsed: number;
+  deaths: number;
+  expPerHour: number | null; // null until a full minute has been simulated
+  goldPerHour: number | null;
+}
+
 export interface C2SClaimOfflineRewardsPayload {
+  // Legado: ignorado pelo servidor. Bônus dependem de autorização no backend.
   multiplier?: number;
 }
 

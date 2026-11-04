@@ -118,6 +118,15 @@ export enum Opcode {
   C2S_CLAIM_OFFLINE_REWARDS = 0xB1,
   S2C_OFFLINE_REWARDS_CLAIMED = 0xB2,
 
+  // --- Online Hunt Session Analysis (0xC0 - 0xCF) ---
+  C2S_REQUEST_HUNT_REPORT = 0xC0,
+  S2C_HUNT_REPORT = 0xC1,
+  C2S_RESET_HUNT_REPORT = 0xC2,
+  C2S_UPDATE_SKILL_ROTATION = 0xC3,
+  S2C_SKILL_ROTATION = 0xC4,
+  C2S_UPGRADE_SKILL = 0xC5,
+  S2C_SKILL_UPGRADE_RESULT = 0xC6,
+
   // --- Heartbeat & Quality of Service (0xF0 - 0xFF) ---
   C2S_PING = 0xF0,
   S2C_PONG = 0xF1,

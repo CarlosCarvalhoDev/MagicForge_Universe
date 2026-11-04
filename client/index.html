@@ -245,45 +245,6 @@
         accent-color: #38bdf8;
       }
 
-      /* Virtual Joystick Styles (Mobile) */
-      #virtual-joystick-zone {
-        position: absolute;
-        bottom: 24px;
-        right: 24px;
-        width: 140px;
-        height: 140px;
-        z-index: 20;
-        touch-action: none;
-        user-select: none;
-      }
-
-      .joystick-base {
-        position: relative;
-        width: 130px;
-        height: 130px;
-        background: radial-gradient(circle, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
-        border: 2px solid rgba(56, 189, 248, 0.3);
-        border-radius: 50%;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(56, 189, 248, 0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-      }
-
-      .joystick-thumb {
-        position: absolute;
-        width: 50px;
-        height: 50px;
-        background: radial-gradient(circle, #38bdf8 0%, #0284c7 100%);
-        border: 2px solid #ffffff;
-        border-radius: 50%;
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
-        pointer-events: none;
-        transform: translate(0px, 0px);
-        transition: transform 0.05s ease-out;
-      }
-
       /* Bottom Combat & Action HUD */
       #bottom-action-container {
         position: absolute;
@@ -3881,12 +3842,6 @@
       </div>
     </aside>
 
-    <!-- Dynamic Floating Virtual Joystick (Appears only on touch / drag on left screen) -->
-    <div id="virtual-joystick-zone" style="display: none; position: fixed; pointer-events: none; z-index: 50; transform: translate(-50%, -50%);">
-      <div class="joystick-base" id="joystick-base">
-        <div class="joystick-thumb" id="joystick-thumb"></div>
-      </div>
-    </div>
 
     <!-- Right Vertical Navigation Dock (Ragnarok Mobile Style) -->
     <div id="right-vertical-dock">
@@ -3915,7 +3870,7 @@
     <!-- Left Tactical Drawer -->
     <aside class='bottom-center-toolbar runic-tactical-bar' id='tactical-action-bar' data-drawer-open='true' aria-label='Menu Tático Lateral'>
       <div class='tactical-drawer-items' id='tactical-drawer-items'>
-        <button id='btn-toggle-auto' class='btn-auto-toggle' type='button' title='Ativar/Desativar Combate Automático'>
+        <button id='btn-toggle-auto' class='btn-auto-toggle' type='button' title='Combate e movimento automáticos' disabled>
           <span id='auto-status-icon'>⚔️</span>
           <span id='auto-status-text'>AUTO ON</span>
         </button>
@@ -3994,16 +3949,8 @@
     </div>
 
     <!-- Combat Arc (Bottom-Right) -->
-    <div id="mobile-combat-arc-container">
-      <!-- Primary Attack -->
-      <button class="mobile-primary-btn" id="btn-primary-attack" type="button" title="Ataque Básico Autorizado [Espaço]">
-        <span class="attack-seal-ring" aria-hidden="true"></span>
-        <span class="mobile-primary-icon"><img id="attack-btn-svg" src="/assets/ui/icons/icon-attack-crest.svg" alt="" class="attack-crest-svg" /></span>
-        <span class="mobile-primary-label" id="attack-btn-label">Atacar</span>
-        <span class="attack-class-trait" id="attack-class-trait">Corte Rúnico</span>
-        <span class="attack-hotkey-pill">ESPAÇO</span>
-      </button>
-
+    <div id="mobile-combat-arc-container" class="automatic-skill-bar" aria-label="Ciclo de habilidades da esquerda para a direita">
+      <button id="btn-toggle-auto-cast" type="button" aria-pressed="true" disabled>Magias: AUTO</button>
       <!-- Slot 1 -->
       <button class="skill-arc-btn" id="skill-btn-1" data-slot="1" title="Habilidade Slot 1 [1]">
         <span class="skill-key-badge">1</span>
@@ -4095,7 +4042,21 @@
         </div>
 
         <!-- Container for the 4 Slot Sections -->
+        <div class="grimorio-tabs" role="tablist" aria-label="Grimório">
+          <button id="grimorio-tab-skills" type="button" role="tab" aria-selected="true" aria-controls="skillbook-slots-container">Habilidades</button>
+          <button id="grimorio-tab-rotation" type="button" role="tab" aria-selected="false" aria-controls="skill-rotation-panel">Ciclo automático</button>
+        </div>
+        <p id="skill-upgrade-status" role="status" aria-live="polite">Selecione uma habilidade para evoluir com ouro e Pó Arcano. Cada nível acrescenta 5% à potência do dano, cura ou escudo implementado.</p>
         <div class="grimorio-slots-container" id="skillbook-slots-container"></div>
+        <section id="skill-rotation-panel" role="tabpanel" hidden>
+          <p>As quatro habilidades selecionadas mantêm suas categorias. Organize a conjuração da esquerda para a direita.</p>
+          <p>O ciclo pula habilidades em recarga, bloqueadas ou sem recurso e continua pela próxima. Você ainda pode tocar numa habilidade para conjurá-la.</p>
+          <label class="auto-cast-setting"><input id="chk-auto-cast-enabled" type="checkbox" checked disabled> Conjurar magias automaticamente</label>
+          <p>Ao desativar, movimento, ataque básico e avanço continuam automáticos. Toque nas habilidades para conjurar quando estiverem prontas.</p>
+          <div id="skill-rotation-editor"></div>
+          <button id="btn-save-skill-rotation" type="button" class="btn-action-primary" disabled>Salvar ciclo</button>
+          <p id="skill-rotation-status" role="status" aria-live="polite"></p>
+        </section>
       </div>
     </div>
 

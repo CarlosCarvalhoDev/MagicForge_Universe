@@ -70,6 +70,15 @@ import {
   C2SClaimOfflineRewardsPayload,
   S2COfflineRewardsClaimedPayload,
   OfflineLootItem,
+  S2CHuntReportPayload,
+  C2SUpdateSkillRotationPayload,
+  S2CSkillRotationPayload,
+  isValidSkillCastOrder,
+  selectNextSkillSlot,
+  C2SUpgradeSkillPayload,
+  S2CSkillUpgradeResultPayload,
+  getSkillLevel,
+  getSkillUpgradeMultiplier,
 } from '@magicforge/shared';
 import { EntityManager } from './EntityManager';
 import { Entity, ActiveCombatStatus } from '../entities/Entity';
@@ -82,8 +91,14 @@ import { DatabaseManager } from '../database/DatabaseManager';
 import { SocialAuthService } from '../auth/SocialAuthService';
 import { DungeonManager } from './DungeonManager';
 import { PartyManager } from './PartyManager';
+import { calculateOfflineReward, OFFLINE_REWARD_POLICY } from './OfflineRewards';
 
 export class World {
+  public automationEnabled = true;
+  public automaticPortalHandler?: (player: Player) => void;
+  private automaticPortalTimerSec = 0;
+  private automaticBossRetrySec = 0;
+  private huntReportTimerSec: number = 0;
   public readonly entityManager = new EntityManager();
   public readonly spatialGrid = new SpatialGrid(20.0);
   public readonly db: DatabaseManager;
@@ -235,7 +250,7 @@ export class World {
    * Remove o jogador desta instância com opção de persistir estado.
    * Usado para desconexões e transferências suaves entre canais.
    */
-  public removePlayerFromWorld(connection: Connection, saveToDb: boolean = true): Player | null {
+  public removePlayerFromWorld(connection: Connection, saveToDb: boolean = true, markLogout: boolean = false): Player | null {
     this.connections.delete(connection.id);
     if (!connection.playerId) return null;
     const playerId = connection.playerId;
@@ -250,6 +265,7 @@ export class World {
         });
       }
       if (saveToDb) {
+        if (markLogout) player.lastLogoutTime = Date.now();
         this.db.savePlayer(player);
         console.log(`[World] Player "${player.name}" salvo no SQLite ao sair da instância ${this.instanceId}.`);
       }
@@ -666,6 +682,7 @@ export class World {
     // 6. Envia habilidades equipadas nos 4 slots
     connection.send(Opcode.S2C_SKILLS_UPDATE, {
       equippedSkills: player.equippedSkills,
+      skillLevels: player.skillLevels,
     } as S2CSkillsUpdatePayload);
 
     // 7. Envia configurações do Farm Helper (Automação Idle)
@@ -696,7 +713,11 @@ export class World {
     console.log(`[World] Player "${player.name}" (${player.classType}) entrou no mundo em [${player.position.x.toFixed(1)}, ${player.position.z.toFixed(1)}]. Total players ativos: ${this.entityManager.getAllPlayers().length}`);
 
     // 9. Processa Recompensas Offline (Baú do Tempo / Progresso AFK)
+    connection.send(Opcode.S2C_SKILL_ROTATION, { order: [...player.skillCastOrder], autoCastEnabled: player.autoCastEnabled, success: true } satisfies S2CSkillRotationPayload);
     this.checkAndNotifyOfflineRewards(connection, player);
+    // Reconnecting at the boss stage must never leave an empty, stalled arena.
+    if (this.automationEnabled && player.currentStage === 10 && !this.isBossActive && !this.isPortalOpen &&
+      player.unlockedWorld <= player.currentWorld) this.challengeStageBoss(player);
 
     return player;
   }
@@ -745,6 +766,87 @@ export class World {
     }
   }
 
+  public sendHuntReport(player: Player): void {
+    const connection = this.connections.get(player.id);
+    if (!connection?.isAuthenticated) return;
+    connection.send(Opcode.S2C_HUNT_REPORT, {
+      characterId: player.dbCharacterId, characterName: player.name, classType: player.classType,
+      level: player.level, world: player.currentWorld, stage: player.currentStage, channel: this.channelId,
+      ...player.huntSession.snapshot(),
+    } satisfies S2CHuntReportPayload);
+  }
+
+  public handleRequestHuntReport(connection: Connection, reset = false): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const player = this.entityManager.getPlayer(connection.playerId);
+    if (!player) return;
+    const now = Date.now();
+    if (reset) {
+      if (now - player.lastHuntReportResetAt < 1000) return;
+      player.lastHuntReportResetAt = now;
+      player.huntSession.reset();
+    } else {
+      if (now - player.lastHuntReportRequestAt < 1000) return;
+      player.lastHuntReportRequestAt = now;
+    }
+    this.sendHuntReport(player);
+  }
+
+  public handleUpdateSkillRotation(connection: Connection, payload?: C2SUpdateSkillRotationPayload): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const player = this.entityManager.getPlayer(connection.playerId);
+    if (!player) return;
+    if (!isValidSkillCastOrder(payload?.order) || (payload?.autoCastEnabled !== undefined && typeof payload.autoCastEnabled !== 'boolean')) {
+      connection.send(Opcode.S2C_SKILL_ROTATION, {
+        order: [...player.skillCastOrder], autoCastEnabled: player.autoCastEnabled, success: false, message: 'Escolha uma ordem com os quatro slots, sem repetir.',
+      } satisfies S2CSkillRotationPayload);
+      return;
+    }
+    try {
+      this.db.updateSkillCastOrder(player.dbCharacterId, payload.order, payload.autoCastEnabled);
+      if (payload.autoCastEnabled !== undefined) player.autoCastEnabled = payload.autoCastEnabled;
+      player.skillCastOrder = [...payload.order];
+      player.skillRotationCursor = 0;
+      connection.send(Opcode.S2C_SKILL_ROTATION, {
+        order: [...player.skillCastOrder], autoCastEnabled: player.autoCastEnabled, success: true, message: player.autoCastEnabled ? 'Magias automáticas ativadas. O ciclo segue da esquerda para a direita.' : 'Magias manuais ativadas. Movimento, ataque básico e avanço continuam automáticos.',
+      } satisfies S2CSkillRotationPayload);
+    } catch {
+      connection.send(Opcode.S2C_SKILL_ROTATION, {
+        order: [...player.skillCastOrder], autoCastEnabled: player.autoCastEnabled, success: false, message: 'Não foi possível salvar o ciclo. Tente novamente.',
+      } satisfies S2CSkillRotationPayload);
+    }
+  }
+
+  public handleUpgradeSkill(connection: Connection, payload?: C2SUpgradeSkillPayload): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const player = this.entityManager.getPlayer(connection.playerId);
+    if (!player) return;
+    let success = false;
+    let message = 'Não foi possível melhorar a habilidade. Tente novamente.';
+    const skillId = typeof payload?.skillId === 'string' ? payload.skillId : '';
+    try {
+      const result = this.db.upgradeCharacterSkill(player, skillId, payload?.expectedLevel as number);
+      player.skillLevels = result.skillLevels;
+      player.gold = result.gold;
+      player.inventory = result.inventory;
+      success = true;
+      message = `${SKILLS_DATABASE[skillId].name} melhorada para Nv. ${result.skillLevels[skillId]}!`;
+    } catch (error) {
+      const messages: Record<string, string> = {
+        INVALID_SKILL: 'Selecione uma habilidade liberada da sua classe com evolução disponível.',
+        INVALID_LEVEL: 'Nível inválido ou habilidade já no nível máximo.',
+        STALE_LEVEL: 'Esta melhoria já foi processada ou o nível mudou. Confira o nível atual.',
+        INSUFFICIENT_GOLD: 'Ouro insuficiente para esta melhoria.',
+        INSUFFICIENT_MATERIAL: 'Pó Arcano insuficiente. Obtenha mais no farm ou reciclando equipamentos.',
+      };
+      message = messages[error instanceof Error ? error.message : ''] ?? message;
+    }
+    connection.send(Opcode.S2C_SKILL_UPGRADE_RESULT, {
+      skillId, success, skillLevels: { ...player.skillLevels }, message,
+    } satisfies S2CSkillUpgradeResultPayload);
+    this.sendInventoryUpdate(player);
+  }
+
   public handlePlayerLevelUp(player: Player): void {
     this.broadcast(Opcode.S2C_PLAYER_LEVEL_UP, {
       playerId: player.id,
@@ -773,6 +875,22 @@ export class World {
    */
   public update(deltaTimeSec: number): void {
     this.currentTick++;
+    if (this.automationEnabled && this.automaticPortalHandler &&
+      (this.isPortalOpen || this.entityManager.getAllPlayers().some(player => player.unlockedWorld > player.currentWorld))) {
+      this.automaticPortalTimerSec += deltaTimeSec;
+      if (this.automaticPortalTimerSec >= 3) {
+        for (const player of this.entityManager.getAllPlayers()) {
+          if (!player.isDead && player.unlockedWorld > player.currentWorld && !this.dungeonManager.isPlayerInDungeon(player.id)) this.automaticPortalHandler(player);
+        }
+      }
+    } else { this.automaticPortalTimerSec = 0; }
+    if (this.automationEnabled && this.isBossAvailable && !this.isBossActive && !this.isPortalOpen) {
+      this.automaticBossRetrySec += deltaTimeSec;
+      if (this.automaticBossRetrySec >= 60) {
+        const player = this.entityManager.getAllPlayers().find(candidate => !candidate.isDead && !this.dungeonManager.isPlayerInDungeon(candidate.id));
+        if (player) { this.automaticBossRetrySec = 0; this.challengeStageBoss(player); }
+      }
+    } else { this.automaticBossRetrySec = 0; }
 
     // 1. Update all Players & Spatial Cell Index
     const players = this.entityManager.getAllPlayers();
@@ -781,10 +899,15 @@ export class World {
       this.spatialGrid.updateEntity(player);
 
       // Auto-Combat AI for Players (matching Unity AutoCombatController logic)
-      this.processPlayerAutoCombat(player);
+      this.processPlayerAutoCombat(player, deltaTimeSec);
 
       // Farm Helper AI for Players (Auto-Poção HP e MP)
       this.processPlayerFarmHelper(player);
+    }
+    this.huntReportTimerSec += deltaTimeSec;
+    if (this.huntReportTimerSec >= 5) {
+      this.huntReportTimerSec %= 5;
+      for (const player of players) this.sendHuntReport(player);
     }
 
     // 1.1. Update Daily Dungeons & Boss Rush
@@ -861,7 +984,7 @@ export class World {
 
       // Proximity auto-pickup (generous 6.0m vacuum radius for smooth idle play, respeitando autoLootEnabled)
       for (const player of players) {
-        if (!player.isDead && player.farmSettings.autoLootEnabled && distance(player.position, drop.position) <= 6.0) {
+        if (!player.isDead && player.farmSettings.autoLootEnabled && distance(player.position, drop.position) <= this.getAutoLootRange(player)) {
           this.lootItem(player, dropId);
           break; // drop picked up, break player loop
         }
@@ -872,8 +995,9 @@ export class World {
     this.broadcastSnapshot();
   }
 
-  private processPlayerAutoCombat(player: Player): void {
-    if (player.isDead) return;
+  private processPlayerAutoCombat(player: Player, deltaTimeSec: number): void {
+    if (player.isDead || player.isStunned()) return;
+    player.autoSkillDecisionTimerSec = Math.max(0, player.autoSkillDecisionTimerSec - deltaTimeSec);
 
     // If player has a target, check validity
     let target = player.targetId ? this.entityManager.getMonster(player.targetId) : null;
@@ -884,12 +1008,36 @@ export class World {
       player.targetId = target ? target.id : null;
     }
 
-    if (!target || target.isDead) return;
+    if (!target || target.isDead) {
+      if (this.automationEnabled) {
+        if (Math.hypot(player.position.x, player.position.z) > 3) player.setMoveDirection(createVector3(-player.position.x, 0, -player.position.z), 0);
+        else player.stopMoving();
+      }
+      return;
+    }
 
     const dist = distance(player.position, target.position);
+    if (this.automationEnabled) {
+      const stopDistance = Math.max(1.4, player.attackRange - 0.35);
+      if (dist > stopDistance) {
+        player.setMoveDirection(createVector3(target.position.x - player.position.x, 0, target.position.z - player.position.z), 0);
+      } else {
+        player.stopMoving();
+        if (player.autoCastEnabled && player.autoSkillDecisionTimerSec <= 0) {
+          player.autoSkillDecisionTimerSec = 0.1;
+          const next = selectNextSkillSlot(player.skillCastOrder, player.skillRotationCursor, slot => {
+            const skill = SKILLS_DATABASE[player.getEquippedSkill(slot)];
+            if (!skill || skill.classType !== player.classType || player.level < skill.unlockLevel ||
+              player.currentResource < skill.cost || (player.skillCooldowns.get(slot) ?? 0) > 0) return false;
+            return skill.isAoe ? this.castPlayerSkill(player, slot, undefined, target!.position) : this.castPlayerSkill(player, slot, target!.id);
+          });
+          if (next) player.skillRotationCursor = next.nextCursor;
+        }
+      }
+    }
 
     // If within attack range and cooldown ready, execute attack
-    if (dist <= player.attackRange) {
+    if (!target.isDead && dist <= player.attackRange) {
       // If moving, stop moving when in attack range (just like Unity AutoCombatController)
       if (player.isMoving && player.targetDestination) {
         player.stopMoving();
@@ -1485,7 +1633,8 @@ export class World {
     player.setSkillCooldown(slot, skill.cooldownSec);
 
     const castId = `cast_${Date.now()}_${++this.castSequence}`;
-    const basePower = calculateSkillPower(skill, player.attributes, player.level, player.maxHp);
+    const upgradeMultiplier = getSkillUpgradeMultiplier(getSkillLevel(player.skillLevels, skill.skillId));
+    const basePower = Math.round(calculateSkillPower(skill, player.attributes, player.level, player.maxHp) * upgradeMultiplier);
     const isCritical = Math.random() < player.attributes.destreza * 0.02;
     let finalPower = isCritical ? Math.round(basePower * 1.5) : basePower;
 
@@ -1552,7 +1701,7 @@ export class World {
             durationSec: 3.0,
             remainingSec: 3.0,
             expiresAtTick: this.currentTick + Math.round(3.0 * SERVER_CONFIG.TICK_RATE),
-            magnitude: Math.max(1, Math.round(player.attributes.forca * 0.35 + player.level)),
+            magnitude: Math.max(1, Math.round((player.attributes.forca * 0.35 + player.level) * upgradeMultiplier)),
             nextTickSec: 1.0,
           };
           singleTargetMonster.addStatus(bleedStatus);
@@ -1723,7 +1872,7 @@ export class World {
       }
     } else if (skill.skillId === 'guerreiro_nv2_2') {
       // Baluarte Inquebrável: absorve 30% HP Máximo por 6s e reflete 20% do dano
-      const shieldValue = Math.round(player.maxHp * 0.30);
+      const shieldValue = Math.round(player.maxHp * 0.30 * upgradeMultiplier);
       const shieldStatus: ActiveCombatStatus = {
         statusId: `status_${Date.now()}_${++this.statusSequence}`,
         type: 'SHIELD',
@@ -1852,7 +2001,7 @@ export class World {
       }
     } else if (skill.skillId === 'guerreiro_nv3_3') {
       // Última Resistência Imortal: imunidade contra morte por 5s, cura 40% HP e ondas de fogo marcial em 4m
-      const healAmount = Math.round(player.maxHp * 0.40);
+      const healAmount = Math.round(player.maxHp * 0.40 * upgradeMultiplier);
       const effectiveHeal = player.heal(healAmount);
       totalEffectiveDamageOrHeal = effectiveHeal;
       affectedEntityIds.push(player.id);
@@ -1884,7 +2033,7 @@ export class World {
       });
 
       // Onda de fogo marcial em 4m
-      const waveDmg = Math.round(player.attributes.forca * 2.0 + player.attributes.constituicao * 1.0);
+      const waveDmg = Math.round((player.attributes.forca * 2.0 + player.attributes.constituicao * 1.0) * upgradeMultiplier);
       const monsters = this.entityManager.getAllMonsters();
       for (const m of monsters) {
         if (!m.isDead && distanceSquared(player.position, m.position) <= 16.0) {
@@ -2019,6 +2168,7 @@ export class World {
     if (conn) {
       conn.send(Opcode.S2C_SKILLS_UPDATE, {
         equippedSkills: player.equippedSkills,
+        skillLevels: player.skillLevels,
         message: `Habilidade '${skill.name}' equipada no Slot ${slot}!`,
       } as S2CSkillsUpdatePayload);
     }
@@ -2087,11 +2237,13 @@ export class World {
 
     // 1. Authoritative Experience (EXP) & Level Up Progression
     if (killer && !killer.isDead && killer instanceof Player) {
+      killer.huntSession.add('kills');
       const expReward = monster.expReward;
       if (this.partyManager) {
         this.partyManager.distributePartyExp(killer, expReward, this);
       } else {
         const progress = killer.addExperience(expReward);
+        killer.huntSession.add('combatExp', expReward);
         this.db.savePlayer(killer);
         this.sendExpUpdate(killer, expReward, monster.name);
 
@@ -2125,6 +2277,10 @@ export class World {
         this.isBossAvailable = false;
         this.isPortalOpen = true;
         this.stageKills = 1;
+        for (const participant of this.entityManager.getAllPlayers()) {
+          participant.unlockedWorld = Math.max(participant.unlockedWorld, this.currentWorld + 1);
+          this.db.savePlayer(participant);
+        }
 
         this.broadcast(Opcode.S2C_BOSS_EVENT, {
           eventType: 'VICTORY',
@@ -2148,7 +2304,7 @@ export class World {
       }
     } else if (!this.isBossActive) {
       // Normal wave progression (Stages 1 to 9)
-      if (this.currentStage < 10) {
+      if (this.currentStage < 10 && !(this.automationEnabled && this.currentStage === 9 && this.isBossAvailable)) {
         this.stageKills++;
         if (this.stageKills >= this.killsPerStage) {
           this.stageKills = 0;
@@ -2244,17 +2400,26 @@ export class World {
     }
   }
 
+  private getAutoLootRange(player: Player): number {
+    // Ranged heroes must reach drops from targets killed at their normal attack
+    // range. Scatter is at most sqrt(2)m; melee retains the existing 6m radius.
+    return Math.max(6.0, player.attackRange + 1.5);
+  }
+
   public lootItem(player: Player, dropId: string): boolean {
     const drop = this.activeItemDrops.get(dropId);
     if (!drop) return false;
 
-    // Validate distance (generous leeway up to 7.0m for tap or lag)
-    if (distance(player.position, drop.position) > 7.0) {
+    // The range comes exclusively from server-owned stats/settings, never a packet.
+    const pickupRange = player.farmSettings.autoLootEnabled ? Math.max(7.0, this.getAutoLootRange(player)) : 7.0;
+    if (distance(player.position, drop.position) > pickupRange) {
       return false;
     }
 
     if (drop.itemId === 'gold') {
+      const previousGold = player.gold;
       player.gold = this.db.updateCharacterGold(player.dbCharacterId, drop.quantity);
+      player.huntSession.add('lootGold', player.gold - previousGold);
     } else if (drop.itemId.startsWith('card_')) {
       this.db.addCharacterCard(player.dbCharacterId, drop.itemId);
       player.cards = this.db.getCharacterCards(player.dbCharacterId);
@@ -2290,7 +2455,9 @@ export class World {
 
       if (shouldAutoSell) {
         const earnedGold = (itemDef.sellPrice || 10) * drop.quantity;
+        const previousGold = player.gold;
         player.gold = this.db.updateCharacterGold(player.dbCharacterId, earnedGold);
+        player.huntSession.add('autoSaleGold', player.gold - previousGold);
 
         const conn = this.connections.get(player.id);
         if (conn) {
@@ -2343,6 +2510,7 @@ export class World {
     if (!itemDef) return false;
 
     if (itemDef.type === ItemType.CONSUMIVEL) {
+      if (!this.db.removeItemFromInventory(player.dbCharacterId, slotIndex, 1)) return false;
       if (item.itemId === 'potion_hp_minor') {
         player.heal(50);
       } else if (item.itemId === 'potion_hp_major') {
@@ -2352,7 +2520,8 @@ export class World {
       } else if (item.itemId === 'potion_mp_major') {
         player.restoreResource(100);
       }
-      this.db.removeItemFromInventory(player.dbCharacterId, slotIndex, 1);
+      if (itemDef.healHp) player.huntSession.add('hpPotionsUsed');
+      if (itemDef.healResource) player.huntSession.add('resourcePotionsUsed');
     } else if (itemDef.type === ItemType.EQUIPAMENTO) {
       const equipRes = this.db.toggleEquipItem(
         player.dbCharacterId,
@@ -2401,7 +2570,9 @@ export class World {
 
     const earnedGold = (itemDef.sellPrice || 1) * item.quantity;
     this.db.removeItemFromInventory(player.dbCharacterId, slotIndex, item.quantity);
+    const previousGold = player.gold;
     player.gold = this.db.updateCharacterGold(player.dbCharacterId, earnedGold);
+    player.huntSession.add('manualSaleGold', player.gold - previousGold);
     player.inventory = this.db.getInventory(player.dbCharacterId);
 
     const conn = this.connections.get(player.id);
@@ -2517,7 +2688,9 @@ export class World {
     }
 
     if (itemsSold > 0) {
+      const previousGold = player.gold;
       player.gold = this.db.updateCharacterGold(player.dbCharacterId, goldEarned);
+      player.huntSession.add('manualSaleGold', player.gold - previousGold);
       player.inventory = this.db.getInventory(player.dbCharacterId);
       player.recalculateStatsFromEquipment();
 
@@ -2646,66 +2819,39 @@ export class World {
    * Avalia o tempo decorrido desde o último logout do herói e notifica com o Baú do Tempo (Recompensas AFK)
    * Regras canônicas de Idle RPG:
    * - Mínimo de 300s (5 minutos) para evitar popups incômodos em simples recarregamentos de página
-   * - Limite máximo de 43.200s (12 horas)
+   * - Limite gratuito de 8h; política premium de 12h reservada no backend
    * - Ganhos transparentes e progressivos baseados em Mundo, Fase e Nível do herói
    */
   public checkAndNotifyOfflineRewards(connection: Connection, player: Player): void {
-    if (!player.lastLogoutTime || player.lastLogoutTime <= 0) return;
-
-    const now = Date.now();
-    const elapsedSeconds = Math.floor((now - player.lastLogoutTime) / 1000);
-    const MIN_THRESHOLD_SEC = 300; // 5 minutos
-    const MAX_CAPPED_SEC = 43200; // 12 horas
-
-    if (elapsedSeconds < MIN_THRESHOLD_SEC) {
-      return;
+    if (!player.offlineRewardsEvaluated) {
+      const now = Date.now();
+      const reward = calculateOfflineReward(player, now, player.pendingOfflineReward);
+      // Persist before sending. Same Player is retained during channel transfers,
+      // so online time is never credited as another offline interval.
+      const previous = player.pendingOfflineReward;
+      const previousLogout = player.lastLogoutTime;
+      player.pendingOfflineReward = reward;
+      player.lastLogoutTime = now;
+      try {
+        this.db.saveOfflineRewardState(player);
+      } catch (error) {
+        player.pendingOfflineReward = previous;
+        player.lastLogoutTime = previousLogout;
+        throw error;
+      }
+      player.offlineRewardsEvaluated = true;
     }
-
-    const effectiveSeconds = Math.min(elapsedSeconds, MAX_CAPPED_SEC);
-
-    // Fórmulas transparentes de Idle RPG
-    const goldPerSec = player.currentWorld * 15 + player.currentStage * 5 + player.level * 3;
-    const expPerSec = player.currentWorld * 10 + player.currentStage * 4 + player.level * 2;
-
-    const accumulatedGold = Math.floor(effectiveSeconds * goldPerSec);
-    const accumulatedExp = Math.floor(effectiveSeconds * expPerSec);
-
-    // Gerador de materiais a cada 15 min (900s) de ausência
-    const lootPreview: OfflineLootItem[] = [];
-    const materialIntervals = Math.min(10, Math.floor(effectiveSeconds / 900));
-    if (materialIntervals > 0) {
-      lootPreview.push({
-        itemId: 'iron_ore',
-        name: 'Minério de Ferro Bruto',
-        rarity: 'COMUM',
-        quantity: materialIntervals * 2,
-      });
-      lootPreview.push({
-        itemId: 'potion_hp_minor',
-        name: 'Poção Menor de Cura',
-        rarity: 'COMUM',
-        quantity: Math.max(1, Math.floor(materialIntervals * 1.5)),
-      });
-    }
-
-    player.pendingOfflineReward = {
-      accumulatedGold,
-      accumulatedExp,
-      loot: lootPreview,
-      offlineSeconds: elapsedSeconds,
-      cappedSeconds: effectiveSeconds,
-    };
-
+    const reward = player.pendingOfflineReward;
+    if (!reward) return;
     connection.send(Opcode.S2C_OFFLINE_REWARD_INFO, {
-      offlineSeconds: elapsedSeconds,
-      cappedSeconds: effectiveSeconds,
-      accumulatedGold,
-      accumulatedExp,
-      lootPreview,
-      minThresholdSeconds: MIN_THRESHOLD_SEC,
+      offlineSeconds: reward.offlineSeconds,
+      cappedSeconds: reward.cappedSeconds,
+      maxOfflineSeconds: reward.maxOfflineSeconds,
+      accumulatedGold: reward.accumulatedGold,
+      accumulatedExp: reward.accumulatedExp,
+      lootPreview: reward.loot,
+      minThresholdSeconds: OFFLINE_REWARD_POLICY.minimumSeconds,
     } as S2COfflineRewardInfoPayload);
-
-    console.log(`[World] Herói "${player.name}" esteve offline por ${elapsedSeconds}s (efetivo: ${effectiveSeconds}s). Recompensa AFK gerada: ${accumulatedGold} Ouro, ${accumulatedExp} EXP.`);
   }
 
   /**
@@ -2729,36 +2875,61 @@ export class World {
       return { success: false, message: 'Nenhuma recompensa offline pendente para resgate.' };
     }
 
-    const safeMultiplier = Math.max(1, Math.min(3, Math.floor(multiplier || 1)));
+    // Legacy client multipliers are intentionally ignored: only backend entitlements
+    // may grant bonuses. Keeping the argument preserves old-client compatibility.
     const reward = player.pendingOfflineReward;
-    const finalGold = reward.accumulatedGold * safeMultiplier;
-    const finalExp = reward.accumulatedExp * safeMultiplier;
-
-    // 1. Concede Ouro
-    player.gold += finalGold;
-    this.db.updateCharacterGold(player.dbCharacterId, finalGold);
-
-    // 2. Concede EXP e processa avanço de nível
-    const progress = player.addExperience(finalExp);
-    if (progress.leveledUp) {
-      this.handlePlayerLevelUp(player);
+    const finalExp = reward.accumulatedExp;
+    const before = {
+      gold: player.gold, level: player.level, currentXp: player.currentXp,
+      baseAttributes: { ...player.baseAttributes }, attributes: { ...player.attributes },
+      currentHp: player.currentHp, maxHp: player.maxHp,
+      currentResource: player.currentResource, maxResource: player.maxResource,
+      inventory: player.inventory, pendingOfflineReward: reward,
+      lastLogoutTime: player.lastLogoutTime,
+    };
+    let leveledUp = false;
+    try {
+      this.db.runInTransaction(() => {
+        const persisted = this.db.getCharacterById(player.dbCharacterId);
+        if (persisted?.pending_offline_reward !== JSON.stringify(reward)) {
+          throw new Error('OFFLINE_REWARD_CHANGED');
+        }
+        for (const item of reward.loot) {
+          const maxStack = ITEMS_DATABASE[item.itemId].maxStack;
+          let remaining = item.quantity;
+          while (remaining > 0) {
+            const stack = this.db.getInventory(player.dbCharacterId)
+              .find(existing => existing.itemId === item.itemId && existing.quantity < maxStack);
+            const quantity = Math.min(remaining, stack ? maxStack - stack.quantity : maxStack);
+            if (!this.db.addItemToInventory(player.dbCharacterId, item.itemId, quantity, player.maxInventorySlots)) {
+              throw new Error('OFFLINE_INVENTORY_FULL');
+            }
+            remaining -= quantity;
+          }
+        }
+        player.inventory = this.db.getInventory(player.dbCharacterId);
+        player.gold = this.db.updateCharacterGold(player.dbCharacterId, reward.accumulatedGold);
+        leveledUp = player.addExperience(finalExp).leveledUp;
+        player.pendingOfflineReward = null;
+        this.db.savePlayer(player, true);
+      });
+    } catch (error) {
+      Object.assign(player, before);
+      const message = error instanceof Error && error.message === 'OFFLINE_INVENTORY_FULL'
+        ? 'Libere espaço na mochila para coletar todos os materiais. Seu baú continua guardado.'
+        : error instanceof Error && error.message === 'OFFLINE_REWARD_CHANGED'
+        ? 'Este baú foi atualizado em outra sessão. Reconecte para sincronizar suas recompensas.'
+        : 'Não foi possível resgatar agora. Seu baú continua guardado; tente novamente.';
+      const conn = this.connections.get(player.id);
+      conn?.send(Opcode.S2C_OFFLINE_REWARDS_CLAIMED, {
+        success: false, claimedGold: 0, claimedExp: 0, lootClaimed: [],
+        newGold: player.gold, newLevel: player.level, newExp: player.currentXp, message,
+      } as S2COfflineRewardsClaimedPayload);
+      return { success: false, message };
     }
-
-    // 3. Adiciona materiais na mochila
-    for (const item of reward.loot) {
-      try {
-        this.db.addItemToInventory(player.dbCharacterId, item.itemId, item.quantity);
-      } catch (err) {
-        console.warn(`[World] Falha ao adicionar item offline "${item.itemId}" para "${player.name}":`, err);
-      }
-    }
-    player.inventory = this.db.getInventory(player.dbCharacterId);
-
-    // 4. Limpa pendência e atualiza timestamp de logout
+    const finalGold = player.gold - before.gold;
+    if (leveledUp) this.handlePlayerLevelUp(player);
     const claimedLoot = [...reward.loot];
-    player.pendingOfflineReward = null;
-    player.lastLogoutTime = Date.now();
-    this.db.savePlayer(player);
 
     const conn = this.connections.get(player.id);
     if (conn) {
@@ -2850,6 +3021,13 @@ export class World {
 
     this.isBossActive = true;
     this.isBossAvailable = false;
+    this.isPortalOpen = false;
+    this.currentStage = 10;
+    this.stageKills = 0;
+    for (const participant of this.entityManager.getAllPlayers()) {
+      participant.currentStage = 10;
+      this.db.savePlayer(participant);
+    }
     this.bossTimerSec = 60.0;
     this.activeBossId = boss.id;
     this.activeBossName = boss.name;
@@ -2917,6 +3095,7 @@ export class World {
     this.stageKills = 0;
 
     player.currentWorld = this.currentWorld;
+    player.unlockedWorld = Math.max(player.unlockedWorld, player.currentWorld);
     player.currentStage = this.currentStage;
     this.db.savePlayer(player);
 
@@ -3088,11 +3267,13 @@ export class World {
   }
 
   public discardOrRecyclePlayerItem(player: Player, slotIndex: number): boolean {
+    const previousGold = player.gold;
     const res = this.db.discardOrRecycleItem(player.dbCharacterId, slotIndex);
     if (!res.success) return false;
 
     player.inventory = this.db.getInventory(player.dbCharacterId);
     player.gold = this.db.getCharacterGold(player.dbCharacterId);
+    player.huntSession.add('manualSaleGold', player.gold - previousGold);
     player.recalculateStatsFromEquipment();
 
     const conn = this.connections.get(player.id);

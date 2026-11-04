@@ -3,6 +3,7 @@ import type { S2COfflineRewardInfoPayload, S2COfflineRewardsClaimedPayload } fro
 export interface OfflineRewardTransport {
   isReady(): boolean;
   claim(multiplier?: number): void;
+  openInventory?(): void;
 }
 
 export function formatOfflineDuration(seconds: number): string {
@@ -17,6 +18,11 @@ export function formatOfflineDuration(seconds: number): string {
     return `${minutes}min ${secs}s`;
   }
   return `${secs}s`;
+}
+
+export function formatOfflineLimit(payload: S2COfflineRewardInfoPayload): string {
+  const limit = payload.maxOfflineSeconds ?? 8 * 3600;
+  return `Limite: ${formatOfflineDuration(limit)} · Tempo recompensado: ${formatOfflineDuration(payload.cappedSeconds)}`;
 }
 
 export class OfflineRewardModal {
@@ -48,7 +54,7 @@ export class OfflineRewardModal {
         <div class="offline-time-banner">
           <span class="offline-time-label">Tempo Ausente:</span>
           <span class="offline-time-value" id="offline-time-text">0min</span>
-          <span class="offline-time-cap" id="offline-time-cap-text">(Limite máximo: 12h)</span>
+          <span class="offline-time-cap" id="offline-time-cap-text"></span>
         </div>
 
         <div class="offline-rewards-grid">
@@ -75,9 +81,11 @@ export class OfflineRewardModal {
         </div>
 
         <footer class="offline-actions">
+          <p id="offline-claim-status" role="status" aria-live="polite"></p>
           <button type="button" class="btn-rpg-runic btn-claim-offline" id="btn-claim-offline">
             ✨ Coletar Recompensas
           </button>
+          <button type="button" class="btn-rpg-runic" id="btn-organize-offline">Organizar mochila</button>
         </footer>
       </div>
     `;
@@ -86,6 +94,11 @@ export class OfflineRewardModal {
 
     const claimBtn = dialog.querySelector('#btn-claim-offline') as HTMLButtonElement;
     claimBtn.addEventListener('click', () => this.handleClaim());
+    dialog.querySelector('#btn-organize-offline')?.addEventListener('click', () => {
+      if (this.isClaiming) return;
+      this.close();
+      this.transport.openInventory?.();
+    });
 
     return dialog;
   }
@@ -95,6 +108,8 @@ export class OfflineRewardModal {
     this.isClaiming = false;
 
     const timeText = this.dialog.querySelector('#offline-time-text') as HTMLElement;
+    const capText = this.dialog.querySelector('#offline-time-cap-text') as HTMLElement;
+    const statusText = this.dialog.querySelector('#offline-claim-status') as HTMLElement;
     const goldText = this.dialog.querySelector('#offline-gold-text') as HTMLElement;
     const expText = this.dialog.querySelector('#offline-exp-text') as HTMLElement;
     const lootContainer = this.dialog.querySelector('#offline-loot-container') as HTMLElement;
@@ -104,6 +119,8 @@ export class OfflineRewardModal {
     if (timeText) {
       timeText.textContent = formatOfflineDuration(payload.offlineSeconds);
     }
+    if (capText) capText.textContent = formatOfflineLimit(payload);
+    if (statusText) statusText.textContent = '';
 
     if (goldText) {
       goldText.textContent = `+${payload.accumulatedGold.toLocaleString('pt-BR')} Ouro`;
@@ -156,6 +173,16 @@ export class OfflineRewardModal {
 
   public onClaimed(result: S2COfflineRewardsClaimedPayload): void {
     this.isClaiming = false;
+    if (!result.success) {
+      const status = this.dialog.querySelector('#offline-claim-status') as HTMLElement;
+      if (status) status.textContent = result.message;
+      const button = this.dialog.querySelector('#btn-claim-offline') as HTMLButtonElement;
+      if (button) {
+        button.disabled = false;
+        button.textContent = '✨ Coletar Recompensas';
+      }
+      return;
+    }
     this.pendingPayload = null;
 
     if (this.dialog.open) {
@@ -171,6 +198,10 @@ export class OfflineRewardModal {
 
   public isOpen(): boolean {
     return this.dialog.open;
+  }
+
+  public reopen(): void {
+    if (this.pendingPayload) this.show(this.pendingPayload);
   }
 }
 

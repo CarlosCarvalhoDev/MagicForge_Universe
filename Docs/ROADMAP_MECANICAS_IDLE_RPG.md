@@ -2,6 +2,8 @@
 
 > **Finalidade deste documento**: Servir como ponto único de verdade (Single Source of Truth) entre o usuário, Antigravity e Codex. Contém o que já foi entregue, o que está em andamento e a ordem exata das próximas mecânicas a serem implementadas. Se qualquer conversa for reiniciada ou compactada, este documento orienta a retomada imediata sem perda de contexto.
 
+> **Atualização de direção — 03/11/2026:** a diretriz vigente é [Idle 100% automático](DIRETRIZ_IDLE_100_AUTOMATICO.md): movimento, ataque básico e avanço automáticos; conjuração AUTO/MANUAL opcional. Offline gratuito de 8h e política futura premium de 12h. Os números de testes e as descrições antigas abaixo são históricos. A Etapa 3 está implementada conforme [entrega do Grimório](ENTREGA_EVOLUCAO_HABILIDADES_2026-11-03.md); calibração econômica e comparação de investimentos contra chefes continuam pendentes.
+
 ---
 
 ## 📌 Status Atual do Projeto
@@ -92,13 +94,17 @@ flowchart TD
 
 ---
 
-### 📍 ETAPA 3: Progressão de Nível de Habilidades (Skill Up / Grimório) *(PRÓXIMO)*
+### ✅ ETAPA 3: Progressão de Nível de Habilidades (Skill Up / Grimório) *(IMPLEMENTADO; CUSTOS EM CALIBRAÇÃO)*
 * **Objetivo**: Permitir que habilidades ativas e truques evoluam além do nível base.
 * **Mecânica**:
   - Cada habilidade no Grimório pode subir de Nível 1 a Nível 20.
-  - Custo de upgrade em Ouro e Pergaminhos Arcanos.
-  - Cada nível aumenta o multiplicador de dano (% de ATK) ou a quantidade de escudo/cura da magia.
+  - Custo de upgrade em ouro e Pó Arcano já disponível no farm e na reciclagem; pergaminhos não foram introduzidos nesta entrega.
+  - Cada nível acrescenta 5% à potência base de dano, sangramento, cura ou escudo implementado, até +95% no nível 20. Cooldowns, recursos e durações permanecem iguais.
   - Persistência na tabela `character_skills` do SQLite.
+  - Compra autoritativa e atômica: ouro, material e nível são gravados juntos. Pedido repetido com o mesmo nível esperado não cobra novamente.
+  - Melhorias acompanham a habilidade ao trocar escolhas, reconectar e mudar de mundo; categorias, desbloqueios e ordem automática são preservados.
+  - Habilidades de suporte sem efeito de potência implementado exibem evolução indisponível e não cobram recursos.
+  - Próximo bloco: medir tempo até as melhorias e comparar habilidade, equipamento e sustentação contra chefes antes de fechar a economia.
 
 ---
 

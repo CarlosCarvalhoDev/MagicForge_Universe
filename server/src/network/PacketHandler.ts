@@ -34,6 +34,8 @@ import {
   C2SPartyLeavePayload,
   C2SPartyDisbandPayload,
   C2SClaimOfflineRewardsPayload,
+  C2SUpdateSkillRotationPayload,
+  C2SUpgradeSkillPayload,
   NetworkMessage,
   Opcode,
   S2CLoginSuccessPayload,
@@ -209,6 +211,20 @@ export class PacketHandler {
         break;
 
       // --- Idle Farm Helper & Bag Automation ---
+      case Opcode.C2S_UPDATE_SKILL_ROTATION:
+        this.getActiveWorld(connection).handleUpdateSkillRotation(connection, message.data as C2SUpdateSkillRotationPayload);
+        break;
+      case Opcode.C2S_UPGRADE_SKILL:
+        this.getActiveWorld(connection).handleUpgradeSkill(connection, message.data as C2SUpgradeSkillPayload);
+        break;
+      case Opcode.C2S_REQUEST_HUNT_REPORT:
+        this.getActiveWorld(connection).handleRequestHuntReport(connection);
+        break;
+
+      case Opcode.C2S_RESET_HUNT_REPORT:
+        this.getActiveWorld(connection).handleRequestHuntReport(connection, true);
+        break;
+
       case Opcode.C2S_UPDATE_FARM_SETTINGS:
         this.getActiveWorld(connection).handleUpdateFarmSettings(connection, message.data as C2SUpdateFarmSettingsPayload);
         break;
@@ -367,6 +383,7 @@ export class PacketHandler {
     }
 
     const world = this.getActiveWorld(connection);
+    if (world.automationEnabled) return;
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) {
       return;
@@ -476,7 +493,8 @@ export class PacketHandler {
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.enterPortal(player);
+    if (this.worldManager instanceof WorldManager) this.worldManager.advancePlayerAutomatically(player, world);
+    else world.enterPortal(player);
   }
 
   private handleExpandInventory(connection: Connection): void {

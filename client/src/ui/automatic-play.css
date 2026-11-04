@@ -1,0 +1,73 @@
+#mobile-combat-arc-container.automatic-skill-bar {
+  position: fixed !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px;
+  width: min(360px, calc(100vw - 28px)) !important;
+  height: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  top: auto !important;
+  transform: translateX(-50%) !important;
+  pointer-events: auto !important;
+  padding: 12px;
+  border: 1px solid #b99954;
+  border-radius: 12px;
+  background: rgba(13, 19, 32, 0.94);
+}
+
+#mobile-combat-arc-container.automatic-skill-bar .skill-arc-btn {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1;
+  border-radius: 10px;
+}
+
+.grimorio-tabs { display: flex; gap: 10px; padding: 12px; }
+.grimorio-tabs button { flex: 1; min-height: 44px; color: #eee0bf; background: #182238; border: 1px solid #856a39; border-radius: 8px; }
+.grimorio-tabs button[aria-selected="true"] { background: #514020; border-color: #fbbf24; }
+#skillbook-slots-container[hidden], #skill-rotation-panel[hidden] { display: none !important; }
+#skill-rotation-panel { padding: 16px; color: #e2e8f0; }
+#skill-rotation-panel p { font-size: 13px; line-height: 1.5; }
+#skill-rotation-editor { display: grid; grid-template-columns: repeat(4, minmax(112px, 1fr)); gap: 8px; margin: 14px 0; overflow-x: auto; }
+.rotation-slot { min-width: 0; padding: 12px 8px; border: 1px solid #856a39; border-radius: 10px; background: #121c2e; }
+.rotation-slot strong, .rotation-slot span { display: block; overflow-wrap: anywhere; }
+.rotation-slot strong { color: #fbbf24; font-size: 13px; }
+.rotation-slot span { color: #b9c4d4; font-size: 11px; margin: 8px 0; }
+.rotation-slot button { width: 50%; min-height: 44px; color: #e2e8f0; background: #24314b; border: 1px solid #856a39; }
+#btn-save-skill-rotation { width: 100%; min-height: 44px; }
+#btn-toggle-auto:disabled { opacity: 1; cursor: default; }
+#btn-enter-portal { display: none !important; }
+#bottom-center-zone {
+  left: 18px !important;
+  right: auto !important;
+  bottom: 24px !important;
+  transform: none !important;
+  max-width: max(180px, calc(50vw - 220px)) !important;
+}
+@media (max-width: 1000px) {
+  #bottom-center-zone {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: min(440px, calc(100vw - 28px));
+    max-width: none !important;
+    bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+@media (max-width: 600px) {
+  #bottom-center-zone { bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important; }
+}
+
+#mobile-combat-arc-container.automatic-skill-bar #btn-toggle-auto-cast { grid-column: 1 / -1; order: -1; min-height: 36px; border: 1px solid #b99954; border-radius: 7px; background: #24314b; color: #eee0bf; cursor: pointer; }
+#btn-toggle-auto-cast[aria-pressed="false"] { background: #453821 !important; }
+.auto-cast-setting { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.skill-upgrade-controls { margin-top: 10px; padding-top: 10px; border-top: 1px solid #856a39; }
+.skill-upgrade-controls p { color: #cbd5e1; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.btn-upgrade-skill { width: 100%; min-height: 44px; border: 1px solid #b99954; border-radius: 8px; color: #fef3c7; background: #514020; cursor: pointer; }
+.btn-upgrade-skill:disabled { opacity: .65; cursor: default; }
+#skill-upgrade-status { margin: 8px 16px; color: #e8dcb7; font-size: 13px; line-height: 1.5; }
+@media (max-width: 1000px) { #bottom-center-zone { bottom: calc(176px + env(safe-area-inset-bottom, 0px)) !important; } }
