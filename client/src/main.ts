@@ -26,6 +26,8 @@ import {
   S2CCardsUpdatePayload,
   S2CFarmSettingsUpdatePayload,
   bagItems,
+  getSkillTargeting,
+  isSkillEffectAvailable,
 } from '@magicforge/shared';
 import { ClientNetwork } from './network/ClientNetwork';
 import { SnapshotBuffer, InterpolatedEntity } from './interpolation/SnapshotBuffer';
@@ -47,6 +49,9 @@ import { setupSkillRotation } from './ui/SkillRotation';
 import { setupSkillUpgrades } from './ui/SkillUpgrades';
 import { DEFAULT_INVENTORY_VIEW, selectBagView, itemBonuses, type InventoryViewState } from './ui/InventoryView';
 import './ui/inventory-view.css';
+import { setupEquipmentFusion } from './ui/EquipmentFusion';
+import './ui/equipment-fusion.css';
+import { setupEquipmentAdvice } from './ui/EquipmentAdvice';
 import { setupInventoryTooltip } from './ui/InventoryTooltip';
 import './ui/hunt-report.css';
 import './ui/auth-selection.css';
@@ -186,9 +191,11 @@ const btnQuickUseAction = document.getElementById('btn-quick-use-action') as HTM
 
 let playerLevel: number = 1;
 let playerRebornCount = 0;
+let equipmentFusion: ReturnType<typeof setupEquipmentFusion> | undefined;
 let inventoryExpansion: ReturnType<typeof setupInventoryExpansion> | undefined;
 function refreshExpansionContext() {
   inventoryExpansion?.setContext({ maxSlots: playerMaxInventorySlots, gold: playerGold, level: playerLevel, reborn: playerRebornCount });
+  equipmentFusion?.setContext({ items: playerInventory, gold: playerGold, level: playerLevel, classType: myPlayerClass });
 }
 let playerCurrentXp: number = 0;
 let playerXpToNextLevel: number = 150;
@@ -401,9 +408,9 @@ function updateEquippedSkillsUI() {
       } else {
         slotUI.button.classList.remove('slot-locked');
         if (lockOverlay) lockOverlay.remove();
-        slotUI.cost.textContent = `${s.cost} ${s.resourceType === 'Energia' ? 'EN' : 'MP'}`;
+        slotUI.cost.textContent = !isSkillEffectAvailable(s) ? 'Em preparo' : `${s.cost} ${s.resourceType === 'Energia' ? 'EN' : 'MP'}`;
         slotUI.cost.style.color = s.resourceType === 'Energia' ? '#facc15' : '#38bdf8';
-        slotUI.button.title = `[Slot ${s.slot} • ${s.tierName || `Tier ${s.tier}`}] ${s.name} · Habilidade Nv. ${skillUpgradeUI?.getLevel(s.skillId) ?? 1}\nCusto: ${s.cost} ${s.resourceType} • Recarga: ${s.cooldownSec}s • Alcance: ${s.range}m\n${s.description}`;
+        slotUI.button.title = !isSkillEffectAvailable(s) ? 'Efeito em preparação. Toque para escolher outra habilidade no Grimório.' : `[Slot ${s.slot} • ${s.tierName || `Tier ${s.tier}`}] ${s.name} · Habilidade Nv. ${skillUpgradeUI?.getLevel(s.skillId) ?? 1}\nCusto: ${s.cost} ${s.resourceType} • Recarga: ${s.cooldownSec}s • Alcance: ${s.range}m\n${s.description}`;
       }
     }
   }
@@ -486,7 +493,8 @@ function renderGrimorioSkills(classType: CharacterClass) {
 
     slotSkills.forEach((s) => {
       const isEquipped = isUnlocked && equippedSkill?.skillId === s.skillId;
-      const canEquip = isUnlocked;
+      const effectReady = isSkillEffectAvailable(s);
+      const canEquip = isUnlocked && effectReady;
 
       let role = 'Ofensivo';
       let roleClass = 'ofensivo';
@@ -525,7 +533,7 @@ function renderGrimorioSkills(classType: CharacterClass) {
         </div>
         <p class="skill-v2-desc">${s.description}</p>
         <button class="btn-equip-skill ${isEquipped ? 'active' : canEquip ? 'equip' : 'locked'}" ${isEquipped || !canEquip ? 'disabled' : ''}>
-          ${isEquipped ? `✓ SELECIONADA NO SLOT ${cfg.slot}` : canEquip ? `⚔️ SELECIONAR PARA O SLOT ${cfg.slot}` : `🔒 LIBERA COM O SLOT (NV. ${cfg.unlockLevel})`}
+          ${!effectReady ? `⏳ EFEITO EM PREPARAÇÃO` : isEquipped ? `✓ SELECIONADA NO SLOT ${cfg.slot}` : canEquip ? `⚔️ SELECIONAR PARA O SLOT ${cfg.slot}` : `🔒 LIBERA COM O SLOT (NV. ${cfg.unlockLevel})`}
         </button>
       `;
 
@@ -540,7 +548,7 @@ function renderGrimorioSkills(classType: CharacterClass) {
         equipped: isEquipped,
         heroLevel: playerLevel,
         gold: playerGold,
-        dust: playerInventory.filter(item => item.itemId === 'arcane_dust').reduce((total, item) => total + item.quantity, 0),
+        dust: playerInventory.filter(item => !item.isLocked && item.itemId === 'arcane_dust').reduce((total, item) => total + item.quantity, 0),
       }));
       cardsRow.appendChild(card);
     });
@@ -605,6 +613,8 @@ let playerCombatPower: number = 1000;
 let selectedSlotIndex: number | null = null;
 
 function getItemEmoji(itemId: string, type: ItemType): string {
+  if (itemId.startsWith('wraps_')) return '🥊';
+  if (itemId.startsWith('focus_')) return '🔮';
   if (itemId === 'gold') return '💰';
   if (itemId.includes('stone_forge')) return '💎';
   if (itemId.includes('gem_ruby')) return '🔴';
@@ -629,21 +639,23 @@ function getItemEmoji(itemId: string, type: ItemType): string {
   return '📦';
 }
 
-let currentSubmenuTab: 'mochila' | 'refino' | 'pedras' | 'cartas' = 'mochila';
+let currentSubmenuTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila';
 let playerCards: CardAlbumEntryPayload[] = [];
 let selectedRefineSlot: number | null = null;
 let selectedGemItemId: string | null = null;
 
-function switchSubmenuTab(tabName: 'mochila' | 'refino' | 'pedras' | 'cartas') {
+function switchSubmenuTab(tabName: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas') {
   currentSubmenuTab = tabName;
   const tabBtns: Record<string, string> = {
     mochila: 'tab-btn-mochila',
+    fusao: 'tab-btn-fusao',
     refino: 'tab-btn-refino',
     pedras: 'tab-btn-pedras',
     cartas: 'tab-btn-cartas',
   };
   const tabPanels: Record<string, string> = {
     mochila: 'tab-mochila',
+    fusao: 'tab-fusao',
     refino: 'tab-refino',
     pedras: 'tab-pedras',
     cartas: 'tab-cartas',
@@ -664,7 +676,10 @@ function switchSubmenuTab(tabName: 'mochila' | 'refino' | 'pedras' | 'cartas') {
     }
   });
 
-  if (tabName === 'refino') {
+  if (tabName === 'fusao') {
+    refreshExpansionContext();
+    equipmentFusion?.onOpen();
+  } else if (tabName === 'refino') {
     updateRefinementView();
   } else if (tabName === 'pedras') {
     updatePedrasView();
@@ -756,7 +771,7 @@ function updateRefinementView() {
   const stoneName = stoneDef ? stoneDef.name : 'Pedra de Refinamento';
   const stoneEmoji = stoneDef?.icon || '💎';
   const playerStones = playerInventory
-    .filter((i) => i.itemId === stoneId)
+    .filter((i) => !i.isLocked && i.itemId === stoneId)
     .reduce((sum, i) => sum + i.quantity, 0);
 
   const hasStone = playerStones >= stoneCount;
@@ -858,7 +873,7 @@ function updatePedrasView() {
   // Find gems in player's inventory
   const gemsInBag = playerInventory.filter((i) => {
     const def = ITEMS_DATABASE[i.itemId];
-    return def && (def.type === ItemType.GEMA || i.itemId.startsWith('gem_'));
+    return !i.isLocked && def && (def.type === ItemType.GEMA || i.itemId.startsWith('gem_'));
   });
 
   if (gemBagList) {
@@ -1011,7 +1026,7 @@ function updateCartasView() {
   }
 }
 
-function openUnifiedHeroModal(defaultTab: 'mochila' | 'refino' | 'pedras' | 'cartas' = 'mochila') {
+function openUnifiedHeroModal(defaultTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila') {
   if (!inventoryModal) return;
   inventoryModal.style.display = 'flex';
   if (characterModal && characterModal !== inventoryModal) {
@@ -1034,7 +1049,7 @@ function closeUnifiedHeroModal() {
   if (characterModal) characterModal.style.display = 'none';
 }
 
-function toggleUnifiedHeroModal(defaultTab: 'mochila' | 'refino' | 'pedras' | 'cartas' = 'mochila', force?: boolean) {
+function toggleUnifiedHeroModal(defaultTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila', force?: boolean) {
   if (!inventoryModal) return;
   const isCurrentlyOpen = inventoryModal.style.display === 'flex';
   const shouldOpen = force !== undefined ? force : !isCurrentlyOpen;
@@ -1097,6 +1112,7 @@ if (tabBtnRefino) tabBtnRefino.addEventListener('click', () => switchSubmenuTab(
 const tabBtnPedras = document.getElementById('tab-btn-pedras');
 if (tabBtnPedras) tabBtnPedras.addEventListener('click', () => switchSubmenuTab('pedras'));
 
+document.getElementById('tab-btn-fusao')?.addEventListener('click', () => switchSubmenuTab('fusao'));
 const tabBtnCartas = document.getElementById('tab-btn-cartas');
 if (tabBtnCartas) tabBtnCartas.addEventListener('click', () => switchSubmenuTab('cartas'));
 
@@ -1159,6 +1175,16 @@ const inventoryViewState: InventoryViewState = { ...DEFAULT_INVENTORY_VIEW };
 const inventorySearch = document.getElementById('inventory-search') as HTMLInputElement;
 const inventoryTypeFilter = document.getElementById('inventory-type-filter') as HTMLSelectElement;
 const inventoryTooltip = inventorySlotsGrid ? setupInventoryTooltip(inventorySlotsGrid, () => playerInventory) : null;
+const equipmentAdvice = setupEquipmentAdvice({
+  isReady: () => network.isConnected && network.isAuthenticated && farmPlayerReady,
+  request: () => network.sendRequestEquipmentAdvice(),
+  inspect: slot => {
+    selectInventorySlot(slot);
+    document.getElementById('inventory-inspector')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  },
+});
+
+
 function updateInventoryView() {
   inventoryViewState.query = inventorySearch.value;
   inventoryViewState.type = inventoryTypeFilter.value;
@@ -1180,7 +1206,7 @@ function renderInventorySlots() {
   document.getElementById('inventory-view-summary')!.textContent = `${visibleItems.length} itens · Equipados ficam fora da mochila.`;
 
   // Render up to 50 slots
-  const totalSlotsToDisplay = filtered ? visibleItems.length : Math.max(20, playerMaxInventorySlots + (playerMaxInventorySlots < 100 ? 5 : 0));
+  const totalSlotsToDisplay = filtered ? visibleItems.length : Math.max(20, playerMaxInventorySlots + (playerMaxInventorySlots < 50 ? Math.min(5, 50 - playerMaxInventorySlots) : 0));
   if (!totalSlotsToDisplay) {
     const empty = document.createElement('p'); empty.className = 'inventory-view-empty'; empty.textContent = 'Nenhum item corresponde à busca. Limpe ou ajuste os filtros.'; inventorySlotsGrid.appendChild(empty);
   }
@@ -1225,6 +1251,11 @@ function renderInventorySlots() {
         nameEl.className = 'inventory-tile-name';
         nameEl.textContent = itemDef.name;
         slotEl.appendChild(nameEl);
+        if (item.isLocked) {
+          const badge = document.createElement('span'); badge.className = 'inventory-lock-badge'; badge.textContent = '🔒';
+          slotEl.appendChild(badge);
+          slotEl.setAttribute('aria-label', slotEl.getAttribute('aria-label') + ' · protegido');
+        }
 
         if (item.quantity > 1) {
           const qtyBadge = document.createElement('span');
@@ -1272,6 +1303,15 @@ function selectInventorySlot(slotIndex: number) {
   renderInventorySlots();
 
   const item = playerInventory.find((i) => i.slotIndex === slotIndex);
+  const lockButton = document.getElementById('btn-inventory-lock') as HTMLButtonElement;
+  lockButton.hidden = !item;
+  if (item) {
+    lockButton.setAttribute('aria-pressed', String(!!item.isLocked));
+    lockButton.textContent = item.isLocked ? '🔓 Desproteger' : '🔒 Proteger';
+    lockButton.title = 'Protege contra venda, reciclagem e consumo. Equipar e refinar continuam permitidos.';
+    lockButton.onclick = () => network.sendSetItemLock(item.slotIndex, !item.isLocked);
+  }
+
 
   const itemDef = item ? ITEMS_DATABASE[item.itemId] : null;
 
@@ -1438,10 +1478,10 @@ function selectInventorySlot(slotIndex: number) {
       }
     } else if (itemDef.type === ItemType.CONSUMIVEL) {
       btnInventoryAction.style.display = 'block';
-      btnInventoryAction.disabled = false;
-      btnInventoryAction.style.opacity = '1';
-      btnInventoryAction.style.cursor = 'pointer';
-      btnInventoryAction.textContent = 'Usar Item (Consumir)';
+      btnInventoryAction.disabled = !!item.isLocked;
+      btnInventoryAction.style.opacity = item.isLocked ? '0.5' : '1';
+      btnInventoryAction.style.cursor = item.isLocked ? 'default' : 'pointer';
+      btnInventoryAction.textContent = item.isLocked ? 'Item protegido' : 'Usar Item (Consumir)';
       btnInventoryAction.style.background = 'linear-gradient(135deg, #059669, #047857)';
       btnInventoryAction.onclick = () => {
         network.sendUseItem(item.slotIndex);
@@ -1453,8 +1493,8 @@ function selectInventorySlot(slotIndex: number) {
 
   if (btnInventoryDiscard) {
     btnInventoryDiscard.style.display = 'flex';
-    btnInventoryDiscard.disabled = item.isEquipped;
-    btnInventoryDiscard.title = item.isEquipped ? 'Desequipe antes de reciclar.' : 'Reciclar item selecionado';
+    btnInventoryDiscard.disabled = item.isEquipped || !!item.isLocked;
+    btnInventoryDiscard.title = item.isLocked ? 'Desproteja antes de reciclar.' : item.isEquipped ? 'Desequipe antes de reciclar.' : 'Reciclar item selecionado';
     btnInventoryDiscard.onclick = () => {
       network.sendDiscardItem(item.slotIndex);
       addChatMessage('Forja', `♻️ Enviando [${itemDef.name}] para reciclagem na Forja Astral...`, 'sys');
@@ -1773,9 +1813,20 @@ const leaderboard = setupLeaderboard({
   isReady: () => network.isConnected && network.isAuthenticated && farmPlayerReady,
   request: (category, limit) => network.sendRequestLeaderboard(category, limit),
 });
+equipmentFusion = setupEquipmentFusion({
+  isReady: () => network.isConnected && network.isAuthenticated && farmPlayerReady,
+  send: request => network.sendFuseEquipment(request),
+  inspect: instanceId => {
+    const item = playerInventory.find(item => item.instanceId === instanceId);
+    if (!item) { addChatMessage('Forja', 'Atualize a mochila para localizar o resultado.', 'sys'); return; }
+    switchSubmenuTab('mochila'); selectInventorySlot(item.slotIndex);
+  },
+  openFarm: () => { closeInventory(); openFarmHelper(); },
+});
+network.onFusionResult = result => equipmentFusion?.onResult(result);
 inventoryExpansion = setupInventoryExpansion({
   isReady: () => network.isConnected && network.isAuthenticated && farmPlayerReady,
-  send: () => network.sendExpandInventory(),
+  send: expectedMaxSlots => network.sendExpandInventory(expectedMaxSlots),
   apply: result => {
     playerMaxInventorySlots = result.newMaxSlots;
     playerGold = result.remainingGold;
@@ -1784,6 +1835,7 @@ inventoryExpansion = setupInventoryExpansion({
     renderInventorySlots();
   },
 });
+network.onEquipmentAdvice = result => equipmentAdvice.onResult(result);
 network.onExpandInventoryResult = result => inventoryExpansion!.onResult(result);
 network.onLeaderboardUpdate = data => leaderboard.onUpdate(data);
 const bossNarrative = setupBossNarrative();
@@ -1800,6 +1852,13 @@ offlineChestButton.className = 'dock-btn';
 offlineChestButton.textContent = '⏳ Baú do Tempo';
 offlineChestButton.style.display = 'none';
 btnDockFarm?.insertAdjacentElement('afterend', offlineChestButton);
+const offlineInventoryButton = document.createElement('button');
+offlineInventoryButton.type = 'button';
+offlineInventoryButton.id = 'btn-inventory-offline-chest';
+offlineInventoryButton.textContent = '⏳ Retirar itens do Baú do Tempo';
+offlineInventoryButton.hidden = true;
+document.getElementById('inventory-expansion-status')?.insertAdjacentElement('afterend', offlineInventoryButton);
+offlineInventoryButton.addEventListener('click', () => { closeInventory(); offlineRewardModal.reopen(); });
 offlineChestButton.addEventListener('click', () => {
   closeInventory();
   offlineRewardModal.reopen();
@@ -1810,7 +1869,8 @@ network.onOfflineRewardInfo = (payload) => {
 };
 network.onOfflineRewardsClaimed = (payload) => {
   offlineRewardModal.onClaimed(payload);
-  if (payload.success) offlineChestButton.style.display = 'none';
+  if (payload.success) offlineInventoryButton.hidden = !payload.remainingReward;
+  if (payload.success) offlineChestButton.style.display = payload.remainingReward ? '' : 'none';
   addChatMessage('Baú do Tempo', payload.message, 'sys');
 };
 
@@ -1996,8 +2056,8 @@ function updateQuickPotionsUI() {
   let hpCount = 0;
   let mpCount = 0;
   playerInventory.forEach((i) => {
-    if (i.itemId.startsWith('potion_hp_')) hpCount += i.quantity;
-    if (i.itemId.startsWith('potion_mp_')) mpCount += i.quantity;
+    if (!i.isLocked && i.itemId.startsWith('potion_hp_')) hpCount += i.quantity;
+    if (!i.isLocked && i.itemId.startsWith('potion_mp_')) mpCount += i.quantity;
   });
   quickHpCount.textContent = `HP (${hpCount})`;
   quickMpCount.textContent = `MP (${mpCount})`;
@@ -2006,7 +2066,7 @@ function updateQuickPotionsUI() {
 if (btnQuickHp) {
   btnQuickHp.addEventListener('click', (e) => {
     e.stopPropagation();
-    const hpPotion = playerInventory.find((i) => i.itemId.startsWith('potion_hp_'));
+    const hpPotion = playerInventory.find((i) => !i.isLocked && i.itemId.startsWith('potion_hp_'));
     if (hpPotion) {
       network.sendUseItem(hpPotion.slotIndex);
       addChatMessage('Item', 'Usou Poção de Vida!', 'loot');
@@ -2019,7 +2079,7 @@ if (btnQuickHp) {
 if (btnQuickMp) {
   btnQuickMp.addEventListener('click', (e) => {
     e.stopPropagation();
-    const mpPotion = playerInventory.find((i) => i.itemId.startsWith('potion_mp_'));
+    const mpPotion = playerInventory.find((i) => !i.isLocked && i.itemId.startsWith('potion_mp_'));
     if (mpPotion) {
       network.sendUseItem(mpPotion.slotIndex);
       addChatMessage('Item', 'Usou Poção de Mana/Energia!', 'loot');
@@ -2134,6 +2194,8 @@ network.onConnectionStateChange = (connected) => {
     skillUpgradeUI?.reset();
     leaderboard.onDisconnected();
     inventoryExpansion?.onDisconnected();
+    equipmentFusion?.onDisconnected();
+    equipmentAdvice.reset();
     bossNarrative.reset();
     renderer.resetNarrative();
     renderer.setStagePresentation({ world: 1 });
@@ -2179,7 +2241,7 @@ network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
   if (event.casterId === network.myPlayerId) {
     const slotUI = skillSlots[event.slot];
     if (slotUI && slotUI.definition) {
-      cooldownMap.set(event.slot, performance.now() + slotUI.definition.cooldownSec * 1000);
+      cooldownMap.set(event.slot, performance.now() + (event.cooldownRemainingSec ?? slotUI.definition.cooldownSec) * 1000);
     }
   }
 
@@ -2357,6 +2419,7 @@ network.onChatMessage = (payload) => {
 
 network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
   playerInventory = payload.slots;
+  equipmentAdvice.sync(playerInventory);
   playerGold = payload.gold;
   if (skillbookModal?.style.display === 'flex') renderGrimorioSkills(myPlayerClass);
   playerCombatPower = payload.totalCombatPower;
@@ -2453,6 +2516,7 @@ network.onPlayerExpUpdate = (payload) => {
   if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
   if (playerLevel !== prevLevel) {
+    equipmentAdvice.reset();
     updateEquippedSkillsUI();
   }
 
@@ -2486,6 +2550,7 @@ network.onSocketResult = (payload: S2CSocketResultPayload) => {
 };
 
 network.onCardsUpdate = (payload: S2CCardsUpdatePayload) => {
+  equipmentAdvice.reset();
   playerCards = payload.cards;
   if (payload.message) {
     addChatMessage('Álbum de Cartas', payload.message, 'sys');
@@ -2501,6 +2566,7 @@ network.onPlayerLevelUp = (payload) => {
     if (other) renderer.addLevelUpEffect(other.position, payload.newLevel);
     return;
   }
+  equipmentAdvice.reset();
   playerLevel = payload.newLevel;
   refreshExpansionContext();
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
@@ -2528,6 +2594,7 @@ network.onPlayerLevelUp = (payload) => {
 };
 
 network.onRebornResult = (payload) => {
+  equipmentAdvice.reset();
   playerLevel = payload.newLevel;
   playerRebornCount = payload.rebornCount;
   refreshExpansionContext();
@@ -2594,6 +2661,7 @@ function castSkill(slot: number) {
   }
 
   const skillDef = slotUI.definition;
+  if (!isSkillEffectAvailable(skillDef)) { addChatMessage('Grimório', 'Este efeito está em preparação. Escolha outra habilidade.', 'sys'); openSkillbook(); return; }
   let targetId: string | undefined = undefined;
   let targetPos: { x: number; y: number; z: number } | undefined = undefined;
 
@@ -2601,13 +2669,14 @@ function castSkill(slot: number) {
   const myPlayer = entities.find((e) => e.id === network.myPlayerId);
   if (!myPlayer) return;
 
-  if (skillDef.isAoe) {
+  const targeting = getSkillTargeting(skillDef);
+  if (targeting.category === 'AOE_TARGET' || targeting.category === 'AOE_LINE') {
     if (renderer.selectedTargetId) {
       const target = entities.find((e) => e.id === renderer.selectedTargetId);
       if (target) targetPos = target.position;
     }
     if (!targetPos) targetPos = myPlayer.position;
-  } else if (!skillDef.isHeal && skillDef.range > 0) {
+  } else if (targeting.category === 'SINGLE_TARGET') {
     targetId = renderer.selectedTargetId || undefined;
   }
 
@@ -2836,8 +2905,10 @@ function gameLoop() {
 
   // ----------------------------------------------------
   // 1. Update Cooldown UI overlays
+  const freeResourceEffect=renderer.hasFreeResourceEffect(network.myPlayerId,entities);
   for (const [slotStr, slotUI] of Object.entries(skillSlots)) {
     const slot = parseInt(slotStr, 10);
+    if(myPlayerClass===CharacterClass.BARBARO&&slotUI.definition&&playerLevel>=slotUI.definition.unlockLevel)slotUI.cost.textContent=`${freeResourceEffect?0:slotUI.definition.cost} EN`;
     const cdEnd = cooldownMap.get(slot);
     if (cdEnd && cdEnd > now) {
       const remainingSec = (cdEnd - now) / 1000;

@@ -120,7 +120,8 @@ export class OfflineRewardModal {
       timeText.textContent = formatOfflineDuration(payload.offlineSeconds);
     }
     if (capText) capText.textContent = formatOfflineLimit(payload);
-    if (statusText) statusText.textContent = '';
+    const itemsOnly = payload.accumulatedGold === 0 && payload.accumulatedExp === 0 && payload.lootPreview?.length > 0;
+    if (statusText) statusText.textContent = itemsOnly ? 'Ouro e EXP já foram creditados. Estes itens continuam guardados até haver espaço na mochila.' : '';
 
     if (goldText) {
       goldText.textContent = `+${payload.accumulatedGold.toLocaleString('pt-BR')} Ouro`;
@@ -150,7 +151,7 @@ export class OfflineRewardModal {
 
     if (claimBtn) {
       claimBtn.disabled = false;
-      claimBtn.textContent = '✨ Coletar Recompensas';
+      claimBtn.textContent = itemsOnly ? '✨ Retirar itens guardados' : '✨ Coletar Recompensas';
     }
 
     if (!this.dialog.open) {
@@ -181,6 +182,14 @@ export class OfflineRewardModal {
         button.disabled = false;
         button.textContent = '✨ Coletar Recompensas';
       }
+      return;
+    }
+    if (result.remainingReward) {
+      this.show(result.remainingReward);
+      const status = this.dialog.querySelector('#offline-claim-status') as HTMLElement;
+      if (status) status.textContent = result.message;
+      const button = this.dialog.querySelector('#btn-claim-offline') as HTMLButtonElement;
+      if (button) button.textContent = '✨ Retirar itens restantes';
       return;
     }
     this.pendingPayload = null;

@@ -1,0 +1,167 @@
+{
+  "generatedAt": "2026-11-05T10:56:46.717Z",
+  "seconds": 1800,
+  "assumptions": "Solo, fresh heroes, memory SQLite, starter equipped, 20 bag slots, equipment auto-sale off, no purchases/recycling/fusion execution, no offline rewards. Measures first availability, not repeated purchases or overall class balance.",
+  "firstReadyRangeSeconds": [
+    158,
+    238
+  ],
+  "runs": [
+    {
+      "classType": "GUERREIRO",
+      "seed": 101,
+      "finalLevel": 9,
+      "goldBalance": 10993,
+      "fullInventorySeconds": 1569,
+      "fusions": [
+        {
+          "recipeId": "forge_blade_v1",
+          "firstReadySeconds": 232,
+          "eligibleCopies": 4,
+          "finalBlockReason": ""
+        },
+        {
+          "recipeId": "forge_mail_v1",
+          "firstReadySeconds": 232,
+          "eligibleCopies": 3,
+          "finalBlockReason": ""
+        }
+      ]
+    },
+    {
+      "classType": "GUERREIRO",
+      "seed": 202,
+      "finalLevel": 9,
+      "goldBalance": 10935,
+      "fullInventorySeconds": 1575,
+      "fusions": [
+        {
+          "recipeId": "forge_blade_v1",
+          "firstReadySeconds": 226,
+          "eligibleCopies": 3,
+          "finalBlockReason": ""
+        },
+        {
+          "recipeId": "forge_mail_v1",
+          "firstReadySeconds": 226,
+          "eligibleCopies": 3,
+          "finalBlockReason": ""
+        }
+      ]
+    },
+    {
+      "classType": "BARBARO",
+      "seed": 101,
+      "finalLevel": 9,
+      "goldBalance": 11291,
+      "fullInventorySeconds": 1548,
+      "fusions": [
+        {
+          "recipeId": "forge_blade_v1",
+          "firstReadySeconds": 236,
+          "eligibleCopies": 4,
+          "finalBlockReason": ""
+        },
+        {
+          "recipeId": "forge_mail_v1",
+          "firstReadySeconds": 236,
+          "eligibleCopies": 5,
+          "finalBlockReason": ""
+        }
+      ]
+    },
+    {
+      "classType": "BARBARO",
+      "seed": 202,
+      "finalLevel": 9,
+      "goldBalance": 11524,
+      "fullInventorySeconds": 1612,
+      "fusions": [
+        {
+          "recipeId": "forge_blade_v1",
+          "firstReadySeconds": 238,
+          "eligibleCopies": 4,
+          "finalBlockReason": ""
+        },
+        {
+          "recipeId": "forge_mail_v1",
+          "firstReadySeconds": 238,
+          "eligibleCopies": 4,
+          "finalBlockReason": ""
+        }
+      ]
+    },
+    {
+      "classType": "ARQUEIRO",
+      "seed": 101,
+      "finalLevel": 9,
+      "goldBalance": 11986,
+      "fullInventorySeconds": 1642,
+      "fusions": [
+        {
+          "recipeId": "forge_bow_v1",
+          "firstReadySeconds": 158,
+          "eligibleCopies": 5,
+          "finalBlockReason": ""
+        }
+      ]
+    },
+    {
+      "classType": "ARQUEIRO",
+      "seed": 202,
+      "finalLevel": 9,
+      "goldBalance": 11223,
+      "fullInventorySeconds": 1629,
+      "fusions": [
+        {
+          "recipeId": "forge_bow_v1",
+          "firstReadySeconds": 171,
+          "eligibleCopies": 4,
+          "finalBlockReason": ""
+        }
+      ]
+    },
+    {
+      "classType": "CLERIGO",
+      "seed": 101,
+      "finalLevel": 9,
+      "goldBalance": 12095,
+      "fullInventorySeconds": 1579,
+      "fusions": [
+        {
+          "recipeId": "forge_mace_v1",
+          "firstReadySeconds": 222,
+          "eligibleCopies": 4,
+          "finalBlockReason": ""
+        },
+        {
+          "recipeId": "forge_mail_v1",
+          "firstReadySeconds": 222,
+          "eligibleCopies": 4,
+          "finalBlockReason": ""
+        }
+      ]
+    },
+    {
+      "classType": "CLERIGO",
+      "seed": 202,
+      "finalLevel": 9,
+      "goldBalance": 11055,
+      "fullInventorySeconds": 1533,
+      "fusions": [
+        {
+          "recipeId": "forge_mace_v1",
+          "firstReadySeconds": 238,
+          "eligibleCopies": 5,
+          "finalBlockReason": ""
+        },
+        {
+          "recipeId": "forge_mail_v1",
+          "firstReadySeconds": 238,
+          "eligibleCopies": 5,
+          "finalBlockReason": ""
+        }
+      ]
+    }
+  ]
+}

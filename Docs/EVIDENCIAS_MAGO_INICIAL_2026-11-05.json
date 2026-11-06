@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-11-05T22:31:05.353Z",
+  "sourceSha256": {
+    "server/src/game/World.ts": "23096a52c2389533d5c127d6d89c3837b96e432e8e05c1e760b2733e941b26c5",
+    "server/src/entities/Entity.ts": "7a30e7ebc3a5136c78b9646c230be3d0744aff93eb07108b99f0a113e3f70e2e",
+    "shared/src/skills.ts": "69d50f33b0046b06f6d841e0358ead08dc4f7e33237e20a5763a2a85a18b8128",
+    "shared/src/mage-effects.ts": "cefa6d7516eb2e83fe2566d958f7a59302f2f646468b8b428eb05ab279155a0a",
+    "shared/src/skill-targeting.ts": "b643310999f739fbe31a404ea68a93ecb546ca40768b50b00045d77a79d43744",
+    "shared/src/skill-progression.ts": "6594d831b4df6e18cf15e6adc1a4daf1a7c089f961d45747f0a31a68b78c9df1",
+    "shared/src/messages.ts": "1e23411f5a86b37b2fb932a36b227d909c940ab4a064044aa6ca096f09fbdbb7",
+    "client/src/renderer/PixelVfx.ts": "657070d62d7126ae36c5e4ad3efc3e5e194059abef7cbd7f291bbba49e96aa04",
+    "client/src/renderer/PixelVfxPlayer.ts": "39a6c672496b50e60fb47d6a84175954eebbe6ef062ff85509e5cc4cf93f0a0f",
+    "server/tools/benchmark-mage.ts": "2f734acff27de74b16970436b8ebfee4180bc8ba077ab78b2c03aa91433bf736"
+  },
+  "defaultMatrix": {
+    "scenarios": 420,
+    "outcomeChanges": [],
+    "rejections": 0,
+    "emptyCasts": 0,
+    "mageWinsBefore": 32,
+    "mageWinsAfter": 32,
+    "mageAverageVictorySecondsBefore": 25.58,
+    "mageAverageVictorySecondsAfter": 29.32
+  },
+  "initialChoices": {
+    "assumptions": "48 fresh in-memory fixtures: three cantrip choices at level 5 and nine initial combinations at level 10, worlds 1/2, seeds 101/202. Default rotation and starter gear, no investment; not farm-earned progression or proof of class balance.",
+    "scenarios": 48,
+    "rejections": 0,
+    "emptyCasts": 0,
+    "groups": [
+      {
+        "skill": null,
+        "level": 5,
+        "cases": 12,
+        "victories": 6,
+        "deaths": 6,
+        "timeouts": 0,
+        "statusDamage": 0
+      },
+      {
+        "skill": "mago_nv1_1",
+        "level": 10,
+        "cases": 12,
+        "victories": 6,
+        "deaths": 6,
+        "timeouts": 0,
+        "statusDamage": 0
+      },
+      {
+        "skill": "mago_nv1_2",
+        "level": 10,
+        "cases": 12,
+        "victories": 6,
+        "deaths": 0,
+        "timeouts": 6,
+        "statusDamage": 0
+      },
+      {
+        "skill": "mago_nv1_3",
+        "level": 10,
+        "cases": 12,
+        "victories": 6,
+        "deaths": 6,
+        "timeouts": 0,
+        "statusDamage": 2353
+      }
+    ]
+  }
+}

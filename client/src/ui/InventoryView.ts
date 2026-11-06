@@ -1,4 +1,4 @@
-import { ITEMS_DATABASE, ItemRarity, ItemType, type InventoryItemPayload, type ItemAttributesBonus } from '@magicforge/shared';
+import { getEquipmentBonuses, ITEMS_DATABASE, ItemRarity, ItemType, type InventoryItemPayload, type ItemAttributesBonus } from '@magicforge/shared';
 
 export interface InventoryViewState { query: string; type: string; rarity: string; sort: 'slot' | 'name' | 'rarity'; }
 export const DEFAULT_INVENTORY_VIEW: InventoryViewState = { query: '', type: 'all', rarity: 'all', sort: 'slot' };
@@ -20,16 +20,7 @@ export function selectBagView(items: readonly InventoryItemPayload[], state: Inv
   });
 }
 
-export function itemBonuses(item: InventoryItemPayload): ItemAttributesBonus {
-  const result: ItemAttributesBonus = {};
-  const base = ITEMS_DATABASE[item.itemId]?.statsBonus ?? {};
-  for (const key of Object.keys(base) as Array<keyof ItemAttributesBonus>) result[key] = Math.round(base[key]! * (1 + (item.refineLevel ?? 0) * 0.08));
-  for (const socket of item.sockets ?? []) {
-    const gem = ITEMS_DATABASE[socket.gemId]?.statsBonus ?? {};
-    for (const key of Object.keys(gem) as Array<keyof ItemAttributesBonus>) result[key] = (result[key] ?? 0) + gem[key]!;
-  }
-  return result;
-}
+export const itemBonuses = getEquipmentBonuses;
 
 export function compareEquipment(candidate: InventoryItemPayload, items: readonly InventoryItemPayload[]) {
   const def = ITEMS_DATABASE[candidate.itemId];

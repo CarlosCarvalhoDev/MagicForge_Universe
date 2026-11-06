@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-11-05T12:38:57.534Z",
+  "sourceSha256": {
+    "server/src/game/World.ts": "1230042e41f8e146c933693b0d06e3016ef067f16b63da04e55c1eada53b980a",
+    "server/src/entities/Entity.ts": "8f3b2e2c8a570919eee8aaca14ce3cf0cf9abf35d22073f6b29a3c9bc2abb13f",
+    "server/src/entities/Monster.ts": "d1fec1683a7274358a78a708509ee8f99f24fb4aa568a69584e2f68c4eab7433",
+    "server/src/entities/Player.ts": "58b66dba74241d1b64fc013efb35087de2a54cb196f1232c1d5e092a8987924a",
+    "shared/src/cleric-effects.ts": "04b02d274dda9c6155f10d3c83dc5031195a56a7e5a620fc167ebaa3af4a8fa5",
+    "shared/src/skills.ts": "b5eecd525c141a5869b5f11926d014acc7549277391bc4d98fee435540ca5dfd",
+    "shared/src/messages.ts": "c44ee5b370816a15ceb73fda218f1cd543e7f49afb754e6c1e72526a21107051",
+    "server/tools/BossInvestmentSimulation.ts": "4cdf8cd8c88a91228616a692830add7c3cdd1ef985e08ab75ec0baf34dfe0e9c",
+    "server/tools/benchmark-cleric.ts": "1d24e98f48d6e03b2e1063d932356570984f174320e22e1be031384ead79e5e6"
+  },
+  "defaultMatrix": {
+    "scenarios": 420,
+    "outcomeChanges": [],
+    "rejections": 0,
+    "emptyCasts": 0
+  },
+  "choices": {
+    "assumptions": "144 fresh in-memory fixtures: nine choices at level 10 and 27 at level 25, worlds 1/2, seeds 101/202. Default order and starter equipment, no investment; not farm-earned progression or a balance target.",
+    "scenarios": 144,
+    "rejections": 0,
+    "emptyCasts": 0,
+    "bySecondCircle": [
+      {
+        "skill": null,
+        "level": 10,
+        "cases": 36,
+        "victories": 18,
+        "deaths": 11,
+        "timeouts": 7,
+        "totalStatusDamage": 0,
+        "totalPeriodicHealing": 0
+      },
+      {
+        "skill": "clerigo_nv2_1",
+        "level": 25,
+        "cases": 36,
+        "victories": 36,
+        "deaths": 0,
+        "timeouts": 0,
+        "totalStatusDamage": 17257,
+        "totalPeriodicHealing": 0
+      },
+      {
+        "skill": "clerigo_nv2_2",
+        "level": 25,
+        "cases": 36,
+        "victories": 36,
+        "deaths": 0,
+        "timeouts": 0,
+        "totalStatusDamage": 14801,
+        "totalPeriodicHealing": 0
+      },
+      {
+        "skill": "clerigo_nv2_3",
+        "level": 25,
+        "cases": 36,
+        "victories": 36,
+        "deaths": 0,
+        "timeouts": 0,
+        "totalStatusDamage": 0,
+        "totalPeriodicHealing": 26315
+      }
+    ]
+  }
+}

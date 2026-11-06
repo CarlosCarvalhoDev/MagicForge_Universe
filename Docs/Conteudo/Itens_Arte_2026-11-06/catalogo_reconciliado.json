@@ -1,0 +1,2706 @@
+{
+  "generatedAt": "2026-11-06",
+  "contractVersion": "2026-11-06.v2-reconciled",
+  "status": "CATALOGO_RECONCILIADO_COM_PROPOSTAS_NAO_CALIBRADAS",
+  "counts": {
+    "existingItemsInSharedItemsTs": 46,
+    "proposedItemsTotalFrom20261105": 47,
+    "proposedItemsActive": 45,
+    "proposedItemsSupersededByCode": 2,
+    "totalCatalogEntries": 93,
+    "duplicateIdsCount": 0
+  },
+  "reconciliationNotes": [
+    "1. Contagem real reconciliada: shared/src/items.ts contém exatamente 46 itens em ITEMS_DATABASE (incluindo staff_monk_ash e focus_pact_initiate adicionados pelo agente principal e os 8 resultados das reforjas v1).",
+    "2. Contrato explícito deste JSON: existingItems contém os 46 itens reais do código; proposedItems contém os 47 registros propostos em 05/11/2026 (sendo 45 propostas ativas não calibradas e 2 marcadas como proposto_atendido_por_existente por staff_monk_ash e focus_pact_initiate), totalizando 93 registros sem colisão de IDs.",
+    "3. Estado das receitas v1: descritas como IMPLEMENTADAS_E_MEDIDAS_INICIALMENTE (medidas em trajetórias de 30 minutos em Docs/FUSAO_EQUIPAMENTOS_2026-11-05.md, não como balanceamento final comprovado de longo prazo).",
+    "4. Fontes de obtenção auditadas contra Monster.ts, DungeonManager.ts, DatabaseManager.ts, OfflineRewards.ts e equipment-fusion.ts: 6 equipamentos existentes em ITEMS_DATABASE não possuem drop ativo em monstros hoje (armor_titan_plate, robe_mystic_threads, shield_iron_buckler e as armas iniciais staff_apprentice, mace_cleric_dawn, staff_monk_ash, focus_pact_initiate que vêm apenas no kit inicial).",
+    "5. Proteção de instância: resultados de reforja v1 nascem protegidos (isLocked = true); qualquer receita futura que os utilize como ingrediente exige desbloqueio explícito prévio pelo jogador."
+  ],
+  "existingItems": [
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "gold",
+      "name": "Moeda de Ouro",
+      "type": "MOEDA",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 1,
+      "maxStack": 999999,
+      "currentIconInCode": "🪙",
+      "existingPngAsset": "client/public/assets/ui/icons/icon-gold-coin.svg (HUD 24x24)",
+      "realAcquisitionSources": [
+        "Monster.ts: Todos os monstros (100%: Slime 5-12, Goblin 6-15, Lobo 8-18, Esqueleto/Arqueiro 10-20, M2 Jotunheim 14-30, Mini-Chefes 40-100, Chefes Grimgor/Ignis 200-500, Frostbite 500-1200)",
+        "DungeonManager.ts: BOSS_RUSH (20k/45k/95k/250k por onda) e GOLD_TREASURY (60k * onda)",
+        "OfflineRewards.ts: Baú do Tempo (accumulatedGold)",
+        "World.ts: Venda e reciclagem de itens"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "potion_hp_minor",
+      "name": "Poção Menor de Vida",
+      "type": "CONSUMIVEL",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "healHp": 50,
+      "sellPrice": 10,
+      "maxStack": 99,
+      "currentIconInCode": "🧪",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/potion_hp_minor.png",
+      "realAcquisitionSources": [
+        "DatabaseManager.ts: Kit inicial na criação de personagem (3 unidades)",
+        "Monster.ts: Slime (35%, 1x), Goblin Lanceiro/padrão (35%, 1x), Monstros M2 Jotunheim (40%, 1-2x), Mini-Chefes Yetin/Goblin (80%, 2-3x)",
+        "OfflineRewards.ts: Baú do Tempo (floor(intervalos * 1.5) a cada 15 min offline, limite 10 intervalos)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "potion_mp_minor",
+      "name": "Poção Menor de Mana",
+      "type": "CONSUMIVEL",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "healResource": 50,
+      "sellPrice": 15,
+      "maxStack": 99,
+      "currentIconInCode": "💧",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/potion_mp_minor.png",
+      "realAcquisitionSources": [
+        "DatabaseManager.ts: Kit inicial na criação de personagem (2 unidades)",
+        "Monster.ts: Arqueiro / Esqueleto (40%, 1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "potion_hp_major",
+      "name": "Poção Maior de Vitalidade",
+      "type": "CONSUMIVEL",
+      "equipmentSlot": null,
+      "rarity": "INCOMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "healHp": 120,
+      "sellPrice": 40,
+      "maxStack": 99,
+      "currentIconInCode": "🍷",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor / Frostbite / Ignis (100%, 4-8x)",
+        "DungeonManager.ts: GOLD_TREASURY (2 * onda por onda superada)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "stone_forge_common",
+      "name": "Pedra da Forja Comum",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 50,
+      "maxStack": 999,
+      "currentIconInCode": "💎",
+      "existingPngAsset": "client/public/assets/ui/items/pedra_forja_comum.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Slime (35%, 1-2x), Lobo (40%, 1-2x), Arqueiro/Esqueleto (35%, 1-2x), Goblin Lanceiro (35%, 1-2x), Monstros M2 Jotunheim (50%, 1-3x), Mini-Chefes (100%, 2-4x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "stone_forge_rare",
+      "name": "Pedra da Forja Rara",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "RARO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 200,
+      "maxStack": 999,
+      "currentIconInCode": "🔮",
+      "existingPngAsset": "client/public/assets/ui/items/pedra_forja_rara.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Mini-Chefes Yetin/Goblin (75%, 1-2x), Chefes Grimgor/Frostbite/Ignis (100%, 3-6x)",
+        "DungeonManager.ts: BOSS_RUSH Onda 1 (2x) e Onda 2 (3x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "stone_forge_mystic",
+      "name": "Pedra da Forja Mística",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "EPICO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 1000,
+      "maxStack": 999,
+      "currentIconInCode": "💠",
+      "existingPngAsset": "client/public/assets/ui/items/pedra_forja_mistica.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor/Frostbite/Ignis (85%, 1-3x)",
+        "DungeonManager.ts: BOSS_RUSH Onda 2 (1x), Onda 3 (2x) e Onda 4 (5x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "arcane_dust",
+      "name": "Pó Arcano de Desmontagem",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 20,
+      "maxStack": 999,
+      "currentIconInCode": "✨",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/arcane_dust.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Slime (30%, 1-2x), Goblin Lanceiro (35%, 1-2x), Monstros M2 Jotunheim (45%, 1-3x), Mini-Chefes (80%, 5-10x), Chefes Grimgor/Frostbite/Ignis (100%, 20-40x)",
+        "DungeonManager.ts: GOLD_TREASURY (10 * onda por onda)",
+        "World.ts: Reciclagem/descarte de item na mochila (+2 por equipamento, +1 por não-equipamento)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "ore_iron_arcane",
+      "name": "Minério de Ferro Arcano",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 8,
+      "maxStack": 99,
+      "currentIconInCode": "🪨",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/ore_iron_arcane.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Goblin Lanceiro/padrão (25%, 1-2x) e Monstros M2 Jotunheim (35%, 1-2x)",
+        "OfflineRewards.ts: Baú do Tempo (2 unidades por intervalo de 15 min offline, até 10 intervalos)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "essence_goblin",
+      "name": "Essência Goblin",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 12,
+      "maxStack": 99,
+      "currentIconInCode": "🧫",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Goblin Lanceiro/padrão (65%, 1-2x) e Arqueiro/Esqueleto (70%, 1-2x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "essence_slime",
+      "name": "Núcleo de Slime Puro",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "INCOMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 20,
+      "maxStack": 99,
+      "currentIconInCode": "🟢",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Slime (80%, 1-2x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "wolf_fang",
+      "name": "Presa de Lobo Alfa",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "INCOMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 25,
+      "maxStack": 99,
+      "currentIconInCode": "🦷",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Lobo (75%, 1-2x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "rune_fragment",
+      "name": "Fragmento Rúnico Ancestral",
+      "type": "MATERIAL",
+      "equipmentSlot": null,
+      "rarity": "RARO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": null,
+      "sellPrice": 75,
+      "maxStack": 99,
+      "currentIconInCode": "💠",
+      "existingPngAsset": "client/public/assets/ui/items/fragmento_runico_ancestral.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor/Frostbite/Ignis (100%, 3-8x)",
+        "DungeonManager.ts: BOSS_RUSH Ondas 1 a 4 (2x, 4x, 6x e 12x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "gem_ruby_str",
+      "name": "Rubi Sangrento",
+      "type": "GEMA",
+      "equipmentSlot": null,
+      "rarity": "RARO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 12
+      },
+      "sellPrice": 300,
+      "maxStack": 99,
+      "currentIconInCode": "🔴",
+      "existingPngAsset": "client/public/assets/ui/items/gema_rubi_forca.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor/Frostbite/Ignis (60%, 1-2x)",
+        "DungeonManager.ts: BOSS_RUSH Onda 3 (1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "gem_sapphire_int",
+      "name": "Safira das Marés",
+      "type": "GEMA",
+      "equipmentSlot": null,
+      "rarity": "RARO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 12,
+        "maxResource": 60
+      },
+      "sellPrice": 300,
+      "maxStack": 99,
+      "currentIconInCode": "🔵",
+      "existingPngAsset": "client/public/assets/ui/items/gema_safira_mana.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor/Frostbite/Ignis (60%, 1-2x)",
+        "DungeonManager.ts: BOSS_RUSH Onda 2 (1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "gem_emerald_dex",
+      "name": "Esmeralda do Vento",
+      "type": "GEMA",
+      "equipmentSlot": null,
+      "rarity": "RARO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 12
+      },
+      "sellPrice": 300,
+      "maxStack": 99,
+      "currentIconInCode": "🟢",
+      "existingPngAsset": "client/public/assets/ui/items/gema_esmeralda_agilidade.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor/Frostbite/Ignis (60%, 1-2x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "gem_topaz_con",
+      "name": "Topázio Solar",
+      "type": "GEMA",
+      "equipmentSlot": null,
+      "rarity": "RARO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "constituicao": 12,
+        "maxHp": 140
+      },
+      "sellPrice": 300,
+      "maxStack": 99,
+      "currentIconInCode": "🟡",
+      "existingPngAsset": "client/public/assets/ui/items/gema_topazio_vitalidade.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Mini-Chefes Yetin/Goblin (25%, 1x) e Chefes Grimgor/Frostbite/Ignis (60%, 1-2x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "sword_iron_broadsword",
+      "name": "Espada Larga Forjada",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 6,
+        "maxHp": 20
+      },
+      "sellPrice": 80,
+      "maxStack": 1,
+      "currentIconInCode": "⚔️",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/sword_iron_broadsword.png",
+      "realAcquisitionSources": [
+        "DatabaseManager.ts: Arma inicial na criação de GUERREIRO e BARBARO (1x)",
+        "Monster.ts: Goblin Lanceiro / padrão (10%, 1x)",
+        "equipment-fusion.ts: Ingrediente base em FUSION_BASE_ITEMS (preferencial para forge_blade_v1 e forge_wraps_v1)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "sword_runic_bastard",
+      "name": "Montante Rúnico dos Titãs",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO"
+      ],
+      "requiredAttributes": {
+        "forca": 28
+      },
+      "statsBonus": {
+        "forca": 18,
+        "constituicao": 10,
+        "maxHp": 85
+      },
+      "sellPrice": 450,
+      "maxStack": 1,
+      "currentIconInCode": "🗡️",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/sword_runic_bastard.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor / Frostbite / Ignis (40%, 1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "staff_apprentice",
+      "name": "Cajado do Aprendiz",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 8,
+        "maxResource": 30
+      },
+      "sellPrice": 85,
+      "maxStack": 1,
+      "currentIconInCode": "🪄",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "DatabaseManager.ts: Arma inicial na criação de MAGO (1x)",
+        "Monster.ts: SEM DROP EM MONSTROS ATUALMENTE (dependência de implementação para dropar duplicatas próprias; hoje forge_staff_v1 e forge_pact_v1 usam fallback de FUSION_BASE_ITEMS como sword_iron_broadsword/bow_hunting/armor_chainmail)"
+      ],
+      "sourceImplementationStatus": "APENAS_KIT_INICIAL_SEM_DROP_DE_MONSTRO"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "staff_void_astral",
+      "name": "Cajado do Vazio Astral",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {
+        "inteligencia": 30
+      },
+      "statsBonus": {
+        "inteligencia": 22,
+        "maxResource": 120
+      },
+      "sellPrice": 480,
+      "maxStack": 1,
+      "currentIconInCode": "🔮",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor / Frostbite / Ignis (35%, 1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "bow_hunting",
+      "name": "Arco de Caça Reforçado",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 1,
+      "allowedClasses": [
+        "ARQUEIRO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 10,
+        "maxHp": 15
+      },
+      "sellPrice": 150,
+      "maxStack": 1,
+      "currentIconInCode": "🏹",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "DatabaseManager.ts: Arma inicial na criação de ARQUEIRO (1x)",
+        "Monster.ts: Arqueiro / Esqueleto (12%, 1x)",
+        "equipment-fusion.ts: Ingrediente base em FUSION_BASE_ITEMS (preferencial para forge_bow_v1)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "mace_cleric_dawn",
+      "name": "Maça da Alvorada Divina",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 1,
+      "allowedClasses": [
+        "CLERIGO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "sabedoria": 10,
+        "maxHp": 40
+      },
+      "sellPrice": 160,
+      "maxStack": 1,
+      "currentIconInCode": "🔨",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "DatabaseManager.ts: Arma inicial na criação de CLERIGO (1x)",
+        "Monster.ts: SEM DROP EM MONSTROS ATUALMENTE (dependência de implementação para dropar duplicatas próprias; forge_mace_v1 usa fallback de FUSION_BASE_ITEMS)"
+      ],
+      "sourceImplementationStatus": "APENAS_KIT_INICIAL_SEM_DROP_DE_MONSTRO"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "armor_chainmail",
+      "name": "Cota de Malha de Aço",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMADURA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "constituicao": 6,
+        "maxHp": 60
+      },
+      "sellPrice": 110,
+      "maxStack": 1,
+      "currentIconInCode": "🛡️",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/armor_chainmail.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Lobo (15%, 1x) e Monstros M2 Jotunheim (15%, 1x)",
+        "equipment-fusion.ts: Ingrediente base em FUSION_BASE_ITEMS (preferencial para forge_mail_v1)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "armor_titan_plate",
+      "name": "Armadura de Placas do Titã",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMADURA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO"
+      ],
+      "requiredAttributes": {
+        "forca": 26,
+        "constituicao": 26
+      },
+      "statsBonus": {
+        "constituicao": 24,
+        "maxHp": 280
+      },
+      "sellPrice": 500,
+      "maxStack": 1,
+      "currentIconInCode": "🛡️",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/armor_titan_plate.png",
+      "realAcquisitionSources": [
+        "SEM FONTE REAL NO CODIGO ATUAL: definido em shared/src/items.ts, mas não está em Monster.ts, DungeonManager.ts nem equipment-fusion.ts (dependência de implementação de drop em Chefes/M2 ou receita de reforja Nv 25)"
+      ],
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO_DE_FONTE"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "robe_mystic_threads",
+      "name": "Manto das Marés Arcanas",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 1,
+      "allowedClasses": [
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 10,
+        "maxResource": 50
+      },
+      "sellPrice": 170,
+      "maxStack": 1,
+      "currentIconInCode": "🥋",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "SEM FONTE DE DROP NO CODIGO ATUAL: listado em FUSION_BASE_ITEMS (preferredInputItemId de forge_robe_v1), mas não dropa em Monster.ts nem é entregue no kit inicial (dependência de implementação de drop)"
+      ],
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO_DE_FONTE"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "shield_iron_buckler",
+      "name": "Broquel de Ferro Forjado",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ESCUDO",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "GUERREIRO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "constituicao": 5,
+        "maxHp": 30
+      },
+      "sellPrice": 70,
+      "maxStack": 1,
+      "currentIconInCode": "🛡️",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/shield_iron_buckler.png",
+      "realAcquisitionSources": [
+        "SEM FONTE DE DROP NO CODIGO ATUAL: listado em FUSION_BASE_ITEMS, mas não dropa em Monster.ts nem é entregue no kit inicial (dependência de implementação de drop em monstros M1 ou reforja)"
+      ],
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO_DE_FONTE"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "relic_ancient_forge",
+      "name": "Relíquia da Forja Suprema",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ACESSORIO",
+      "rarity": "LENDARIO",
+      "minLevel": 30,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 12,
+        "destreza": 12,
+        "constituicao": 12,
+        "inteligencia": 12,
+        "sabedoria": 12,
+        "carisma": 12,
+        "maxHp": 150,
+        "maxResource": 80
+      },
+      "sellPrice": 1000,
+      "maxStack": 1,
+      "currentIconInCode": "👑",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/relic_ancient_forge.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Chefes Grimgor / Frostbite / Ignis (50%, 1x)",
+        "DungeonManager.ts: BOSS_RUSH Onda 4 (1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "staff_monk_ash",
+      "name": "Bastão de Freixo do Iniciado",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "MONGE"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 6,
+        "sabedoria": 2,
+        "maxHp": 20
+      },
+      "sellPrice": 80,
+      "maxStack": 1,
+      "currentIconInCode": "🥢",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "DatabaseManager.ts: Arma inicial na criação de MONGE (1x, linha 941)",
+        "Monster.ts / equipment-fusion.ts: Ainda sem drop em Monster.ts e ainda fora de FUSION_BASE_ITEMS (forge_wraps_v1 usa sword_iron_broadsword como preferredInputItemId atual)"
+      ],
+      "sourceImplementationStatus": "APENAS_KIT_INICIAL_SEM_DROP_DE_MONSTRO"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "focus_pact_initiate",
+      "name": "Foco do Pacto Iniciante",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "carisma": 6,
+        "maxResource": 30
+      },
+      "sellPrice": 85,
+      "maxStack": 1,
+      "currentIconInCode": "🔮",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "DatabaseManager.ts: Arma inicial na criação de BRUXO (1x, linha 943)",
+        "Monster.ts / equipment-fusion.ts: Ainda sem drop em Monster.ts e ainda fora de FUSION_BASE_ITEMS (forge_pact_v1 usa staff_apprentice como preferredInputItemId atual)"
+      ],
+      "sourceImplementationStatus": "APENAS_KIT_INICIAL_SEM_DROP_DE_MONSTRO"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "IMPLEMENTADO_E_MEDIDO_INICIALMENTE",
+      "itemId": "sword_runic_tempered",
+      "name": "Espada da Têmpera Rúnica",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 9,
+        "constituicao": 2,
+        "maxHp": 35
+      },
+      "sellPrice": 200,
+      "maxStack": 1,
+      "currentIconInCode": "⚔️",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/sword_runic_tempered.png",
+      "realAcquisitionSources": [
+        "equipment-fusion.ts: Receita v1 forge_blade_v1 (implementada e medida inicialmente: 3x FUSION_BASE_ITEMS [pref. sword_iron_broadsword] + 6x ore_iron_arcane + 8x arcane_dust + 1800 ouro, Nv 5)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA_FUSAO_V1"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "IMPLEMENTADO_E_MEDIDO_INICIALMENTE",
+      "itemId": "bow_warden_runic",
+      "name": "Arco do Guardião Rúnico",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "ARQUEIRO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 12,
+        "sabedoria": 1,
+        "maxHp": 30
+      },
+      "sellPrice": 200,
+      "maxStack": 1,
+      "currentIconInCode": "🏹",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "equipment-fusion.ts: Receita v1 forge_bow_v1 (implementada e medida inicialmente: 3x FUSION_BASE_ITEMS [pref. bow_hunting] + 6x ore_iron_arcane + 8x arcane_dust + 1800 ouro, Nv 5)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA_FUSAO_V1"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "IMPLEMENTADO_E_MEDIDO_INICIALMENTE",
+      "itemId": "mace_dawn_consecrated",
+      "name": "Maça da Aurora Consagrada",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "CLERIGO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "sabedoria": 12,
+        "constituicao": 2,
+        "maxHp": 55
+      },
+      "sellPrice": 200,
+      "maxStack": 1,
+      "currentIconInCode": "🔨",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "equipment-fusion.ts: Receita v1 forge_mace_v1 (implementada e medida inicialmente: 3x FUSION_BASE_ITEMS [pref. mace_cleric_dawn, obtida via fallback de FUSION_BASE_ITEMS que dropam] + 6x ore_iron_arcane + 8x arcane_dust + 1800 ouro, Nv 5)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA_FUSAO_V1"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "IMPLEMENTADO_E_MEDIDO_INICIALMENTE",
+      "itemId": "staff_runic_focus",
+      "name": "Cajado do Foco Rúnico",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "MAGO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 11,
+        "maxResource": 45
+      },
+      "sellPrice": 200,
+      "maxStack": 1,
+      "currentIconInCode": "🪄",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "equipment-fusion.ts: Receita v1 forge_staff_v1 (implementada e medida inicialmente: 3x FUSION_BASE_ITEMS [pref. staff_apprentice, obtida via fallback de FUSION_BASE_ITEMS que dropam] + 6x ore_iron_arcane + 8x arcane_dust + 1800 ouro, Nv 5)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA_FUSAO_V1"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "IMPLEMENTADO_E_MEDIDO_INICIALMENTE",
+      "itemId": "focus_veiled_pact",
+      "name": "Foco do Pacto Velado",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "carisma": 9,
+        "inteligencia": 8,
+        "maxResource": 45
+      },
+      "sellPrice": 200,
+      "maxStack": 1,
+      "currentIconInCode": "🔮",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "equipment-fusion.ts: Receita v1 forge_pact_v1 (implementada e medida inicialmente: 3x FUSION_BASE_ITEMS + 6x ore_iron_arcane + 8x arcane_dust + 1800 ouro, Nv 5)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA_FUSAO_V1"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "IMPLEMENTADO_E_MEDIDO_INICIALMENTE",
+      "itemId": "wraps_serene_path",
+      "name": "Manoplas do Caminho Sereno",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "MONGE"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 9,
+        "sabedoria": 2,
+        "maxHp": 25
+      },
+      "sellPrice": 200,
+      "maxStack": 1,
+      "currentIconInCode": "🥊",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "equipment-fusion.ts: Receita v1 forge_wraps_v1 (implementada e medida inicialmente: 3x FUSION_BASE_ITEMS [pref. sword_iron_broadsword] + 6x ore_iron_arcane + 8x arcane_dust + 1800 ouro, Nv 5)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA_FUSAO_V1"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "IMPLEMENTADO_E_MEDIDO_INICIALMENTE",
+      "itemId": "armor_runic_vigil",
+      "name": "Cota da Vigília Rúnica",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "constituicao": 8,
+        "maxHp": 85
+      },
+      "sellPrice": 200,
+      "maxStack": 1,
+      "currentIconInCode": "🛡️",
+      "existingPngAsset": null,
+      "draftIconAsset": "Docs/Conteudo/Itens_Arte_2026-11-06/rascunhos/armor_runic_vigil.png",
+      "realAcquisitionSources": [
+        "equipment-fusion.ts: Receita v1 forge_mail_v1 (implementada e medida inicialmente: 3x FUSION_BASE_ITEMS [pref. armor_chainmail] + 6x ore_iron_arcane + 8x arcane_dust + 1800 ouro, Nv 5)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA_FUSAO_V1"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "IMPLEMENTADO_E_MEDIDO_INICIALMENTE",
+      "itemId": "robe_runic_weave",
+      "name": "Manto da Trama Rúnica",
+      "type": "EQUIPAMENTO",
+      "equipmentSlot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 12,
+        "carisma": 2,
+        "maxResource": 70
+      },
+      "sellPrice": 200,
+      "maxStack": 1,
+      "currentIconInCode": "🥋",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "equipment-fusion.ts: Receita v1 forge_robe_v1 (implementada e medida inicialmente: 3x FUSION_BASE_ITEMS + 6x ore_iron_arcane + 8x arcane_dust + 1800 ouro, Nv 5)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA_FUSAO_V1"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "card_slime",
+      "name": "Carta Slime Puro",
+      "type": "CARTA",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "constituicao": 4,
+        "maxHp": 60
+      },
+      "sellPrice": 150,
+      "maxStack": 99,
+      "currentIconInCode": "🟢",
+      "existingPngAsset": "client/public/assets/cards/carta_slime_puro.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Slime (15%, 1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "card_goblin",
+      "name": "Carta Goblin Lanceiro",
+      "type": "CARTA",
+      "equipmentSlot": null,
+      "rarity": "COMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 4
+      },
+      "sellPrice": 150,
+      "maxStack": 99,
+      "currentIconInCode": "👺",
+      "existingPngAsset": "client/public/assets/cards/carta_goblin_lanceiro.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Goblin Lanceiro (15%, 1x) e Mini-Chefe Goblin (35%, 1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "card_wolf",
+      "name": "Carta Lobo Selvagem",
+      "type": "CARTA",
+      "equipmentSlot": null,
+      "rarity": "INCOMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 4,
+        "destreza": 4,
+        "maxHp": 40
+      },
+      "sellPrice": 300,
+      "maxStack": 99,
+      "currentIconInCode": "🐺",
+      "existingPngAsset": "client/public/assets/cards/carta_lobo_selvagem.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Lobo (15%, 1x) e Mini-Chefe Yetin (35%, 1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "card_skeleton",
+      "name": "Carta Esqueleto Arqueiro",
+      "type": "CARTA",
+      "equipmentSlot": null,
+      "rarity": "INCOMUM",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 4,
+        "maxResource": 50
+      },
+      "sellPrice": 300,
+      "maxStack": 99,
+      "currentIconInCode": "💀",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Arqueiro / Esqueleto (15%, 1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "card_orc",
+      "name": "Carta Orc Guerreiro",
+      "type": "CARTA",
+      "equipmentSlot": null,
+      "rarity": "RARO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 8,
+        "constituicao": 8,
+        "maxHp": 120
+      },
+      "sellPrice": 600,
+      "maxStack": 99,
+      "currentIconInCode": "👹",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Monstros M2 Jotunheim (18%, 1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "card_boss_grimgor",
+      "name": "Carta Grimgor, o Destruidor",
+      "type": "CARTA",
+      "equipmentSlot": null,
+      "rarity": "EPICO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 15,
+        "constituicao": 12,
+        "maxHp": 450
+      },
+      "sellPrice": 2500,
+      "maxStack": 99,
+      "currentIconInCode": "🗿",
+      "existingPngAsset": "client/public/assets/cards/carta_chefe_grimgor.png",
+      "realAcquisitionSources": [
+        "Monster.ts: Chefe Grimgor (100%, 1x)",
+        "DungeonManager.ts: BOSS_RUSH Onda 4 (1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "card_boss_frostbite",
+      "name": "Carta Frostbite, Dragão Glacial",
+      "type": "CARTA",
+      "equipmentSlot": null,
+      "rarity": "EPICO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 15,
+        "sabedoria": 12,
+        "maxResource": 300
+      },
+      "sellPrice": 2500,
+      "maxStack": 99,
+      "currentIconInCode": "🐉",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Chefe Frostbite (100%, 1x)",
+        "DungeonManager.ts: BOSS_RUSH Onda 4 (1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    },
+    {
+      "status": "existente",
+      "calibrationState": "EM_EXECUCAO_NO_CODIGO",
+      "itemId": "card_boss_ignis",
+      "name": "Carta Ignis, Colosso de Magma",
+      "type": "CARTA",
+      "equipmentSlot": null,
+      "rarity": "LENDARIO",
+      "minLevel": null,
+      "allowedClasses": null,
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 20,
+        "constituicao": 15,
+        "maxHp": 650
+      },
+      "sellPrice": 5000,
+      "maxStack": 99,
+      "currentIconInCode": "🌋",
+      "existingPngAsset": null,
+      "realAcquisitionSources": [
+        "Monster.ts: Chefe Ignis (100%, 1x)",
+        "DungeonManager.ts: BOSS_RUSH Onda 3 (1x)"
+      ],
+      "sourceImplementationStatus": "FONTE_REAL_ATIVA"
+    }
+  ],
+  "proposedItems": [
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "gem_amethyst_wis",
+      "name": "Ametista da Sabedoria Astral",
+      "type": "GEMA",
+      "slot": null,
+      "rarity": "EPICO",
+      "minLevel": null,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "ARQUEIRO",
+        "CLERIGO",
+        "MAGO",
+        "MONGE",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "sabedoria": 6,
+        "maxResource": 30
+      },
+      "buildRole": "Dano sacro, cura e Ki (CLERIGO, MONGE)",
+      "origin": "Chefes (60%) e Boss Rush (Onda 2)",
+      "sellPrice": 180,
+      "maxStack": 99,
+      "iconAssetProposto": "/assets/items/gema_ametista_sabedoria.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e tabela de loot de Chefes",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Chefes (60%) e Boss Rush (Onda 2). Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "gem_onyx_cha",
+      "name": "Ônix do Pacto Soberano",
+      "type": "GEMA",
+      "slot": null,
+      "rarity": "EPICO",
+      "minLevel": null,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "ARQUEIRO",
+        "CLERIGO",
+        "MAGO",
+        "MONGE",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "carisma": 6,
+        "maxHp": 45
+      },
+      "buildRole": "Dano de pacto e presença marcial (BRUXO, GUERREIRO)",
+      "origin": "Chefes (60%) e Boss Rush (Onda 3)",
+      "sellPrice": 180,
+      "maxStack": 99,
+      "iconAssetProposto": "/assets/items/gema_onix_carisma.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e tabela de loot de Chefes",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Chefes (60%) e Boss Rush (Onda 3). Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto_atendido_por_existente",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "wraps_novice_linen",
+      "name": "Faixas de Linho do Iniciado",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "MONGE"
+      ],
+      "requiredAttributes": {
+        "destreza": 10
+      },
+      "statsBonus": {
+        "destreza": 5,
+        "sabedoria": 2
+      },
+      "buildRole": "Dano rápido de Chi e precisão marcial",
+      "origin": "Criação (MONGE) e drop de Slime/Goblin (10%)",
+      "sellPrice": 45,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/wraps_novice_linen.png",
+      "dependencies": "Atualizar createCharacterInSlot para MONGE e incluir em FUSION_BASE_ITEMS",
+      "supersededByExistingItemId": "staff_monk_ash",
+      "reconciledOrigin": "Atendido no código atual por staff_monk_ash (DatabaseManager.ts linha 941). Mantido apenas para rastreabilidade histórica; não duplicar no banco.",
+      "sourceImplementationStatus": "ATENDIDO_POR_STAFF_MONK_ASH"
+    },
+    {
+      "status": "proposto_atendido_por_existente",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "focus_ash_grimoire",
+      "name": "Tomo de Cinzas do Pacto",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "BRUXO"
+      ],
+      "requiredAttributes": {
+        "carisma": 10
+      },
+      "statsBonus": {
+        "carisma": 5,
+        "maxResource": 35
+      },
+      "buildRole": "Dano sustentado de Carisma e Mana",
+      "origin": "Criação (BRUXO) e drop de Lobo/Goblin (10%)",
+      "sellPrice": 45,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/focus_ash_grimoire.png",
+      "dependencies": "Atualizar createCharacterInSlot para BRUXO e incluir em FUSION_BASE_ITEMS",
+      "supersededByExistingItemId": "focus_pact_initiate",
+      "reconciledOrigin": "Atendido no código atual por focus_pact_initiate (DatabaseManager.ts linha 943). Mantido apenas para rastreabilidade histórica; não duplicar no banco.",
+      "sourceImplementationStatus": "ATENDIDO_POR_FOCUS_PACT_INITIATE"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "tunic_scout_leather",
+      "name": "Gibão de Couro do Batedor",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE"
+      ],
+      "requiredAttributes": {
+        "destreza": 10
+      },
+      "statsBonus": {
+        "destreza": 3,
+        "constituicao": 4,
+        "maxHp": 40
+      },
+      "buildRole": "Sobrevivência leve e agilidade",
+      "origin": "Drop de Lobo Selvagem (12%) e Goblin Arqueiro (12%)",
+      "sellPrice": 60,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/tunic_scout_leather.png",
+      "dependencies": "Incluir em ITEMS_DATABASE, loot de M1 e FUSION_BASE_ITEMS",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Lobo Selvagem (12%) e Goblin Arqueiro (12%). Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "vestment_pact_acolyte",
+      "name": "Túnica do Acólito Velado",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "INCOMUM",
+      "minLevel": 1,
+      "allowedClasses": [
+        "BRUXO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "carisma": 3,
+        "sabedoria": 3,
+        "constituicao": 3,
+        "maxHp": 35
+      },
+      "buildRole": "Híbrido de dano espiritual/pacto e vida",
+      "origin": "Drop de Slime da Floresta (12%)",
+      "sellPrice": 60,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/vestment_pact_acolyte.png",
+      "dependencies": "Incluir em ITEMS_DATABASE, loot de M1 e FUSION_BASE_ITEMS",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Slime da Floresta (12%). Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "axe_berserker_cleaver",
+      "name": "Machado Rúnico da Fúria Bruta",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "BARBARO"
+      ],
+      "requiredAttributes": {
+        "forca": 14
+      },
+      "statsBonus": {
+        "forca": 8,
+        "constituicao": 6,
+        "maxHp": 65
+      },
+      "buildRole": "Sobrevivência agressiva para Bárbaro",
+      "origin": "Fusão forge_cleaver_v2",
+      "sellPrice": 150,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/axe_berserker_cleaver.png",
+      "dependencies": "Nova receita v2 em equipment-fusion.ts",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Fusão forge_cleaver_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "armor_ranger_stalker",
+      "name": "Couraça Rúnica do Rastreio",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE"
+      ],
+      "requiredAttributes": {
+        "destreza": 12
+      },
+      "statsBonus": {
+        "destreza": 6,
+        "sabedoria": 3,
+        "constituicao": 5,
+        "maxHp": 60
+      },
+      "buildRole": "Dano ágil e sobrevivência leve",
+      "origin": "Fusão forge_leather_v2",
+      "sellPrice": 155,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/armor_ranger_stalker.png",
+      "dependencies": "Nova receita v2 em equipment-fusion.ts",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Fusão forge_leather_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "robe_pact_shroud",
+      "name": "Manto das Sombras Juradas",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "BRUXO"
+      ],
+      "requiredAttributes": {
+        "carisma": 12
+      },
+      "statsBonus": {
+        "carisma": 8,
+        "constituicao": 4,
+        "maxHp": 45,
+        "maxResource": 55
+      },
+      "buildRole": "Dano sombrio (CAR) e sustentação",
+      "origin": "Fusão forge_shroud_v2",
+      "sellPrice": 155,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/robe_pact_shroud.png",
+      "dependencies": "Nova receita v2 em equipment-fusion.ts",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Fusão forge_shroud_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "shield_runic_bulwark",
+      "name": "Égide da Vigília Rúnica",
+      "type": "EQUIPAMENTO",
+      "slot": "ESCUDO",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "GUERREIRO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 11
+      },
+      "statsBonus": {
+        "constituicao": 7,
+        "sabedoria": 3,
+        "carisma": 2,
+        "maxHp": 75
+      },
+      "buildRole": "Mitigação e suporte ao ataque básico/cura",
+      "origin": "Fusão forge_shield_v2",
+      "sellPrice": 145,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/shield_runic_bulwark.png",
+      "dependencies": "Nova receita v2 em equipment-fusion.ts",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Fusão forge_shield_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "helm_iron_vanguard",
+      "name": "Elmo de Ferro da Vanguarda",
+      "type": "EQUIPAMENTO",
+      "slot": "ELMO",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 10
+      },
+      "statsBonus": {
+        "constituicao": 5,
+        "forca": 3,
+        "sabedoria": 3,
+        "maxHp": 45
+      },
+      "buildRole": "Sobrevivência e atributo híbrido frontal",
+      "origin": "Drop de Mini-chefe M1 (25%) ou Fusão forge_helm_heavy_v2",
+      "sellPrice": 130,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/helm_iron_vanguard.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de Mini-chefe e fusão v2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Mini-chefe M1 (25%) ou Fusão forge_helm_heavy_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "hood_wind_strider",
+      "name": "Capuz do Vento Silvestre",
+      "type": "EQUIPAMENTO",
+      "slot": "ELMO",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE"
+      ],
+      "requiredAttributes": {
+        "destreza": 12
+      },
+      "statsBonus": {
+        "destreza": 5,
+        "sabedoria": 3,
+        "maxHp": 35
+      },
+      "buildRole": "Precisão e foco de Ki/Energia",
+      "origin": "Drop de Mini-chefe M1 (25%) ou Fusão forge_helm_agile_v2",
+      "sellPrice": 130,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/hood_wind_strider.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de Mini-chefe e fusão v2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Mini-chefe M1 (25%) ou Fusão forge_helm_agile_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "circlet_arcane_whisper",
+      "name": "Diadema dos Sussurros Astrais",
+      "type": "EQUIPAMENTO",
+      "slot": "ELMO",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 5,
+        "carisma": 5,
+        "maxResource": 45
+      },
+      "buildRole": "Dano mágico (INT/CAR) e Mana",
+      "origin": "Drop de Mini-chefe M1 (25%) ou Fusão forge_helm_caster_v2",
+      "sellPrice": 130,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/circlet_arcane_whisper.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de Mini-chefe e fusão v2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Mini-chefe M1 (25%) ou Fusão forge_helm_caster_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "boots_forged_march",
+      "name": "Grevas da Marcha Forjada",
+      "type": "EQUIPAMENTO",
+      "slot": "BOTAS",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 10
+      },
+      "statsBonus": {
+        "constituicao": 5,
+        "forca": 2,
+        "maxHp": 50
+      },
+      "buildRole": "Estabilidade e vida na linha de frente",
+      "origin": "Drop de Lobo/Gelo (8%) ou Fusão forge_boots_heavy_v2",
+      "sellPrice": 125,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/boots_forged_march.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e fusão v2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Lobo/Gelo (8%) ou Fusão forge_boots_heavy_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "boots_silent_step",
+      "name": "Botas do Passo Silencioso",
+      "type": "EQUIPAMENTO",
+      "slot": "BOTAS",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE",
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 4,
+        "constituicao": 3,
+        "maxHp": 35,
+        "maxResource": 25
+      },
+      "buildRole": "Sobrevivência leve e recurso",
+      "origin": "Drop de Goblin Arqueiro (8%) ou Fusão forge_boots_light_v2",
+      "sellPrice": 125,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/boots_silent_step.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e fusão v2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Goblin Arqueiro (8%) ou Fusão forge_boots_light_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "ring_ember_vitality",
+      "name": "Anel da Brasa Vital",
+      "type": "EQUIPAMENTO",
+      "slot": "ACESSORIO",
+      "rarity": "RARO",
+      "minLevel": 5,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "ARQUEIRO",
+        "CLERIGO",
+        "MAGO",
+        "MONGE",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "constituicao": 4,
+        "maxHp": 55,
+        "maxResource": 25
+      },
+      "buildRole": "Sobrevivência e fôlego universal",
+      "origin": "Drop de Grimgor (35%) ou Fusão forge_ring_ember_v2",
+      "sellPrice": 160,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/ring_ember_vitality.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e fusão v2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Grimgor (35%) ou Fusão forge_ring_ember_v2. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "sword_command_valiant",
+      "name": "Lâmina do Comando Valoroso",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "GUERREIRO"
+      ],
+      "requiredAttributes": {
+        "forca": 20
+      },
+      "statsBonus": {
+        "forca": 13,
+        "carisma": 5,
+        "constituicao": 6,
+        "maxHp": 60
+      },
+      "buildRole": "Dano sustentado (FOR+CAR) e postura tática",
+      "origin": "Drop de Chefe Yetin M2 (20%) ou Fusão Nv. 15",
+      "sellPrice": 260,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/sword_command_valiant.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefe Yetin M2 (20%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "greataxe_frost_breaker",
+      "name": "Machado Quebra-Gelo de Jotun",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "BARBARO"
+      ],
+      "requiredAttributes": {
+        "forca": 22
+      },
+      "statsBonus": {
+        "forca": 14,
+        "constituicao": 8,
+        "maxHp": 110
+      },
+      "buildRole": "Dano bruto e alta reserva de HP",
+      "origin": "Drop de Chefe Yetin M2 (20%) ou Fusão Nv. 15",
+      "sellPrice": 260,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/greataxe_frost_breaker.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefe Yetin M2 (20%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "bow_glacial_wind",
+      "name": "Arco Composto da Ventania Glacial",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "ARQUEIRO"
+      ],
+      "requiredAttributes": {
+        "destreza": 22
+      },
+      "statsBonus": {
+        "destreza": 15,
+        "sabedoria": 4,
+        "constituicao": 3
+      },
+      "buildRole": "Dano sustentado à distância",
+      "origin": "Drop de Monstros de Gelo M2 (8%) ou Fusão Nv. 15",
+      "sellPrice": 260,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/bow_glacial_wind.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Monstros de Gelo M2 (8%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "cestus_lotus_tempest",
+      "name": "Manoplas da Tempestade de Lótus",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "MONGE"
+      ],
+      "requiredAttributes": {
+        "destreza": 20,
+        "sabedoria": 14
+      },
+      "statsBonus": {
+        "destreza": 13,
+        "sabedoria": 7,
+        "constituicao": 4,
+        "maxHp": 45
+      },
+      "buildRole": "Dano corpo a corpo veloz e cura do Lótus",
+      "origin": "Drop de Monstros de Gelo M2 (8%) ou Fusão Nv. 15",
+      "sellPrice": 260,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/cestus_lotus_tempest.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Monstros de Gelo M2 (8%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "mace_radiant_verdict",
+      "name": "Maça do Veredito Radiante",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "sabedoria": 22
+      },
+      "statsBonus": {
+        "sabedoria": 15,
+        "constituicao": 5,
+        "maxResource": 65
+      },
+      "buildRole": "DPS radiante para vencer o timer de chefes",
+      "origin": "Drop de Chefe Yetin M2 (20%) ou Fusão Nv. 15",
+      "sellPrice": 260,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/mace_radiant_verdict.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefe Yetin M2 (20%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "staff_crystalline_rime",
+      "name": "Cajado da Geada Cristalina",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "MAGO"
+      ],
+      "requiredAttributes": {
+        "inteligencia": 22
+      },
+      "statsBonus": {
+        "inteligencia": 15,
+        "sabedoria": 4,
+        "maxResource": 80
+      },
+      "buildRole": "Explosão arcana em área e Mana",
+      "origin": "Drop de Monstros de Gelo M2 (8%) ou Fusão Nv. 15",
+      "sellPrice": 260,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/staff_crystalline_rime.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Monstros de Gelo M2 (8%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "tome_abyssal_covenant",
+      "name": "Grimório da Aliança Abissal",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "BRUXO"
+      ],
+      "requiredAttributes": {
+        "carisma": 22
+      },
+      "statsBonus": {
+        "carisma": 15,
+        "constituicao": 5,
+        "maxResource": 75
+      },
+      "buildRole": "Dano sustentado de maldição e dreno",
+      "origin": "Drop de Chefe Yetin M2 (20%) ou Fusão Nv. 15",
+      "sellPrice": 260,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/tome_abyssal_covenant.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefe Yetin M2 (20%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "armor_glacier_plate",
+      "name": "Couraça da Muralha Glacial",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 20
+      },
+      "statsBonus": {
+        "constituicao": 14,
+        "forca": 6,
+        "maxHp": 150
+      },
+      "buildRole": "Tanque físico e dano marcial",
+      "origin": "Drop de Monstros de Gelo M2 (10%) ou Fusão Nv. 15",
+      "sellPrice": 275,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/armor_glacier_plate.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Monstros de Gelo M2 (10%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "vestment_solar_sanctuary",
+      "name": "Vestimenta do Santuário Solar",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "sabedoria": 18,
+        "constituicao": 16
+      },
+      "statsBonus": {
+        "sabedoria": 10,
+        "constituicao": 10,
+        "maxHp": 110,
+        "maxResource": 60
+      },
+      "buildRole": "Equilíbrio entre DPS sacro e resistência",
+      "origin": "Drop de Chefe Yetin M2 (18%) ou Fusão Nv. 15",
+      "sellPrice": 275,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/vestment_solar_sanctuary.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefe Yetin M2 (18%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "jerkin_frost_prowler",
+      "name": "Couraça Leve do Predador Ártico",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE"
+      ],
+      "requiredAttributes": {
+        "destreza": 18
+      },
+      "statsBonus": {
+        "destreza": 10,
+        "sabedoria": 5,
+        "constituicao": 8,
+        "maxHp": 95
+      },
+      "buildRole": "Agilidade ofensiva e sobrevivência no Mundo 2",
+      "origin": "Drop de Monstros de Gelo M2 (10%) ou Fusão Nv. 15",
+      "sellPrice": 275,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/jerkin_frost_prowler.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Monstros de Gelo M2 (10%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "mantle_starlight_pact",
+      "name": "Manto do Crepúsculo Astral",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "inteligencia": 11,
+        "carisma": 11,
+        "constituicao": 6,
+        "maxResource": 100
+      },
+      "buildRole": "Poder arcano/abissal compartilhado e Mana",
+      "origin": "Drop de Monstros de Gelo M2 (10%) ou Fusão Nv. 15",
+      "sellPrice": 275,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/mantle_starlight_pact.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de M2 e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Monstros de Gelo M2 (10%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "shield_aegis_dawn",
+      "name": "Escudo Torre da Alvorada",
+      "type": "EQUIPAMENTO",
+      "slot": "ESCUDO",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "GUERREIRO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 18
+      },
+      "statsBonus": {
+        "constituicao": 12,
+        "sabedoria": 6,
+        "forca": 4,
+        "maxHp": 140
+      },
+      "buildRole": "Sobrevivência pesada contra chefes",
+      "origin": "Drop de Chefe Yetin M2 (18%) ou Fusão Nv. 15",
+      "sellPrice": 250,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/shield_aegis_dawn.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefe Yetin M2 (18%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "helm_jotun_crest",
+      "name": "Elmo de Crista Boreal",
+      "type": "EQUIPAMENTO",
+      "slot": "ELMO",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 16
+      },
+      "statsBonus": {
+        "constituicao": 9,
+        "forca": 5,
+        "sabedoria": 5,
+        "maxHp": 90
+      },
+      "buildRole": "Resistência frontal no Mundo 2",
+      "origin": "Drop de Monstros de Gelo M2 (8%)",
+      "sellPrice": 220,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/helm_jotun_crest.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e loot de M2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Monstros de Gelo M2 (8%). Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "crown_astral_focus",
+      "name": "Coroa de Foco Hiperbóreo",
+      "type": "EQUIPAMENTO",
+      "slot": "ELMO",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE",
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 8,
+        "inteligencia": 8,
+        "carisma": 8,
+        "sabedoria": 4,
+        "maxResource": 60
+      },
+      "buildRole": "Dano especializado e reservatório",
+      "origin": "Drop de Monstros de Gelo M2 (8%)",
+      "sellPrice": 220,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/crown_astral_focus.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e loot de M2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Monstros de Gelo M2 (8%). Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "boots_glacier_strider",
+      "name": "Botas Cravadas da Tundra",
+      "type": "EQUIPAMENTO",
+      "slot": "BOTAS",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "ARQUEIRO",
+        "CLERIGO",
+        "MAGO",
+        "MONGE",
+        "BRUXO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 14
+      },
+      "statsBonus": {
+        "constituicao": 8,
+        "destreza": 5,
+        "forca": 4,
+        "maxHp": 85
+      },
+      "buildRole": "Estabilidade e sobrevivência no gelo",
+      "origin": "Drop de Chefe Yetin M2 (22%)",
+      "sellPrice": 210,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/boots_glacier_strider.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e loot de M2",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefe Yetin M2 (22%). Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "amulet_runic_equilibrium",
+      "name": "Amuleto do Equilíbrio Rúnico",
+      "type": "EQUIPAMENTO",
+      "slot": "ACESSORIO",
+      "rarity": "RARO",
+      "minLevel": 15,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "ARQUEIRO",
+        "CLERIGO",
+        "MAGO",
+        "MONGE",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 5,
+        "destreza": 5,
+        "inteligencia": 5,
+        "sabedoria": 5,
+        "carisma": 5,
+        "constituicao": 5,
+        "maxHp": 70
+      },
+      "buildRole": "Versatilidade omni-atributo",
+      "origin": "Drop de Frostbite (35%) ou Fusão Nv. 15",
+      "sellPrice": 280,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/amulet_runic_equilibrium.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 15",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Frostbite (35%) ou Fusão Nv. 15. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "greataxe_cataclysm_maw",
+      "name": "Machado Colossal da Voragem",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "BARBARO"
+      ],
+      "requiredAttributes": {
+        "forca": 28
+      },
+      "statsBonus": {
+        "forca": 20,
+        "constituicao": 12,
+        "maxHp": 180
+      },
+      "buildRole": "Dano brutal e tanque por HP máximo",
+      "origin": "Drop de Chefes M2/M3 (25%) ou Fusão Nv. 25",
+      "sellPrice": 440,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/greataxe_cataclysm_maw.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 (25%) ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "bow_celestial_tempest",
+      "name": "Arco Longo da Tempestade Celestial",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "ARQUEIRO"
+      ],
+      "requiredAttributes": {
+        "destreza": 30
+      },
+      "statsBonus": {
+        "destreza": 22,
+        "sabedoria": 8,
+        "maxResource": 60
+      },
+      "buildRole": "Dano em área/sustentado à distância",
+      "origin": "Drop de Chefes (30%) ou Fusão Nv. 25",
+      "sellPrice": 440,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/bow_celestial_tempest.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de Chefes e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes (30%) ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "gauntlets_dragon_chi",
+      "name": "Manoplas Imperiais do Dragão de Chi",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "MONGE"
+      ],
+      "requiredAttributes": {
+        "destreza": 26,
+        "sabedoria": 18
+      },
+      "statsBonus": {
+        "destreza": 19,
+        "sabedoria": 11,
+        "constituicao": 6,
+        "maxHp": 90
+      },
+      "buildRole": "Cadência marcial, esquiva e sopro de Chi",
+      "origin": "Drop de Chefes (30%) ou Fusão Nv. 25",
+      "sellPrice": 440,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/gauntlets_dragon_chi.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de Chefes e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes (30%) ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "scepter_seraph_grace",
+      "name": "Cetro Consagrado do Serafim",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "sabedoria": 28
+      },
+      "statsBonus": {
+        "sabedoria": 22,
+        "constituicao": 8,
+        "maxHp": 80,
+        "maxResource": 110
+      },
+      "buildRole": "Dano radiante e cura milagrosa",
+      "origin": "Drop de Chefes (30%) ou Fusão Nv. 25",
+      "sellPrice": 440,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/scepter_seraph_grace.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de Chefes e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes (30%) ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "grimoire_hadar_eclipse",
+      "name": "Grimório Abissal do Eclipse de Hadar",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "BRUXO"
+      ],
+      "requiredAttributes": {
+        "carisma": 30
+      },
+      "statsBonus": {
+        "carisma": 22,
+        "constituicao": 8,
+        "maxHp": 70,
+        "maxResource": 110
+      },
+      "buildRole": "Dano de pacto (CAR) e vampirismo",
+      "origin": "Drop de Chefes (30%) ou Fusão Nv. 25",
+      "sellPrice": 450,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/grimoire_hadar_eclipse.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE, loot de Chefes e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes (30%) ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "armor_seraphic_bastion",
+      "name": "Armadura Sacra do Bastião Solar",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 22,
+        "sabedoria": 22
+      },
+      "statsBonus": {
+        "sabedoria": 14,
+        "constituicao": 18,
+        "maxHp": 210,
+        "maxResource": 90
+      },
+      "buildRole": "Sobrevivência consagrada e poder divino",
+      "origin": "Drop de Chefes M2/M3 ou Fusão Nv. 25",
+      "sellPrice": 490,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/armor_seraphic_bastion.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "armor_windrunner_scale",
+      "name": "Cota de Escamas do Vento Astral",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE"
+      ],
+      "requiredAttributes": {
+        "destreza": 25
+      },
+      "statsBonus": {
+        "destreza": 15,
+        "sabedoria": 8,
+        "constituicao": 14,
+        "maxHp": 180
+      },
+      "buildRole": "Agilidade ofensiva e defesa leve épica",
+      "origin": "Drop de Chefes M2/M3 ou Fusão Nv. 25",
+      "sellPrice": 490,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/armor_windrunner_scale.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "robe_archmage_nexus",
+      "name": "Manto Real do Nexus Arcano",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "MAGO"
+      ],
+      "requiredAttributes": {
+        "inteligencia": 28
+      },
+      "statsBonus": {
+        "inteligencia": 18,
+        "sabedoria": 8,
+        "constituicao": 10,
+        "maxHp": 120,
+        "maxResource": 160
+      },
+      "buildRole": "Dano arcano sustentado e amplo Mana",
+      "origin": "Drop de Chefes M2/M3 ou Fusão Nv. 25",
+      "sellPrice": 490,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/robe_archmage_nexus.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "robe_voidlord_covenant",
+      "name": "Vestes Soberanas do Pacto Abissal",
+      "type": "EQUIPAMENTO",
+      "slot": "ARMADURA",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "BRUXO"
+      ],
+      "requiredAttributes": {
+        "carisma": 28
+      },
+      "statsBonus": {
+        "carisma": 18,
+        "constituicao": 14,
+        "maxHp": 160,
+        "maxResource": 140
+      },
+      "buildRole": "Dano de Carisma e resiliência para magias de curta distância",
+      "origin": "Drop de Chefes M2/M3 ou Fusão Nv. 25",
+      "sellPrice": 490,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/robe_voidlord_covenant.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "shield_immortal_bastion",
+      "name": "Bastião Inquebrável dos Titãs",
+      "type": "EQUIPAMENTO",
+      "slot": "ESCUDO",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "GUERREIRO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 25
+      },
+      "statsBonus": {
+        "constituicao": 18,
+        "forca": 6,
+        "sabedoria": 8,
+        "maxHp": 220
+      },
+      "buildRole": "Mitigação máxima para chefes e Boss Rush",
+      "origin": "Drop de Chefes M2/M3 ou Fusão Nv. 25",
+      "sellPrice": 430,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/shield_immortal_bastion.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "helm_titan_warlord",
+      "name": "Elmo Imperial do Senhor da Guerra",
+      "type": "EQUIPAMENTO",
+      "slot": "ELMO",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 22
+      },
+      "statsBonus": {
+        "constituicao": 14,
+        "forca": 10,
+        "sabedoria": 10,
+        "carisma": 5,
+        "maxHp": 150
+      },
+      "buildRole": "Comando, vigor e força marcial/sacra",
+      "origin": "Drop de Chefes M2/M3 ou Boss Rush",
+      "sellPrice": 390,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/helm_titan_warlord.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e loot de Chefes",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Boss Rush. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "diadem_celestial_mind",
+      "name": "Diadema da Mente Espectral",
+      "type": "EQUIPAMENTO",
+      "slot": "ELMO",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE",
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 12,
+        "inteligencia": 12,
+        "carisma": 12,
+        "sabedoria": 6,
+        "maxResource": 110
+      },
+      "buildRole": "Precisão e poder mental/astral",
+      "origin": "Drop de Chefes M2/M3 ou Boss Rush",
+      "sellPrice": 390,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/diadem_celestial_mind.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e loot de Chefes",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Boss Rush. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "greaves_colossus_stride",
+      "name": "Grevas Rúnicas do Colosso",
+      "type": "EQUIPAMENTO",
+      "slot": "BOTAS",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "CLERIGO"
+      ],
+      "requiredAttributes": {
+        "constituicao": 22
+      },
+      "statsBonus": {
+        "constituicao": 14,
+        "forca": 8,
+        "sabedoria": 6,
+        "maxHp": 160
+      },
+      "buildRole": "Firmeza e reserva de vida épica",
+      "origin": "Drop de Chefes M2/M3 ou Boss Rush",
+      "sellPrice": 380,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/greaves_colossus_stride.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e loot de Chefes",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Boss Rush. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "boots_phantom_gale",
+      "name": "Botas do Vendaval Fantasma",
+      "type": "EQUIPAMENTO",
+      "slot": "BOTAS",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "ARQUEIRO",
+        "MONGE",
+        "MAGO",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "destreza": 12,
+        "inteligencia": 8,
+        "carisma": 8,
+        "constituicao": 8,
+        "maxHp": 110,
+        "maxResource": 80
+      },
+      "buildRole": "Mobilidade tática e sustentação",
+      "origin": "Drop de Chefes M2/M3 ou Boss Rush",
+      "sellPrice": 380,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/boots_phantom_gale.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e loot de Chefes",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Drop de Chefes M2/M3 ou Boss Rush. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    },
+    {
+      "status": "proposto",
+      "calibrationState": "NAO_CALIBRADO",
+      "itemId": "signet_crimson_forge",
+      "name": "Sinete da Forja Carmesim",
+      "type": "EQUIPAMENTO",
+      "slot": "ACESSORIO",
+      "rarity": "EPICO",
+      "minLevel": 25,
+      "allowedClasses": [
+        "GUERREIRO",
+        "BARBARO",
+        "ARQUEIRO",
+        "CLERIGO",
+        "MAGO",
+        "MONGE",
+        "BRUXO"
+      ],
+      "requiredAttributes": {},
+      "statsBonus": {
+        "forca": 8,
+        "destreza": 8,
+        "inteligencia": 8,
+        "sabedoria": 8,
+        "carisma": 8,
+        "constituicao": 8,
+        "maxHp": 120,
+        "maxResource": 80
+      },
+      "buildRole": "Amplificador completo de 2º Círculo",
+      "origin": "Boss Rush (Onda 2–3) ou Fusão Nv. 25",
+      "sellPrice": 460,
+      "maxStack": 1,
+      "iconAssetProposto": "/assets/ui/items/signet_crimson_forge.png",
+      "dependencies": "Inclusão em ITEMS_DATABASE e receita Nv. 25",
+      "supersededByExistingItemId": null,
+      "reconciledOrigin": "DEPENDÊNCIA DE IMPLEMENTAÇÃO: Boss Rush (Onda 2–3) ou Fusão Nv. 25. Requer cadastro em ITEMS_DATABASE e inclusão explícita em Monster.ts, DungeonManager.ts ou equipment-fusion.ts (e desbloqueio manual caso use resultado protegido de reforja anterior).",
+      "sourceImplementationStatus": "DEPENDENCIA_DE_IMPLEMENTACAO"
+    }
+  ]
+}

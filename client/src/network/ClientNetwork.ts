@@ -9,6 +9,9 @@ import {
   C2SUseItemPayload,
   C2SSellItemPayload,
   C2SDiscardItemPayload,
+  EquipmentAdvicePayload,
+  FusionRequest,
+  FusionResult,
   C2SExpandInventoryPayload,
   CharacterClass,
   NetworkMessage,
@@ -129,6 +132,8 @@ export class ClientNetwork {
   public onItemDropSpawn: MessageListener<S2CItemDropSpawnPayload> | null = null;
   public onItemDropDespawn: MessageListener<S2CItemDropDespawnPayload> | null = null;
   public onInventoryUpdate: MessageListener<S2CInventoryUpdatePayload> | null = null;
+  public onFusionResult: MessageListener<FusionResult> | null = null;
+  public onEquipmentAdvice: MessageListener<EquipmentAdvicePayload> | null = null;
   private inventorySnapshot = new Map<number, InventoryItemPayload>();
   public onPlayerExpUpdate: MessageListener<S2CPlayerExpUpdatePayload> | null = null;
   public onPlayerLevelUp: MessageListener<S2CPlayerLevelUpPayload> | null = null;
@@ -420,8 +425,18 @@ export class ClientNetwork {
     this.send(Opcode.C2S_DISCARD_ITEM, payload);
   }
 
-  public sendExpandInventory(): void {
-    this.send(Opcode.C2S_EXPAND_INVENTORY, {});
+  public sendSetItemLock(slotIndex: number, isLocked: boolean): void {
+    const expectedInstanceId = this.inventorySnapshot.get(slotIndex)?.instanceId;
+    if (!expectedInstanceId) return;
+    this.send(Opcode.C2S_SET_ITEM_LOCK, { slotIndex, expectedInstanceId, isLocked });
+  }
+
+  public sendFuseEquipment(request: FusionRequest): void { this.send(Opcode.C2S_FUSE_EQUIPMENT, request); }
+
+  public sendRequestEquipmentAdvice(): void { this.send(Opcode.C2S_REQUEST_EQUIPMENT_ADVICE, {}); }
+
+  public sendExpandInventory(expectedMaxSlots?: number): void {
+    this.send(Opcode.C2S_EXPAND_INVENTORY, { expectedMaxSlots });
   }
 
   public sendChallengeBoss(): void {
@@ -615,6 +630,11 @@ export class ClientNetwork {
           break;
         }
 
+        case Opcode.S2C_FUSION_RESULT: { this.onFusionResult?.(packet.data as FusionResult); break; }
+        case Opcode.S2C_EQUIPMENT_ADVICE: {
+          this.onEquipmentAdvice?.(packet.data as EquipmentAdvicePayload);
+          break;
+        }
         case Opcode.S2C_INVENTORY_UPDATE: {
           this.inventorySnapshot = new Map((packet.data as S2CInventoryUpdatePayload).slots.map(item => [item.slotIndex, item]));
           this.onInventoryUpdate?.(packet.data as S2CInventoryUpdatePayload);

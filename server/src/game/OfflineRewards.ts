@@ -40,13 +40,26 @@ export function calculateOfflineReward(
     Math.floor(cappedSeconds / OFFLINE_REWARD_POLICY.materialIntervalSeconds),
   );
 
+  // Add only newly earned material intervals: a partially claimed chest must not recreate delivered items.
+  const priorIntervals = Math.min(OFFLINE_REWARD_POLICY.materialIntervalLimit, Math.floor(priorSeconds / OFFLINE_REWARD_POLICY.materialIntervalSeconds));
+  const loot = (previous?.loot ?? []).map(item => ({ ...item }));
+  const materials = [
+    ['ore_iron_arcane', (n: number) => n * 2],
+    ['potion_hp_minor', (n: number) => n > 0 ? Math.max(1, Math.floor(n * 1.5)) : 0],
+  ] as const;
+  for (const [itemId, quantityAt] of materials) {
+    const quantity = quantityAt(intervals) - quantityAt(priorIntervals);
+    if (quantity <= 0) continue;
+    const existing = loot.find(item => item.itemId === itemId);
+    if (existing) existing.quantity += quantity;
+    else loot.push({ itemId, name: ITEMS_DATABASE[itemId].name, rarity: ITEMS_DATABASE[itemId].rarity, quantity });
+  }
+
+
   return {
     accumulatedGold: (previous?.accumulatedGold ?? 0) + Math.floor(addedSeconds * goldRate),
     accumulatedExp: (previous?.accumulatedExp ?? 0) + Math.floor(addedSeconds * expRate),
-    loot: intervals > 0 ? [
-      { itemId: 'ore_iron_arcane', name: ITEMS_DATABASE.ore_iron_arcane.name, rarity: ITEMS_DATABASE.ore_iron_arcane.rarity, quantity: intervals * 2 },
-      { itemId: 'potion_hp_minor', name: ITEMS_DATABASE.potion_hp_minor.name, rarity: ITEMS_DATABASE.potion_hp_minor.rarity, quantity: Math.max(1, Math.floor(intervals * 1.5)) },
-    ] : [],
+    loot,
     offlineSeconds: (previous?.offlineSeconds ?? 0) + elapsed,
     cappedSeconds,
     maxOfflineSeconds,

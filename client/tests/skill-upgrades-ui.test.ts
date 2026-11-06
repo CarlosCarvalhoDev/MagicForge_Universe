@@ -44,14 +44,16 @@ test('Upgrade só altera nível após confirmação e impede clique duplicado', 
   assert.match(f.controls().children[0].textContent, /\+5%.*\+10%/);
 });
 
-test('Recursos, seleção, desbloqueio, teto e suporte sem efeito bloqueiam compra', t => {
+test('Recursos, seleção, desbloqueio, teto e suporte sem evolução de potência bloqueiam compra', t => {
   const f = setup(t);
   f.ui.onSkillsUpdate({});
   for (const options of [{ gold: 99 }, { dust: 0 }, { equipped: false }, { heroLevel: 0 }]) {
     assert.equal(f.controls(options).children[2].disabled, true);
   }
-  const support = f.ui.createControls(SKILLS_DATABASE.mago_nv1_2, { equipped: true, heroLevel: 50, gold: 10000, dust: 100 }) as unknown as Element;
+  const support = f.ui.createControls(SKILLS_DATABASE.mago_nv2_3, { equipped: true, heroLevel: 50, gold: 10000, dust: 100 }) as unknown as Element;
   assert.equal(support.children[2].disabled, true);
+  const shield = f.ui.createControls(SKILLS_DATABASE.mago_nv1_2, { equipped: true, heroLevel: 10, gold: 10000, dust: 100 }) as unknown as Element;
+  assert.equal(shield.children[2].disabled, false);
   f.ui.onSkillsUpdate({ guerreiro_truque_1: 20 });
   assert.match(f.controls().children[0].textContent, /\+95%/);
   assert.equal(f.controls().children[2].textContent, 'Nível máximo');

@@ -46,7 +46,7 @@
    - Auto-recuo imediato para a Fase 9 com farm contínuo de mobs em caso de derrota/timeout.
    - Re-desafio manual com cura total e toggle de auto-challenge autoritativo.
 8. **Recompensas AFK / Progresso Offline - Baú do Tempo (Etapa 2)**:
-   - Cálculo autoritativo de Ouro e EXP acumulados com teto de 12 horas e limiar mínimo de 5 minutos.
+   - Cálculo autoritativo de Ouro e EXP acumulados com teto gratuito de 8 horas (premium de 12 horas reservado para o futuro) e limiar mínimo de 5 minutos.
    - Drops de suprimentos/minérios por tempo ausente e modal estético `[Coletar Recompensas Offline]`.
 
 ---
@@ -83,7 +83,7 @@ flowchart TD
 * **Objetivo**: Recompensar o jogador pelo tempo que passou fora do jogo (celular bloqueado ou navegador fechado).
 * **Mecânica Implementada e Testada**:
   - `last_logout` persistido e atualizado autoritativamente na tabela `characters` do SQLite.
-  - Ao logar, se $\Delta t \ge 300\text{s}$ (5 minutos), gera `S2C_OFFLINE_REWARD_INFO` com teto de 12 horas ($43.200\text{s}$).
+  - Ao logar, se $\Delta t \ge 300\text{s}$ (5 minutos), gera `S2C_OFFLINE_REWARD_INFO` com teto gratuito de 8 horas ($28.800\text{s}$); premium futuro de 12 horas ainda não ativado.
   - Fórmulas autoritativas:
     - $\text{Ouro/s} = \text{Mundo} \times 15 + \text{Fase} \times 5 + \text{Nível} \times 3$
     - $\text{EXP/s} = \text{Mundo} \times 10 + \text{Fase} \times 4 + \text{Nível} \times 2$
@@ -105,15 +105,17 @@ flowchart TD
   - Melhorias acompanham a habilidade ao trocar escolhas, reconectar e mudar de mundo; categorias, desbloqueios e ordem automática são preservados.
   - Habilidades de suporte sem efeito de potência implementado exibem evolução indisponível e não cobram recursos.
   - Economia inicial medida em 04/11/2026: primeira melhoria por 300 ouro + 1 Pó Arcano; previsão de tempo no Grimório e proteção de materiais na auto-venda. Ver [entrega e limitações](ENTREGA_ECONOMIA_2026-11-04.md).
-  - Comparação controlada comprovou que habilidade e refino mudam resultados limítrofes. Balanceamento de DPS do Clérigo, sobrevivência do Bárbaro, mochila e progressão além dos primeiros 30 minutos continuam pendentes antes de considerar o ciclo completo equilibrado.
+  - Comparação controlada comprovou que habilidade e refino mudam resultados limítrofes. Em 05/11, corrigidos alvo/alcance automático, Fúria, mana por classe e dois ataques híbridos com cura; 420 cenários medidos nas sete classes. Ver [combate e chefes](CICLO_COMBATE_E_CHEFES_2026-11-05.md). Clérigo tem os efeitos das 12 habilidades implementados: [níveis 1/10](ENTREGA_CLERIGO_INICIAL_2026-11-05.md), [nível 25](ENTREGA_CLERIGO_TEMPORAL_2026-11-05.md) e [nível 50](ENTREGA_CLERIGO_NIVEL50_2026-11-05.md), com 468 lutas de escolhas medidas. Mago agora tem as 12 habilidades implementadas: [níveis 1/10](ENTREGA_MAGO_INICIAL_2026-11-05.md), [nível 25](ENTREGA_MAGO_NIVEL25_2026-11-05.md) e [nível 50](ENTREGA_MAGO_NIVEL50_2026-11-05.md), incluindo três impactos reais dos Cometas; 480 lutas de escolhas medidas. Guerreiro revisado e efeitos das 12 habilidades do Bárbaro implementados, com sangramento seguro, dreno, debuffs, deslocamento, proteção e auras; ver [entrega marcial](ENTREGA_GUERREIRO_BARBARO_2026-11-05.md). Medidas 936 lutas de escolhas das duas classes; próxima prioridade é calibrar sua progressão com recursos do farm. Efeitos incompletos das demais classes, balanceamento e progressão longa continuam pendentes antes de considerar o ciclo completo equilibrado.
 
 ---
 
-### ⏳ ETAPA 4: Fusão de Equipamentos (Merge) & Auto-Equipar Melhor
+### 🚧 ETAPA 4: Proteção, sugestões de equipamento e fusão
 * **Objetivo**: Dar utilidade para dezenas de itens acumulados na bag e facilitar a troca de equipamentos no celular.
 * **Mecânica**:
-  - **Fusão**: Juntar 5 espadas comuns idênticas para forjar 1 espada incomum (+atributos).
-  - **Auto-Equipar**: Botão no Paperdoll que compara o Poder de Combate (CP) de todos os itens do inventário com os equipados e substitui instantaneamente pelos mais fortes.
+  - **Proteção entregue**: trava por instância, persistida no SQLite, respeitada por venda, reciclagem, consumo de materiais/gemas/poções e venda em lote. Equipar e refinar o próprio equipamento continuam permitidos.
+  - **Sugestões entregues**: botão Ver melhorias consulta o servidor; considera classe, nível, atributos, refino, gemas e itens protegidos. Indica ganhos sem perda em outros bônus e permite inspecionar antes de equipar manualmente.
+  - **Reforja inicial entregue**: oito receitas para as sete classes, nível 5; três peças iniciais idênticas + 1.800 ouro + 6 minérios + 8 pós. Prévia, confirmação, proteção de ingredientes, transação e recibo persistente. Equipados, protegidos, refinados e peças com gemas ficam fora; resultado nasce protegido. Primeira disponibilidade medida em 158–238s em oito trajetórias sem compras e com auto-venda desligada; não representa equilíbrio completo. Ver [entrega de fusão](FUSAO_EQUIPAMENTOS_2026-11-05.md).
+  - **Autoequipar completo pendente**: nenhuma troca automática foi adicionada nesta etapa. CP isolado não define a melhor build; uma futura aplicação em lote precisa de revisão e validação do conjunto. Ver [entrega de proteção e sugestões](PROTECAO_E_SUGESTOES_2026-11-04.md).
 
 ---
 
@@ -137,6 +139,9 @@ flowchart TD
 ---
 
 ## 📝 Registro de Atualizações
+
+Em 06/11/2026 foi concluída a bancada de compras durante o farm de Guerreiro/Bárbaro: 36 trajetórias de 30 minutos, sem recursos concedidos, com habilidade/refino/fusão reais. As melhorias funcionam, mas não superaram o terceiro chefe nessa janela. A auto-venda de comuns/incomuns não resolveu sozinha a lotação por equipamentos raros incompatíveis. Próximo foco recomendado: gestão seletiva de excedentes e medição de builds combinadas antes de alterar a dificuldade. Ver [progressão com recursos do farm](PROGRESSAO_MARCIAL_COM_RECURSOS_DO_FARM_2026-11-06.md). Nenhuma regra de produção foi alterada neste bloco.
+
 | Data | Autor | Alteração Realizada |
 | :--- | :--- | :--- |
 | **03/11/2026** | Antigravity | Criação deste documento de arquitetura e backlog de mecânicas Idle RPG. |

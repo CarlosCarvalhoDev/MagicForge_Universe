@@ -20,6 +20,9 @@ test('Cliente envia identidade da instância após troca, incluindo equipado e n
   assert.equal(sent.at(-1).data.expectedInstanceId, 'weapon_b');
   client.sendSocketGem(-1,1,'gem_ruby_str');
   assert.equal(sent.at(-1).data.expectedInstanceId, 'weapon_a');
+  client.sendSetItemLock(-1, true);
+  assert.equal(sent.at(-1).op, Opcode.C2S_SET_ITEM_LOCK);
+  assert.deepEqual(sent.at(-1).data, { slotIndex:-1, expectedInstanceId:'weapon_a', isLocked:true });
   client.disconnect(false);
   client.sendUseItem(2);
   assert.equal(sent.at(-1).data.expectedInstanceId, undefined);

@@ -4375,6 +4375,7 @@
               <button class="submenu-tab-btn active" data-tab="tab-mochila" id="tab-btn-mochila">
                 <span class="tab-emoji">🎒</span> Mochila
               </button>
+              <button class="submenu-tab-btn" data-tab="tab-fusao" id="tab-btn-fusao"><span class="tab-emoji">⚒️</span> Fusão</button>
               <button class="submenu-tab-btn" data-tab="tab-refino" id="tab-btn-refino">
                 <span class="tab-emoji">🔨</span> Refinamento
               </button>
@@ -4393,21 +4394,29 @@
                 <div class="inventory-grid-wrap">
                   <div class="grid-sub-header">
                     <span id="inventory-capacity-text">CAPACIDADE: 20 / 20 SLOTS</span>
-                    <button id="btn-expand-inventory" class="btn-expand-bag" title="Expandir Mochila (+5 Slots)">➕ Expandir (+5) • <span id="expand-cost-label">10.000 G</span></button>
+                    <button id="btn-expand-inventory" class="btn-expand-bag" title="Expandir Mochila (+5 Slots)"><span id="expand-slots-label">+5 espaços</span><span id="expand-cost-label">10.000 G</span></button>
                   </div>
+                  <p id="inventory-expansion-status" role="status" aria-live="polite"></p>
+                  <section id="inventory-expansion-confirm" aria-label="Expandir mochila" hidden>
+                    <h4>Expandir mochila</h4>
+                    <p id="inventory-expansion-summary"></p>
+                    <p id="inventory-expansion-requirements" role="status"></p>
+                    <div class="inventory-expansion-actions">
+                      <button id="btn-confirm-expansion" type="button">Comprar expansão</button>
+                      <button id="btn-cancel-expansion" type="button">Agora não</button>
+                    </div>
+                  </section>
                   <div id="inventory-view-tools" aria-label="Filtrar mochila">
                     <input id="inventory-search" aria-label="Buscar item" type="search" placeholder="Buscar item…" autocomplete="off" />
                     <select id="inventory-type-filter" aria-label="Tipo de item"><option value="all">Todos</option><option value="EQUIPAMENTO">Equipamentos</option><option value="CONSUMIVEL">Poções</option><option value="MATERIAL">Materiais</option><option value="GEMA">Gemas</option></select>
+                    <button type="button" id="btn-equipment-advice">Ver melhorias</button>
                   </div>
+                  <p id="equipment-advice-status" role="status" aria-live="polite"></p>
+                  <div id="equipment-advice-list"></div>
                   <p id="inventory-view-summary" role="status" aria-live="polite"></p>
                   <p class="inventory-equipment-note">Passe o mouse ou segure um item para comparar. Toque para selecionar.</p>
                   <div class="inventory-slots-grid" id="inventory-slots-grid"></div>
-                  <p id="inventory-expansion-status" role="status" aria-live="polite"></p>
-                  <div id="inventory-expansion-confirm" hidden>
-                    <p id="inventory-expansion-summary"></p>
-                    <button id="btn-confirm-expansion" type="button">Confirmar compra</button>
-                    <button id="btn-cancel-expansion" type="button">Cancelar</button>
-                  </div>
+
                 </div>
 
                 <!-- Inspector Card -->
@@ -4439,10 +4448,31 @@
 
                   <div class="inspector-actions" style="display: flex; gap: 8px; margin-top: auto;">
                     <button id="btn-inventory-action" class="btn-action-primary" style="display: none; flex: 1;">Equipar</button>
+                    <button id="btn-inventory-lock" type="button" hidden>Proteger item</button>
                     <button id="btn-inventory-discard" class="btn-action-discard" style="display: none; flex: 1;">♻️ Reciclar na Forja</button>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="submenu-tab-panel" id="tab-fusao" style="display:none;">
+              <section class="fusion-forge-card">
+                <h3>Reforja Rúnica</h3>
+                <p>Reúna duplicatas e desperte uma nova afinidade na bigorna ancestral.</p>
+                <label for="fusion-recipe">Receita da sua classe</label>
+                <select id="fusion-recipe"></select>
+                <h4 id="fusion-output"></h4>
+                <p id="fusion-cost"></p>
+                <div class="fusion-details"><section><h4>Ingredientes</h4><ul id="fusion-ingredients"></ul></section><section id="fusion-comparison" aria-label="Resultado comparado ao equipado"></section></div>
+                <p id="fusion-requirements" role="status"></p>
+                <p class="fusion-note">Use três cópias idênticas de uma peça inicial, sem proteção, refino ou gemas. O resultado nasce protegido, +0 e sem gemas.</p>
+                <button id="fusion-prepare" type="button">Preparar fusão</button>
+                <div id="fusion-confirmation" hidden><p id="fusion-confirmation-summary"></p><button id="fusion-confirm" type="button">Confirmar reforja</button><button id="fusion-cancel" type="button">Cancelar</button></div>
+                <p id="fusion-status" role="status" aria-live="polite"></p>
+                <button id="fusion-inspect-result" type="button" hidden>Inspecionar resultado na mochila</button>
+                <p class="fusion-note">Para juntar duplicatas, confira a auto-venda da raridade no Farm.</p>
+                <button id="fusion-open-farm" type="button">Ajustar auto-venda</button>
+              </section>
             </div>
 
             <!-- SUBMENU VIEW 2: REFINAMENTO (Forja de Equipamentos) -->

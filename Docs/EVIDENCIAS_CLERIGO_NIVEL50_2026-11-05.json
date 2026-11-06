@@ -1,0 +1,87 @@
+{
+  "generatedAt": "2026-11-05T12:54:46.566Z",
+  "sourceSha256": {
+    "server/src/game/World.ts": "c5d7bdcc113e261028ff4040dd98359b98c13296ddd79d4eb3bd1051cc1318c3",
+    "shared/src/skills.ts": "647ff2af7f873e6d52f242bcb736f8674153b415e0c2cb41a4c8e1910875e10a",
+    "shared/src/skill-targeting.ts": "dc8cbadc9265cc85d822650fb941c292ffa3cb852c226316531df2c542e95a41",
+    "client/src/renderer/PixelVfx.ts": "2716c6e0cc48822a3c6965b268be4585e410f2a5ab2d13dbe13baa957c024b6a",
+    "server/tools/benchmark-cleric.ts": "ac7ee1732903c479ad94dbc6463efff03aafaa04003e3b0ab1bf69cbcc6c6195",
+    "server/tools/BossInvestmentSimulation.ts": "4cdf8cd8c88a91228616a692830add7c3cdd1ef985e08ab75ec0baf34dfe0e9c"
+  },
+  "defaultMatrix": {
+    "scenarios": 420,
+    "outcomeChanges": 0,
+    "rejections": 0,
+    "emptyCasts": 0
+  },
+  "clericChoices": {
+    "assumptions": "468 fresh in-memory fixtures: nine choices at level 10 and 27 at level 25 in worlds 1/2; all 81 choices at level 50 in worlds 3/4; seeds 101/202. Default order and starter equipment, no investment; not farm-earned progression or a balance target. Different levels/worlds must not be compared as equal-difficulty fights.",
+    "scenarios": 468,
+    "commonCases": 144,
+    "commonOutcomeChanges": 0,
+    "rejections": 0,
+    "emptyCasts": 0,
+    "level50": [
+      {
+        "skill": "clerigo_nv3_1",
+        "world": 3,
+        "cases": 54,
+        "victories": 53,
+        "deaths": 0,
+        "timeouts": 1,
+        "averageSeconds": 49.41,
+        "averageHealing": 1845
+      },
+      {
+        "skill": "clerigo_nv3_1",
+        "world": 4,
+        "cases": 54,
+        "victories": 0,
+        "deaths": 0,
+        "timeouts": 54,
+        "averageSeconds": 60,
+        "averageHealing": 2404
+      },
+      {
+        "skill": "clerigo_nv3_2",
+        "world": 3,
+        "cases": 54,
+        "victories": 54,
+        "deaths": 0,
+        "timeouts": 0,
+        "averageSeconds": 50.14,
+        "averageHealing": 3047
+      },
+      {
+        "skill": "clerigo_nv3_2",
+        "world": 4,
+        "cases": 54,
+        "victories": 0,
+        "deaths": 0,
+        "timeouts": 54,
+        "averageSeconds": 60,
+        "averageHealing": 4521
+      },
+      {
+        "skill": "clerigo_nv3_3",
+        "world": 3,
+        "cases": 54,
+        "victories": 54,
+        "deaths": 0,
+        "timeouts": 0,
+        "averageSeconds": 49.75,
+        "averageHealing": 1845
+      },
+      {
+        "skill": "clerigo_nv3_3",
+        "world": 4,
+        "cases": 54,
+        "victories": 0,
+        "deaths": 0,
+        "timeouts": 54,
+        "averageSeconds": 60,
+        "averageHealing": 2399
+      }
+    ]
+  }
+}

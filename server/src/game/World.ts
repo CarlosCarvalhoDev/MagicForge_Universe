@@ -75,10 +75,25 @@ import {
   S2CSkillRotationPayload,
   isValidSkillCastOrder,
   selectNextSkillSlot,
+  getSkillTargeting,
+  isSkillEffectAvailable,
   C2SUpgradeSkillPayload,
   S2CSkillUpgradeResultPayload,
+  getEquipmentSuggestions,
+  FusionRequest,
   getSkillLevel,
+  INVENTORY_EXPANSIONS,
+  getInventoryExpansion,
   getSkillUpgradeMultiplier,
+  getClericPeriodicEffect,
+  getClericPulsePower,
+  isHybridHealingSkill,
+  MAGE_INITIAL_EFFECTS,
+  MAGE_SECOND_CIRCLE_EFFECTS,
+  MAGE_ULTIMATE_EFFECTS,
+  MARTIAL_EFFECTS,
+  isInMageCone,
+  splitMagePower,
 } from '@magicforge/shared';
 import { EntityManager } from './EntityManager';
 import { Entity, ActiveCombatStatus } from '../entities/Entity';
@@ -258,6 +273,8 @@ export class World {
     this.spatialGrid.removeEntity(playerId);
     if (player) {
       const clearedStatuses = player.clearAllStatuses();
+      this.clearCombatEffectsFromSource(player.id);
+      this.syncClericZones();
       for (const st of clearedStatuses) {
         this.broadcastStatusTransition('CLEARED_ON_DISCONNECT', st, {
           targetRemainingHp: player.currentHp,
@@ -728,6 +745,8 @@ export class World {
     if (player) {
       player.lastLogoutTime = Date.now();
       const clearedStatuses = player.clearAllStatuses();
+      this.clearCombatEffectsFromSource(player.id);
+      this.syncClericZones();
       for (const st of clearedStatuses) {
         this.broadcastStatusTransition('CLEARED_ON_DISCONNECT', st, {
           targetRemainingHp: player.currentHp,
@@ -913,6 +932,7 @@ export class World {
     // 1.1. Update Daily Dungeons & Boss Rush
     this.dungeonManager.update(deltaTimeSec);
 
+    this.syncClericZones();
     // 2. Update all Monsters & Spatial Cell Index
     const monsters = this.entityManager.getAllMonsters();
     for (const monster of monsters) {
@@ -997,7 +1017,8 @@ export class World {
 
   private processPlayerAutoCombat(player: Player, deltaTimeSec: number): void {
     if (player.isDead || player.isStunned()) return;
-    player.autoSkillDecisionTimerSec = Math.max(0, player.autoSkillDecisionTimerSec - deltaTimeSec);
+    const hasArcaneHaste=player.hasStatus('ARCANE_HASTE');
+    player.autoSkillDecisionTimerSec = Math.max(hasArcaneHaste?-SERVER_CONFIG.TICK_DELTA_TIME_SEC:0, player.autoSkillDecisionTimerSec - deltaTimeSec);
 
     // If player has a target, check validity
     let target = player.targetId ? this.entityManager.getMonster(player.targetId) : null;
@@ -1018,17 +1039,33 @@ export class World {
 
     const dist = distance(player.position, target.position);
     if (this.automationEnabled) {
-      const stopDistance = Math.max(1.4, player.attackRange - 0.35);
+      const readySkills = new Map(player.skillCastOrder.map(slot => [slot, SKILLS_DATABASE[player.getEquippedSkill(slot)]] as const).filter(([, skill]) => {
+        if (!skill || skill.classType !== player.classType || player.level < skill.unlockLevel || player.currentResource < this.getEffectiveSkillCost(player,skill.cost) || !isSkillEffectAvailable(skill)) return false;
+        const category = getSkillTargeting(skill).category;
+        if (category==='AOE_SELF' && isHybridHealingSkill(skill) && player.currentHp>=player.maxHp && dist>getSkillTargeting(skill).reach) return false;
+        return !(skill.isHeal && !isHybridHealingSkill(skill) && !['clerigo_nv2_3','barbaro_nv2_2','guerreiro_nv3_3'].includes(skill.skillId) && (category === 'SELF_HEAL' || category === 'AOE_SELF') && player.currentHp >= player.maxHp);
+      }).filter(([slot]) => (player.skillCooldowns.get(slot) ?? 0) <= 0));
+      let approachRange = player.attackRange;
+      if (player.autoCastEnabled) for (const skill of readySkills.values()) {
+        const targeting = getSkillTargeting(skill);
+        if (targeting.category !== 'SELF_HEAL' && targeting.category !== 'SELF_BUFF' && !(targeting.category === 'AOE_SELF' && skill.isHeal && !isHybridHealingSkill(skill))) approachRange = Math.min(approachRange, targeting.reach);
+      }
+      const stopDistance = Math.max(0.1, approachRange - 0.35);
       if (dist > stopDistance) {
         player.setMoveDirection(createVector3(target.position.x - player.position.x, 0, target.position.z - player.position.z), 0);
       } else {
         player.stopMoving();
         if (player.autoCastEnabled && player.autoSkillDecisionTimerSec <= 0) {
-          player.autoSkillDecisionTimerSec = 0.1;
+          player.autoSkillDecisionTimerSec = hasArcaneHaste?player.autoSkillDecisionTimerSec+0.1/MAGE_SECOND_CIRCLE_EFFECTS.hasteDecisionMultiplier:0.1;
           const next = selectNextSkillSlot(player.skillCastOrder, player.skillRotationCursor, slot => {
-            const skill = SKILLS_DATABASE[player.getEquippedSkill(slot)];
-            if (!skill || skill.classType !== player.classType || player.level < skill.unlockLevel ||
-              player.currentResource < skill.cost || (player.skillCooldowns.get(slot) ?? 0) > 0) return false;
+            const skill = readySkills.get(slot); if (!skill) return false;
+            const targeting = getSkillTargeting(skill);
+            if (targeting.category === 'SELF_HEAL' || targeting.category === 'SELF_BUFF') return this.castPlayerSkill(player, slot);
+            if (targeting.category === 'AOE_SELF') {
+              if (!skill.isHeal && dist > targeting.reach) return false;
+              return this.castPlayerSkill(player, slot);
+            }
+            if (dist > targeting.reach + 0.5) return false;
             return skill.isAoe ? this.castPlayerSkill(player, slot, undefined, target!.position) : this.castPlayerSkill(player, slot, target!.id);
           });
           if (next) player.skillRotationCursor = next.nextCursor;
@@ -1050,11 +1087,21 @@ export class World {
     }
   }
 
+  private rollPlayerCritical(player: Player, target: Monster | null, baseChance: number): boolean {
+    const mark = target?.getStatus('GUIDING_MARK');
+    if (mark && mark.sourceEntityId === player.id && mark.remainingSec > 0) {
+      target!.removeStatus(mark.statusId);
+      this.broadcastStatusTransition('BROKEN', mark);
+      return true;
+    }
+    return Math.random() < player.getCriticalChance(baseChance);
+  }
+
   private executePlayerAttack(player: Player, target: Monster): void {
     const wasAlive = !target.isDead;
     const rawDamage = player.BaseDamage;
     // Simple critical strike formula based on DEX
-    const isCritical = Math.random() < (player.attributes.destreza * 0.015);
+    const isCritical = this.rollPlayerCritical(player, target, player.attributes.destreza * 0.015);
     const finalDamage = isCritical ? Math.round(rawDamage * 1.5) : rawDamage;
 
     const dmgRes = target.takeDamage(finalDamage, player);
@@ -1096,7 +1143,7 @@ export class World {
     if (player.isDead) return;
 
     if (monster.attackCooldown <= 0) {
-      const damage = monster.attackDamage;
+      const damage = Math.round(monster.attackDamage*(1-Math.max(0,Math.min(.5,monster.getStatus('WEAKENED')?.magnitude??0))));
       // Dodge check based on player DEX
       const isDodged = Math.random() < (player.attributes.destreza * 0.01);
 
@@ -1128,7 +1175,7 @@ export class World {
 
         this.broadcast(Opcode.S2C_COMBAT_EVENT, combatEvent);
 
-        if (dmgRes.reflected > 0 && !monster.isDead) {
+        if (dmgRes.reflected > 0) {
           this.broadcast(Opcode.S2C_COMBAT_EVENT, {
             attackerId: player.id,
             targetId: monster.id,
@@ -1220,6 +1267,8 @@ export class World {
 
   public toCombatStatusPayload(status: ActiveCombatStatus): CombatStatusStatePayload {
     return {
+      areaCenter: status.areaCenter ? cloneVector3(status.areaCenter) : undefined,
+      radius: status.radius,
       statusId: status.statusId,
       type: status.type,
       skillId: status.skillId,
@@ -1238,20 +1287,138 @@ export class World {
   public broadcastStatusTransition(
     event: CombatStatusEventReason,
     status: ActiveCombatStatus,
-    extra?: { tickDamage?: number; targetRemainingHp?: number; isTargetDead?: boolean }
+    extra?: { tickDamage?: number; tickHeal?: number; targetRemainingHp?: number; isTargetDead?: boolean }
   ): void {
     const payload: CombatStatusTransitionPayload = {
       event,
       serverTick: this.currentTick,
       status: this.toCombatStatusPayload(status),
       tickDamage: extra?.tickDamage,
+      tickHeal: extra?.tickHeal,
       targetRemainingHp: extra?.targetRemainingHp,
       isTargetDead: extra?.isTargetDead,
     };
     this.broadcast(Opcode.S2C_COMBAT_STATUS_EVENT, payload);
   }
 
+  private syncClericZones(): void {
+    const players=this.entityManager.getAllPlayers().filter(player=>!player.isDead);
+    const guardians=players.map(player=>({player,effect:player.getStatus('GUARDIANS_AURA')})).filter(entry=>entry.effect && entry.effect.remainingSec>0);
+    const sync=(entity:Entity,type:'SLOW'|'SANCTUARY_WARD',source:Player|undefined,effect:ActiveCombatStatus|undefined,magnitude:number)=>{
+      const current=entity.getStatus(type);
+      if(!source||!effect){
+        if(current?.skillId==='clerigo_nv2_1'||current?.skillId==='clerigo_nv2_3'){
+          entity.removeStatus(current.statusId);this.broadcastStatusTransition('EXPIRED',current);
+        }
+        return;
+      }
+      if(current?.sourceEntityId===source.id && current.skillId===effect.skillId){
+        current.remainingSec=effect.remainingSec;
+        if(current.expiresAtTick!==effect.expiresAtTick){current.expiresAtTick=effect.expiresAtTick;this.broadcastStatusTransition('REFRESHED',current);}
+        return;
+      }
+      if(current){entity.removeStatus(current.statusId);this.broadcastStatusTransition('EXPIRED',current);}
+      const status:ActiveCombatStatus={statusId:`status_${Date.now()}_${++this.statusSequence}`,type,skillId:effect.skillId,sourceEntityId:source.id,targetEntityId:entity.id,durationSec:effect.durationSec,remainingSec:effect.remainingSec,expiresAtTick:effect.expiresAtTick,magnitude};
+      entity.addStatus(status);this.broadcastStatusTransition('APPLIED',status);
+    };
+    for(const monster of this.entityManager.getAllMonsters()){
+      const source=!monster.isDead?guardians.find(({player,effect})=>distanceSquared(player.position,monster.position)<=(effect!.radius??5)**2):undefined;
+      sync(monster,'SLOW',source?.player,source?.effect,0.4);
+    }
+    for(const player of players){
+      const effect=player.getStatus('SANCTUARY');
+      const inside=effect && effect.remainingSec>0 && effect.areaCenter && distanceSquared(player.position,effect.areaCenter)<=(effect.radius??6)**2;
+      sync(player,'SANCTUARY_WARD',inside?player:undefined,inside?effect:undefined,0.25);
+    }
+  }
+
+  private updateClericPeriodicEffect(player:Player,status:ActiveCombatStatus,deltaTimeSec:number): void {
+    const spec=getClericPeriodicEffect(status.skillId), periodic=status.periodic;
+    if(!spec||!periodic||player.isDead)return;
+    periodic.elapsedSec=Math.min(spec.durationSec,periodic.elapsedSec+Math.min(deltaTimeSec,Math.max(0,status.remainingSec)));
+    while(periodic.pulsesDone<spec.pulses && periodic.elapsedSec+1e-8>=(periodic.pulsesDone+1)*spec.intervalSec){
+      if(player.isDead || this.entityManager.getPlayer(player.id)!==player || !player.activeStatuses.has(status.statusId))break;
+      const power=getClericPulsePower(periodic.totalPower,++periodic.pulsesDone,spec.pulses);
+      if(status.type==='SANCTUARY'){
+        if(status.areaCenter && distanceSquared(player.position,status.areaCenter)<=spec.radius**2){
+          const healed=player.heal(power);
+          this.broadcastStatusTransition('TICK',status,{tickHeal:healed,targetRemainingHp:player.currentHp,isTargetDead:false});
+        }
+        continue;
+      }
+      let targets:Monster[]=[];
+      if(status.type==='GUARDIANS_AURA')targets=this.entityManager.getAllMonsters().filter(monster=>!monster.isDead&&distanceSquared(player.position,monster.position)<=spec.radius**2);
+      else {
+        let target=periodic.targetId?this.entityManager.getMonster(periodic.targetId):null;
+        if(!target||target.isDead||distanceSquared(player.position,target.position)>spec.radius**2)target=this.entityManager.findNearestMonster(player.position,spec.radius);
+        periodic.targetId=target?.id;
+        if(target&&!target.isDead)targets=[target];
+      }
+      for(const target of targets){
+        if(player.isDead)break;
+        const previousHp=target.currentHp;
+        target.takeDamage(power,player);
+        const damage=Math.max(0,previousHp-target.currentHp);
+        this.broadcast(Opcode.S2C_COMBAT_EVENT,{attackerId:player.id,targetId:target.id,damage,isCritical:false,isDodged:false,targetRemainingHp:target.currentHp,targetMaxHp:target.maxHp,isTargetDead:target.isDead,damageSource:'STATUS_TICK'} as S2CCombatEventPayload);
+        if(target.isDead)this.handleMonsterDeath(target,player);
+      }
+    }
+  }
+
+  private clearCombatEffectsFromSource(sourceId:string):void{
+    for(const monster of this.entityManager.getAllMonsters())for(const status of [...monster.activeStatuses.values()]){
+      if(status.sourceEntityId===sourceId && ['BURN','FROST_SLOW','FROZEN','BLEED','CRIPPLED','WEAKENED'].includes(status.type)){
+        monster.removeStatus(status.statusId);this.broadcastStatusTransition('CLEARED_ON_DISCONNECT',status);
+      }
+    }
+  }
+
+  private applySkillStatus(player:Player,target:Entity,type:CombatStatusType,durationSec:number,magnitude:number,skillId:string,extra:Pick<ActiveCombatStatus,'periodic'|'remainingAbsorption'|'maxAbsorption'|'reflectRatio'|'reflectOnAbsorbed'|'areaCenter'|'radius'>={}):ActiveCombatStatus{
+    const previous=target.getStatus(type);
+    if(previous){target.removeStatus(previous.statusId);this.broadcastStatusTransition('EXPIRED',previous);}
+    const status:ActiveCombatStatus={statusId:`status_${Date.now()}_${++this.statusSequence}`,type,skillId,sourceEntityId:player.id,targetEntityId:target.id,durationSec,remainingSec:durationSec,expiresAtTick:this.currentTick+durationSec*SERVER_CONFIG.TICK_RATE,magnitude,...extra};
+    target.addStatus(status);this.broadcastStatusTransition('APPLIED',status);return status;
+  }
+
+  private updateMageBurn(monster:Monster,status:ActiveCombatStatus,deltaTimeSec:number):void{
+    const periodic=status.periodic,source=this.entityManager.getPlayer(status.sourceEntityId);
+    if(!periodic||!source||source.isDead)return;
+    periodic.elapsedSec=Math.min(MAGE_INITIAL_EFFECTS.burnDurationSec,periodic.elapsedSec+Math.min(deltaTimeSec,Math.max(0,status.remainingSec)));
+    while(periodic.pulsesDone<4 && periodic.elapsedSec+1e-8>=periodic.pulsesDone+1){
+      if(monster.isDead||source.isDead||!monster.activeStatuses.has(status.statusId))break;
+      const power=splitMagePower(periodic.totalPower,++periodic.pulsesDone,4),previousHp=monster.currentHp;
+      monster.takeDamage(power,source);
+      const damage=Math.max(0,previousHp-monster.currentHp);
+      this.broadcastStatusTransition('TICK',status,{tickDamage:damage,targetRemainingHp:monster.currentHp,isTargetDead:monster.isDead});
+      this.broadcast(Opcode.S2C_COMBAT_EVENT,{attackerId:source.id,targetId:monster.id,damage,isCritical:false,isDodged:false,targetRemainingHp:monster.currentHp,targetMaxHp:monster.maxHp,isTargetDead:monster.isDead,damageSource:'STATUS_TICK'} as S2CCombatEventPayload);
+      if(monster.isDead)this.handleMonsterDeath(monster,source);
+    }
+  }
+
+  private updateAreaDamageEffect(player:Player,status:ActiveCombatStatus,deltaTimeSec:number):void{
+    const pack=status.type==='SPECTRAL_PACK';
+    const duration=pack?MARTIAL_EFFECTS.packSec:MAGE_ULTIMATE_EFFECTS.cometDurationSec;
+    const pulses=pack?MARTIAL_EFFECTS.packPulses:MAGE_ULTIMATE_EFFECTS.cometPulses;
+    const interval=pack?1:MAGE_ULTIMATE_EFFECTS.cometIntervalSec;
+    const periodic=status.periodic,center=pack?player.position:status.areaCenter;
+    if(!periodic||!center||player.isDead)return;
+    periodic.elapsedSec=Math.min(duration,periodic.elapsedSec+Math.min(deltaTimeSec,Math.max(0,status.remainingSec)));
+    while(periodic.pulsesDone<pulses && periodic.elapsedSec+1e-8>=(periodic.pulsesDone+1)*interval){
+      if(player.isDead||this.entityManager.getPlayer(player.id)!==player||!player.activeStatuses.has(status.statusId))break;
+      const power=splitMagePower(periodic.totalPower,++periodic.pulsesDone,pulses);let totalDamage=0;
+      const targets=this.entityManager.getAllMonsters().filter(monster=>!monster.isDead&&distanceSquared(center,monster.position)<=(status.radius??6.5)**2);
+      for(const monster of targets){
+        if(player.isDead)break;
+        const previousHp=monster.currentHp;monster.takeDamage(power,player);const damage=Math.max(0,previousHp-monster.currentHp);totalDamage+=damage;
+        this.broadcast(Opcode.S2C_COMBAT_EVENT,{attackerId:player.id,targetId:monster.id,damage,isCritical:false,isDodged:false,targetRemainingHp:monster.currentHp,targetMaxHp:monster.maxHp,isTargetDead:monster.isDead,damageSource:'STATUS_TICK'} as S2CCombatEventPayload);
+        if(monster.isDead)this.handleMonsterDeath(monster,player);
+      }
+      this.broadcastStatusTransition('TICK',status,{tickDamage:totalDamage});
+    }
+  }
+
   public updateCombatStatuses(deltaTimeSec: number): void {
+    this.syncClericZones();
     const allEntities: Entity[] = [
       ...this.entityManager.getAllPlayers(),
       ...this.entityManager.getAllMonsters(),
@@ -1261,13 +1428,22 @@ export class World {
       if (ent.activeStatuses.size === 0) continue;
 
       for (const [statusId, status] of Array.from(ent.activeStatuses.entries())) {
-        status.remainingSec -= deltaTimeSec;
+        if(!ent.activeStatuses.has(statusId))continue;
+        if(['BURN','FROST_SLOW','FROZEN','BLEED','CRIPPLED','WEAKENED'].includes(status.type)){
+          const source=this.entityManager.getPlayer(status.sourceEntityId);
+          if(!source||source.isDead){ent.removeStatus(statusId);this.broadcastStatusTransition(source?'CLEARED_ON_DEATH':'CLEARED_ON_DISCONNECT',status);continue;}
+          if(ent instanceof Monster && status.type==='BURN')this.updateMageBurn(ent,status,deltaTimeSec);
+        }
+        if(ent instanceof Player && status.periodic){
+          if(status.type==='COMET_RAIN'||status.type==='SPECTRAL_PACK')this.updateAreaDamageEffect(ent,status,deltaTimeSec);
+          else this.updateClericPeriodicEffect(ent,status,deltaTimeSec);
+        }
 
         // Periodic Tick (e.g. BLEED a cada 1.0s)
         if (status.type === 'BLEED') {
-          status.nextTickSec = (status.nextTickSec ?? 1.0) - deltaTimeSec;
-          if (status.nextTickSec <= 0 && !ent.isDead) {
-            status.nextTickSec = 1.0;
+          status.nextTickSec = (status.nextTickSec ?? 1.0) - Math.min(deltaTimeSec,Math.max(0,status.remainingSec));
+          while (status.nextTickSec <= 1e-8 && !ent.isDead && ent.activeStatuses.has(statusId)) {
+            status.nextTickSec += 1;
             const tickDmg = status.magnitude;
             const dmgRes = ent.takeDamage(tickDmg);
 
@@ -1296,6 +1472,8 @@ export class World {
           }
         }
 
+        status.remainingSec -= deltaTimeSec;
+
         // Expiração do status
         if (status.remainingSec <= 0 && ent.activeStatuses.has(statusId)) {
           ent.activeStatuses.delete(statusId);
@@ -1306,6 +1484,7 @@ export class World {
         }
       }
     }
+    this.syncClericZones();
   }
 
   /**
@@ -1313,6 +1492,10 @@ export class World {
    * Valida rigorosamente classe, slot, nível, CD, recurso, alvo, distância e geometria
    * ANTES de consumir qualquer recurso ou acionar cooldown.
    */
+  private getEffectiveSkillCost(player:Player,baseCost:number):number{
+    return player.classType===CharacterClass.BARBARO&&player.hasStatus('UNBRIDLED_RAGE')?0:baseCost;
+  }
+
   public castPlayerSkill(player: Player, slot: number, targetId?: string, targetPos?: Vector3): boolean {
     if (player.isDead) {
       this.sendSkillRejection(player, slot, 'CASTER_DEAD', 'O herói está derrotado e não pode agir!');
@@ -1369,6 +1552,11 @@ export class World {
       return false;
     }
 
+    if (!isSkillEffectAvailable(skill)) {
+      this.sendSkillRejection(player, slot, 'UNIMPLEMENTED_EFFECT', 'Este efeito está em preparação. Escolha outra habilidade no Grimório.', skill.skillId);
+      return false;
+    }
+
     const currentCd = player.getSkillCooldown(slot);
     if (currentCd > 0) {
       this.sendSkillRejection(
@@ -1381,12 +1569,13 @@ export class World {
       return false;
     }
 
-    if (player.currentResource < skill.cost) {
+    const resourceCost=this.getEffectiveSkillCost(player,skill.cost);
+    if (player.currentResource < resourceCost) {
       this.sendSkillRejection(
         player,
         slot,
         'INSUFFICIENT_RESOURCE',
-        `${skill.resourceType} insuficiente! Necessário ${skill.cost} (Atual: ${Math.round(player.currentResource)}).`,
+        `${skill.resourceType} insuficiente! Necessário ${resourceCost} (Atual: ${Math.round(player.currentResource)}).`,
         skill.skillId
       );
       return false;
@@ -1397,37 +1586,7 @@ export class World {
       return false;
     }
 
-    // Classificação da Habilidade
-    let category: SkillCategory;
-    let geometry: SkillGeometryType;
-
-    if (skill.isHeal && skill.range === 0 && !skill.isAoe) {
-      category = 'SELF_HEAL';
-      geometry = 'POINT';
-    } else if (!skill.isHeal && skill.range === 0 && !skill.isAoe) {
-      category = 'SELF_BUFF';
-      geometry = 'POINT';
-    } else if (skill.isAoe) {
-      if (skill.skillId === 'guerreiro_nv2_3') {
-        category = 'AOE_LINE';
-        geometry = 'LINE';
-      } else if (
-        skill.range === 0 ||
-        skill.skillId === 'guerreiro_nv2_1' ||
-        skill.skillId === 'guerreiro_nv3_1' ||
-        skill.skillId === 'guerreiro_3' ||
-        skill.skillId === 'guerreiro_4'
-      ) {
-        category = 'AOE_SELF';
-        geometry = 'CIRCLE_SELF';
-      } else {
-        category = 'AOE_TARGET';
-        geometry = 'CIRCLE_TARGET';
-      }
-    } else {
-      category = 'SINGLE_TARGET';
-      geometry = 'POINT';
-    }
+    const { category, geometry } = getSkillTargeting(skill);
 
     const RANGE_TOLERANCE = 0.5;
     let resolvedTargetId: string | undefined;
@@ -1510,11 +1669,11 @@ export class World {
         const monsters = this.entityManager.getAllMonsters();
         targetsToDamage = monsters.filter((m) => !m.isDead && distanceSquared(resolvedCenter, m.position) <= radiusSq);
 
-        if (targetsToDamage.length === 0) {
+        if (targetsToDamage.length === 0 && !skill.isHeal) {
           this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum inimigo dentro do raio de efeito da habilidade.', skill.skillId);
           return false;
         }
-        resolvedTargetId = targetsToDamage[0].id;
+        resolvedTargetId = targetsToDamage[0]?.id ?? player.id;
         break;
       }
 
@@ -1581,7 +1740,7 @@ export class World {
         if (targetId) {
           const ent = this.entityManager.getEntity(targetId);
           if (!ent || !(ent instanceof Monster)) {
-            this.sendSkillRejection(player, slot, 'INVALID_TARGET', 'Alvo para queda da espada inexistente.', skill.skillId);
+            this.sendSkillRejection(player, slot, 'INVALID_TARGET', 'Alvo de área inexistente.', skill.skillId);
             return false;
           }
           if (ent.isDead) {
@@ -1590,7 +1749,7 @@ export class World {
           }
           const d = distance(player.position, ent.position);
           if (d > skill.range + RANGE_TOLERANCE) {
-            this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', 'Alvo de impacto além do alcance máximo de 8m.', skill.skillId);
+            this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', `Alvo além do alcance de ${skill.range}m.`, skill.skillId);
             return false;
           }
           resolvedCenter = cloneVector3(ent.position);
@@ -1598,14 +1757,14 @@ export class World {
         } else if (targetPos) {
           const d = distance(player.position, targetPos);
           if (d > skill.range + RANGE_TOLERANCE) {
-            this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', 'Ponto de impacto além do alcance máximo de 8m.', skill.skillId);
+            this.sendSkillRejection(player, slot, 'OUT_OF_RANGE', `Ponto além do alcance de ${skill.range}m.`, skill.skillId);
             return false;
           }
           resolvedCenter = cloneVector3(targetPos);
         } else {
           const nearest = this.entityManager.findNearestMonster(player.position, skill.range + RANGE_TOLERANCE);
           if (!nearest || nearest.isDead) {
-            this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum alvo ao alcance para invocar a lâmina.', skill.skillId);
+            this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum inimigo ao alcance da habilidade.', skill.skillId);
             return false;
           }
           resolvedCenter = cloneVector3(nearest.position);
@@ -1617,8 +1776,30 @@ export class World {
         const monsters = this.entityManager.getAllMonsters();
         targetsToDamage = monsters.filter((m) => !m.isDead && distanceSquared(resolvedCenter, m.position) <= radiusSq);
 
+        if(geometry==='CONE'){
+          const dx=resolvedCenter.x-player.position.x,dz=resolvedCenter.z-player.position.z;
+          resolvedDirection=Math.hypot(dx,dz)>1e-8?Math.atan2(dx,dz)*180/Math.PI:player.headingYaw;
+          targetsToDamage=monsters.filter(monster=>!monster.isDead&&isInMageCone(player.position,monster.position,resolvedDirection));
+        }
+        if(skill.skillId==='mago_truque_3'){
+          targetsToDamage.sort((a,b)=>{
+            if(a.id===resolvedTargetId)return -1;if(b.id===resolvedTargetId)return 1;
+            return distanceSquared(resolvedCenter,a.position)-distanceSquared(resolvedCenter,b.position)||a.id.localeCompare(b.id);
+          });
+          targetsToDamage=targetsToDamage.slice(0,MAGE_INITIAL_EFFECTS.chainTargets);
+        }
+        if(skill.skillId==='mago_nv2_2'){
+          const byDistance=(origin:Vector3)=>(a:Monster,b:Monster)=>distanceSquared(origin,a.position)-distanceSquared(origin,b.position)||a.id.localeCompare(b.id);
+          let next=resolvedTargetId?monsters.find(monster=>monster.id===resolvedTargetId):targetsToDamage.filter(monster=>distance(player.position,monster.position)<=skill.range+RANGE_TOLERANCE).sort(byDistance(resolvedCenter))[0];
+          const chain:Monster[]=[];
+          while(next&&!next.isDead&&chain.length<MAGE_SECOND_CIRCLE_EFFECTS.chainTargets){
+            chain.push(next);const origin=next.position;
+            next=monsters.filter(monster=>!monster.isDead&&!chain.includes(monster)&&distanceSquared(origin,monster.position)<=radiusSq+1e-8).sort(byDistance(origin))[0];
+          }
+          targetsToDamage=chain;
+        }
         if (targetsToDamage.length === 0) {
-          this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum inimigo dentro do raio de impacto da lâmina.', skill.skillId);
+          this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum inimigo dentro da área de impacto.', skill.skillId);
           return false;
         }
         if (!resolvedTargetId) resolvedTargetId = targetsToDamage[0].id;
@@ -1629,16 +1810,27 @@ export class World {
     // =========================================================================
     // TODAS AS VALIDAÇÕES PASSARAM: AGORA SIM CONSOME RECURSO E APLICA COOLDOWN
     // =========================================================================
-    player.consumeResource(skill.cost);
-    player.setSkillCooldown(slot, skill.cooldownSec);
+    if(skill.skillId==='barbaro_nv2_3'&&(Math.abs(resolvedCenter.y)>.001||resolvedCenter.x<SERVER_CONFIG.MAP_BOUNDS.minX||resolvedCenter.x>SERVER_CONFIG.MAP_BOUNDS.maxX||resolvedCenter.z<SERVER_CONFIG.MAP_BOUNDS.minZ||resolvedCenter.z>SERVER_CONFIG.MAP_BOUNDS.maxZ)){
+      this.sendSkillRejection(player,slot,'INVALID_POSITION','Ponto de salto fora do mapa.',skill.skillId);return false;
+    }
+    const castOrigin=cloneVector3(player.position);
+    player.consumeResource(resourceCost);
+    const cooldownSec=slot===1&&player.hasStatus('ARCANE_HASTE')?skill.cooldownSec*MAGE_SECOND_CIRCLE_EFFECTS.hasteCantripCooldownMultiplier:skill.cooldownSec;
+    player.setSkillCooldown(slot, cooldownSec);
 
     const castId = `cast_${Date.now()}_${++this.castSequence}`;
     const upgradeMultiplier = getSkillUpgradeMultiplier(getSkillLevel(player.skillLevels, skill.skillId));
-    const basePower = Math.round(calculateSkillPower(skill, player.attributes, player.level, player.maxHp) * upgradeMultiplier);
-    const isCritical = Math.random() < player.attributes.destreza * 0.02;
+    const hybridAttack = isHybridHealingSkill(skill);
+    const rawPower = skill.skillId === 'clerigo_truque_3' ? player.attributes.sabedoria * 1.1
+      : skill.skillId === 'bruxo_nv2_2' ? player.attributes.carisma * 2.5
+      : calculateSkillPower(skill, player.attributes, player.level, player.maxHp);
+    const basePower = Math.round(rawPower * upgradeMultiplier);
+    const periodicSpec=getClericPeriodicEffect(skill.skillId);
+    const isCritical = periodicSpec || ['mago_nv1_2','mago_nv2_3','mago_nv3_2','barbaro_nv1_2','barbaro_nv2_2','barbaro_nv3_3'].includes(skill.skillId) ? false : this.rollPlayerCritical(player, !skill.isHeal || hybridAttack ? singleTargetMonster : null, player.attributes.destreza * 0.02);
     let finalPower = isCritical ? Math.round(basePower * 1.5) : basePower;
+    if (skill.skillId === 'clerigo_truque_2' && singleTargetMonster && singleTargetMonster.currentHp < singleTargetMonster.maxHp) finalPower = Math.round(finalPower * 1.25);
 
-    if (!skill.isHeal && category !== 'SELF_BUFF') {
+    if ((!skill.isHeal || hybridAttack) && category !== 'SELF_BUFF') {
       finalPower = Math.round(finalPower * player.getDamageMultiplier());
     }
 
@@ -1648,7 +1840,53 @@ export class World {
     let totalEffectiveDamageOrHeal = 0;
 
     // Aplicação Específica por Habilidade
-    if (skill.skillId === 'guerreiro_truque_1' || skill.skillId === 'guerreiro_1') {
+    if (periodicSpec) {
+      const totalPower=skill.isHeal?basePower:Math.round(basePower*player.getDamageMultiplier());
+      const status:ActiveCombatStatus={statusId:`status_${Date.now()}_${++this.statusSequence}`,type:periodicSpec.type,skillId:skill.skillId,sourceEntityId:player.id,targetEntityId:player.id,durationSec:periodicSpec.durationSec,remainingSec:periodicSpec.durationSec,expiresAtTick:this.currentTick+periodicSpec.durationSec*SERVER_CONFIG.TICK_RATE,magnitude:totalPower,radius:periodicSpec.radius,areaCenter:periodicSpec.type==='SANCTUARY'?cloneVector3(player.position):undefined,periodic:{elapsedSec:0,pulsesDone:0,totalPower,targetId:singleTargetMonster?.id}};
+      const previous=player.getStatus(periodicSpec.type);
+      if(previous){player.removeStatus(previous.statusId);this.broadcastStatusTransition('EXPIRED',previous);}
+      player.addStatus(status);appliedStatuses.push(this.toCombatStatusPayload(status));this.broadcastStatusTransition('APPLIED',status);this.syncClericZones();
+      affectedEntityIds.push(player.id);
+    } else if (skill.skillId==='mago_nv3_2') {
+      const status=this.applySkillStatus(player,player,'COMET_RAIN',MAGE_ULTIMATE_EFFECTS.cometDurationSec,finalPower,skill.skillId,{areaCenter:cloneVector3(resolvedCenter),radius:skill.aoeRadius??6.5,periodic:{elapsedSec:0,pulsesDone:0,totalPower:finalPower}});
+      appliedStatuses.push(this.toCombatStatusPayload(status));affectedEntityIds.push(player.id);
+    } else if (skill.skillId==='mago_nv2_3') {
+      const status=this.applySkillStatus(player,player,'ARCANE_HASTE',MAGE_SECOND_CIRCLE_EFFECTS.hasteDurationSec,MAGE_SECOND_CIRCLE_EFFECTS.hasteDecisionMultiplier-1,skill.skillId);
+      appliedStatuses.push(this.toCombatStatusPayload(status));affectedEntityIds.push(player.id);
+    } else if (skill.skillId === 'mago_nv1_2') {
+      const status=this.applySkillStatus(player,player,'SHIELD',MAGE_INITIAL_EFFECTS.shieldDurationSec,basePower,skill.skillId,{remainingAbsorption:basePower,maxAbsorption:basePower,reflectRatio:MAGE_INITIAL_EFFECTS.shieldReflection,reflectOnAbsorbed:true});
+      appliedStatuses.push(this.toCombatStatusPayload(status));affectedEntityIds.push(player.id);
+    } else if (['mago_truque_1','mago_truque_2','mago_truque_3','mago_nv1_1','mago_nv1_3','mago_nv2_1','mago_nv2_2','mago_nv3_1','mago_nv3_3'].includes(skill.skillId)) {
+      for(const monster of targetsToDamage){
+        const hits=skill.skillId==='mago_nv1_1'?MAGE_INITIAL_EFFECTS.missiles:1;
+        for(let hit=1;hit<=hits;hit++){
+          if(monster.isDead||player.isDead)break;
+          const previousHp=monster.currentHp;
+          monster.takeDamage(splitMagePower(finalPower,hit,hits),player);
+          const damage=Math.max(0,previousHp-monster.currentHp);
+          totalEffectiveDamageOrHeal+=damage;
+          if(!affectedEntityIds.includes(monster.id))affectedEntityIds.push(monster.id);
+          targetResults.push({targetId:monster.id,impactPosition:cloneVector3(monster.position),effectiveDamage:damage,effectiveHeal:0,remainingHp:monster.currentHp,maxHp:monster.maxHp,isDead:monster.isDead,isCritical});
+          if(monster.isDead){this.handleMonsterDeath(monster,player);break;}
+        }
+        if(!monster.isDead && !player.isDead && skill.skillId==='mago_truque_2'){
+          const status=this.applySkillStatus(player,monster,'FROST_SLOW',MAGE_INITIAL_EFFECTS.frostDurationSec,MAGE_INITIAL_EFFECTS.frostSlow,skill.skillId);
+          appliedStatuses.push(this.toCombatStatusPayload(status));
+        }
+        if(!monster.isDead&&!player.isDead&&['mago_nv2_1','mago_nv3_3'].includes(skill.skillId)){
+          const duration=skill.skillId==='mago_nv3_3'?MAGE_ULTIMATE_EFFECTS.stasisFreezeSec:MAGE_SECOND_CIRCLE_EFFECTS.freezeDurationSec;
+          if((monster.getStatus('FROZEN')?.remainingSec??0)<duration){
+            const status=this.applySkillStatus(player,monster,'FROZEN',duration,1,skill.skillId);
+            appliedStatuses.push(this.toCombatStatusPayload(status));
+          }
+        }
+        if(!monster.isDead && !player.isDead && skill.skillId==='mago_nv1_3'){
+          const totalPower=Math.round(Math.round(player.attributes.inteligencia*MAGE_INITIAL_EFFECTS.burnCoefficient)*upgradeMultiplier*player.getDamageMultiplier());
+          const status=this.applySkillStatus(player,monster,'BURN',MAGE_INITIAL_EFFECTS.burnDurationSec,totalPower,skill.skillId,{periodic:{elapsedSec:0,pulsesDone:0,totalPower}});
+          appliedStatuses.push(this.toCombatStatusPayload(status));
+        }
+      }
+    } else if (skill.skillId === 'guerreiro_truque_1' || skill.skillId === 'guerreiro_1') {
       // Golpe Firme: 1.35x STR + restaura 5 de Energia ao acertar
       if (singleTargetMonster && !singleTargetMonster.isDead) {
         const wasAlive = !singleTargetMonster.isDead;
@@ -1918,8 +2156,8 @@ export class World {
         totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
 
         if (!m.isDead) {
-          m.position.x += pushX;
-          m.position.z += pushZ;
+          m.position.x = Math.max(SERVER_CONFIG.MAP_BOUNDS.minX,Math.min(SERVER_CONFIG.MAP_BOUNDS.maxX,m.position.x+pushX));
+          m.position.z = Math.max(SERVER_CONFIG.MAP_BOUNDS.minZ,Math.min(SERVER_CONFIG.MAP_BOUNDS.maxZ,m.position.z+pushZ));
           this.spatialGrid.updateEntity(m);
         }
 
@@ -2033,12 +2271,13 @@ export class World {
       });
 
       // Onda de fogo marcial em 4m
-      const waveDmg = Math.round((player.attributes.forca * 2.0 + player.attributes.constituicao * 1.0) * upgradeMultiplier);
+      const waveDmg = Math.round((player.attributes.forca * 2.0 + player.attributes.constituicao * 1.0) * upgradeMultiplier * player.getDamageMultiplier());
       const monsters = this.entityManager.getAllMonsters();
       for (const m of monsters) {
         if (!m.isDead && distanceSquared(player.position, m.position) <= 16.0) {
           const wasAlive = !m.isDead;
           const dmgRes = m.takeDamage(waveDmg, player);
+          totalEffectiveDamageOrHeal+=dmgRes.effectiveDamage;
           affectedEntityIds.push(m.id);
           targetResults.push({
             targetId: m.id,
@@ -2056,6 +2295,87 @@ export class World {
           }
         }
       }
+    } else if (skill.skillId === 'clerigo_nv1_2') {
+      for (const type of ['DAMAGE_BUFF', 'DAMAGE_REDUCTION', 'CRITICAL_BUFF'] as const) {
+        const status: ActiveCombatStatus = {statusId:`status_${Date.now()}_${++this.statusSequence}`,type,skillId:skill.skillId,sourceEntityId:player.id,targetEntityId:player.id,durationSec:8,remainingSec:8,expiresAtTick:this.currentTick+8*SERVER_CONFIG.TICK_RATE,magnitude:0.2};
+        player.addStatus(status);appliedStatuses.push(this.toCombatStatusPayload(status));this.broadcastStatusTransition('APPLIED',status);
+      }
+      affectedEntityIds.push(player.id);
+      targetResults.push({targetId:player.id,impactPosition:cloneVector3(player.position),effectiveDamage:0,effectiveHeal:0,remainingHp:player.currentHp,maxHp:player.maxHp,isDead:false,isCritical:false});
+    } else if (skill.skillId === 'barbaro_nv1_1') {
+      // Fúria Primitiva: os bônus já descritos no catálogo, com duração autoritativa.
+      for (const [type, magnitude] of [['DAMAGE_BUFF', 0.25], ['DAMAGE_REDUCTION', 0.15]] as const) {
+        const status: ActiveCombatStatus = { statusId: `status_${Date.now()}_${++this.statusSequence}`, type, skillId:skill.skillId, sourceEntityId:player.id, targetEntityId:player.id, durationSec:6, remainingSec:6, expiresAtTick:this.currentTick + 6 * SERVER_CONFIG.TICK_RATE, magnitude };
+        player.addStatus(status); appliedStatuses.push(this.toCombatStatusPayload(status)); this.broadcastStatusTransition('APPLIED', status);
+      }
+      affectedEntityIds.push(player.id);
+      targetResults.push({targetId:player.id,impactPosition:cloneVector3(player.position),effectiveDamage:0,effectiveHeal:0,remainingHp:player.currentHp,maxHp:player.maxHp,isDead:false,isCritical:false});
+    } else if (player.classType===CharacterClass.BARBARO) {
+      if(skill.skillId==='barbaro_nv3_3'){
+        const status=this.applySkillStatus(player,player,'SPECTRAL_PACK',MARTIAL_EFFECTS.packSec,finalPower,skill.skillId,{radius:MARTIAL_EFFECTS.packRadius,periodic:{elapsedSec:0,pulsesDone:0,totalPower:finalPower}});
+        appliedStatuses.push(this.toCombatStatusPayload(status));affectedEntityIds.push(player.id);
+      }else if(skill.skillId==='barbaro_nv2_2'){
+        const heal=player.heal(basePower);totalEffectiveDamageOrHeal=heal;affectedEntityIds.push(player.id);
+        const status=this.applySkillStatus(player,player,'STONE_SKIN',MARTIAL_EFFECTS.stoneSec,MARTIAL_EFFECTS.stoneReduction,skill.skillId);appliedStatuses.push(this.toCombatStatusPayload(status));
+        targetResults.push({targetId:player.id,impactPosition:cloneVector3(player.position),effectiveDamage:0,effectiveHeal:heal,remainingHp:player.currentHp,maxHp:player.maxHp,isDead:false,isCritical:false});
+      }else{
+        if(skill.skillId==='barbaro_nv1_3'&&singleTargetMonster){
+          const dx=singleTargetMonster.position.x-player.position.x,dz=singleTargetMonster.position.z-player.position.z,d=Math.hypot(dx,dz);
+          if(d>1.5){const travel=d-1.5;player.position.x=Math.max(SERVER_CONFIG.MAP_BOUNDS.minX,Math.min(SERVER_CONFIG.MAP_BOUNDS.maxX,player.position.x+dx/d*travel));player.position.z=Math.max(SERVER_CONFIG.MAP_BOUNDS.minZ,Math.min(SERVER_CONFIG.MAP_BOUNDS.maxZ,player.position.z+dz/d*travel));player.headingYaw=Math.atan2(dx,dz)*180/Math.PI;player.stopMoving();this.spatialGrid.updateEntity(player);}
+        }
+        if(skill.skillId==='barbaro_nv2_3'){player.headingYaw=Math.atan2(resolvedCenter.x-castOrigin.x,resolvedCenter.z-castOrigin.z)*180/Math.PI;player.position=createVector3(resolvedCenter.x,0,resolvedCenter.z);player.stopMoving();this.spatialGrid.updateEntity(player);}
+        for(const monster of targetsToDamage){
+          if(player.isDead)break;
+          if(monster.isDead)continue;
+          if(skill.skillId==='barbaro_nv1_2'){
+            const status=this.applySkillStatus(player,monster,'WEAKENED',MARTIAL_EFFECTS.roarSec,Math.min(.5,MARTIAL_EFFECTS.weakness*upgradeMultiplier),skill.skillId);appliedStatuses.push(this.toCombatStatusPayload(status));affectedEntityIds.push(monster.id);continue;
+          }
+          const power=skill.skillId==='barbaro_nv3_2'&&monster.currentHp/monster.maxHp<.3?finalPower*2:finalPower;
+          const previousHp=monster.currentHp;monster.takeDamage(power,player);const damage=Math.max(0,previousHp-monster.currentHp);
+          totalEffectiveDamageOrHeal+=damage;affectedEntityIds.push(monster.id);
+          targetResults.push({targetId:monster.id,impactPosition:cloneVector3(monster.position),effectiveDamage:damage,effectiveHeal:0,remainingHp:monster.currentHp,maxHp:monster.maxHp,isDead:monster.isDead,isCritical});
+          if(skill.skillId==='barbaro_truque_3'){
+            const heal=player.heal(Math.floor(damage*.2));totalEffectiveDamageOrHeal+=heal;affectedEntityIds.push(player.id);
+            targetResults.push({targetId:player.id,impactPosition:cloneVector3(player.position),effectiveDamage:0,effectiveHeal:heal,remainingHp:player.currentHp,maxHp:player.maxHp,isDead:false,isCritical:false});
+          }
+          if(monster.isDead){this.handleMonsterDeath(monster,player);continue;}
+          if(skill.skillId==='barbaro_truque_2')appliedStatuses.push(this.toCombatStatusPayload(this.applySkillStatus(player,monster,'CRIPPLED',MARTIAL_EFFECTS.slowSec,MARTIAL_EFFECTS.slow,skill.skillId)));
+          if(skill.skillId==='barbaro_nv1_3')appliedStatuses.push(this.toCombatStatusPayload(this.applySkillStatus(player,monster,'STUN',MARTIAL_EFFECTS.stunSec,1,skill.skillId)));
+          if(skill.skillId==='barbaro_nv2_1'){
+            const magnitude=Math.max(1,Math.round((player.attributes.forca*.35+player.level)*upgradeMultiplier*player.getDamageMultiplier()));
+            appliedStatuses.push(this.toCombatStatusPayload(this.applySkillStatus(player,monster,'BLEED',MARTIAL_EFFECTS.bleedSec,magnitude,skill.skillId)));
+          }
+        }
+        if(skill.skillId==='barbaro_nv3_1'&&!player.isDead){const status=this.applySkillStatus(player,player,'UNBRIDLED_RAGE',MARTIAL_EFFECTS.freeResourceSec,1,skill.skillId);appliedStatuses.push(this.toCombatStatusPayload(status));affectedEntityIds.push(player.id);}
+      }
+    } else if (skill.skillId === 'clerigo_nv3_2') {
+      const effectiveHeal=player.heal(player.maxHp);
+      affectedEntityIds.push(player.id);
+      totalEffectiveDamageOrHeal=effectiveHeal;
+      targetResults.push({targetId:player.id,impactPosition:cloneVector3(player.position),effectiveDamage:0,effectiveHeal,remainingHp:player.currentHp,maxHp:player.maxHp,isDead:false,isCritical:false});
+      for(const monster of targetsToDamage){
+        const wasAlive=!monster.isDead;
+        const previousHp=monster.currentHp;
+        monster.takeDamage(finalPower,player);
+        const damage=Math.max(0,previousHp-monster.currentHp);
+        affectedEntityIds.push(monster.id);totalEffectiveDamageOrHeal+=damage;
+        targetResults.push({targetId:monster.id,impactPosition:cloneVector3(monster.position),effectiveDamage:damage,effectiveHeal:0,remainingHp:monster.currentHp,maxHp:monster.maxHp,isDead:monster.isDead,isCritical});
+        if(wasAlive&&monster.isDead)this.handleMonsterDeath(monster,player);
+      }
+    } else if (hybridAttack && singleTargetMonster) {
+      const monster = singleTargetMonster;
+      const wasAlive = !monster.isDead;
+      const previousHp = monster.currentHp;
+      monster.takeDamage(finalPower, player);
+      const hpDamage = Math.max(0, previousHp - monster.currentHp);
+      const healing = skill.skillId === 'bruxo_nv2_2' ? Math.floor(hpDamage * 0.5)
+        : hpDamage > 0 ? Math.round(player.attributes.sabedoria * 0.5 * upgradeMultiplier) : 0;
+      const effectiveHeal = player.heal(healing);
+      affectedEntityIds.push(monster.id, player.id);
+      totalEffectiveDamageOrHeal = hpDamage + effectiveHeal;
+      targetResults.push({targetId:monster.id,impactPosition:cloneVector3(monster.position),effectiveDamage:hpDamage,effectiveHeal:0,remainingHp:monster.currentHp,maxHp:monster.maxHp,isDead:monster.isDead,isCritical});
+      targetResults.push({targetId:player.id,impactPosition:cloneVector3(player.position),effectiveDamage:0,effectiveHeal,remainingHp:player.currentHp,maxHp:player.maxHp,isDead:false,isCritical:false});
+      if (wasAlive && monster.isDead) this.handleMonsterDeath(monster, player);
     } else {
       // Fallback genérico para habilidades de outras classes
       if (skill.isHeal) {
@@ -2097,6 +2417,11 @@ export class World {
       }
     }
 
+    if (skill.skillId === 'clerigo_nv1_3' && singleTargetMonster && !singleTargetMonster.isDead && targetResults.some(result=>result.targetId===singleTargetMonster!.id && result.effectiveDamage>0)) {
+      const status: ActiveCombatStatus = {statusId:`status_${Date.now()}_${++this.statusSequence}`,type:'GUIDING_MARK',skillId:skill.skillId,sourceEntityId:player.id,targetEntityId:singleTargetMonster.id,durationSec:6,remainingSec:6,expiresAtTick:this.currentTick+6*SERVER_CONFIG.TICK_RATE,magnitude:1};
+      singleTargetMonster.addStatus(status);appliedStatuses.push(this.toCombatStatusPayload(status));this.broadcastStatusTransition('APPLIED',status);
+    }
+
     // Transmissão Autoritativa do Evento de Conjuração
     const castPayload: S2CSkillCastEventPayload = {
       castId,
@@ -2107,7 +2432,9 @@ export class World {
       skillName: skill.name,
       category,
       geometry,
-      originPosition: cloneVector3(player.position),
+      coneRange:geometry==='CONE'?MAGE_INITIAL_EFFECTS.coneRange:undefined,
+      coneAngleDeg:geometry==='CONE'?MAGE_INITIAL_EFFECTS.coneAngleDeg:undefined,
+      originPosition: castOrigin,
       targetId: resolvedTargetId,
       targetPosition: resolvedCenter,
       headingYaw: resolvedDirection,
@@ -2122,6 +2449,7 @@ export class World {
       appliedStatuses,
       casterCurrentResource: Math.round(player.currentResource),
       casterMaxResource: player.maxResource,
+      cooldownRemainingSec:player.getSkillCooldown(slot),
     };
 
     this.broadcast(Opcode.S2C_SKILL_CAST_EVENT, castPayload);
@@ -2562,9 +2890,41 @@ export class World {
     return true;
   }
 
+  public fusePlayerEquipment(player: Player, request: FusionRequest): void {
+    const conn = this.connections.get(player.id);
+    try {
+      const result = this.db.fuseEquipment(player, request);
+      player.inventory = this.db.getInventory(player.dbCharacterId);
+      player.gold = this.db.getCharacterGold(player.dbCharacterId);
+      player.recalculateStatsFromEquipment();
+      this.sendInventoryUpdate(player);
+      conn?.send(Opcode.S2C_FUSION_RESULT, { requestId: request.requestId, success: true, outputInstanceId: result.outputInstanceId, replayed: result.replayed,
+        message: result.replayed ? 'Esta fusão já foi concluída. Mochila sincronizada.' : `Reforja concluída: ${ITEMS_DATABASE[result.outputItemId].name}. O resultado está protegido na mochila.` });
+    } catch (error) {
+      const code = error instanceof Error ? error.message : '';
+      const messages: Record<string, string> = { FUSION_INVALID_REQUEST: 'Pedido de fusão inválido.', FUSION_REQUEST_REUSED: 'Este pedido já foi usado para outra fusão. Atualize a receita.', FUSION_RECIPE_CHANGED: 'A receita mudou. Reabra a prévia.', FUSION_REQUIREMENTS: 'Confira a classe e o nível exigidos.', FUSION_INGREDIENTS: 'As cópias mudaram: use apenas peças da mochila, sem proteção, refino ou gemas.', FUSION_GOLD: 'Ouro insuficiente.', FUSION_MATERIALS: 'Faltam materiais desbloqueados.', FUSION_SPACE: 'Não foi possível guardar o resultado. Nada foi consumido.' };
+      conn?.send(Opcode.S2C_FUSION_RESULT, { requestId: request?.requestId ?? '', success: false, message: messages[code] ?? 'Não foi possível confirmar a reforja. Confira a mochila ou reconecte antes de tentar novamente.' });
+    }
+  }
+
+  public setPlayerItemLocked(player: Player, instanceId: string, isLocked: boolean): void {
+    if (!this.db.setItemLocked(player.dbCharacterId, instanceId, isLocked)) return;
+    player.inventory = this.db.getInventory(player.dbCharacterId);
+    this.sendInventoryUpdate(player);
+  }
+
+  public sendEquipmentAdvice(player: Player): void {
+    player.inventory = this.db.getInventory(player.dbCharacterId);
+    player.recalculateStatsFromEquipment();
+    this.connections.get(player.id)?.send(Opcode.S2C_EQUIPMENT_ADVICE, {
+      characterId: player.dbCharacterId,
+      suggestions: getEquipmentSuggestions(player.inventory, { classType: player.classType, level: player.level, attributes: player.attributes }),
+    });
+  }
+
   public sellPlayerItem(player: Player, slotIndex: number): boolean {
-    const item = player.inventory.find((i) => i.slotIndex === slotIndex);
-    if (!item || item.isEquipped) return false;
+    const item = this.db.getInventory(player.dbCharacterId).find((i) => i.slotIndex === slotIndex);
+    if (!item || item.isEquipped || item.isLocked) return false;
 
     const itemDef = ITEMS_DATABASE[item.itemId];
     if (!itemDef) return false;
@@ -2606,7 +2966,7 @@ export class World {
       if (hpPct <= player.farmSettings.autoHpPotionThreshold) {
         // Busca na mochila (prioriza poção de vida)
         const hpPot = player.inventory.find(
-          (i) => (i.itemId === 'potion_hp_major' || i.itemId === 'potion_hp_minor') && i.quantity > 0
+          (i) => !i.isLocked && (i.itemId === 'potion_hp_major' || i.itemId === 'potion_hp_minor') && i.quantity > 0
         );
         if (hpPot) {
           this.usePlayerItem(player, hpPot.slotIndex);
@@ -2620,7 +2980,7 @@ export class World {
       const mpPct = (player.currentResource / player.maxResource) * 100;
       if (mpPct <= player.farmSettings.autoMpPotionThreshold) {
         const mpPot = player.inventory.find(
-          (i) => (i.itemId === 'potion_mp_major' || i.itemId === 'potion_mp_minor') && i.quantity > 0
+          (i) => !i.isLocked && (i.itemId === 'potion_mp_major' || i.itemId === 'potion_mp_minor') && i.quantity > 0
         );
         if (mpPot) {
           this.usePlayerItem(player, mpPot.slotIndex);
@@ -2673,9 +3033,10 @@ export class World {
     let itemsSold = 0;
     let goldEarned = 0;
 
+    this.db.runInTransaction(() => {
     // Clona o array para iterar com segurança enquanto remove do SQLite
-    for (const item of [...player.inventory]) {
-      if (item.isEquipped) continue;
+    for (const item of this.db.getInventory(player.dbCharacterId)) {
+      if (item.isEquipped || item.isLocked) continue;
 
       const def = ITEMS_DATABASE[item.itemId];
       if (!def) continue;
@@ -2687,15 +3048,18 @@ export class World {
 
       if (isCommon || isUncommon || isRare) {
         const itemGold = (def.sellPrice || 10) * item.quantity;
-        this.db.removeItemFromInventory(player.dbCharacterId, item.slotIndex, item.quantity);
+        if (!this.db.removeItemFromInventory(player.dbCharacterId, item.slotIndex, item.quantity)) continue;
         goldEarned += itemGold;
         itemsSold += item.quantity;
       }
     }
 
+      if (itemsSold > 0) this.db.updateCharacterGold(player.dbCharacterId, goldEarned);
+    });
+
     if (itemsSold > 0) {
       const previousGold = player.gold;
-      player.gold = this.db.updateCharacterGold(player.dbCharacterId, goldEarned);
+      player.gold = this.db.getCharacterGold(player.dbCharacterId);
       player.huntSession.add('manualSaleGold', player.gold - previousGold);
       player.inventory = this.db.getInventory(player.dbCharacterId);
       player.recalculateStatsFromEquipment();
@@ -2894,6 +3258,7 @@ export class World {
       lastLogoutTime: player.lastLogoutTime,
     };
     let leveledUp = false;
+    const claimedLoot: OfflineLootItem[] = [], remainingLoot: OfflineLootItem[] = [];
     try {
       this.db.runInTransaction(() => {
         const persisted = this.db.getCharacterById(player.dbCharacterId);
@@ -2901,22 +3266,23 @@ export class World {
           throw new Error('OFFLINE_REWARD_CHANGED');
         }
         for (const item of reward.loot) {
-          const maxStack = ITEMS_DATABASE[item.itemId].maxStack;
-          let remaining = item.quantity;
-          while (remaining > 0) {
-            const stack = this.db.getInventory(player.dbCharacterId)
-              .find(existing => existing.itemId === item.itemId && existing.quantity < maxStack);
-            const quantity = Math.min(remaining, stack ? maxStack - stack.quantity : maxStack);
-            if (!this.db.addItemToInventory(player.dbCharacterId, item.itemId, quantity, player.maxInventorySlots)) {
-              throw new Error('OFFLINE_INVENTORY_FULL');
-            }
-            remaining -= quantity;
+          const maxStack = ITEMS_DATABASE[item.itemId]?.maxStack;
+          if (!maxStack) throw new Error('OFFLINE_ITEM_INVALID');
+          const inventory = this.db.getInventory(player.dbCharacterId).filter(entry => !entry.isEquipped);
+          const freeSlots = Math.max(0, player.maxInventorySlots - inventory.length);
+          const stackRoom = inventory.filter(entry => entry.itemId === item.itemId).reduce((sum, entry) => sum + Math.max(0, maxStack - entry.quantity), 0);
+          const quantity = Math.min(item.quantity, freeSlots * maxStack + stackRoom);
+          if (quantity > 0) {
+            if (!this.db.addItemToInventory(player.dbCharacterId, item.itemId, quantity, player.maxInventorySlots)) throw new Error('OFFLINE_INSERT_FAILED');
+            claimedLoot.push({ ...item, quantity });
           }
+          if (quantity < item.quantity) remainingLoot.push({ ...item, quantity: item.quantity - quantity });
         }
+        if (!claimedLoot.length && !reward.accumulatedGold && !finalExp) throw new Error('OFFLINE_INVENTORY_FULL');
         player.inventory = this.db.getInventory(player.dbCharacterId);
         player.gold = this.db.updateCharacterGold(player.dbCharacterId, reward.accumulatedGold);
         leveledUp = player.addExperience(finalExp).leveledUp;
-        player.pendingOfflineReward = null;
+        player.pendingOfflineReward = remainingLoot.length ? { ...reward, accumulatedGold: 0, accumulatedExp: 0, loot: remainingLoot } : null;
         this.db.savePlayer(player, true);
       });
     } catch (error) {
@@ -2935,7 +3301,12 @@ export class World {
     }
     const finalGold = player.gold - before.gold;
     if (leveledUp) this.handlePlayerLevelUp(player);
-    const claimedLoot = [...reward.loot];
+    const remainingReward: S2COfflineRewardInfoPayload | undefined = player.pendingOfflineReward ? {
+      ...player.pendingOfflineReward, lootPreview: player.pendingOfflineReward.loot, minThresholdSeconds: OFFLINE_REWARD_POLICY.minimumSeconds,
+    } : undefined;
+    const message = remainingLoot.length
+      ? `Ouro e EXP creditados; itens que couberam foram retirados. Restam ${remainingLoot.reduce((n, item) => n + item.quantity, 0)} unidades no baú. Libere espaço ou expanda a mochila e retire o restante.`
+      : `✦ BAÚ DO TEMPO RESGATADO! Você coletou +${finalGold.toLocaleString('pt-BR')} Ouro e +${finalExp.toLocaleString('pt-BR')} EXP!`;
 
     const conn = this.connections.get(player.id);
     if (conn) {
@@ -2947,7 +3318,8 @@ export class World {
         newGold: player.gold,
         newLevel: player.level,
         newExp: player.currentXp,
-        message: `✦ BAÚ DO TEMPO RESGATADO! Você coletou +${finalGold.toLocaleString('pt-BR')} Ouro e +${finalExp.toLocaleString('pt-BR')} EXP!`,
+        message,
+        remainingReward,
       } as S2COfflineRewardsClaimedPayload);
 
       conn.send(Opcode.S2C_INVENTORY_UPDATE, {
@@ -2968,7 +3340,7 @@ export class World {
     }
 
     console.log(`[World] Herói "${player.name}" resgatou Baú do Tempo com sucesso: +${finalGold} ouro, +${finalExp} exp.`);
-    return { success: true, message: 'Recompensas offline resgatadas com sucesso!' };
+    return { success: true, message };
   }
 
   public challengeStageBoss(player?: Player): { success: boolean; reason?: string } {
@@ -3145,24 +3517,23 @@ export class World {
     return { success: true };
   }
 
-  public static readonly INVENTORY_EXPANSIONS: Record<number, { cost: number; minLevel: number; minReborn?: number }> = {
-    20: { cost: 10_000, minLevel: 15 },
-    25: { cost: 50_000, minLevel: 25 },
-    30: { cost: 250_000, minLevel: 35 },
-    35: { cost: 1_000_000, minLevel: 45 },
-    40: { cost: 3_500_000, minLevel: 50 },
-    45: { cost: 10_000_000, minLevel: 50, minReborn: 1 },
-  };
+  public static readonly INVENTORY_EXPANSIONS = INVENTORY_EXPANSIONS;
 
-  public expandPlayerInventory(player: Player): { success: boolean; reason?: string; newMaxSlots?: number } {
+  public expandPlayerInventory(player: Player, expectedMaxSlots?: number): { success: boolean; reason?: string; newMaxSlots?: number } {
     const conn = this.connections.get(player.id);
+    if (expectedMaxSlots !== undefined && expectedMaxSlots !== player.maxInventorySlots) {
+      const reason = 'A capacidade mudou. Confira a mochila antes de comprar outra expansão.';
+      conn?.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, { success: false, newMaxSlots: player.maxInventorySlots, goldSpent: 0, remainingGold: player.gold, message: reason } as S2CExpandInventoryResultPayload);
+      return { success: false, reason };
+    }
+
 
     if (player.maxInventorySlots >= 50) {
       const reason = 'Mochila já atingiu a capacidade máxima (50 slots)!';
       if (conn) {
         conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
           success: false,
-          newMaxSlots: 50,
+          newMaxSlots: player.maxInventorySlots,
           goldSpent: 0,
           remainingGold: player.gold,
           message: reason,
@@ -3171,10 +3542,8 @@ export class World {
       return { success: false, reason };
     }
 
-    const tier = World.INVENTORY_EXPANSIONS[player.maxInventorySlots] || {
-      cost: 10_000,
-      minLevel: 15,
-    };
+    const tier = getInventoryExpansion(player.maxInventorySlots);
+    if (!tier) return { success: false, reason: 'Capacidade inválida. Reconecte para sincronizar a mochila.' };
 
     // Validação de Reborn
     if (tier.minReborn && player.rebornCount < tier.minReborn) {
@@ -3196,7 +3565,7 @@ export class World {
     // Validação de Nível (jogadores com Reborn possuem passe livre de nível)
     const hasRequiredLevel = player.rebornCount > 0 || player.level >= tier.minLevel;
     if (!hasRequiredLevel) {
-      const reason = `Nível insuficiente! Requer Nível ${tier.minLevel} para expandir para ${player.maxInventorySlots + 5} slots.`;
+      const reason = `Nível insuficiente! Requer Nível ${tier.minLevel} para expandir para ${tier.newMaxSlots} slots.`;
       if (conn) {
         conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
           success: false,
@@ -3247,7 +3616,7 @@ export class World {
     player.gold = this.db.getCharacterGold(player.dbCharacterId);
     this.db.savePlayer(player);
 
-    const nextTier = World.INVENTORY_EXPANSIONS[player.maxInventorySlots];
+    const nextTier = getInventoryExpansion(player.maxInventorySlots);
 
     if (conn) {
       conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
@@ -3257,7 +3626,7 @@ export class World {
         remainingGold: player.gold,
         nextExpansionCost: nextTier?.cost,
         nextExpansionMinLevel: nextTier?.minLevel,
-        message: `🎉 Mochila expandida com sucesso para ${player.maxInventorySlots} slots (+5 novos slots)! (-${tier.cost.toLocaleString()} Ouro)`,
+        message: `🎉 Mochila expandida com sucesso para ${player.maxInventorySlots} slots (+${tier.slotsAdded} novos slots)! (-${tier.cost.toLocaleString()} Ouro)`,
       } as S2CExpandInventoryResultPayload);
 
       conn.send(Opcode.S2C_INVENTORY_UPDATE, {

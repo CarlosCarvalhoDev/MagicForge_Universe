@@ -9,6 +9,8 @@ import {
   C2SUseItemPayload,
   C2SSellItemPayload,
   C2SDiscardItemPayload,
+  C2SSetItemLockPayload,
+  FusionRequest,
   C2SRequestCharacterListPayload,
   C2SCreateCharacterSlotPayload,
   C2SSelectCharacterSlotPayload,
@@ -174,6 +176,26 @@ export class PacketHandler {
         this.handleSellItem(connection, message.data as C2SSellItemPayload);
         break;
 
+      case Opcode.C2S_FUSE_EQUIPMENT: {
+        if (!connection.isAuthenticated || !connection.playerId) return;
+        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        if (player) world.fusePlayerEquipment(player, message.data as FusionRequest);
+        break;
+      }
+      case Opcode.C2S_SET_ITEM_LOCK: {
+        const payload = message.data as C2SSetItemLockPayload;
+        if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.isLocked !== 'boolean') return;
+        if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
+        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        if (player) this.runInventoryAction(connection, () => world.setPlayerItemLocked(player, payload.expectedInstanceId, payload.isLocked));
+        break;
+      }
+      case Opcode.C2S_REQUEST_EQUIPMENT_ADVICE: {
+        if (!connection.isAuthenticated || !connection.playerId) return;
+        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        if (player) this.runInventoryAction(connection, () => world.sendEquipmentAdvice(player));
+        break;
+      }
       case Opcode.C2S_DISCARD_ITEM:
         this.handleDiscardItem(connection, message.data as C2SDiscardItemPayload);
         break;
@@ -187,7 +209,7 @@ export class PacketHandler {
         break;
 
       case Opcode.C2S_EXPAND_INVENTORY:
-        this.handleExpandInventory(connection);
+        this.handleExpandInventory(connection, (message.data as { expectedMaxSlots?: number })?.expectedMaxSlots);
         break;
 
       case Opcode.C2S_PERFORM_REBORN:
@@ -528,12 +550,12 @@ export class PacketHandler {
     else world.enterPortal(player);
   }
 
-  private handleExpandInventory(connection: Connection): void {
+  private handleExpandInventory(connection: Connection, expectedMaxSlots?: number): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.expandPlayerInventory(player);
+    world.expandPlayerInventory(player, expectedMaxSlots);
   }
 
   private handleDiscardItem(connection: Connection, payload: C2SDiscardItemPayload): void {

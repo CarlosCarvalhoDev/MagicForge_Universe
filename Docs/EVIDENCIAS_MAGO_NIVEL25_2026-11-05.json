@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-11-05T22:49:51.211Z",
+  "sourceSha256": {
+    "server/src/game/World.ts": "e6edda276e73d561c396ac3e248e12d5faa97a97e92b9b4572549860b012d837",
+    "server/src/entities/Entity.ts": "92e4214e92d9a4f4577e178591a52347460e6cf9f1bdaac72705fbc575141d93",
+    "shared/src/skills.ts": "f4edfa93b4acb4d8c93f872b6e0646c40bdf5e16e5115a8234734e801113ec31",
+    "shared/src/mage-effects.ts": "04fe608356fefdb8b58050beb5fdaef891f4f802511ff2f225bf1db97628e89f",
+    "shared/src/messages.ts": "76e75cace1a7b985d74f10ae0886cf93971d337b45c17c94262fca67d9053931",
+    "shared/src/skill-targeting.ts": "03331174e40d4286d3befce48c4593fd87984f1eb1c34ffaae3e7de007442ae6",
+    "client/src/main.ts": "eae99274467a635ff69ce74c4240e437532888f7c70d024c026398cd26b1024b",
+    "client/src/renderer/PixelVfx.ts": "45b9a8fdcb5bc5df7dc7fad25a7e81c73f94616a9de4742b669beb3ef31a13cf",
+    "client/src/renderer/PixelVfxPlayer.ts": "6f07414c9e5ce2b44390239a22412794844ecde77bbc539b53767208644b81d2",
+    "server/tools/benchmark-mage.ts": "713341a37a82138672741dce9ed41937b9cd894ac00d048e358feef0a9cc40b5"
+  },
+  "defaultMatrix": {
+    "scenarios": 420,
+    "outcomeChanges": [],
+    "rejections": 0,
+    "emptyCasts": 0,
+    "mageAverageVictorySecondsBefore": 29.32,
+    "mageAverageVictorySecondsAfter": 29.48
+  },
+  "mageChoices": {
+    "assumptions": "156 fresh in-memory fixtures: three cantrip choices at level 5 and nine initial combinations at level 10 in worlds 1/2; all 27 choices at level 25 in worlds 2/3; seeds 101/202. Default rotation and starter gear, no investment; not farm-earned progression or proof of class balance. Different levels/worlds are not equal-difficulty pairs.",
+    "scenarios": 156,
+    "commonCases": 48,
+    "commonOutcomeChanges": 0,
+    "rejections": 0,
+    "emptyCasts": 0,
+    "secondCircle": [
+      {
+        "skill": "mago_nv2_1",
+        "cases": 36,
+        "victories": 18,
+        "deaths": 12,
+        "timeouts": 6,
+        "averageSeconds": 43.37
+      },
+      {
+        "skill": "mago_nv2_2",
+        "cases": 36,
+        "victories": 18,
+        "deaths": 12,
+        "timeouts": 6,
+        "averageSeconds": 41.07
+      },
+      {
+        "skill": "mago_nv2_3",
+        "cases": 36,
+        "victories": 18,
+        "deaths": 12,
+        "timeouts": 6,
+        "averageSeconds": 41.08
+      }
+    ]
+  }
+}

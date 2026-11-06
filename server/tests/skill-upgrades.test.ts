@@ -159,12 +159,13 @@ test('Melhoria aumenta dano, cura, escudo e sangramento reais sem mudar custo ne
   assert.ok(cast(1).appliedStatuses.find((s: any) => s.type === 'BLEED').magnitude > bleed);
 });
 
-test('Suporte sem efeito implementado não pode vender melhoria', t => {
+test('Suporte com percentuais fixos não pode vender evolução de potência', t => {
   const f = setup(t);
   const account = f.db.getOrCreateAccount('mage_account');
   const mage = f.db.createCharacterInSlot('mage', account.id, 0, 'Mage', CharacterClass.MAGO);
   mage.level = 50;
-  assert.throws(() => f.db.upgradeCharacterSkill(mage, 'mago_nv1_2', 1), /INVALID_SKILL/);
+  mage.setEquippedSkill(3,'mago_nv2_3');
+  assert.throws(() => f.db.upgradeCharacterSkill(mage, 'mago_nv2_3', 1), /INVALID_SKILL/);
 });
 
 test('Banco fechado e reaberto mantém nível, consumo e escolha sem repetir migração', t => {

@@ -27,7 +27,7 @@ const mine = { ...entry, rank: 99, characterId: 'me', name: 'Meu Herói', reborn
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 try {
   expansion.setContext({ maxSlots: 20, gold: 100000, level: 1, reborn: 0 }); click('btn-expand-inventory');
-  check(sends === 0 && text('inventory-expansion-status').includes('15'), 'Expansão respeita nível mínimo sem enviar compra');
+  check(sends === 0 && text('inventory-expansion-requirements').includes('15'), 'Expansão respeita nível mínimo sem enviar compra');
   expansion.setContext({ maxSlots: 20, gold: 100000, level: 20, reborn: 0 }); click('btn-expand-inventory'); click('btn-cancel-expansion');
   check(sends === 0, 'Cancelar preserva ouro e capacidade');
   click('btn-expand-inventory'); click('btn-confirm-expansion'); click('btn-confirm-expansion');
@@ -35,14 +35,14 @@ try {
   expansion.onResult({ success: true, newMaxSlots: 25, goldSpent: 10000, remainingGold: 90000, nextExpansionCost: 50000, nextExpansionMinLevel: 25, message: 'Expansão confirmada.' });
   check(applied[0].newMaxSlots === 25 && applied[0].remainingGold === 90000 && text('expand-cost-label').includes('50.000'), 'Capacidade, saldo e próxima cotação vêm do servidor');
   expansion.setContext({ maxSlots: 25, gold: 100, level: 30, reborn: 0 }); click('btn-expand-inventory');
-  check(sends === 1 && text('inventory-expansion-status').includes('50.000'), 'Saldo insuficiente impede envio');
+  check(sends === 1 && text('inventory-expansion-requirements').includes('50.000'), 'Saldo insuficiente impede envio');
   expansion.setContext({ maxSlots: 25, gold: 100000, level: 30, reborn: 0 }); click('btn-expand-inventory'); click('btn-confirm-expansion');
   expansion.onResult({ success: false, newMaxSlots: 25, goldSpent: 0, remainingGold: 100000, nextExpansionCost: 55000, nextExpansionMinLevel: 25, message: 'Compra rejeitada pelo servidor.' });
   check(applied.at(-1)!.newMaxSlots === 25 && applied.at(-1)!.remainingGold === 100000 && text('expand-cost-label').includes('55.000'), 'Falha preserva capacidade/saldo e substitui prévia pela cotação recebida');
   click('btn-expand-inventory'); expansion.setContext({ maxSlots: 25, gold: 90000, level: 30, reborn: 0 });
-  check(document.getElementById('inventory-expansion-confirm')!.hidden, 'Mudança de saldo invalida confirmação anterior');
+  check(!document.getElementById('inventory-expansion-confirm')!.hidden, 'Farm preserva confirmação quando capacidade não muda');
   expansion.setContext({ maxSlots: 45, gold: 20000000, level: 50, reborn: 0 }); click('btn-expand-inventory');
-  check(text('inventory-expansion-status').includes('Reborn 1'), 'Última expansão exige Reborn');
+  check(text('inventory-expansion-requirements').includes('Reborn 1'), 'Última expansão exige Reborn');
   expansion.setContext({ maxSlots: 45, gold: 20000000, level: 1, reborn: 1 }); click('btn-expand-inventory');
   check(!document.getElementById('inventory-expansion-confirm')!.hidden, 'Reborn permite expansão após reiniciar nível'); click('btn-cancel-expansion');
   expansion.setContext({ maxSlots: 50, gold: 20000000, level: 50, reborn: 1 });

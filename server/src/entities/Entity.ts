@@ -9,6 +9,9 @@ import {
 } from '@magicforge/shared';
 
 export interface ActiveCombatStatus {
+  areaCenter?: Vector3;
+  radius?: number;
+  periodic?: {elapsedSec:number; pulsesDone:number; totalPower:number; targetId?:string};
   statusId: string;
   type: CombatStatusType;
   skillId: string;
@@ -21,6 +24,7 @@ export interface ActiveCombatStatus {
   remainingAbsorption?: number;
   maxAbsorption?: number;
   reflectRatio?: number;
+  reflectOnAbsorbed?: boolean;
   nextTickSec?: number;
 }
 
@@ -93,7 +97,7 @@ export abstract class Entity {
   }
 
   public isStunned(): boolean {
-    return this.hasStatus('STUN');
+    return this.hasStatus('STUN') || this.hasStatus('FROZEN');
   }
 
   public hasDeathImmunity(): boolean {
@@ -110,6 +114,14 @@ export abstract class Entity {
     return buff ? 1.0 + buff.magnitude : 1.0;
   }
 
+  public getCriticalChance(baseChance: number): number {
+    return Math.max(0, Math.min(1, baseChance * (1 + (this.getStatus('CRITICAL_BUFF')?.magnitude ?? 0))));
+  }
+
+  public getMovementMultiplier(): number {
+    return 1-Math.max(0,Math.min(1,Math.max(this.getStatus('SLOW')?.magnitude??0,this.getStatus('FROST_SLOW')?.magnitude??0,this.getStatus('CRIPPLED')?.magnitude??0)));
+  }
+
   public getAttackSpeedMultiplier(): number {
     const haste = this.getStatus('ATTACK_SPEED_BUFF');
     // +25% de velocidade de ataque reduz o intervalo de ataque em 20% (1 / 1.25 = 0.8)
@@ -121,7 +133,8 @@ export abstract class Entity {
       return { effectiveDamage: 0, absorbed: 0, reflected: 0, killed: false };
     }
 
-    let modifiedDamage = Math.round(damage * this.getArmorMultiplier());
+    const reduction = Math.max(0, Math.min(1, Math.max(this.getStatus('DAMAGE_REDUCTION')?.magnitude ?? 0, this.getStatus('SANCTUARY_WARD')?.magnitude ?? 0,this.getStatus('STONE_SKIN')?.magnitude??0)));
+    let modifiedDamage = Math.round(damage * this.getArmorMultiplier() * (1 - reduction));
     let absorbed = 0;
     let reflected = 0;
     let brokenShieldStatus: ActiveCombatStatus | undefined;
@@ -130,7 +143,7 @@ export abstract class Entity {
     // 1. Reflexão e absorção de escudo (Baluarte Inquebrável)
     const shield = this.getStatus('SHIELD');
     if (shield) {
-      if (shield.reflectRatio && shield.reflectRatio > 0 && source && !source.isDead && !isReflected) {
+      if (!shield.reflectOnAbsorbed && shield.reflectRatio && shield.reflectRatio > 0 && source && !source.isDead && !isReflected) {
         reflected = Math.max(1, Math.round(modifiedDamage * shield.reflectRatio));
         source.takeDamage(reflected, this, true);
       }
@@ -147,6 +160,11 @@ export abstract class Entity {
           refreshedShieldStatus = shield;
         }
       }
+    }
+
+    if(shield?.reflectOnAbsorbed && absorbed>0 && shield.reflectRatio && source && !source.isDead && !isReflected){
+      reflected=Math.round(absorbed*shield.reflectRatio);
+      if(reflected>0)source.takeDamage(reflected,this,true);
     }
 
     // 2. Aplicação de dano no HP com verificação de Imunidade à Morte

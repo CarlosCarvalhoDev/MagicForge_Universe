@@ -3,6 +3,10 @@ import { DatabaseManager } from '../src/database/DatabaseManager';
 import { WorldManager } from '../src/game/WorldManager';
 import type { Connection } from '../src/network/Connection';
 import { calculateOfflineReward } from '../src/game/OfflineRewards';
+import { FUSION_RECIPES, getFusionPreview } from '@magicforge/shared';
+import { getEquipmentSuggestions, getSkillLevel } from '@magicforge/shared';
+
+export type ProgressionInvestment = 'none' | 'skill' | 'equipment' | 'fusion';
 
 export interface SimulationOptions {
   classType: CharacterClass;
@@ -10,6 +14,8 @@ export interface SimulationOptions {
   seed: number;
   equipStarter?: boolean;
   autoSellEquipment?: boolean;
+  collectFusionMilestones?: boolean;
+  investment?: ProgressionInvestment;
 }
 
 /** Sequential, isolated CLI/test use only: RNG and Date.now are restored before returning. */
@@ -70,10 +76,15 @@ export function simulateProgression(options: SimulationOptions) {
     const startingWeapon = player.inventory.find(item => ITEMS_DATABASE[item.itemId]?.type === ItemType.EQUIPAMENTO &&
       ITEMS_DATABASE[item.itemId].equipmentSlot === EquipmentSlot.ARMA);
     if (options.equipStarter !== false && startingWeapon) world.usePlayerItem(player, startingWeapon.slotIndex);
+    const startingGold = player.gold;
+    const actions: Array<{ seconds: number; kind: string; itemOrSkillId: string; goldSpent: number; level?: number }> = [];
+    const investment = options.investment ?? 'none';
     let maxStage = player.currentStage;
     const levelReachedAt: Record<number, number> = { [player.level]: 0 };
     const phases: Record<string, { world: number; stage: number; seconds: number; gold: number; dust: number; kills: number; deaths: number }> = {};
     let fullInventorySeconds = 0;
+    const fusionRecipes = options.collectFusionMilestones ? Object.values(FUSION_RECIPES).filter(recipe => recipe.classes.includes(player.classType)) : [];
+    const firstFusionReady: Record<string, number | null> = Object.fromEntries(fusionRecipes.map(recipe => [recipe.id, null]));
     const skill = SKILLS_DATABASE[player.getEquippedSkill(1)];
     const milestoneCosts = [2, 5, 10].map(targetLevel => {
       let gold = 0, dust = 0;
@@ -91,6 +102,9 @@ export function simulateProgression(options: SimulationOptions) {
       const phase = phases[phaseKey] ??= { world: player.currentWorld, stage: player.currentStage, seconds: 0, gold: 0, dust: 0, kills: 0, deaths: 0 };
       // No browser/controller inputs: production automation owns the entire cycle.
       manager.update(0.05);
+      if (tick % 20 === 0) for (const recipe of fusionRecipes) {
+        if (firstFusionReady[recipe.id] === null && !getFusionPreview(recipe, player.inventory, { classType:player.classType, level:player.level, gold:player.gold }).reason) firstFusionReady[recipe.id] = Math.round(elapsed() + .05);
+      }
       const after = player.huntSession.snapshot();
       phase.seconds += 0.05;
       phase.gold += after.lootGold - before.lootGold;
@@ -114,17 +128,78 @@ export function simulateProgression(options: SimulationOptions) {
         db.hasItemQuantity(player.dbCharacterId, 'stone_forge_common', 1)) {
         events.firstRefineAffordableSeconds = Math.round((elapsed() + 0.05) * 100) / 100;
       }
+      // A simulated player's decisions once per second, never a production auto-purchase feature.
+      // Use the current world after automatic portals, not the original channel instance.
+      if (tick % 20 === 0 && investment !== 'none' && !player.isDead) {
+        const activeWorld = connection.currentWorldInstance as typeof world;
+        const record = (kind: string, itemOrSkillId: string, beforeGold: number, level?: number) => {
+          actions.push({ seconds: Math.round((elapsed() + .05) * 100) / 100, kind, itemOrSkillId, goldSpent: beforeGold - player.gold, level });
+        };
+        if (investment === 'skill') {
+          const skillId = player.getEquippedSkill(1), selected = SKILLS_DATABASE[skillId];
+          const level = getSkillLevel(player.skillLevels, skillId), cost = getSkillUpgradeCost(selected, level);
+          if (cost && player.gold >= cost.gold && db.hasItemQuantity(player.dbCharacterId, 'arcane_dust', cost.dust)) {
+            const beforeGold = player.gold;
+            Object.assign(player, db.upgradeCharacterSkill(player, skillId, level));
+            record('skill', skillId, beforeGold, level + 1);
+          }
+        } else if (investment === 'equipment') {
+          // Re-evaluate after each equip; requirements and equipped stats can change.
+          for (let n = 0; n < 10; n++) {
+            const suggestion = getEquipmentSuggestions(player.inventory, player)[0];
+            if (!suggestion) break;
+            activeWorld.usePlayerItem(player, suggestion.candidate.slotIndex);
+            if (!suggestion.candidate.instanceId || !player.inventory.some(item => item.instanceId === suggestion.candidate.instanceId && item.isEquipped)) break;
+            record('equip', suggestion.candidate.itemId, player.gold);
+          }
+          const weapon = player.inventory.find(item => item.isEquipped && ITEMS_DATABASE[item.itemId]?.equipmentSlot === EquipmentSlot.ARMA);
+          // Only the guaranteed early tier; stop at +2, where starter attributes actually improve.
+          if (weapon && (weapon.refineLevel ?? 0) < 2 && player.gold >= 500 && db.hasItemQuantity(player.dbCharacterId, 'stone_forge_common', 1)) {
+            const beforeGold = player.gold, beforeLevel = weapon.refineLevel ?? 0;
+            activeWorld.refinePlayerEquipment(player, weapon.slotIndex);
+            const current = player.inventory.find(item => item.instanceId === weapon.instanceId);
+            if ((current?.refineLevel ?? 0) > beforeLevel) record('refine', weapon.itemId, beforeGold, current!.refineLevel);
+          }
+        } else if (!actions.some(action => action.kind === 'fusion')) {
+          // Reserve all earned ingredients for the first compatible weapon; no shop or grants.
+          const recipe = Object.values(FUSION_RECIPES).find(recipe => recipe.classes.includes(player.classType) && ITEMS_DATABASE[recipe.outputItemId].equipmentSlot === EquipmentSlot.ARMA);
+          if (recipe) {
+            const preview = getFusionPreview(recipe, player.inventory, { classType: player.classType, level: player.level, gold: player.gold });
+            if (!preview.reason) {
+              const beforeGold = player.gold;
+              const result = db.fuseEquipment(player, { requestId: 'progression-first-fusion', recipeId: recipe.id, recipeVersion: recipe.version, inputInstanceIds: preview.selected.map(item => item.instanceId!) });
+              player.inventory = db.getInventory(player.dbCharacterId);
+              player.gold = db.getCharacterGold(player.dbCharacterId);
+              record('fusion', result.outputItemId, beforeGold);
+              const output = player.inventory.find(item => item.instanceId === result.outputInstanceId)!;
+              activeWorld.usePlayerItem(player, output.slotIndex);
+              if (player.inventory.some(item => item.instanceId === output.instanceId && item.isEquipped)) record('equip', output.itemId, player.gold);
+            }
+          }
+        }
+      }
     }
     const offlineHour = calculateOfflineReward({ ...player, lastLogoutTime: epoch - 3600_000 }, epoch)!;
+    const bagComposition = new Map<string, { itemId: string; slots: number; quantity: number }>();
+    for (const item of bagItems(player.inventory)) {
+      const entry = bagComposition.get(item.itemId) ?? { itemId: item.itemId, slots: 0, quantity: 0 };
+      entry.slots++; entry.quantity += item.quantity;
+      bagComposition.set(item.itemId, entry);
+    }
     return {
       classType: options.classType, seed: options.seed, durationSeconds: options.seconds,
       starterEquipped: options.equipStarter !== false,
       autoSellEquipment: options.autoSellEquipment === true,
+      investment, startingGold, actions, spentGold: actions.reduce((total, action) => total + action.goldSpent, 0),
+      skillLevels: { ...player.skillLevels },
+      equippedItems: player.inventory.filter(item => item.isEquipped).map(item => ({ itemId: item.itemId, refineLevel: item.refineLevel ?? 0 })),
       finalLevel: player.level, finalWorld: player.currentWorld, finalStage: player.currentStage,
       maxStage, portalOpen: (connection.currentWorldInstance as typeof world).isPortalOpen, combatPower: player.CombatPower,
       goldBalance: player.gold, inventorySlotsUsed: bagItems(player.inventory).length,
+      bagComposition: [...bagComposition.values()],
       arcaneDustBalance: player.inventory.filter(item => item.itemId === 'arcane_dust').reduce((sum, item) => sum + item.quantity, 0),
       fullInventorySeconds: Math.round(fullInventorySeconds), milestoneCosts,
+      fusionAvailability: fusionRecipes.map(recipe => ({ recipeId:recipe.id, firstReadySeconds:firstFusionReady[recipe.id], eligibleCopies:getFusionPreview(recipe, player.inventory, { classType:player.classType, level:player.level, gold:player.gold }).eligible.length, finalBlockReason:getFusionPreview(recipe, player.inventory, { classType:player.classType, level:player.level, gold:player.gold }).reason })),
       phases: Object.values(phases).map(phase => ({ ...phase, seconds: Math.round(phase.seconds * 100) / 100,
         goldPerMinute: Number((phase.gold * 60 / phase.seconds).toFixed(2)),
         dustPerMinute: Number((phase.dust * 60 / phase.seconds).toFixed(2)) })),

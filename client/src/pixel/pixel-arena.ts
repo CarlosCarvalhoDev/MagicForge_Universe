@@ -32,7 +32,7 @@ function previewFx(kind: FxKind): void {
   if (kind === 'shield') previewShield(false);
   else renderer.vfx.queue.spawn({ kind, position: hero.position, followId: ['heal', 'levelUp'].includes(kind) ? hero.id : undefined, yaw: hero.headingYaw, radius: kind === 'avatar' ? 7 : 5 }, performance.now());
   nextFx = performance.now() + 1400;
-  const labels: Record<FxKind, string> = { slash: 'Corte V2 · aprovado provisoriamente', heal: 'Cura', whirlwind: 'Redemoinho', avatar: 'Avatar', impact: 'Impacto', shield: 'Escudo', levelUp: 'Subida de nível', line: 'Golpe Colossal', judgment: 'Lâmina do Julgamento' };
+  const labels: Record<FxKind, string> = { cone: 'Cone de Fogo', slash: 'Corte V2 · aprovado provisoriamente', heal: 'Cura', whirlwind: 'Redemoinho', avatar: 'Avatar', impact: 'Impacto', shield: 'Escudo', levelUp: 'Subida de nível', line: 'Golpe Colossal', judgment: 'Lâmina do Julgamento' };
   fxStatus.textContent = `Prévia visual: ${labels[kind]}. A vida e os atributos não são alterados.`;
 }
 document.querySelectorAll<HTMLButtonElement>('[data-fx]').forEach(button => button.addEventListener('click', () => previewFx(button.dataset.fx as FxKind)));

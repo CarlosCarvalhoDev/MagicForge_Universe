@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2026-11-05T11:56:17.563Z",
+  "sourceSha256": {
+    "server/src/game/World.ts": "cfece6d409ea43ad155588a864a8cf746d6480d5054b9a30b130f1fdf2c2bf3e",
+    "server/src/entities/Player.ts": "58b66dba74241d1b64fc013efb35087de2a54cb196f1232c1d5e092a8987924a",
+    "server/src/entities/Entity.ts": "4401c8e5a4c84e9d934e0d97da08a876633dd4f6d1ed0ca03b3da5dd947c749a",
+    "server/src/database/DatabaseManager.ts": "7e65560ebbe36b86b03624f59cf1459b0b0bfc4a11c79987f1e400166dd5ab8e",
+    "shared/src/skills.ts": "ea0aa9108971a050c600e110ca909c0aa9d54dd653327732c72cc4da1ea71266",
+    "shared/src/entities.ts": "d323068e1dd7ccb7b78b929340f74db892209155735bb51b7e4775b58286f7fa",
+    "shared/src/skill-targeting.ts": "b9e431f4a1ecd1c1d0570e0dd16c8da2e251db88e7ae98e9801a36f97cf07476"
+  },
+  "defaultMatrix": {
+    "scenarios": 420,
+    "outcomeChanges": [],
+    "rejections": 0,
+    "emptyCasts": 0
+  },
+  "clericChoices": {
+    "assumptions": "36 fresh in-memory fixtures: all nine cantrip/first-circle choices, level 10, worlds 1/2, seeds 101/202. Default order and starter equipment, no investment; not farm-earned progression or a balance target.",
+    "scenarios": 36,
+    "rejections": 0,
+    "emptyCasts": 0,
+    "combinations": [
+      {
+        "choices": "clerigo_truque_1/clerigo_nv1_1",
+        "victories": 2,
+        "deaths": 0,
+        "timeouts": 2,
+        "averageHealing": 809,
+        "averageSeconds": 48.02
+      },
+      {
+        "choices": "clerigo_truque_1/clerigo_nv1_2",
+        "victories": 2,
+        "deaths": 2,
+        "timeouts": 0,
+        "averageHealing": 0,
+        "averageSeconds": 45
+      },
+      {
+        "choices": "clerigo_truque_1/clerigo_nv1_3",
+        "victories": 2,
+        "deaths": 2,
+        "timeouts": 0,
+        "averageHealing": 0,
+        "averageSeconds": 39.38
+      },
+      {
+        "choices": "clerigo_truque_2/clerigo_nv1_1",
+        "victories": 2,
+        "deaths": 1,
+        "timeouts": 1,
+        "averageHealing": 845,
+        "averageSeconds": 47.64
+      },
+      {
+        "choices": "clerigo_truque_2/clerigo_nv1_2",
+        "victories": 2,
+        "deaths": 2,
+        "timeouts": 0,
+        "averageHealing": 0,
+        "averageSeconds": 42.55
+      },
+      {
+        "choices": "clerigo_truque_2/clerigo_nv1_3",
+        "victories": 2,
+        "deaths": 2,
+        "timeouts": 0,
+        "averageHealing": 0,
+        "averageSeconds": 39.8
+      },
+      {
+        "choices": "clerigo_truque_3/clerigo_nv1_1",
+        "victories": 2,
+        "deaths": 0,
+        "timeouts": 2,
+        "averageHealing": 1161,
+        "averageSeconds": 49.67
+      },
+      {
+        "choices": "clerigo_truque_3/clerigo_nv1_2",
+        "victories": 2,
+        "deaths": 0,
+        "timeouts": 2,
+        "averageHealing": 303,
+        "averageSeconds": 46.15
+      },
+      {
+        "choices": "clerigo_truque_3/clerigo_nv1_3",
+        "victories": 2,
+        "deaths": 2,
+        "timeouts": 0,
+        "averageHealing": 275,
+        "averageSeconds": 43.1
+      }
+    ]
+  }
+}

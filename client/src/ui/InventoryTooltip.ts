@@ -48,7 +48,7 @@ export function setupInventoryTooltip(grid: HTMLElement, getItems: () => readonl
       text('h4', caption, section);
       const itemDef = item && ITEMS_DATABASE[item.itemId];
       if (item && itemDef) {
-        const name = text('strong', `${itemDef.icon} ${itemDef.name}${item.refineLevel ? ` +${item.refineLevel}` : ''}`, section);
+        const name = text('strong', `${item.isLocked ? '🔒 ' : ''}${itemDef.icon} ${itemDef.name}${item.refineLevel ? ` +${item.refineLevel}` : ''}`, section);
         name.className = 'item-tooltip-name'; name.style.color = RARITY_COLORS[itemDef.rarity]?.text ?? '#fef08a';
         text('small', `${itemDef.rarity} · ${itemDef.equipmentSlot ?? itemDef.type}`, section);
         text('small', `Nível ${itemDef.minLevel ?? 1} · ${itemDef.allowedClasses?.join(', ') || 'Todas as classes'}`, section);

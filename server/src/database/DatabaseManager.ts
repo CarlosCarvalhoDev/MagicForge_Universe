@@ -2,6 +2,9 @@ import { DatabaseSync } from 'node:sqlite';
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import path from 'path';
 import {
+  FUSION_RECIPES,
+  FusionRequest,
+  isFusionIngredient,
   CharacterClass,
   CLASS_DEFINITIONS,
   createVector3,
@@ -25,6 +28,7 @@ import {
   getSkillUpgradeCost,
   EQUIPMENT_ADDRESSES,
   ItemType,
+  getInventoryExpansion,
 } from '@magicforge/shared';
 import { Player } from '../entities/Player';
 import { VerifiedSocialProfile } from '../auth/SocialAuthService';
@@ -164,6 +168,14 @@ export class DatabaseManager {
       );
     `);
 
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS equipment_fusions (
+        character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+        request_id TEXT NOT NULL, fingerprint TEXT NOT NULL, result_json TEXT NOT NULL, created_at INTEGER NOT NULL,
+        PRIMARY KEY(character_id, request_id)
+      );
+    `);
+
     // 3. Tabela de Inventário
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS inventory (
@@ -181,6 +193,11 @@ export class DatabaseManager {
       this.db.exec('ALTER TABLE inventory ADD COLUMN is_equipped INTEGER NOT NULL DEFAULT 0;');
     } catch {
       // Ignora se a coluna já existir
+    }
+
+    const inventoryColumns = this.db.prepare('PRAGMA table_info(inventory)').all() as Array<{ name: string }>;
+    if (!inventoryColumns.some(column => column.name === 'is_locked')) {
+      this.db.exec('ALTER TABLE inventory ADD COLUMN is_locked INTEGER NOT NULL DEFAULT 0 CHECK(is_locked IN (0, 1))');
     }
 
     try {
@@ -920,7 +937,11 @@ export class DatabaseManager {
     this.addItemToInventory(charId, 'potion_hp_minor', 3);
     this.addItemToInventory(charId, 'potion_mp_minor', 2);
 
-    if (classType === CharacterClass.MAGO || classType === CharacterClass.BRUXO) {
+    if (classType === CharacterClass.MONGE) {
+      this.addItemToInventory(charId, 'staff_monk_ash', 1);
+    } else if (classType === CharacterClass.BRUXO) {
+      this.addItemToInventory(charId, 'focus_pact_initiate', 1);
+    } else if (classType === CharacterClass.MAGO) {
       this.addItemToInventory(charId, 'staff_apprentice', 1);
     } else if (classType === CharacterClass.CLERIGO) {
       this.addItemToInventory(charId, 'mace_cleric_dawn', 1);
@@ -1182,9 +1203,52 @@ export class DatabaseManager {
     }
   }
 
+  public fuseEquipment(player: Player, request: FusionRequest): { outputInstanceId: string; outputItemId: string; replayed: boolean } {
+    if (!request || typeof request.requestId !== 'string' || !/^[a-zA-Z0-9_-]{16,80}$/.test(request.requestId) || typeof request.recipeId !== 'string' || !Number.isSafeInteger(request.recipeVersion) || !Array.isArray(request.inputInstanceIds) || request.inputInstanceIds.length > 10 || request.inputInstanceIds.some(id => typeof id !== 'string' || id.length > 100) || new Set(request.inputInstanceIds).size !== request.inputInstanceIds.length) throw new Error('FUSION_INVALID_REQUEST');
+    return this.runInTransaction(() => {
+      const characterId = player.dbCharacterId;
+      const fingerprint = JSON.stringify([request.recipeId, request.recipeVersion, [...request.inputInstanceIds].sort()]);
+      const previous = this.db.prepare('SELECT fingerprint, result_json FROM equipment_fusions WHERE character_id = ? AND request_id = ?').get(characterId, request.requestId) as { fingerprint: string; result_json: string } | undefined;
+      if (previous) {
+        if (previous.fingerprint !== fingerprint) throw new Error('FUSION_REQUEST_REUSED');
+        return { ...JSON.parse(previous.result_json), replayed: true };
+      }
+      const recipe = FUSION_RECIPES[request.recipeId];
+      if (!recipe || recipe.version !== request.recipeVersion) throw new Error('FUSION_RECIPE_CHANGED');
+      if (!recipe.classes.includes(player.classType) || player.level < recipe.minLevel) throw new Error('FUSION_REQUIREMENTS');
+      if (request.inputInstanceIds.length !== recipe.inputCount) throw new Error('FUSION_INGREDIENTS');
+      const inventory = this.getInventory(characterId);
+      const chosen = request.inputInstanceIds.map(id => inventory.find(item => item.instanceId === id));
+      if (chosen.some(item => !item || !isFusionIngredient(item, recipe))) throw new Error('FUSION_INGREDIENTS');
+      if (chosen.some(item => item!.itemId !== chosen[0]!.itemId)) throw new Error('FUSION_INGREDIENTS');
+      const character = this.db.prepare('SELECT gold, max_inventory_slots FROM characters WHERE id = ?').get(characterId) as { gold: number; max_inventory_slots: number } | undefined;
+      if (!character || character.gold < recipe.goldCost) throw new Error('FUSION_GOLD');
+      for (const material of recipe.materials) if (!this.hasItemQuantity(characterId, material.itemId, material.quantity)) throw new Error('FUSION_MATERIALS');
+      for (const item of chosen) {
+        const removed = this.db.prepare('DELETE FROM inventory WHERE character_id = ? AND id = ? AND item_id = ? AND slot_index >= 0 AND quantity = 1 AND is_equipped = 0 AND is_locked = 0 AND refine_level = 0 AND NOT EXISTS (SELECT 1 FROM equipment_gems WHERE inventory_id = inventory.id)').run(characterId, item!.instanceId!, item!.itemId);
+        if (removed.changes !== 1) throw new Error('FUSION_INGREDIENTS');
+      }
+      for (const material of recipe.materials) if (!this.consumeItemQuantity(characterId, material.itemId, material.quantity)) throw new Error('FUSION_MATERIALS');
+      this.updateCharacterGold(characterId, -recipe.goldCost);
+      if (!this.addItemToInventory(characterId, recipe.outputItemId, 1, character.max_inventory_slots)) throw new Error('FUSION_SPACE');
+      const existingIds = new Set(inventory.map(item => item.instanceId));
+      const output = this.getInventory(characterId).find(item => item.itemId === recipe.outputItemId && !existingIds.has(item.instanceId));
+      if (!output?.instanceId || !this.setItemLocked(characterId, output.instanceId, true)) throw new Error('FUSION_OUTPUT');
+      const result = { outputInstanceId: output.instanceId, outputItemId: recipe.outputItemId };
+      this.db.prepare('INSERT INTO equipment_fusions (character_id, request_id, fingerprint, result_json, created_at) VALUES (?, ?, ?, ?, ?)').run(characterId, request.requestId, fingerprint, JSON.stringify(result), Date.now());
+      return { ...result, replayed: false };
+    });
+  }
+
+  public setItemLocked(characterId: string, instanceId: string, isLocked: boolean): boolean {
+    if (typeof isLocked !== 'boolean' || typeof instanceId !== 'string') return false;
+    return this.db.prepare('UPDATE inventory SET is_locked = ? WHERE character_id = ? AND id = ?')
+      .run(isLocked ? 1 : 0, characterId, instanceId).changes === 1;
+  }
+
   public getInventory(characterId: string): InventoryItemPayload[] {
     const query = this.db.prepare(
-      'SELECT id, slot_index, item_id, quantity, is_equipped, refine_level FROM inventory WHERE character_id = ? ORDER BY slot_index ASC'
+      'SELECT id, slot_index, item_id, quantity, is_equipped, is_locked, refine_level FROM inventory WHERE character_id = ? ORDER BY slot_index ASC'
     );
     const rows = query.all(characterId) as Array<{
       id: string;
@@ -1192,6 +1256,7 @@ export class DatabaseManager {
       item_id: string;
       quantity: number;
       is_equipped: number;
+      is_locked: number;
       refine_level: number;
     }>;
 
@@ -1218,6 +1283,7 @@ export class DatabaseManager {
       itemId: r.item_id,
       quantity: r.quantity,
       isEquipped: r.is_equipped === 1,
+      isLocked: r.is_locked === 1,
       refineLevel: r.refine_level || 0,
       sockets: gemMap.get(r.id) || [],
     }));
@@ -1255,7 +1321,7 @@ export class DatabaseManager {
 
   public removeItemFromInventory(characterId: string, slotIndex: number, quantity: number = 1): boolean {
     if (!Number.isSafeInteger(quantity) || quantity < 1) return false;
-    const query = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND slot_index = ? AND is_equipped = 0');
+    const query = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND slot_index = ? AND is_equipped = 0 AND is_locked = 0');
     const existing = query.get(characterId, slotIndex) as { id: string; quantity: number } | undefined;
     if (!existing) return false;
 
@@ -1303,17 +1369,12 @@ export class DatabaseManager {
   }
 
   public expandInventorySlots(characterId: string, currentSlots: number, cost: number): number | null {
-    const goldQuery = this.db.prepare('SELECT gold FROM characters WHERE id = ?');
-    const charRow = goldQuery.get(characterId) as { gold: number } | undefined;
-    if (!charRow || charRow.gold < cost) return null;
-
-    const newSlots = currentSlots + 5;
-    this.db.prepare('UPDATE characters SET gold = gold - ?, max_inventory_slots = ? WHERE id = ?').run(
-      cost,
-      newSlots,
-      characterId
-    );
-    return newSlots;
+    const expansion = getInventoryExpansion(currentSlots);
+    if (!expansion || expansion.cost !== cost) return null;
+    // Capacity and funds are checked together: stale/replayed purchases cannot debit twice.
+    const changed = this.db.prepare('UPDATE characters SET gold = gold - ?, max_inventory_slots = ? WHERE id = ? AND max_inventory_slots = ? AND gold >= ?')
+      .run(cost, expansion.newMaxSlots, characterId, currentSlots, cost);
+    return changed.changes === 1 ? expansion.newMaxSlots : null;
   }
 
   public discardOrRecycleItem(
@@ -1321,9 +1382,10 @@ export class DatabaseManager {
     slotIndex: number
   ): { success: true; goldGained: number; dustGained: number } | { success: false; reason: string } {
     return this.runInTransaction(() => {
-    const query = this.db.prepare('SELECT id, item_id, quantity, is_equipped FROM inventory WHERE character_id = ? AND slot_index = ?');
-    const item = query.get(characterId, slotIndex) as { id: string; item_id: string; quantity: number; is_equipped: number } | undefined;
+    const query = this.db.prepare('SELECT id, item_id, quantity, is_equipped, is_locked FROM inventory WHERE character_id = ? AND slot_index = ?');
+    const item = query.get(characterId, slotIndex) as { id: string; item_id: string; quantity: number; is_equipped: number; is_locked: number } | undefined;
     if (!item) return { success: false, reason: 'Item não encontrado no slot' };
+    if (item.is_locked === 1) return { success: false, reason: 'Item protegido. Desproteja antes de reciclar.' };
     if (item.is_equipped === 1) return { success: false, reason: 'Desequipe o item antes de reciclar!' };
 
     const itemDef = ITEMS_DATABASE[item.item_id];
@@ -1417,7 +1479,7 @@ export class DatabaseManager {
     }
 
     // 2. Verifica se a gema existe no inventário do jogador
-    const gemQuery = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND item_id = ? AND quantity >= 1');
+    const gemQuery = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND item_id = ? AND quantity >= 1 AND is_equipped = 0 AND is_locked = 0');
     const gemRow = gemQuery.get(characterId, gemItemId) as { id: string; quantity: number } | undefined;
     if (!gemRow) return { success: false, reason: 'Você não possui esta gema na mochila!' };
 
@@ -1534,7 +1596,7 @@ export class DatabaseManager {
 
   // --- CONTROLE DE MATERIAIS PARA FORJA ---
   public hasItemQuantity(characterId: string, itemId: string, requiredQuantity: number): boolean {
-    const query = this.db.prepare('SELECT SUM(quantity) as total FROM inventory WHERE character_id = ? AND item_id = ? AND is_equipped = 0');
+    const query = this.db.prepare('SELECT SUM(quantity) as total FROM inventory WHERE character_id = ? AND item_id = ? AND is_equipped = 0 AND is_locked = 0');
     const row = query.get(characterId, itemId) as { total: number | null } | undefined;
     return (row?.total || 0) >= requiredQuantity;
   }
@@ -1542,7 +1604,7 @@ export class DatabaseManager {
   public consumeItemQuantity(characterId: string, itemId: string, quantityToConsume: number): boolean {
     if (!this.hasItemQuantity(characterId, itemId, quantityToConsume)) return false;
 
-    const query = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND item_id = ? AND is_equipped = 0 ORDER BY quantity ASC');
+    const query = this.db.prepare('SELECT id, quantity FROM inventory WHERE character_id = ? AND item_id = ? AND is_equipped = 0 AND is_locked = 0 ORDER BY quantity ASC');
     const rows = query.all(characterId, itemId) as Array<{ id: string; quantity: number }>;
 
     let remaining = quantityToConsume;

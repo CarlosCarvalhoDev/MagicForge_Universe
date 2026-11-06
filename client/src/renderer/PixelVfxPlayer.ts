@@ -61,6 +61,12 @@ export class PixelVfxPlayer {
         ctx.fillStyle = '#e8b65e';
         ctx.fillRect(x - 9 * scale, y - (49 + drop) * scale, 18 * scale, 3 * scale);
         if (progress > .35) ring(8 + (progress - .35) * 38, '#ffe3a1');
+      } else if (fx.kind === 'cone') {
+        const direction=Math.PI/2-(fx.yaw??0)*Math.PI/180;
+        const halfAngle=Math.max(1,Math.min(180,fx.coneAngleDeg??60))*Math.PI/360;
+        const length=Math.max(0,Math.min(30,fx.coneRange??6))*zoom;
+        ctx.beginPath();ctx.moveTo(x,y);ctx.arc(x,y,length,direction-halfAngle,direction+halfAngle);ctx.closePath();
+        ctx.fillStyle='#e8883580';ctx.fill();ctx.strokeStyle='#ffd995';ctx.lineWidth=2;ctx.stroke();
       } else if (fx.kind === 'line') {
         const length = Math.min(15, Math.max(1, fx.lineLength ?? 4.5)) * zoom / scale;
         const width = Math.min(6, Math.max(.5, fx.lineWidth ?? 3)) * zoom / scale;
@@ -84,7 +90,7 @@ export class PixelVfxPlayer {
     ctx.restore(); return effects.length;
   }
   drawStatuses(ctx: CanvasRenderingContext2D, statuses: CombatStatusStatePayload[], entities: readonly FxEntity[], camera: { x: number; y: number }, zoom: number, now: number): void {
-    const names = { BLEED: 'SANGRANDO', ARMOR_BREAK: 'DEFESA ↓', ATTACK_SPEED_BUFF: 'VELOCIDADE ↑', STUN: 'ATORDOADO', SHIELD: 'ESCUDO', DAMAGE_BUFF: 'PODER ↑', DEATH_IMMUNITY: 'PROTEÇÃO À MORTE' };
+    const names = { BLEED: 'SANGRANDO', ARMOR_BREAK: 'DEFESA ↓', ATTACK_SPEED_BUFF: 'VELOCIDADE ↑', STUN: 'ATORDOADO', SHIELD: 'ESCUDO', DAMAGE_BUFF: 'PODER ↑', DAMAGE_REDUCTION: 'RESISTÊNCIA ↑', CRITICAL_BUFF: 'CRÍTICO ↑', GUIDING_MARK: 'MARCA GUIA', GUARDIANS_AURA:'GUARDIÕES', SPIRITUAL_WEAPON:'ARMA ESPIRITUAL', SANCTUARY:'SANTUÁRIO', SANCTUARY_WARD:'PROTEÇÃO SAGRADA', SLOW:'LENTIDÃO', FROST_SLOW:'GELO: LENTIDÃO', BURN:'QUEIMANDO', FROZEN:'CONGELADO', ARCANE_HASTE:'MENTE ACELERADA', COMET_RAIN:'COMETAS', CRIPPLED:'MOVIMENTO ↓', WEAKENED:'ATAQUE ↓', STONE_SKIN:'PELE ROCHOSA', UNBRIDLED_RAGE:'ENERGIA LIVRE', SPECTRAL_PACK:'MATILHA ESPIRITUAL', DEATH_IMMUNITY: 'PROTEÇÃO À MORTE' };
     const grouped = new Map<string, CombatStatusStatePayload[]>();
     for (const status of statuses) grouped.set(status.targetEntityId, [...(grouped.get(status.targetEntityId) ?? []), status]);
     ctx.save(); ctx.imageSmoothingEnabled = false;
@@ -93,6 +99,12 @@ export class PixelVfxPlayer {
       const x = Math.round(ctx.canvas.width / 2 + (entity.position.x - camera.x) * zoom), y = Math.round(ctx.canvas.height / 2 + (entity.position.z - camera.y) * zoom);
       if (x < -200 || y < -200 || x > ctx.canvas.width + 200 || y > ctx.canvas.height + 200) continue;
       active.forEach((status, index) => {
+        if((status.type==='GUARDIANS_AURA'||status.type==='SANCTUARY'||status.type==='COMET_RAIN'||status.type==='SPECTRAL_PACK')&&status.radius){
+          const center=['SANCTUARY','COMET_RAIN'].includes(status.type)?(status.areaCenter??entity.position):entity.position;
+          const cx=ctx.canvas.width/2+(center.x-camera.x)*zoom,cy=ctx.canvas.height/2+(center.z-camera.y)*zoom;
+          ctx.beginPath();ctx.arc(cx,cy,status.radius*zoom,0,Math.PI*2);
+          ctx.fillStyle=status.type==='SANCTUARY'?'#b8e99b16':'#f8d78812';ctx.fill();ctx.strokeStyle=status.type==='SANCTUARY'?'#b8e99b88':'#f8d78888';ctx.lineWidth=1;ctx.stroke();
+        }
         const color = ['BLEED', 'ARMOR_BREAK', 'STUN'].includes(status.type) ? '#f3a18d' : '#ade4ee';
         ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center'; ctx.fillStyle = '#15291ee8';
         const absorption = status.type === 'SHIELD' && Number.isFinite(status.remainingAbsorption) ? Math.max(0, Math.ceil(status.remainingAbsorption!)) : undefined;

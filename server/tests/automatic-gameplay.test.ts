@@ -25,6 +25,8 @@ function setup(t: TestContext, managed = false) {
   if (manager) { manager.registerConnection(connection); manager.assignPlayerToChannel(connection, player, 1); }
   else world.enterWorld(connection, player);
   player.level = 50;
+  // Cycle test uses a damaging choice: self-heals wait for missing HP.
+  player.setEquippedSkill(2, 'guerreiro_nv1_2');
   player.recalculateStatsFromEquipment();
   player.maxResource = player.currentResource = 1000;
   player.attackTimer = 10000;

@@ -38,3 +38,18 @@ test('Falha de resgate mantém modal e recompensa; sucesso fecha o modal', () =>
   assert.equal(dialog.open, false);
   assert.equal(modal.pendingPayload, null);
 });
+
+test('Resgate parcial mantém o baú aberto e troca a prévia pelo restante já sem ouro/EXP', () => {
+  const status = { textContent: '' }, button = { textContent: '' };
+  const dialog = { open: true, querySelector: selector => selector === '#offline-claim-status' ? status : button, close() { this.open = false; } };
+  const modal = Object.create(OfflineRewardModal.prototype);
+  modal.show = payload => { modal.pendingPayload = payload; };
+  Object.assign(modal, { dialog, isClaiming: true });
+  const remainingReward = { accumulatedGold: 0, accumulatedExp: 0, lootPreview: [{itemId:'ore_iron_arcane',quantity:2}] };
+  modal.onClaimed({ success: true, remainingReward, message: 'Restam 2 unidades no baú.' });
+  assert.equal(dialog.open, true);
+  assert.equal(modal.pendingPayload, remainingReward);
+  assert.equal(modal.isClaiming, false);
+  assert.match(button.textContent, /itens restantes/);
+  assert.match(status.textContent, /2 unidades/);
+});

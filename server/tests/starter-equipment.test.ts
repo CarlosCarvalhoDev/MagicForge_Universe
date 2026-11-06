@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { CharacterClass, ITEMS_DATABASE, ItemType } from '@magicforge/shared';
 import { DatabaseManager } from '../src/database/DatabaseManager';
 
-for (const classType of [CharacterClass.GUERREIRO, CharacterClass.BARBARO, CharacterClass.ARQUEIRO, CharacterClass.CLERIGO]) {
+for (const classType of Object.values(CharacterClass)) {
   test(`${classType}: kit inicial contém arma válida e equipável no nível 1`, (t) => {
     const db = new DatabaseManager(':memory:');
     t.after(() => db.close());
