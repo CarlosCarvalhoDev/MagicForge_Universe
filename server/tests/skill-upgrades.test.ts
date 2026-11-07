@@ -48,7 +48,7 @@ test('Compra usa preço do servidor, persiste por habilidade e rejeita pedido re
   const loadout = { ...f.player.equippedSkills };
   f.player.skillCastOrder = [4, 2, 1, 3];
   assert.equal(f.upgrade().success, true);
-  assert.equal(f.player.gold, old.gold - 100);
+  assert.equal(f.player.gold, old.gold - 300);
   assert.equal(f.player.skillLevels.guerreiro_truque_1, 2);
   assert.equal(f.db.hasItemQuantity(f.player.dbCharacterId, 'arcane_dust', 500), false);
   assert.equal(f.db.hasItemQuantity(f.player.dbCharacterId, 'arcane_dust', 499), true);
@@ -159,12 +159,13 @@ test('Melhoria aumenta dano, cura, escudo e sangramento reais sem mudar custo ne
   assert.ok(cast(1).appliedStatuses.find((s: any) => s.type === 'BLEED').magnitude > bleed);
 });
 
-test('Suporte sem efeito implementado não pode vender melhoria', t => {
+test('Suporte com percentuais fixos não pode vender evolução de potência', t => {
   const f = setup(t);
   const account = f.db.getOrCreateAccount('mage_account');
   const mage = f.db.createCharacterInSlot('mage', account.id, 0, 'Mage', CharacterClass.MAGO);
   mage.level = 50;
-  assert.throws(() => f.db.upgradeCharacterSkill(mage, 'mago_nv1_2', 1), /INVALID_SKILL/);
+  mage.setEquippedSkill(3,'mago_nv2_3');
+  assert.throws(() => f.db.upgradeCharacterSkill(mage, 'mago_nv2_3', 1), /INVALID_SKILL/);
 });
 
 test('Banco fechado e reaberto mantém nível, consumo e escolha sem repetir migração', t => {
@@ -183,7 +184,7 @@ test('Banco fechado e reaberto mantém nível, consumo e escolha sem repetir mig
     db = new DatabaseManager(filename);
     const loaded = db.loadPlayerFromRecord('after', db.getCharacterByName('DiskHero')!);
     assert.equal(loaded.skillLevels.guerreiro_truque_1, 2);
-    assert.equal(loaded.gold, 950);
+    assert.equal(loaded.gold, 750);
     assert.equal(loaded.getEquippedSkill(1), 'guerreiro_truque_1');
     assert.equal(loaded.inventory.find(item => item.itemId === 'arcane_dust')!.quantity, 2);
   } finally { db.close(); }

@@ -629,11 +629,11 @@ test('8. Preservação integral do herói com SQLite em disco fechado e reaberto
     db.toggleEquipItem(player.dbCharacterId, armorSlot, player.classType, player.level, player.attributes);
 
     // Aplica refinos (+7 na arma, +5 na armadura)
-    db.refineEquipmentItem(player.dbCharacterId, swordSlot, 7);
-    db.refineEquipmentItem(player.dbCharacterId, armorSlot, 5);
+    db.refineEquipmentItem(player.dbCharacterId, -1, 7);
+    db.refineEquipmentItem(player.dbCharacterId, -2, 5);
 
     // Engasta gema de rubi no soquete 0 da espada
-    db.socketGem(player.dbCharacterId, swordSlot, 0, 'gem_ruby_str');
+    db.socketGem(player.dbCharacterId, -1, 0, 'gem_ruby_str');
 
     // Adiciona cartas
     db.addCharacterCard(player.dbCharacterId, 'card_wolf');

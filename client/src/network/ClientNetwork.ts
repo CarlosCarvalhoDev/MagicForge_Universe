@@ -9,12 +9,16 @@ import {
   C2SUseItemPayload,
   C2SSellItemPayload,
   C2SDiscardItemPayload,
+  EquipmentAdvicePayload,
+  FusionRequest,
+  FusionResult,
   C2SExpandInventoryPayload,
   CharacterClass,
   NetworkMessage,
   Opcode,
   S2CCombatEventPayload,
   S2CInventoryUpdatePayload,
+  InventoryItemPayload,
   S2CItemDropDespawnPayload,
   S2CItemDropSpawnPayload,
   C2SRequestCharacterListPayload,
@@ -129,6 +133,9 @@ export class ClientNetwork {
   public onItemDropSpawn: MessageListener<S2CItemDropSpawnPayload> | null = null;
   public onItemDropDespawn: MessageListener<S2CItemDropDespawnPayload> | null = null;
   public onInventoryUpdate: MessageListener<S2CInventoryUpdatePayload> | null = null;
+  public onFusionResult: MessageListener<FusionResult> | null = null;
+  public onEquipmentAdvice: MessageListener<EquipmentAdvicePayload> | null = null;
+  private inventorySnapshot = new Map<number, InventoryItemPayload>();
   public onPlayerExpUpdate: MessageListener<S2CPlayerExpUpdatePayload> | null = null;
   public onPlayerLevelUp: MessageListener<S2CPlayerLevelUpPayload> | null = null;
   public onBossEvent: MessageListener<S2CBossEventPayload> | null = null;
@@ -209,6 +216,7 @@ export class ClientNetwork {
     this.ws.onclose = () => {
       console.warn('[ClientNetwork] Disconnected from WebSocket server.');
       this.isConnected = false;
+      this.inventorySnapshot.clear();
       this.onConnectionStateChange?.(false);
       this.stopPingHeartbeat();
       if (this.autoReconnect) {
@@ -260,6 +268,7 @@ export class ClientNetwork {
       this.ws = null;
     }
     this.isConnected = false;
+      this.inventorySnapshot.clear();
   }
 
   public send<T>(op: Opcode, data: T): void {
@@ -408,22 +417,32 @@ export class ClientNetwork {
   }
 
   public sendUseItem(slotIndex: number): void {
-    const payload: C2SUseItemPayload = { slotIndex };
+    const payload: C2SUseItemPayload = { slotIndex, expectedInstanceId: this.inventorySnapshot.get(slotIndex)?.instanceId };
     this.send(Opcode.C2S_USE_ITEM, payload);
   }
 
   public sendSellItem(slotIndex: number): void {
-    const payload: C2SSellItemPayload = { slotIndex };
+    const payload: C2SSellItemPayload = { slotIndex, expectedInstanceId: this.inventorySnapshot.get(slotIndex)?.instanceId };
     this.send(Opcode.C2S_SELL_ITEM, payload);
   }
 
   public sendDiscardItem(slotIndex: number): void {
-    const payload: C2SDiscardItemPayload = { slotIndex };
+    const payload: C2SDiscardItemPayload = { slotIndex, expectedInstanceId: this.inventorySnapshot.get(slotIndex)?.instanceId };
     this.send(Opcode.C2S_DISCARD_ITEM, payload);
   }
 
-  public sendExpandInventory(): void {
-    this.send(Opcode.C2S_EXPAND_INVENTORY, {});
+  public sendSetItemLock(slotIndex: number, isLocked: boolean): void {
+    const expectedInstanceId = this.inventorySnapshot.get(slotIndex)?.instanceId;
+    if (!expectedInstanceId) return;
+    this.send(Opcode.C2S_SET_ITEM_LOCK, { slotIndex, expectedInstanceId, isLocked });
+  }
+
+  public sendFuseEquipment(request: FusionRequest): void { this.send(Opcode.C2S_FUSE_EQUIPMENT, request); }
+
+  public sendRequestEquipmentAdvice(): void { this.send(Opcode.C2S_REQUEST_EQUIPMENT_ADVICE, {}); }
+
+  public sendExpandInventory(expectedMaxSlots?: number): void {
+    this.send(Opcode.C2S_EXPAND_INVENTORY, { expectedMaxSlots });
   }
 
   public sendChallengeBoss(): void {
@@ -439,12 +458,14 @@ export class ClientNetwork {
   }
 
   public sendRefineEquipment(slotIndex: number): void {
-    const payload: C2SRefineEquipmentPayload = { slotIndex };
+    const payload: C2SRefineEquipmentPayload = { slotIndex, expectedInstanceId: this.inventorySnapshot.get(slotIndex)?.instanceId,
+      expectedRefineLevel: this.inventorySnapshot.get(slotIndex)?.refineLevel ?? 0 };
     this.send(Opcode.C2S_REFINE_EQUIPMENT, payload);
   }
 
   public sendSocketGem(equipmentSlotIndex: number, socketIndex: number, gemItemId: string): void {
-    const payload: C2SSocketGemPayload = { equipmentSlotIndex, socketIndex, gemItemId };
+    const payload: C2SSocketGemPayload = { equipmentSlotIndex, socketIndex, gemItemId,
+      expectedInstanceId: this.inventorySnapshot.get(equipmentSlotIndex)?.instanceId };
     this.send(Opcode.C2S_SOCKET_GEM, payload);
   }
 
@@ -615,7 +636,13 @@ export class ClientNetwork {
           break;
         }
 
+        case Opcode.S2C_FUSION_RESULT: { this.onFusionResult?.(packet.data as FusionResult); break; }
+        case Opcode.S2C_EQUIPMENT_ADVICE: {
+          this.onEquipmentAdvice?.(packet.data as EquipmentAdvicePayload);
+          break;
+        }
         case Opcode.S2C_INVENTORY_UPDATE: {
+          this.inventorySnapshot = new Map((packet.data as S2CInventoryUpdatePayload).slots.map(item => [item.slotIndex, item]));
           this.onInventoryUpdate?.(packet.data as S2CInventoryUpdatePayload);
           break;
         }

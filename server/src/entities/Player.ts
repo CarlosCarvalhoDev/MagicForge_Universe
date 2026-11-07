@@ -7,6 +7,7 @@ import {
   distanceSquared,
   EntityType,
   getXpForNextLevel,
+  getManaAttribute,
   PrimaryStatType,
   Vector3,
   cloneVector3,
@@ -113,7 +114,7 @@ export class Player extends Entity {
     // Resource allocation based on class (Mana for casters, Energia for martials)
     const isCaster = classType === CharacterClass.MAGO || classType === CharacterClass.CLERIGO || classType === CharacterClass.BRUXO;
     this.resourceType = isCaster ? 'Mana' : 'Energia';
-    this.maxResource = isCaster ? 100 + (this.attributes.inteligencia || this.attributes.sabedoria || 10) * 8 : 100;
+    this.maxResource = isCaster ? 100 + getManaAttribute(this.classType, this.attributes) * 8 : 100;
     this.currentResource = this.maxResource;
   }
 
@@ -216,10 +217,11 @@ export class Player extends Entity {
 
     const isCaster = this.classType === CharacterClass.MAGO || this.classType === CharacterClass.CLERIGO || this.classType === CharacterClass.BRUXO;
     if (isCaster) {
-      this.maxResource = 100 + (this.attributes.inteligencia || this.attributes.sabedoria || 10) * 8 + this.rebornCount * 50 + extraResourceFromGear;
+      this.maxResource = 100 + getManaAttribute(this.classType, this.attributes) * 8 + this.rebornCount * 50 + extraResourceFromGear;
     } else {
       this.maxResource = 100 + extraResourceFromGear;
     }
+    this.currentResource = Math.min(this.currentResource, this.maxResource);
   }
 
   public respawn(): void {

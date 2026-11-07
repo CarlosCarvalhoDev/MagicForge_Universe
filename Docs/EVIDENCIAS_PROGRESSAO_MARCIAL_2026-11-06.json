@@ -1,0 +1,2142 @@
+{
+  "generatedAt": "2026-11-06T16:03:06.345Z",
+  "scenarioCount": 36,
+  "simulatedHours": 18,
+  "currentSourceHashes": {
+    "server/tools/ProgressionSimulation.ts": "42e108ea3ee709508c98be371351d830d6025200c1fff7c4878877a73d576b3a",
+    "server/tools/benchmark-earned-progression.ts": "52b6c6900ab6df557e9372ffc623ad8f77f92e503881cd8db73b1a3795df71e0",
+    "server/tests/earned-progression.test.ts": "6c1ef38160a07d587ea1969fb25e92f198387871e343f33a2dc67aff01eb0686"
+  },
+  "sourceNote": "Experiments preserve source hashes captured at their start. Afterwards only diagnostic bagComposition was added to the simulator; the runner gained sell mode between experiments. No production combat/economy rule changed in this block.",
+  "experiments": [
+    {
+      "report": "scratch/runtime/earned-progression-2026-11-06.json",
+      "sourceHashes": {
+        "tools/ProgressionSimulation.ts": "d5f24347fc64926ca0a0d7c0cbee71b6669bc221bbafc957d4d36745fefe80f0",
+        "tools/benchmark-earned-progression.ts": "899fc9fc671d1cdc69a8634e2cc275d1086de3fed609ff41b773e7923a127f87",
+        "src/game/World.ts": "8026ef7044b678d6d2abb9712a114a078465892e28b2b0eaafa9918692f599db",
+        "src/entities/Player.ts": "58b66dba74241d1b64fc013efb35087de2a54cb196f1232c1d5e092a8987924a",
+        "src/entities/Entity.ts": "f9cea2ee0dddef4f0807558f4490a36d0a7db4af56d1c661ace8385aa0237fbc",
+        "src/database/DatabaseManager.ts": "7e65560ebbe36b86b03624f59cf1459b0b0bfc4a11c79987f1e400166dd5ab8e",
+        "../shared/src/skills.ts": "8e5c970c01d1f658cb53d3eaedd55dded9eabc58612c9cfe43c2b72417b53697",
+        "../shared/src/items.ts": "a3911dba2e2c0100a192e86a805970aea8c42989608a0bda60833c4ddb76d462",
+        "../shared/src/skill-progression.ts": "6594d831b4df6e18cf15e6adc1a4daf1a7c089f961d45747f0a31a68b78c9df1",
+        "../shared/src/equipment-fusion.ts": "fdd36848c2f77effaad29565f6b50379bd873be8ef6878081a0c130c7914393c"
+      },
+      "assumptions": {
+        "database": ":memory:",
+        "tickRate": 20,
+        "startingLevel": 1,
+        "equippedStarter": true,
+        "equipmentAutoSale": false,
+        "grantedResources": false,
+        "offlineRewardsClaimed": false,
+        "decisionsEverySeconds": 1,
+        "purchasesDuringCombat": true,
+        "policies": {
+          "none": "Starter only; retain all earned resources.",
+          "skill": "Purchase slot 1 ranks as soon as affordable with earned gold/dust.",
+          "equipment": "Equip conservative nonnegative-stat suggestions; refine equipped weapon to +2 with earned stones/gold.",
+          "fusion": "Reserve resources for first compatible weapon fusion, purchase once and attempt to equip it."
+        },
+        "limitations": "Sequential deterministic solo samples, not live-player behaviour or endgame balance. Identical starting seeds; decisions can change subsequent RNG use. No inventory expansion, recycling, manual sales or build selection. Balance milestones describe unspent current balances, not cumulative lifetime earnings. Initial potions and 50 gold are the normal character starter kit."
+      },
+      "runs": [
+        {
+          "classType": "GUERREIRO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 582,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 10993,
+          "lootGold": 10943,
+          "autoSaleGold": 0,
+          "spentGold": 0,
+          "fullInventorySeconds": 1569,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 582,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 2304,
+          "lootGold": 10604,
+          "autoSaleGold": 0,
+          "spentGold": 8350,
+          "fullInventorySeconds": 1573,
+          "skillLevels": {
+            "guerreiro_truque_1": 8
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 38.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 86.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 148.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 235.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 375.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 652.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 1300.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "equipment",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 584,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 9609,
+          "lootGold": 10559,
+          "autoSaleGold": 0,
+          "spentGold": 1000,
+          "fullInventorySeconds": 1538,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "armor_chainmail",
+              "refineLevel": 0
+            },
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 2
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 24.05,
+              "kind": "equip",
+              "itemOrSkillId": "armor_chainmail",
+              "goldSpent": 0
+            },
+            {
+              "seconds": 62.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 1
+            },
+            {
+              "seconds": 122.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 2
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "fusion",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 615,
+          "deaths": 10,
+          "bossAttempts": 14,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 9075,
+          "lootGold": 10825,
+          "autoSaleGold": 0,
+          "spentGold": 1800,
+          "fullInventorySeconds": 1561,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_runic_tempered",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 232.05,
+              "kind": "fusion",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 1800
+            },
+            {
+              "seconds": 232.05,
+              "kind": "equip",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 0
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 606,
+          "deaths": 11,
+          "bossAttempts": 14,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 10935,
+          "lootGold": 10885,
+          "autoSaleGold": 0,
+          "spentGold": 0,
+          "fullInventorySeconds": 1575,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 589,
+          "deaths": 11,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 2901,
+          "lootGold": 11201,
+          "autoSaleGold": 0,
+          "spentGold": 8350,
+          "fullInventorySeconds": 1579,
+          "skillLevels": {
+            "guerreiro_truque_1": 8
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 28.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 87.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 170.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 253.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 379.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 679.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 1284.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "equipment",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 577,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 9718,
+          "lootGold": 10668,
+          "autoSaleGold": 0,
+          "spentGold": 1000,
+          "fullInventorySeconds": 1590,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "armor_chainmail",
+              "refineLevel": 0
+            },
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 2
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 51.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 1
+            },
+            {
+              "seconds": 57.05,
+              "kind": "equip",
+              "itemOrSkillId": "armor_chainmail",
+              "goldSpent": 0
+            },
+            {
+              "seconds": 102.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 2
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "fusion",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 613,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 9077,
+          "lootGold": 10827,
+          "autoSaleGold": 0,
+          "spentGold": 1800,
+          "fullInventorySeconds": 1575,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_runic_tempered",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 226.05,
+              "kind": "fusion",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 1800
+            },
+            {
+              "seconds": 226.05,
+              "kind": "equip",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 0
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 623,
+          "deaths": 10,
+          "bossAttempts": 14,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 11153,
+          "lootGold": 11103,
+          "autoSaleGold": 0,
+          "spentGold": 0,
+          "fullInventorySeconds": 1647,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 601,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 2069,
+          "lootGold": 10369,
+          "autoSaleGold": 0,
+          "spentGold": 8350,
+          "fullInventorySeconds": 1655,
+          "skillLevels": {
+            "guerreiro_truque_1": 8
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 30.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 64.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 134.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 233.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 358.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 699.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 1265.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "equipment",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 618,
+          "deaths": 10,
+          "bossAttempts": 14,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 10165,
+          "lootGold": 11115,
+          "autoSaleGold": 0,
+          "spentGold": 1000,
+          "fullInventorySeconds": 1642,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "armor_chainmail",
+              "refineLevel": 0
+            },
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 2
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 47.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 1
+            },
+            {
+              "seconds": 68.05,
+              "kind": "equip",
+              "itemOrSkillId": "armor_chainmail",
+              "goldSpent": 0
+            },
+            {
+              "seconds": 93.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 2
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "fusion",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 594,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 9164,
+          "lootGold": 10914,
+          "autoSaleGold": 0,
+          "spentGold": 1800,
+          "fullInventorySeconds": 1564,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_runic_tempered",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 245.05,
+              "kind": "fusion",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 1800
+            },
+            {
+              "seconds": 245.05,
+              "kind": "equip",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 0
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 607,
+          "deaths": 8,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 11291,
+          "lootGold": 11241,
+          "autoSaleGold": 0,
+          "spentGold": 0,
+          "fullInventorySeconds": 1548,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 582,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 2325,
+          "lootGold": 10625,
+          "autoSaleGold": 0,
+          "spentGold": 8350,
+          "fullInventorySeconds": 1565,
+          "skillLevels": {
+            "barbaro_truque_1": 8
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 44.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 90.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 155.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 268.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 385.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 730.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 1267.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "equipment",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 583,
+          "deaths": 8,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 10096,
+          "lootGold": 11046,
+          "autoSaleGold": 0,
+          "spentGold": 1000,
+          "fullInventorySeconds": 1573,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "armor_chainmail",
+              "refineLevel": 0
+            },
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 2
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 37.05,
+              "kind": "equip",
+              "itemOrSkillId": "armor_chainmail",
+              "goldSpent": 0
+            },
+            {
+              "seconds": 65.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 1
+            },
+            {
+              "seconds": 119.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 2
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "fusion",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 585,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 9402,
+          "lootGold": 11152,
+          "autoSaleGold": 0,
+          "spentGold": 1800,
+          "fullInventorySeconds": 1534,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_runic_tempered",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 236.05,
+              "kind": "fusion",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 1800
+            },
+            {
+              "seconds": 236.05,
+              "kind": "equip",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 0
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 609,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 11524,
+          "lootGold": 11474,
+          "autoSaleGold": 0,
+          "spentGold": 0,
+          "fullInventorySeconds": 1612,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 613,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 3041,
+          "lootGold": 11341,
+          "autoSaleGold": 0,
+          "spentGold": 8350,
+          "fullInventorySeconds": 1612,
+          "skillLevels": {
+            "barbaro_truque_1": 8
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 45.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 96.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 160.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 283.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 425.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 766.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 1214.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "equipment",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 603,
+          "deaths": 8,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 10364,
+          "lootGold": 11314,
+          "autoSaleGold": 0,
+          "spentGold": 1000,
+          "fullInventorySeconds": 1634,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "armor_chainmail",
+              "refineLevel": 0
+            },
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 2
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 25.05,
+              "kind": "equip",
+              "itemOrSkillId": "armor_chainmail",
+              "goldSpent": 0
+            },
+            {
+              "seconds": 79.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 1
+            },
+            {
+              "seconds": 128.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 2
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "fusion",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 598,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 9042,
+          "lootGold": 10792,
+          "autoSaleGold": 0,
+          "spentGold": 1800,
+          "fullInventorySeconds": 1649,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_runic_tempered",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 238.05,
+              "kind": "fusion",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 1800
+            },
+            {
+              "seconds": 238.05,
+              "kind": "equip",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 0
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 581,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 10575,
+          "lootGold": 10525,
+          "autoSaleGold": 0,
+          "spentGold": 0,
+          "fullInventorySeconds": 1524,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 589,
+          "deaths": 11,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 2400,
+          "lootGold": 10700,
+          "autoSaleGold": 0,
+          "spentGold": 8350,
+          "fullInventorySeconds": 1571,
+          "skillLevels": {
+            "barbaro_truque_1": 8
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 35.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 94.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 161.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 259.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 379.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 726.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 1340.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "equipment",
+          "autoSellEquipment": false,
+          "finalLevel": 10,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 630,
+          "deaths": 8,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 11439,
+          "lootGold": 12389,
+          "autoSaleGold": 0,
+          "spentGold": 1000,
+          "fullInventorySeconds": 1566,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "armor_chainmail",
+              "refineLevel": 0
+            },
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 2
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 8.05,
+              "kind": "equip",
+              "itemOrSkillId": "armor_chainmail",
+              "goldSpent": 0
+            },
+            {
+              "seconds": 70.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 1
+            },
+            {
+              "seconds": 122.05,
+              "kind": "refine",
+              "itemOrSkillId": "sword_iron_broadsword",
+              "goldSpent": 500,
+              "level": 2
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "fusion",
+          "autoSellEquipment": false,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 604,
+          "deaths": 8,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 9968,
+          "lootGold": 11718,
+          "autoSaleGold": 0,
+          "spentGold": 1800,
+          "fullInventorySeconds": 1509,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_runic_tempered",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 298.05,
+              "kind": "fusion",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 1800
+            },
+            {
+              "seconds": 298.05,
+              "kind": "equip",
+              "itemOrSkillId": "sword_runic_tempered",
+              "goldSpent": 0
+            }
+          ],
+          "goldConserved": true
+        }
+      ]
+    },
+    {
+      "report": "scratch/runtime/earned-progression-sell-2026-11-06.json",
+      "sourceHashes": {
+        "tools/ProgressionSimulation.ts": "d5f24347fc64926ca0a0d7c0cbee71b6669bc221bbafc957d4d36745fefe80f0",
+        "tools/benchmark-earned-progression.ts": "52b6c6900ab6df557e9372ffc623ad8f77f92e503881cd8db73b1a3795df71e0",
+        "src/game/World.ts": "8026ef7044b678d6d2abb9712a114a078465892e28b2b0eaafa9918692f599db",
+        "src/entities/Player.ts": "58b66dba74241d1b64fc013efb35087de2a54cb196f1232c1d5e092a8987924a",
+        "src/entities/Entity.ts": "f9cea2ee0dddef4f0807558f4490a36d0a7db4af56d1c661ace8385aa0237fbc",
+        "src/database/DatabaseManager.ts": "7e65560ebbe36b86b03624f59cf1459b0b0bfc4a11c79987f1e400166dd5ab8e",
+        "../shared/src/skills.ts": "8e5c970c01d1f658cb53d3eaedd55dded9eabc58612c9cfe43c2b72417b53697",
+        "../shared/src/items.ts": "a3911dba2e2c0100a192e86a805970aea8c42989608a0bda60833c4ddb76d462",
+        "../shared/src/skill-progression.ts": "6594d831b4df6e18cf15e6adc1a4daf1a7c089f961d45747f0a31a68b78c9df1",
+        "../shared/src/equipment-fusion.ts": "fdd36848c2f77effaad29565f6b50379bd873be8ef6878081a0c130c7914393c"
+      },
+      "assumptions": {
+        "database": ":memory:",
+        "tickRate": 20,
+        "startingLevel": 1,
+        "equippedStarter": true,
+        "equipmentAutoSale": true,
+        "grantedResources": false,
+        "offlineRewardsClaimed": false,
+        "decisionsEverySeconds": 1,
+        "purchasesDuringCombat": true,
+        "policies": {
+          "none": "Starter only; retain all earned resources.",
+          "skill": "Purchase slot 1 ranks as soon as affordable with earned gold/dust.",
+          "equipment": "Equip conservative nonnegative-stat suggestions; refine equipped weapon to +2 with earned stones/gold.",
+          "fusion": "Reserve resources for first compatible weapon fusion, purchase once and attempt to equip it."
+        },
+        "limitations": "Sequential deterministic solo samples, not live-player behaviour or endgame balance. Identical starting seeds; decisions can change subsequent RNG use. No inventory expansion, recycling, manual sales or build selection. Balance milestones describe unspent current balances, not cumulative lifetime earnings. Initial potions and 50 gold are the normal character starter kit."
+      },
+      "runs": [
+        {
+          "classType": "GUERREIRO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 582,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 13743,
+          "lootGold": 10943,
+          "autoSaleGold": 2750,
+          "spentGold": 0,
+          "fullInventorySeconds": 1397,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 605,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 2224,
+          "lootGold": 10964,
+          "autoSaleGold": 3610,
+          "spentGold": 12400,
+          "fullInventorySeconds": 1558,
+          "skillLevels": {
+            "guerreiro_truque_1": 9
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 24.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 67.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 121.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 204.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 296.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 488.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 851.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            },
+            {
+              "seconds": 1424.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 4050,
+              "level": 9
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 606,
+          "deaths": 11,
+          "bossAttempts": 14,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 14335,
+          "lootGold": 10885,
+          "autoSaleGold": 3400,
+          "spentGold": 0,
+          "fullInventorySeconds": 1545,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 604,
+          "deaths": 11,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 1581,
+          "lootGold": 10791,
+          "autoSaleGold": 3140,
+          "spentGold": 12400,
+          "fullInventorySeconds": 1531,
+          "skillLevels": {
+            "guerreiro_truque_1": 9
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 28.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 81.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 124.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 243.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 332.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 538.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 929.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            },
+            {
+              "seconds": 1572.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 4050,
+              "level": 9
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 623,
+          "deaths": 10,
+          "bossAttempts": 14,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 14863,
+          "lootGold": 11103,
+          "autoSaleGold": 3710,
+          "spentGold": 0,
+          "fullInventorySeconds": 1407,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "GUERREIRO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 616,
+          "deaths": 9,
+          "bossAttempts": 14,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 2913,
+          "lootGold": 11993,
+          "autoSaleGold": 3270,
+          "spentGold": 12400,
+          "fullInventorySeconds": 1422,
+          "skillLevels": {
+            "guerreiro_truque_1": 9
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 30.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 55.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 89.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 167.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 283.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 481.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 804.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            },
+            {
+              "seconds": 1360.05,
+              "kind": "skill",
+              "itemOrSkillId": "guerreiro_truque_1",
+              "goldSpent": 4050,
+              "level": 9
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 600,
+          "deaths": 7,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 16180,
+          "lootGold": 11790,
+          "autoSaleGold": 4340,
+          "spentGold": 0,
+          "fullInventorySeconds": 1302,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 101,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 611,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 2793,
+          "lootGold": 11453,
+          "autoSaleGold": 3690,
+          "spentGold": 12400,
+          "fullInventorySeconds": 1274,
+          "skillLevels": {
+            "barbaro_truque_1": 9
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 37.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 68.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 108.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 163.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 294.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 489.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 783.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            },
+            {
+              "seconds": 1395.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 4050,
+              "level": 9
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 601,
+          "deaths": 8,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 14839,
+          "lootGold": 11199,
+          "autoSaleGold": 3590,
+          "spentGold": 0,
+          "fullInventorySeconds": 1442,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 202,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 599,
+          "deaths": 10,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 10,
+          "startingGold": 50,
+          "goldBalance": 2090,
+          "lootGold": 10680,
+          "autoSaleGold": 3760,
+          "spentGold": 12400,
+          "fullInventorySeconds": 1051,
+          "skillLevels": {
+            "barbaro_truque_1": 9
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 25.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 76.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 105.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 166.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 289.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 435.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 838.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            },
+            {
+              "seconds": 1481.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 4050,
+              "level": 9
+            }
+          ],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "none",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 581,
+          "deaths": 9,
+          "bossAttempts": 13,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 13605,
+          "lootGold": 10525,
+          "autoSaleGold": 3030,
+          "spentGold": 0,
+          "fullInventorySeconds": 1445,
+          "skillLevels": {},
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [],
+          "goldConserved": true
+        },
+        {
+          "classType": "BARBARO",
+          "seed": 303,
+          "seconds": 1800,
+          "investment": "skill",
+          "autoSellEquipment": true,
+          "finalLevel": 9,
+          "finalWorld": 3,
+          "finalStage": 10,
+          "kills": 627,
+          "deaths": 10,
+          "bossAttempts": 14,
+          "bossVictories": 2,
+          "bossFailures": 11,
+          "startingGold": 50,
+          "goldBalance": 2669,
+          "lootGold": 11279,
+          "autoSaleGold": 3740,
+          "spentGold": 12400,
+          "fullInventorySeconds": 1577,
+          "skillLevels": {
+            "barbaro_truque_1": 9
+          },
+          "equippedItems": [
+            {
+              "itemId": "sword_iron_broadsword",
+              "refineLevel": 0
+            }
+          ],
+          "actions": [
+            {
+              "seconds": 25.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 300,
+              "level": 2
+            },
+            {
+              "seconds": 59.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 440,
+              "level": 3
+            },
+            {
+              "seconds": 96.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 640,
+              "level": 4
+            },
+            {
+              "seconds": 170.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 920,
+              "level": 5
+            },
+            {
+              "seconds": 265.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1330,
+              "level": 6
+            },
+            {
+              "seconds": 410.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 1930,
+              "level": 7
+            },
+            {
+              "seconds": 852.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 2790,
+              "level": 8
+            },
+            {
+              "seconds": 1400.05,
+              "kind": "skill",
+              "itemOrSkillId": "barbaro_truque_1",
+              "goldSpent": 4050,
+              "level": 9
+            }
+          ],
+          "goldConserved": true
+        }
+      ]
+    }
+  ],
+  "bagProbe": {
+    "classType": "GUERREIRO",
+    "seed": 101,
+    "durationSeconds": 600,
+    "autoSellEquipment": true,
+    "finalLevel": 7,
+    "fullInventorySeconds": 197,
+    "bagComposition": [
+      {
+        "itemId": "potion_hp_minor",
+        "slots": 1,
+        "quantity": 76
+      },
+      {
+        "itemId": "potion_mp_minor",
+        "slots": 1,
+        "quantity": 16
+      },
+      {
+        "itemId": "stone_forge_common",
+        "slots": 1,
+        "quantity": 220
+      },
+      {
+        "itemId": "arcane_dust",
+        "slots": 1,
+        "quantity": 280
+      },
+      {
+        "itemId": "essence_goblin",
+        "slots": 1,
+        "quantity": 98
+      },
+      {
+        "itemId": "ore_iron_arcane",
+        "slots": 1,
+        "quantity": 26
+      },
+      {
+        "itemId": "stone_forge_rare",
+        "slots": 1,
+        "quantity": 35
+      },
+      {
+        "itemId": "wolf_fang",
+        "slots": 1,
+        "quantity": 50
+      },
+      {
+        "itemId": "essence_slime",
+        "slots": 1,
+        "quantity": 60
+      },
+      {
+        "itemId": "bow_hunting",
+        "slots": 6,
+        "quantity": 6
+      },
+      {
+        "itemId": "gem_topaz_con",
+        "slots": 1,
+        "quantity": 7
+      },
+      {
+        "itemId": "gem_sapphire_int",
+        "slots": 1,
+        "quantity": 2
+      },
+      {
+        "itemId": "gem_emerald_dex",
+        "slots": 1,
+        "quantity": 1
+      },
+      {
+        "itemId": "potion_hp_major",
+        "slots": 1,
+        "quantity": 5
+      },
+      {
+        "itemId": "rune_fragment",
+        "slots": 1,
+        "quantity": 6
+      }
+    ]
+  }
+}

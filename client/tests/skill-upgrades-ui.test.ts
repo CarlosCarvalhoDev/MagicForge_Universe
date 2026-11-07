@@ -32,7 +32,7 @@ test('Upgrade só altera nível após confirmação e impede clique duplicado', 
   f.ui.onSkillsUpdate({});
   const root = f.controls();
   assert.match(root.children[0].textContent, /Nv. 1\/20/);
-  assert.match(root.children[1].textContent, /100 ouro \+ 1 Pó Arcano/);
+  assert.match(root.children[1].textContent, /300 ouro \+ 1 Pó Arcano/);
   root.children[2].click();
   root.children[2].click();
   assert.deepEqual(f.sent, [['guerreiro_truque_1', 1]]);
@@ -44,14 +44,16 @@ test('Upgrade só altera nível após confirmação e impede clique duplicado', 
   assert.match(f.controls().children[0].textContent, /\+5%.*\+10%/);
 });
 
-test('Recursos, seleção, desbloqueio, teto e suporte sem efeito bloqueiam compra', t => {
+test('Recursos, seleção, desbloqueio, teto e suporte sem evolução de potência bloqueiam compra', t => {
   const f = setup(t);
   f.ui.onSkillsUpdate({});
   for (const options of [{ gold: 99 }, { dust: 0 }, { equipped: false }, { heroLevel: 0 }]) {
     assert.equal(f.controls(options).children[2].disabled, true);
   }
-  const support = f.ui.createControls(SKILLS_DATABASE.mago_nv1_2, { equipped: true, heroLevel: 50, gold: 10000, dust: 100 }) as unknown as Element;
+  const support = f.ui.createControls(SKILLS_DATABASE.mago_nv2_3, { equipped: true, heroLevel: 50, gold: 10000, dust: 100 }) as unknown as Element;
   assert.equal(support.children[2].disabled, true);
+  const shield = f.ui.createControls(SKILLS_DATABASE.mago_nv1_2, { equipped: true, heroLevel: 10, gold: 10000, dust: 100 }) as unknown as Element;
+  assert.equal(shield.children[2].disabled, false);
   f.ui.onSkillsUpdate({ guerreiro_truque_1: 20 });
   assert.match(f.controls().children[0].textContent, /\+95%/);
   assert.equal(f.controls().children[2].textContent, 'Nível máximo');
@@ -70,4 +72,19 @@ test('Erro mantém nível confirmado e reconexão limpa o estado do herói anter
   assert.equal(f.controls().children[2].disabled, true);
   f.ui.onResult({ skillId: 'guerreiro_truque_1', success: true, skillLevels: { guerreiro_truque_1: 5 }, message: 'ACK atrasado' });
   assert.equal(f.ui.getLevel('guerreiro_truque_1'), 1);
+});
+
+test('Previsão espera medição, usa pó como gargalo e descarta amostra antiga', t => {
+  t.mock.timers.enable({ apis: ['Date'], now: 100000 });
+  const f = setup(t);
+  f.ui.onSkillsUpdate({});
+  assert.match(f.controls({ gold: 0, dust: 0 }).children[3].textContent, /1 minuto/);
+  f.ui.onFarmSample({ elapsedSeconds: 60, goldPerHour: 3600, arcaneDustPerHour: 10 });
+  assert.match(f.controls({ gold: 0, dust: 0 }).children[3].textContent, /6min/);
+  t.mock.timers.tick(31000);
+  assert.match(f.controls({ gold: 0, dust: 0 }).children[3].textContent, /1 minuto/);
+  f.ui.onFarmSample({ elapsedSeconds: 60, goldPerHour: 3600, arcaneDustPerHour: 0 });
+  assert.match(f.controls({ gold: 300, dust: 0 }).children[3].textContent, /Sem taxa de Pó Arcano/);
+  f.disconnect();
+  assert.match(f.controls({ gold: 0, dust: 0 }).children[3].textContent, /1 minuto/);
 });

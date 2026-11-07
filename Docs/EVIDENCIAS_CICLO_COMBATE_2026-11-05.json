@@ -1,0 +1,430 @@
+{
+  "generatedAt": "2026-11-05T11:43:13.860Z",
+  "assumptions": "Controlled fresh fixtures; levels 5/10/25, worlds 1/2, seeds 101/202, equal 2000 gold and supplied stocks for every alternative. No real account, farm or offline income. Materials spent differ. RNG reset before each fight, action streams may subsequently diverge.",
+  "sourceSha256": {
+    "server/src/game/World.ts": "513e6b1b1ad6b69fe6c70959e766394e8425959ed4367699de8fd95e5f5b3533",
+    "server/src/entities/Player.ts": "58b66dba74241d1b64fc013efb35087de2a54cb196f1232c1d5e092a8987924a",
+    "server/src/entities/Entity.ts": "72b7f44f6f340926ff78e54236d365edbac2b4205462c80ba0f65104284aa8e6",
+    "server/src/database/DatabaseManager.ts": "7e65560ebbe36b86b03624f59cf1459b0b0bfc4a11c79987f1e400166dd5ab8e",
+    "shared/src/skills.ts": "7c53fd416210f3b90a0cd9dc871edd9624c60684e43e5e7f58d981773e78bb1e",
+    "shared/src/entities.ts": "d323068e1dd7ccb7b78b929340f74db892209155735bb51b7e4775b58286f7fa",
+    "shared/src/skill-targeting.ts": "e7d73411ac49e01c4290b3f6c67527beef1be3ba8d27a6cf1b024bab8ab06a59"
+  },
+  "totalScenarios": 420,
+  "classes": [
+    {
+      "classType": "CLERIGO",
+      "commonCases": 60,
+      "beforeWins": 38,
+      "afterWins": 40,
+      "newlyAvailable": 0,
+      "beforeRejections": 6027,
+      "afterRejections": 0,
+      "beforeEmptyCasts": 86,
+      "afterEmptyCasts": 0,
+      "afterBasicAttacks": 1550,
+      "transitions": [
+        {
+          "level": 5,
+          "world": 1,
+          "seed": 101,
+          "investment": "sustain",
+          "before": "timeout",
+          "after": "victory"
+        },
+        {
+          "level": 5,
+          "world": 1,
+          "seed": 202,
+          "investment": "sustain",
+          "before": "timeout",
+          "after": "victory"
+        },
+        {
+          "level": 5,
+          "world": 2,
+          "seed": 101,
+          "investment": "sustain",
+          "before": "timeout",
+          "after": "death"
+        },
+        {
+          "level": 5,
+          "world": 2,
+          "seed": 202,
+          "investment": "sustain",
+          "before": "timeout",
+          "after": "death"
+        }
+      ],
+      "investments": [
+        {
+          "investment": "none",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 37.45
+        },
+        {
+          "investment": "skill",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 36.49
+        },
+        {
+          "investment": "weapon",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 36.74
+        },
+        {
+          "investment": "fusion",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 37.03
+        },
+        {
+          "investment": "sustain",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 42.03
+        }
+      ]
+    },
+    {
+      "classType": "GUERREIRO",
+      "commonCases": 56,
+      "beforeWins": 46,
+      "afterWins": 46,
+      "newlyAvailable": 0,
+      "beforeRejections": 0,
+      "afterRejections": 0,
+      "beforeEmptyCasts": 0,
+      "afterEmptyCasts": 0,
+      "afterBasicAttacks": 1496,
+      "transitions": [],
+      "investments": [
+        {
+          "investment": "none",
+          "available": 12,
+          "victories": 9,
+          "averageSeconds": 32.04
+        },
+        {
+          "investment": "skill",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 31.47
+        },
+        {
+          "investment": "weapon",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 31.67
+        },
+        {
+          "investment": "fusion",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 31.46
+        },
+        {
+          "investment": "sustain",
+          "available": 8,
+          "victories": 7,
+          "averageSeconds": 30.05
+        }
+      ]
+    },
+    {
+      "classType": "BARBARO",
+      "commonCases": 52,
+      "beforeWins": 36,
+      "afterWins": 42,
+      "newlyAvailable": 0,
+      "beforeRejections": 0,
+      "afterRejections": 0,
+      "beforeEmptyCasts": 141,
+      "afterEmptyCasts": 0,
+      "afterBasicAttacks": 1164,
+      "transitions": [
+        {
+          "level": 10,
+          "world": 2,
+          "seed": 101,
+          "investment": "skill",
+          "before": "death",
+          "after": "victory"
+        },
+        {
+          "level": 10,
+          "world": 2,
+          "seed": 101,
+          "investment": "fusion",
+          "before": "death",
+          "after": "victory"
+        },
+        {
+          "level": 10,
+          "world": 2,
+          "seed": 202,
+          "investment": "none",
+          "before": "death",
+          "after": "victory"
+        },
+        {
+          "level": 10,
+          "world": 2,
+          "seed": 202,
+          "investment": "skill",
+          "before": "death",
+          "after": "victory"
+        },
+        {
+          "level": 10,
+          "world": 2,
+          "seed": 202,
+          "investment": "weapon",
+          "before": "death",
+          "after": "victory"
+        },
+        {
+          "level": 10,
+          "world": 2,
+          "seed": 202,
+          "investment": "fusion",
+          "before": "death",
+          "after": "victory"
+        }
+      ],
+      "investments": [
+        {
+          "investment": "none",
+          "available": 12,
+          "victories": 9,
+          "averageSeconds": 31.8
+        },
+        {
+          "investment": "skill",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 31.15
+        },
+        {
+          "investment": "weapon",
+          "available": 12,
+          "victories": 9,
+          "averageSeconds": 31.45
+        },
+        {
+          "investment": "fusion",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 31.09
+        },
+        {
+          "investment": "sustain",
+          "available": 4,
+          "victories": 4,
+          "averageSeconds": 19.95
+        }
+      ]
+    },
+    {
+      "classType": "MONGE",
+      "commonCases": 44,
+      "beforeWins": 36,
+      "afterWins": 38,
+      "newlyAvailable": 12,
+      "beforeRejections": 0,
+      "afterRejections": 0,
+      "beforeEmptyCasts": 4,
+      "afterEmptyCasts": 0,
+      "afterBasicAttacks": 1260,
+      "transitions": [
+        {
+          "level": 10,
+          "world": 2,
+          "seed": 101,
+          "investment": "none",
+          "before": "death",
+          "after": "victory"
+        },
+        {
+          "level": 10,
+          "world": 2,
+          "seed": 101,
+          "investment": "skill",
+          "before": "death",
+          "after": "victory"
+        }
+      ],
+      "investments": [
+        {
+          "investment": "none",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 26.22
+        },
+        {
+          "investment": "skill",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 25.69
+        },
+        {
+          "investment": "weapon",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 25.91
+        },
+        {
+          "investment": "fusion",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 25.23
+        },
+        {
+          "investment": "sustain",
+          "available": 8,
+          "victories": 8,
+          "averageSeconds": 23.54
+        }
+      ]
+    },
+    {
+      "classType": "BRUXO",
+      "commonCases": 52,
+      "beforeWins": 36,
+      "afterWins": 36,
+      "newlyAvailable": 0,
+      "beforeRejections": 0,
+      "afterRejections": 0,
+      "beforeEmptyCasts": 4,
+      "afterEmptyCasts": 0,
+      "afterBasicAttacks": 1042,
+      "transitions": [],
+      "investments": [
+        {
+          "investment": "none",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 30.21
+        },
+        {
+          "investment": "skill",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 29.34
+        },
+        {
+          "investment": "weapon",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 30.07
+        },
+        {
+          "investment": "fusion",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 29.48
+        },
+        {
+          "investment": "sustain",
+          "available": 4,
+          "victories": 4,
+          "averageSeconds": 20.35
+        }
+      ]
+    },
+    {
+      "classType": "MAGO",
+      "commonCases": 48,
+      "beforeWins": 32,
+      "afterWins": 32,
+      "newlyAvailable": 0,
+      "beforeRejections": 0,
+      "afterRejections": 0,
+      "beforeEmptyCasts": 0,
+      "afterEmptyCasts": 0,
+      "afterBasicAttacks": 926,
+      "transitions": [],
+      "investments": [
+        {
+          "investment": "none",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 28.48
+        },
+        {
+          "investment": "skill",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 27.56
+        },
+        {
+          "investment": "weapon",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 27.85
+        },
+        {
+          "investment": "fusion",
+          "available": 12,
+          "victories": 8,
+          "averageSeconds": 27.43
+        },
+        {
+          "investment": "sustain",
+          "available": 0,
+          "victories": 0,
+          "averageSeconds": null
+        }
+      ]
+    },
+    {
+      "classType": "ARQUEIRO",
+      "commonCases": 48,
+      "beforeWins": 40,
+      "afterWins": 40,
+      "newlyAvailable": 0,
+      "beforeRejections": 0,
+      "afterRejections": 0,
+      "beforeEmptyCasts": 0,
+      "afterEmptyCasts": 0,
+      "afterBasicAttacks": 1108,
+      "transitions": [],
+      "investments": [
+        {
+          "investment": "none",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 25
+        },
+        {
+          "investment": "skill",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 24.25
+        },
+        {
+          "investment": "weapon",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 24.55
+        },
+        {
+          "investment": "fusion",
+          "available": 12,
+          "victories": 10,
+          "averageSeconds": 24.83
+        },
+        {
+          "investment": "sustain",
+          "available": 0,
+          "victories": 0,
+          "averageSeconds": null
+        }
+      ]
+    }
+  ]
+}

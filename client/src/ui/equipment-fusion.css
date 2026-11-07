@@ -1,0 +1,23 @@
+.submenus-tab-nav { overflow-x: auto; }
+.fusion-forge-card { padding: 16px; margin: 2px; border: 1.5px solid #d97706; outline: 1px solid #fef08a44; outline-offset: -5px; border-radius: 6px;
+  background: url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat, url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat, url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat, url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat, linear-gradient(165deg,#141828,#080c17); color: #e4dfd1; font: 12px/1.5 system-ui,sans-serif; }
+.fusion-forge-card h3,.fusion-forge-card h4,.fusion-forge-card label { font-family:'Cinzel',serif; color:#fef08a; }
+.fusion-forge-card h3 { margin:0 0 8px; font-size:17px; }
+.fusion-forge-card h4 { font-size:13px; margin:12px 0 6px; }
+.fusion-forge-card p { margin:8px 0; }
+.fusion-forge-card select,.fusion-forge-card button { min-height:40px; box-sizing:border-box; padding:8px 12px; border:1.5px solid #d97706; border-radius:4px; color:#fef08a; font:700 11px 'Cinzel',serif;
+  background:url('/assets/ui/frames/corner-tl.svg') top left / 12px 12px no-repeat,url('/assets/ui/frames/corner-tr.svg') top right / 12px 12px no-repeat,url('/assets/ui/frames/corner-bl.svg') bottom left / 12px 12px no-repeat,url('/assets/ui/frames/corner-br.svg') bottom right / 12px 12px no-repeat,linear-gradient(165deg,#322333,#0b101e); }
+.fusion-forge-card select { display:block; width:100%; margin-top:5px; }
+.fusion-forge-card option { background:#0b101e; }
+.fusion-forge-card button { cursor:pointer; margin:4px 5px 4px 0; }
+.fusion-forge-card button:disabled { opacity:.45; cursor:default; }
+.fusion-forge-card [hidden] { display:none; }
+.fusion-forge-card ul { padding-left:20px; }
+.fusion-note { color:#aab6c8; font-size:11px; }
+#fusion-requirements { color:#fbbf24; }
+#fusion-comparison { border-block:1px solid #d9770655; padding-block:6px; }
+#fusion-comparison [data-delta="gain"],#fusion-status[data-state="success"] { color:#34d399; }
+#fusion-comparison [data-delta="loss"],#fusion-status[data-state="error"] { color:#f87171; }
+#fusion-confirmation { padding:10px; border:1px solid #d97706; margin-top:8px; }
+@media(max-width:480px) { .fusion-forge-card { padding:12px; } #fusion-confirm { width:100%; } }
+.fusion-details { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; align-items:start; } @media(max-width:600px){ .fusion-details { grid-template-columns:1fr; gap:6px; } }

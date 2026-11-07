@@ -1,0 +1,77 @@
+{
+  "generatedAt": "2026-11-05T23:01:28.869Z",
+  "sourceSha256": {
+    "server/src/game/World.ts": "dd2cc78443863cd116c56853df8d74f21187fc024661ed373f8a36f8ed941886",
+    "shared/src/mage-effects.ts": "d80ddf96627da04aa06bbea41661d64cc9cd0af960426c32ab18e122e0b5a972",
+    "shared/src/skills.ts": "bf914b65b1d0f5a780233bd9495253ecf5f3b3ed947d5ed352fc66898b23b236",
+    "shared/src/messages.ts": "721fad8874e98218812906647dc818f661a702199fe7dcad38567b15a91b9805",
+    "client/src/renderer/GameRenderer.ts": "e481e80ed2abe0f8ed8ff81efa34e285f24866d4e8f1697b10d16a20b79f1553",
+    "client/src/renderer/PixelVfx.ts": "d7fc37caf7228d85afe1175a78ca6ef74646ab1cbd31ff7485926e3c129e1a17",
+    "client/src/renderer/PixelVfxPlayer.ts": "d97b23bc0ec08d15f5d17ea9a116d956946f3c311db43b0e0b32a5567243294c",
+    "server/tools/benchmark-mage.ts": "039a37bfb1978166bbe2546096ae67b5ac7705e97f616799a1d4beded798b97e"
+  },
+  "defaultMatrix": {
+    "scenarios": 420,
+    "outcomeChanges": 0,
+    "rejections": 0,
+    "emptyCasts": 0
+  },
+  "mageChoices": {
+    "assumptions": "480 fresh in-memory fixtures: three choices at level 5 and nine at level 10 in worlds 1/2; 27 choices at level 25 in worlds 2/3; all 81 choices at level 50 in worlds 3/4; seeds 101/202. Default rotation and starter gear, no investment; not farm-earned progression or proof of class balance. Different levels/worlds are not equal-difficulty pairs.",
+    "scenarios": 480,
+    "commonCases": 156,
+    "commonOutcomeChanges": 0,
+    "rejections": 0,
+    "emptyCasts": 0,
+    "ultimates": [
+      {
+        "skill": "mago_nv3_1",
+        "world": 3,
+        "cases": 54,
+        "victories": 54,
+        "deaths": 0,
+        "timeouts": 0
+      },
+      {
+        "skill": "mago_nv3_1",
+        "world": 4,
+        "cases": 54,
+        "victories": 0,
+        "deaths": 27,
+        "timeouts": 27
+      },
+      {
+        "skill": "mago_nv3_2",
+        "world": 3,
+        "cases": 54,
+        "victories": 54,
+        "deaths": 0,
+        "timeouts": 0
+      },
+      {
+        "skill": "mago_nv3_2",
+        "world": 4,
+        "cases": 54,
+        "victories": 0,
+        "deaths": 25,
+        "timeouts": 29
+      },
+      {
+        "skill": "mago_nv3_3",
+        "world": 3,
+        "cases": 54,
+        "victories": 54,
+        "deaths": 0,
+        "timeouts": 0
+      },
+      {
+        "skill": "mago_nv3_3",
+        "world": 4,
+        "cases": 54,
+        "victories": 0,
+        "deaths": 10,
+        "timeouts": 44
+      }
+    ]
+  }
+}

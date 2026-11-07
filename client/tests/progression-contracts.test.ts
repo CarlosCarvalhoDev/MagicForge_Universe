@@ -3,15 +3,13 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { EXPANSION_PREVIEW } from '../src/ui/InventoryExpansion';
+import { INVENTORY_EXPANSIONS, getInventoryExpansion } from '@magicforge/shared';
 import { INTRO_SCENES } from '../src/ui/NarrativeContent';
 import { FloatingDialogue, monsterDialogueType } from '../src/ui/FloatingDialogue';
 
-test('display quote matches the current authoritative table without invoking shared database', () => {
-  const world = readFileSync(resolve('../server/src/game/World.ts'), 'utf8');
-  const table = world.slice(world.indexOf('public static readonly INVENTORY_EXPANSIONS'), world.indexOf('public expandPlayerInventory'));
-  const entries = [...table.matchAll(/(\d+):\s*\{\s*cost:\s*([\d_]+),\s*minLevel:\s*(\d+)(?:,\s*minReborn:\s*(\d+))?\s*\}/g)];
-  const actual = Object.fromEntries(entries.map(([, slots, cost, minLevel, minReborn]) => [slots, { cost: Number(cost.replaceAll('_', '')), minLevel: Number(minLevel), ...(minReborn ? { minReborn: Number(minReborn) } : {}) }]));
-  assert.deepEqual(EXPANSION_PREVIEW, actual);
+test('display quote shares the authoritative policy including legacy capacity', () => {
+  assert.equal(EXPANSION_PREVIEW, INVENTORY_EXPANSIONS);
+  assert.equal(getInventoryExpansion(31)!.cost, EXPANSION_PREVIEW[30].cost);
 });
 test('all cinematic images exist and the six-scene sequence lasts within 40–60 seconds', () => {
   assert.equal(INTRO_SCENES.length, 6);

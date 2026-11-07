@@ -289,7 +289,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Físico',
-    description: 'Golpe feroz com machado de duas mãos causando 1.4x STR.',
+    description: 'Cutilada de 1.4x FOR + 4x nível + 6.',
     iconEmoji: '🪓',
   },
   'barbaro_truque_2': {
@@ -308,7 +308,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Físico (Lentidão)',
-    description: 'Pisa no chão violentamente (1.2x STR + 0.4x CON) desacelerando o alvo em 30%.',
+    description: 'Pisotão de 1.2x FOR + 0.4x CON + 4x nível + 6, reduzindo movimento em 30% por 3s. Usa a maior lentidão ativa.',
     iconEmoji: '🦶',
   },
   'barbaro_truque_3': {
@@ -327,7 +327,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Físico (Dreno)',
-    description: 'Golpe animalesco (1.3x STR) que recupera Vida equivalente a 20% do dano causado.',
+    description: 'Mordida de 1.3x FOR + 4x nível + 6. Cura 20% da vida realmente retirada, sem cura por dano excedente ou absorvido.',
     iconEmoji: '🐺',
   },
 
@@ -367,7 +367,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.0,
     isHeal: false,
     damageType: 'Sônico',
-    description: 'Grito estrondoso que reduz o ataque de todos os monstros em área em 20%.',
+    description: 'Rugido pessoal em 5m: reduz o dano de ataque dos inimigos em 20% por 6s, sem dano direto. Evolução aumenta a redução, sem somar instâncias.',
     iconEmoji: '📢',
   },
   'barbaro_nv1_3': {
@@ -386,7 +386,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Físico',
-    description: 'Investida devastadora (1.75x FOR) que atordoa o alvo por 2 segundos.',
+    description: 'Investida até o alvo, mantendo distância de 1.5m: dano de 1.75x FOR + 4x nível + 6 e atordoamento de 2s.',
     iconEmoji: '🦏',
   },
 
@@ -407,7 +407,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.0,
     isHeal: false,
     damageType: 'Físico (Área)',
-    description: 'Giro violento com machados gêmeos (2.4x FOR) aplicando sangramento em área.',
+    description: 'Giro pessoal em 5m: 2.4x FOR + 4x nível + 6, aplicando três pulsos de sangramento de 0.35x FOR + nível.',
     iconEmoji: '🩸',
   },
   'barbaro_nv2_2': {
@@ -426,7 +426,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: true,
     damageType: 'Totêmico',
-    description: 'Enrijece a pele com espíritos da terra, concedendo armadura e curando 15% HP.',
+    description: 'Cura 15% do HP máximo e reduz dano recebido em 20% por 6s. Evolução aumenta a cura; usa a maior proteção ativa, sem somar com Fúria.',
     iconEmoji: '🗿',
   },
   'barbaro_nv2_3': {
@@ -446,7 +446,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.0,
     isHeal: false,
     damageType: 'Impacto',
-    description: 'Salto no ar que desaba sobre o grupo inimigo criando uma cratera (2.6x FOR).',
+    description: 'Salta para um ponto no chão até 6m, dentro do mapa. Impacto em raio de 5m de 2.6x FOR + 4x nível + 6.',
     iconEmoji: '☄️',
   },
 
@@ -467,7 +467,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 7.0,
     isHeal: false,
     damageType: 'Fogo Primitivo',
-    description: 'Erupção de magma ancestral em 7m (3.9x FOR + 2.0x CON) com fúria infinita.',
+    description: 'Erupção pessoal em 7m: 3.9x FOR + 2x CON + 4x nível + 6. Após pagar a ativação, habilidades ficam sem custo de energia por 6s; cooldowns continuam valendo.',
     iconEmoji: '🌋',
   },
   'barbaro_nv3_2': {
@@ -486,7 +486,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Execução',
-    description: 'Execução brutal em alvo único (5.2x FOR), dobrando o dano se o alvo estiver < 30% HP.',
+    description: 'Execução de 5.2x FOR + 4x nível + 6 contra um alvo. Dano dobrado se a vida anterior ao impacto estiver estritamente abaixo de 30%.',
     iconEmoji: '⚔️',
   },
   'barbaro_nv3_3': {
@@ -506,7 +506,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 6.0,
     isHeal: false,
     damageType: 'Espiritual',
-    description: 'Invoca uma horda de lobos fantasmagóricos que atacam continuamente por 10s (4.2x FOR).',
+    description: 'Matilha espiritual acompanha o herói em 6m por 10s. Potência total de 4.2x FOR + 4x nível + 6, dividida em dez pulsos de 1s sem crítico. Cancelada ao morrer ou sair do mundo.',
     iconEmoji: '🐺',
   },
 
@@ -1026,7 +1026,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Gelo (Lentidão)',
-    description: 'Ray of Frost de D&D: feixe gélido que retarda o alvo em 35% e causa dano de gelo (1.25x INT).',
+    description: 'Feixe de 1.25x INT que reduz o movimento do alvo em 35% por 3s. Usa a maior lentidão ativa, sem somar com Guardiões.',
     iconEmoji: '❄️',
   },
   'mago_truque_3': {
@@ -1046,7 +1046,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 3.0,
     isHeal: false,
     damageType: 'Elétrico',
-    description: 'Shocking Grasp de D&D: arco elétrico que salta em até 2 monstros adjacentes (1.3x INT).',
+    description: 'Arco de 1.3x INT por alvo: atinge até 2 inimigos no total, dentro de 3m do alvo ou ponto escolhido até 8m.',
     iconEmoji: '⚡',
   },
 
@@ -1066,7 +1066,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Força Arcana',
-    description: 'Magic Missile de D&D: 3 dardos de força mágica teleguiados que nunca erram (1.85x INT).',
+    description: 'Três dardos sem teste de esquiva contra um alvo até 10m. Potência total de 1.85x INT dividida entre os três impactos, em uma única cobrança.',
     iconEmoji: '✨',
   },
   'mago_nv1_2': {
@@ -1085,7 +1085,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Barreira Arcana',
-    description: 'Shield de D&D: absorve dano igual a 25% de HP e devolve choque elétrico ao atacante.',
+    description: 'Barreira por 5s: absorve 25% do HP máximo e reflete 20% do dano efetivamente absorvido ao atacante, sem reflexão em cadeia. Evolução aumenta a absorção.',
     iconEmoji: '🛡️',
   },
   'mago_nv1_3': {
@@ -1105,7 +1105,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 4.0,
     isHeal: false,
     damageType: 'Fogo em Cone',
-    description: 'Cone de fogo que incendeia os monstros por 4s (1.65x INT + dano de queima).',
+    description: 'Cone frontal de 6m e 60 graus: impacto de 1.65x INT e queima adicional de 0.8x INT no total, em quatro pulsos de 1s sem crítico. Queimas renovam sem empilhar.',
     iconEmoji: '🔥',
   },
 
@@ -1126,7 +1126,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.5,
     isHeal: false,
     damageType: 'Gelo em Área',
-    description: 'Cone of Cold / Blizzard: chuva de gelo cortante em 5.5m (2.4x INT) que congela por 1.5s.',
+    description: 'Chuva de gelo de 2.4x INT em raio de 5.5m no ponto escolhido até 10m. Congela os inimigos atingidos por 1.5s, impedindo movimento e ataques.',
     iconEmoji: '🌨️',
   },
   'mago_nv2_2': {
@@ -1146,7 +1146,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.0,
     isHeal: false,
     damageType: 'Relâmpago',
-    description: 'Feixe elétrico de alta tensão que ricocheteia entre até 4 monstros (2.35x INT).',
+    description: 'Descarga de 2.35x INT por alvo: primeiro inimigo até 10m, seguido de até três saltos para o inimigo mais próximo em 5m do atingido. Não repete alvos.',
     iconEmoji: '⚡',
   },
   'mago_nv2_3': {
@@ -1165,7 +1165,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Tempo Arcano',
-    description: 'Haste de D&D: +35% de velocidade de conjuração e reduz o cooldown do truque em 50% por 7s.',
+    description: 'Por 7s, acelera em 35% as decisões de conjuração do automático e reduz pela metade os novos cooldowns do truque. Não altera cooldowns já iniciados, mana, ordem ou velocidade de ataque básico. Percentuais fixos, sem evolução de potência.',
     iconEmoji: '⏳',
   },
 
@@ -1186,7 +1186,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 8.0,
     isHeal: false,
     damageType: 'Fireball D&D',
-    description: 'A clássica Bola de Fogo de D&D 5E: explosão colossal de chamas em 8m (4.3x INT).',
+    description: 'Explosão de 4.3x INT em raio de 8m no ponto escolhido até 10m. Evolução e crítico aumentam o dano.',
     iconEmoji: '💥',
   },
   'mago_nv3_2': {
@@ -1206,7 +1206,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 6.5,
     isHeal: false,
     damageType: 'Meteoro Arcano',
-    description: 'Três meteoros mágicos caem consecutivamente em uma área gerando 4.7x INT total.',
+    description: 'Três cometas atingem uma área fixa de 6.5m, após 0.5s, 1s e 1.5s. Potência total de 4.7x INT, sem crítico; inimigos podem entrar ou sair entre impactos. Ponto escolhido até 10m.',
     iconEmoji: '☄️',
   },
   'mago_nv3_3': {
@@ -1226,7 +1226,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 6.0,
     isHeal: false,
     damageType: 'Paralisia Temporal',
-    description: 'Congela os monstros em 6m por 3 segundos causando dano de gelo massivo (3.9x INT).',
+    description: 'Impacto de 3.9x INT em raio de 6m no ponto escolhido até 8m, congelando sobreviventes por 3s. Mantém um congelamento mais longo já ativo, sem somar durações.',
     iconEmoji: '🧊',
   },
 
@@ -1509,7 +1509,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Toll the Dead',
-    description: 'Toll the Dead de D&D: som fúnebre sagrado que causa 1.45x WIS (dano ampliado em monstros feridos).',
+    description: 'Som fúnebre sagrado: 1.45x SAB, com +25% de dano se o monstro já estiver ferido.',
     iconEmoji: '🔔',
   },
   'clerigo_truque_3': {
@@ -1567,7 +1567,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Bless',
-    description: 'Bless clássico de D&D: +20% de Ataque, Defesa e Chance Crítica por 8 segundos.',
+    description: 'Bênção pessoal por 8s: +20% de dano, redução de dano recebido de 20% e chance crítica multiplicada por 1.20 (20% vira 24%).',
     iconEmoji: '🙏',
   },
   'clerigo_nv1_3': {
@@ -1586,7 +1586,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Guiding Bolt',
-    description: 'Guiding Bolt de D&D: projétil de pura luz radiante (2.15x WIS) marcando para acerto crítico.',
+    description: 'Luz radiante (2.15x SAB) que marca por 6s. O próximo ataque básico ou habilidade de impacto direto em alvo único do conjurador consome a marca e é crítico.',
     iconEmoji: '⚡',
   },
 
@@ -1607,7 +1607,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.0,
     isHeal: false,
     damageType: 'Spirit Guardians',
-    description: 'Spirit Guardians de D&D: anjos radiantes giram em 5m causando 2.5x WIS contínuo e lentidão 40%.',
+    description: 'Aura de 5m acompanha o herói por 6s: 2.5x SAB no total, em 6 pulsos de 1s, e lentidão de movimento de 40% dentro da aura.',
     iconEmoji: '👼',
   },
   'clerigo_nv2_2': {
@@ -1626,7 +1626,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Spiritual Weapon',
-    description: 'Spiritual Weapon de D&D: martelo sagrado flutuante que golpeia automaticamente por 8s (2.4x WIS).',
+    description: 'Arma espiritual por 8s: 2.4x SAB no total em 4 golpes de 2s, sem crítico. Mantém o alvo ou busca outro até 8m do herói.',
     iconEmoji: '🔨',
   },
   'clerigo_nv2_3': {
@@ -1646,7 +1646,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 6.0,
     isHeal: true,
     damageType: 'Solo Sagrado',
-    description: 'Círculo rúnico no solo curando 5% HP a cada segundo e reduzindo dano recebido em 25%.',
+    description: 'Círculo fixo de 6m por 6s. Dentro dele, o conjurador cura 5% do HP máximo por segundo e recebe 25% menos dano. Usa a maior redução ativa, sem somar com Bênção.',
     iconEmoji: '☀️',
   },
 
@@ -1667,7 +1667,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 7.5,
     isHeal: false,
     damageType: 'Flame Strike',
-    description: 'Flame Strike de D&D: pilar monumental de fogo radiante que atinge 7.5m de raio (4.1x WIS + 1.5x CON).',
+    description: 'Pilar de fogo radiante: 4.1x SAB + 1.5x CON em raio de 7.5m no ponto escolhido, até 10m do conjurador.',
     iconEmoji: '🔥',
   },
   'clerigo_nv3_2': {
@@ -1687,7 +1687,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 8.0,
     isHeal: true,
     damageType: 'Milagre Supremo',
-    description: 'Divine Intervention de D&D: restaura 100% de Vida e emite supernova radiante de 4.3x WIS em área.',
+    description: 'Restaura a própria vida até 100% e causa 4.3x SAB aos inimigos em 8m ao redor do herói. Evolução aumenta o dano; a cura permanece limitada ao HP máximo. Pode atacar mesmo com vida cheia.',
     iconEmoji: '🌟',
   },
   'clerigo_nv3_3': {
@@ -1706,7 +1706,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Sunbeam',
-    description: 'Sunbeam de D&D: raio focalizado de pura radiação solar destruidor de chefões (4.8x WIS).',
+    description: 'Raio solar de 4.8x SAB contra um alvo até 12m. Pode consumir a marca do Raio Guia para garantir crítico.',
     iconEmoji: '☀️',
   },
 };
@@ -1777,6 +1777,50 @@ export function calculateSkillPower(
   level: number,
   maxHp?: number
 ): number {
+  switch(skill.skillId){
+    case 'mago_truque_1': return Math.round(stats.inteligencia*1.4);
+    case 'mago_truque_2': return Math.round(stats.inteligencia*1.25);
+    case 'mago_truque_3': return Math.round(stats.inteligencia*1.3);
+    case 'mago_nv1_1': return Math.round(stats.inteligencia*1.85);
+    case 'mago_nv1_2': return Math.round((maxHp??0)*0.25);
+    case 'mago_nv1_3': return Math.round(stats.inteligencia*1.65);
+    case 'mago_nv2_1': return Math.round(stats.inteligencia*2.4);
+    case 'mago_nv2_2': return Math.round(stats.inteligencia*2.35);
+    case 'mago_nv2_3': return 0;
+    case 'mago_nv3_1': return Math.round(stats.inteligencia*4.3);
+    case 'mago_nv3_2': return Math.round(stats.inteligencia*4.7);
+    case 'mago_nv3_3': return Math.round(stats.inteligencia*3.9);
+  }
+  switch (skill.skillId) {
+    case 'clerigo_truque_1': return Math.round(stats.sabedoria * 1.35);
+    case 'clerigo_truque_2': return Math.round(stats.sabedoria * 1.45);
+    case 'clerigo_truque_3': return Math.round(stats.sabedoria * 1.1);
+    case 'clerigo_nv1_1': return Math.round(stats.sabedoria * 2 + level);
+    case 'clerigo_nv1_2': return 0; // Percentual fixo; evolução de potência indisponível.
+    case 'clerigo_nv1_3': return Math.round(stats.sabedoria * 2.15);
+    case 'clerigo_nv2_1': return Math.round(stats.sabedoria * 2.5);
+    case 'clerigo_nv2_2': return Math.round(stats.sabedoria * 2.4);
+    case 'clerigo_nv2_3': return Math.round((maxHp??0)*0.05*6);
+    case 'clerigo_nv3_1': return Math.round(stats.sabedoria*4.1+stats.constituicao*1.5);
+    case 'clerigo_nv3_2': return Math.round(stats.sabedoria*4.3);
+    case 'clerigo_nv3_3': return Math.round(stats.sabedoria*4.8);
+  }
+  if(skill.classType===CharacterClass.BARBARO){
+    const base=6+level*4;
+    switch(skill.skillId){
+      case 'barbaro_truque_1':return Math.round(base+stats.forca*1.4);
+      case 'barbaro_truque_2':return Math.round(base+stats.forca*1.2+stats.constituicao*.4);
+      case 'barbaro_truque_3':return Math.round(base+stats.forca*1.3);
+      case 'barbaro_nv1_1':case 'barbaro_nv1_2':return 0;
+      case 'barbaro_nv1_3':return Math.round(base+stats.forca*1.75);
+      case 'barbaro_nv2_1':return Math.round(base+stats.forca*2.4);
+      case 'barbaro_nv2_2':return Math.round((maxHp??0)*.15);
+      case 'barbaro_nv2_3':return Math.round(base+stats.forca*2.6);
+      case 'barbaro_nv3_1':return Math.round(base+stats.forca*3.9+stats.constituicao*2);
+      case 'barbaro_nv3_2':return Math.round(base+stats.forca*5.2);
+      case 'barbaro_nv3_3':return Math.round(base+stats.forca*4.2);
+    }
+  }
   if (skill.classType === CharacterClass.GUERREIRO) {
     switch (skill.skillId) {
       case 'guerreiro_truque_1':

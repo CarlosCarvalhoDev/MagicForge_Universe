@@ -116,7 +116,7 @@ export interface C2SCastSkillPayload {
 }
 
 export type SkillCategory = 'SINGLE_TARGET' | 'AOE_SELF' | 'AOE_TARGET' | 'AOE_LINE' | 'SELF_HEAL' | 'SELF_BUFF';
-export type SkillGeometryType = 'POINT' | 'CIRCLE_SELF' | 'CIRCLE_TARGET' | 'LINE';
+export type SkillGeometryType = 'POINT' | 'CIRCLE_SELF' | 'CIRCLE_TARGET' | 'LINE' | 'CONE';
 
 export interface SkillTargetResultPayload {
   targetId: string;
@@ -137,6 +137,24 @@ export type CombatStatusType =
   | 'STUN'
   | 'SHIELD'
   | 'DAMAGE_BUFF'
+  | 'DAMAGE_REDUCTION'
+  | 'CRITICAL_BUFF'
+  | 'GUIDING_MARK'
+  | 'GUARDIANS_AURA'
+  | 'SPIRITUAL_WEAPON'
+  | 'SANCTUARY'
+  | 'SANCTUARY_WARD'
+  | 'SLOW'
+  | 'FROST_SLOW'
+  | 'BURN'
+  | 'FROZEN'
+  | 'ARCANE_HASTE'
+  | 'COMET_RAIN'
+  | 'CRIPPLED'
+  | 'WEAKENED'
+  | 'STONE_SKIN'
+  | 'UNBRIDLED_RAGE'
+  | 'SPECTRAL_PACK'
   | 'DEATH_IMMUNITY';
 
 export type CombatStatusEventReason =
@@ -149,6 +167,8 @@ export type CombatStatusEventReason =
   | 'CLEARED_ON_DISCONNECT';
 
 export interface CombatStatusStatePayload {
+  areaCenter?: Vector3;
+  radius?: number;
   statusId: string;
   type: CombatStatusType;
   skillId: string;
@@ -164,6 +184,7 @@ export interface CombatStatusStatePayload {
 }
 
 export interface CombatStatusTransitionPayload {
+  tickHeal?: number;
   event: CombatStatusEventReason;
   serverTick: number;
   status: CombatStatusStatePayload;
@@ -177,6 +198,7 @@ export type SkillCastRejectCode =
   | 'CASTER_STUNNED'
   | 'INVALID_SLOT'
   | 'INVALID_SKILL'
+  | 'UNIMPLEMENTED_EFFECT'
   | 'WRONG_CLASS'
   | 'LEVEL_LOCKED'
   | 'ON_COOLDOWN'
@@ -200,6 +222,9 @@ export interface S2CSkillCastRejectedPayload {
 }
 
 export interface S2CSkillCastEventPayload {
+  cooldownRemainingSec?: number;
+  coneRange?: number;
+  coneAngleDeg?: number;
   castId?: string;
   serverTick?: number;
   casterId: string;
@@ -272,6 +297,9 @@ export interface C2SLootItemPayload {
 }
 
 export interface InventoryItemPayload {
+  isLocked?: boolean;
+  instanceId?: string;
+  location?: 'bag' | 'equipment';
   slotIndex: number;
   itemId: string;
   quantity: number;
@@ -290,21 +318,28 @@ export interface S2CInventoryUpdatePayload {
 
 export interface C2SUseItemPayload {
   slotIndex: number;
+  expectedInstanceId?: string;
 }
 
 export interface C2SSellItemPayload {
   slotIndex: number;
+  expectedInstanceId?: string;
 }
 
-export interface C2SExpandInventoryPayload {}
+export interface C2SExpandInventoryPayload { expectedMaxSlots?: number; }
 
 export interface C2SDiscardItemPayload {
   slotIndex: number;
+  expectedInstanceId?: string;
 }
+
+export interface C2SSetItemLockPayload { slotIndex: number; expectedInstanceId: string; isLocked: boolean; }
 
 // --- SUBMENU 2: REFINAMENTO DE EQUIPAMENTOS (+1 A +15) ---
 export interface C2SRefineEquipmentPayload {
   slotIndex: number;
+  expectedInstanceId?: string;
+  expectedRefineLevel?: number;
 }
 
 export interface S2CRefineResultPayload {
@@ -322,6 +357,7 @@ export interface S2CRefineResultPayload {
 // --- SUBMENU 3: ENGASTE DE GEMAS (SOCKETS) ---
 export interface C2SSocketGemPayload {
   equipmentSlotIndex: number;
+  expectedInstanceId?: string;
   socketIndex: number;
   gemItemId: string;
 }
@@ -870,6 +906,7 @@ export interface S2CHuntReportPayload {
   kills: number; // Own final blows; party members still receive their actual EXP share.
   combatExp: number;
   lootGold: number;
+  arcaneDustLoot?: number; // Only successfully collected combat drops; excludes rewards and recycling.
   autoSaleGold: number;
   manualSaleGold: number;
   hpPotionsUsed: number;
@@ -877,6 +914,7 @@ export interface S2CHuntReportPayload {
   deaths: number;
   expPerHour: number | null; // null until a full minute has been simulated
   goldPerHour: number | null;
+  arcaneDustPerHour?: number | null;
 }
 
 export interface C2SClaimOfflineRewardsPayload {
@@ -886,6 +924,7 @@ export interface C2SClaimOfflineRewardsPayload {
 
 export interface S2COfflineRewardsClaimedPayload {
   success: boolean;
+  remainingReward?: S2COfflineRewardInfoPayload; // Only unclaimed rewards; never repeat credited gold/EXP.
   claimedGold: number;
   claimedExp: number;
   lootClaimed: OfflineLootItem[];

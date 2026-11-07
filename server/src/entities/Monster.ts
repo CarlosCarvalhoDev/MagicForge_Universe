@@ -292,13 +292,14 @@ export class Monster extends Entity {
     const dirX = dx / dist;
     const dirZ = dz / dist;
 
-    this.velocity.x = dirX * this.speed;
+    const movementSpeed = this.speed * this.getMovementMultiplier();
+    this.velocity.x = dirX * movementSpeed;
     this.velocity.y = 0;
-    this.velocity.z = dirZ * this.speed;
+    this.velocity.z = dirZ * movementSpeed;
 
     this.headingYaw = (Math.atan2(dirX, dirZ) * 180) / Math.PI;
 
-    const step = this.speed * dt;
+    const step = movementSpeed * dt;
     if (step >= dist) {
       this.position.x = target.x;
       this.position.z = target.z;

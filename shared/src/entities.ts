@@ -181,3 +181,9 @@ export const CLASS_STAT_GROWTH: Record<CharacterClass, Partial<CharacterAttribut
   [CharacterClass.MAGO]: { inteligencia: 3, constituicao: 1, sabedoria: 1 },
   [CharacterClass.BRUXO]: { carisma: 3, constituicao: 2 },
 };
+
+export function getManaAttribute(classType: CharacterClass, attributes: CharacterAttributes): number {
+  if (classType === CharacterClass.CLERIGO) return attributes.sabedoria;
+  if (classType === CharacterClass.BRUXO) return attributes.carisma;
+  return attributes.inteligencia;
+}

@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-11-06T00:08:41.501Z",
+  "sourceSha256": {
+    "shared/src/martial-effects.ts": "10293ac6e8d09637da303c126d415c4f75632654db5121fc31c0579d9af6e80f",
+    "shared/src/skills.ts": "26b6638b4f18aa06bd92f4fcce584ea304d89f06708ac110c55bd7c1f26d11c9",
+    "shared/src/messages.ts": "6dfefe9c4ea363f873e7afbcb14010980e442c14e77c02bc484cd4c817c71477",
+    "shared/src/skill-targeting.ts": "004ac7d6fee670300254329af5e50ed68dd5cfe4f1344fe0223ff81ceaad9615",
+    "server/src/game/World.ts": "8026ef7044b678d6d2abb9712a114a078465892e28b2b0eaafa9918692f599db",
+    "server/src/entities/Entity.ts": "f9cea2ee0dddef4f0807558f4490a36d0a7db4af56d1c661ace8385aa0237fbc",
+    "client/src/main.ts": "33796694ae605f5a46c745a9c1b3fe071e1792083965fe6fc4e5859e6830de14",
+    "client/src/renderer/GameRenderer.ts": "f98847d3eb202d66e6e60768aeb70e089927a16261a190f38abe00edbed7b6d7",
+    "client/src/renderer/PixelVfx.ts": "a4efb7bbd003f697c3076ffe7f783a4c8e18163a9c598620369a572622c5de3f",
+    "client/src/renderer/PixelVfxPlayer.ts": "7d6759aac310085e755931982106298aa805d65d85f00e2af6097f445eb912ac",
+    "server/tools/benchmark-martial.ts": "e76c065d52725d8d8d55b2e7dab132644dd2c82c6b8b8a031eecf0cfda6cbc96"
+  },
+  "defaultMatrix": {
+    "scenarios": 420,
+    "outcomeChanges": [],
+    "rejections": 0,
+    "emptyCasts": 0
+  },
+  "martialChoices": {
+    "assumptions": "936 fresh in-memory fixtures: Warrior/Barbarian, nine choices at level 10 in worlds 1/2; 27 at level 25 in worlds 2/3; 81 at level 50 in worlds 3/4; seeds 101/202. Default order and supplied starter gear/resources, no investment. Not farm-earned progression or a balance target.",
+    "scenarios": 936,
+    "classes": [
+      {
+        "classType": "GUERREIRO",
+        "cases": 468,
+        "victories": 456,
+        "deaths": 3,
+        "timeouts": 9,
+        "rejections": 0,
+        "emptyCasts": 0,
+        "levels": [
+          {
+            "level": 10,
+            "cases": 36,
+            "victories": 32,
+            "deaths": 3,
+            "timeouts": 1
+          },
+          {
+            "level": 25,
+            "cases": 108,
+            "victories": 100,
+            "deaths": 0,
+            "timeouts": 8
+          },
+          {
+            "level": 50,
+            "cases": 324,
+            "victories": 324,
+            "deaths": 0,
+            "timeouts": 0
+          }
+        ]
+      },
+      {
+        "classType": "BARBARO",
+        "cases": 468,
+        "victories": 371,
+        "deaths": 9,
+        "timeouts": 88,
+        "rejections": 0,
+        "emptyCasts": 0,
+        "levels": [
+          {
+            "level": 10,
+            "cases": 36,
+            "victories": 19,
+            "deaths": 6,
+            "timeouts": 11
+          },
+          {
+            "level": 25,
+            "cases": 108,
+            "victories": 64,
+            "deaths": 3,
+            "timeouts": 41
+          },
+          {
+            "level": 50,
+            "cases": 324,
+            "victories": 288,
+            "deaths": 0,
+            "timeouts": 36
+          }
+        ]
+      }
+    ]
+  },
+  "postMeasurementPresentationChange": {
+    "file": "shared/src/skills.ts",
+    "change": "Texto do Salto esclarecido para indicar ponto no chão; nenhuma alteração funcional após a medição."
+  }
+}

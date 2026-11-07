@@ -4,7 +4,7 @@ import { HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground } fro
 import { FloatingDialogue } from '../ui/FloatingDialogue';
 import { PixelWorld } from './PixelWorld';
 import { PixelVfxPlayer } from './PixelVfxPlayer';
-import { planWarriorCastFx } from './PixelVfx';
+import { planWarriorCastFx, planMageCometPulseFx } from './PixelVfx';
 import { WarriorPresentation } from './WarriorPresentation';
 import type { VisualStage } from './WorldPresentation';
 
@@ -252,9 +252,15 @@ export class GameRenderer {
 
   public applyCombatStatus(event: CombatStatusTransitionPayload, entities: InterpolatedEntity[]): void {
     if (!this.warriorPresentation.transition(event, performance.now())) return;
+    for(const request of planMageCometPulseFx(event))this.vfx.queue.spawn(request,performance.now());
     const target = entities.find(e => e.id === event.status.targetEntityId);
-    if (target && event.event === 'BROKEN') this.floatingTexts.push({ id: `status-${event.status.statusId}`, text: 'ESCUDO QUEBRADO', color: '#b9e9fa', x: target.position.x, y: target.position.z - 2, opacity: 1, createdAt: performance.now() });
+    if (target && event.event === 'BROKEN') this.floatingTexts.push({ id: `status-${event.status.statusId}`, text: event.status.type==='GUIDING_MARK'?'MARCA CONSUMIDA':'ESCUDO QUEBRADO', color: '#b9e9fa', x: target.position.x, y: target.position.z - 2, opacity: 1, createdAt: performance.now() });
+    if(target && event.event==='TICK' && (event.tickHeal??0)>0)this.floatingTexts.push({id:`heal-${event.status.statusId}-${event.serverTick}`,text:`+${event.tickHeal}`,color:'#a2f4a0',x:target.position.x,y:target.position.z-2,opacity:1,createdAt:performance.now()});
     // BLEED damage is already broadcast via S2C_COMBAT_EVENT; do not duplicate numbers here.
+  }
+
+  public hasFreeResourceEffect(entityId:string|null,entities:InterpolatedEntity[]):boolean{
+    return !!entityId&&this.warriorPresentation.visible(performance.now(),entities).some(status=>status.targetEntityId===entityId&&status.type==='UNBRIDLED_RAGE');
   }
 
   public playSkillVfx(event: S2CSkillCastEventPayload, entities: InterpolatedEntity[]): void {

@@ -9,6 +9,8 @@ import {
   C2SUseItemPayload,
   C2SSellItemPayload,
   C2SDiscardItemPayload,
+  C2SSetItemLockPayload,
+  FusionRequest,
   C2SRequestCharacterListPayload,
   C2SCreateCharacterSlotPayload,
   C2SSelectCharacterSlotPayload,
@@ -179,6 +181,26 @@ export class PacketHandler {
         this.handleSellItem(connection, message.data as C2SSellItemPayload);
         break;
 
+      case Opcode.C2S_FUSE_EQUIPMENT: {
+        if (!connection.isAuthenticated || !connection.playerId) return;
+        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        if (player) world.fusePlayerEquipment(player, message.data as FusionRequest);
+        break;
+      }
+      case Opcode.C2S_SET_ITEM_LOCK: {
+        const payload = message.data as C2SSetItemLockPayload;
+        if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.isLocked !== 'boolean') return;
+        if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
+        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        if (player) this.runInventoryAction(connection, () => world.setPlayerItemLocked(player, payload.expectedInstanceId, payload.isLocked));
+        break;
+      }
+      case Opcode.C2S_REQUEST_EQUIPMENT_ADVICE: {
+        if (!connection.isAuthenticated || !connection.playerId) return;
+        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        if (player) this.runInventoryAction(connection, () => world.sendEquipmentAdvice(player));
+        break;
+      }
       case Opcode.C2S_DISCARD_ITEM:
         this.handleDiscardItem(connection, message.data as C2SDiscardItemPayload);
         break;
@@ -192,7 +214,7 @@ export class PacketHandler {
         break;
 
       case Opcode.C2S_EXPAND_INVENTORY:
-        this.handleExpandInventory(connection);
+        this.handleExpandInventory(connection, (message.data as { expectedMaxSlots?: number })?.expectedMaxSlots);
         break;
 
       case Opcode.C2S_PERFORM_REBORN:
@@ -473,7 +495,36 @@ export class PacketHandler {
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.lootItem(player, payload.dropId);
+    this.runInventoryAction(connection, () => world.lootItem(player, payload.dropId));
+  }
+
+  private runInventoryAction(connection: Connection, action: () => unknown): void {
+    try { action(); } catch {
+      const world = this.getActiveWorld(connection);
+      const player = connection.playerId ? world.entityManager.getPlayer(connection.playerId) : undefined;
+      if (player) {
+        try {
+          player.inventory = world.db.getInventory(player.dbCharacterId);
+          player.gold = world.db.getCharacterGold(player.dbCharacterId);
+          player.recalculateStatsFromEquipment();
+          world.sendInventoryUpdate(player);
+        } catch { /* A temporarily unavailable database must not terminate every player's connection. */ }
+      }
+      connection.send(Opcode.S2C_CHAT_MESSAGE, { senderId: 'inventory', senderName: 'Mochila', channel: 'system',
+        timestamp: Date.now(), message: 'Não foi possível concluir a operação. Confira a mochila atualizada antes de tentar novamente.' });
+    }
+  }
+
+  private validateInventoryTarget(connection: Connection, slotIndex: number, expectedInstanceId?: string): boolean {
+    const world = this.getActiveWorld(connection);
+    const player = connection.playerId ? world.entityManager.getPlayer(connection.playerId) : undefined;
+    if (!player) return false;
+    const item = player.inventory.find(entry => entry.slotIndex === slotIndex);
+    if (Number.isInteger(slotIndex) && typeof expectedInstanceId === 'string' && item?.instanceId === expectedInstanceId) return true;
+    world.sendInventoryUpdate(player);
+    connection.send(Opcode.S2C_CHAT_MESSAGE, { senderId: 'inventory', senderName: 'Mochila', channel: 'system',
+      timestamp: Date.now(), message: 'O item mudou de posição. A mochila foi atualizada; selecione o item novamente. Se necessário, recarregue a página.' });
+    return false;
   }
 
   private handleUseItem(connection: Connection, payload: C2SUseItemPayload): void {
@@ -481,7 +532,8 @@ export class PacketHandler {
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.usePlayerItem(player, payload.slotIndex);
+    if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
+    this.runInventoryAction(connection, () => world.usePlayerItem(player, payload.slotIndex));
   }
 
   private handleSellItem(connection: Connection, payload: C2SSellItemPayload): void {
@@ -489,7 +541,8 @@ export class PacketHandler {
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.sellPlayerItem(player, payload.slotIndex);
+    if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
+    this.runInventoryAction(connection, () => world.sellPlayerItem(player, payload.slotIndex));
   }
 
   private handleChallengeBoss(connection: Connection): void {
@@ -509,12 +562,12 @@ export class PacketHandler {
     else world.enterPortal(player);
   }
 
-  private handleExpandInventory(connection: Connection): void {
+  private handleExpandInventory(connection: Connection, expectedMaxSlots?: number): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.expandPlayerInventory(player);
+    world.expandPlayerInventory(player, expectedMaxSlots);
   }
 
   private handleDiscardItem(connection: Connection, payload: C2SDiscardItemPayload): void {
@@ -522,7 +575,8 @@ export class PacketHandler {
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.discardOrRecyclePlayerItem(player, payload.slotIndex);
+    if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
+    this.runInventoryAction(connection, () => world.discardOrRecyclePlayerItem(player, payload.slotIndex));
   }
 
   private handlePerformReborn(connection: Connection): void {
@@ -538,7 +592,9 @@ export class PacketHandler {
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.refinePlayerEquipment(player, payload.slotIndex);
+    if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
+    if ((player.inventory.find(item => item.slotIndex === payload.slotIndex)?.refineLevel ?? 0) !== payload.expectedRefineLevel) { world.sendInventoryUpdate(player); return; }
+    this.runInventoryAction(connection, () => world.refinePlayerEquipment(player, payload.slotIndex));
   }
 
   private handleSocketGem(connection: Connection, payload: C2SSocketGemPayload): void {
@@ -546,7 +602,8 @@ export class PacketHandler {
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.socketPlayerGem(player, payload.equipmentSlotIndex, payload.socketIndex, payload.gemItemId);
+    if (!this.validateInventoryTarget(connection, payload.equipmentSlotIndex, payload.expectedInstanceId)) return;
+    this.runInventoryAction(connection, () => world.socketPlayerGem(player, payload.equipmentSlotIndex, payload.socketIndex, payload.gemItemId));
   }
 
   private handleEquipCard(connection: Connection, payload: C2SEquipCardPayload): void {

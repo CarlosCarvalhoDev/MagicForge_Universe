@@ -198,32 +198,34 @@ test('5. Multiplicadores enviados pelo cliente não aumentam a recompensa', (t) 
   assert.equal(db.getCharacterByName(player.name)!.gold, initialGold + expectedGold);
 });
 
-test('6. Mochila cheia desfaz inclusive inserções parciais e permite tentar novamente', () => {
+test('6. Mochila cheia entrega ouro/EXP e itens que cabem; restante persiste sem duplicar resgate', () => {
   const { world, conn, db, mockSocket } = setupTestWorld();
   const player = world.entityManager.getPlayer(conn.playerId!)!;
   player.lastLogoutTime = Date.now() - 1800_000;
   world.checkAndNotifyOfflineRewards(conn, player);
   const reward = structuredClone(player.pendingOfflineReward!);
-  // Leave exactly one slot: ore inserts first, potion needs another slot.
   const potion = player.inventory.find(item => item.itemId === 'potion_hp_minor')!;
   db.removeItemFromInventory(player.dbCharacterId, potion.slotIndex, potion.quantity);
   player.inventory = db.getInventory(player.dbCharacterId);
   player.maxInventorySlots = player.inventory.length + 1;
-  const inventoryBefore = db.getInventory(player.dbCharacterId);
-  const characterBefore = db.getCharacterByName(player.name)!;
-  const originalHp = player.currentHp;
-  const result = world.claimOfflineRewards(player);
-  assert.equal(result.success, false);
-  assert.match(result.message, /mochila/);
-  assert.deepEqual(db.getInventory(player.dbCharacterId), inventoryBefore);
-  assert.deepEqual(player.pendingOfflineReward, reward);
-  assert.equal(player.level, characterBefore.level);
-  assert.equal(player.gold, characterBefore.gold);
-  assert.equal(player.currentHp, originalHp);
-  assert.equal(mockSocket.getLastPacket(Opcode.S2C_OFFLINE_REWARDS_CLAIMED).success, false);
+  const initialGold = player.gold;
+  assert.equal(world.claimOfflineRewards(player).success, true);
+  assert.equal(player.gold, initialGold + reward.accumulatedGold);
+  assert.equal(player.pendingOfflineReward!.accumulatedGold, 0);
+  assert.equal(player.pendingOfflineReward!.accumulatedExp, 0);
+  assert.equal(player.pendingOfflineReward!.loot.length, 1);
+  assert.equal(player.pendingOfflineReward!.loot[0].itemId, 'potion_hp_minor');
+  assert.ok(mockSocket.getLastPacket(Opcode.S2C_OFFLINE_REWARDS_CLAIMED).remainingReward);
+  const persisted = db.getCharacterByName(player.name)!;
+  const loaded = db.loadPlayerFromRecord('reloaded', persisted);
+  assert.deepEqual(loaded.pendingOfflineReward, player.pendingOfflineReward);
+  assert.equal(world.claimOfflineRewards(player).success, false);
+  assert.equal(player.gold, initialGold + reward.accumulatedGold);
   player.maxInventorySlots = 25;
   assert.equal(world.claimOfflineRewards(player).success, true);
   assert.equal(player.pendingOfflineReward, null);
+  assert.equal(player.gold, initialGold + reward.accumulatedGold);
+  assert.equal(db.getInventory(player.dbCharacterId).find(i => i.itemId === 'ore_iron_arcane')!.quantity, reward.loot.find(i => i.itemId === 'ore_iron_arcane')!.quantity);
 });
 
 test('7. Baú persiste no SQLite; reconexão acumula somente a nova ausência e resgata uma vez', (t) => {
@@ -322,4 +324,25 @@ test('11. Reinício do SQLite mantém o baú e a migração pode executar novame
   database = new DatabaseManager(databasePath);
   const loaded = database.loadPlayerFromRecord('new_connection', database.getCharacterByName(player.name)!);
   assert.deepEqual(loaded.pendingOfflineReward, expected);
+});
+
+test('10. Resgate com bag cheia, expansão comprada e retirada do restante completam o mesmo baú uma vez', () => {
+  const { world, conn, db } = setupTestWorld();
+  const player = world.entityManager.getPlayer(conn.playerId!)!;
+  player.level = 35; player.gold = 500000; db.savePlayer(player);
+  while (db.getInventory(player.dbCharacterId).filter(item => !item.isEquipped).length < 20) {
+    assert.equal(db.addItemToInventory(player.dbCharacterId, 'sword_iron_broadsword', 1, 20), true);
+  }
+  player.inventory = db.getInventory(player.dbCharacterId);
+  player.lastLogoutTime = Date.now() - 1800_000;
+  world.checkAndNotifyOfflineRewards(conn, player);
+  const expectedGold = 500000 + player.pendingOfflineReward!.accumulatedGold - 10000;
+  assert.equal(world.claimOfflineRewards(player).success, true);
+  assert.ok(player.pendingOfflineReward!.loot.some(item => item.itemId === 'ore_iron_arcane'));
+  assert.equal(world.expandPlayerInventory(player, 20).success, true);
+  assert.equal(player.maxInventorySlots, 25);
+  assert.equal(world.claimOfflineRewards(player).success, true);
+  assert.equal(player.pendingOfflineReward, null);
+  assert.equal(player.gold, expectedGold);
+  assert.equal(world.claimOfflineRewards(player).success, false);
 });

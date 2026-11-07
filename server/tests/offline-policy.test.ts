@@ -35,3 +35,13 @@ test('Novo intervalo soma ao baú preservado e respeita o teto total, sem duplic
   const again = calculateOfflineReward({ ...state, lastLogoutTime: now }, now, accumulated)!;
   assert.deepEqual(again, accumulated);
 });
+
+test('Reconectar após coleta parcial preserva só o restante e acrescenta apenas materiais novos', () => {
+  const first = calculateOfflineReward({ ...state, lastLogoutTime: now - 3600_000 }, now)!;
+  const remaining = { ...first, accumulatedGold: 0, accumulatedExp: 0, loot: [{ ...first.loot[1], quantity: 3 }] };
+  assert.deepEqual(calculateOfflineReward({ ...state, lastLogoutTime: now }, now, remaining)!.loot, remaining.loot);
+  const next = calculateOfflineReward({ ...state, lastLogoutTime: now - 3600_000 }, now, remaining)!;
+  assert.equal(next.accumulatedGold, first.accumulatedGold);
+  assert.equal(next.loot.find(i => i.itemId === 'ore_iron_arcane')!.quantity, 8);
+  assert.equal(next.loot.find(i => i.itemId === 'potion_hp_minor')!.quantity, 9);
+});
