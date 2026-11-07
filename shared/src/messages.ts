@@ -502,8 +502,14 @@ export interface C2SSelectCharacterSlotPayload {
   slotIndex: number; // 0, 1 ou 2
 }
 
+export interface C2SDeleteCharacterSlotPayload {
+  slotIndex: number; // 0, 1 ou 2
+  characterName: string;
+  confirmation: string;
+}
+
 export interface S2CCharacterActionErrorPayload {
-  errorCode: 'INVALID_SLOT' | 'SLOT_OCCUPIED' | 'NAME_TAKEN' | 'INVALID_NAME' | 'CHARACTER_NOT_FOUND' | 'UNAUTHENTICATED';
+  errorCode: 'INVALID_SLOT' | 'SLOT_OCCUPIED' | 'NAME_TAKEN' | 'INVALID_NAME' | 'CHARACTER_NOT_FOUND' | 'UNAUTHENTICATED' | 'DELETE_CONFIRMATION_REQUIRED' | 'CHARACTER_ACTIVE';
   errorMessage: string;
   slotIndex?: number;
 }

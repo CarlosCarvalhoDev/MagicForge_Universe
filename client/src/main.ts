@@ -2726,6 +2726,7 @@ const authSelection = setupAuthSelection({
   requestList: username => { legacyLoginRequested = false; network.sendRequestCharacterList(username); },
   create: (slot, name, classType) => network.sendCreateCharacterSlot(slot, name, classType),
   select: slot => network.sendSelectCharacterSlot(slot),
+  delete: (slot, name, confirmation) => network.sendDeleteCharacterSlot(slot, name, confirmation),
 });
 network.onCharacterList = payload => authSelection.onCharacterList(payload);
 const cinematic = setupCinematicIntro();

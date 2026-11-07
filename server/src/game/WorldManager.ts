@@ -506,6 +506,47 @@ export class WorldManager {
     this.assignPlayerToChannel(connection, player, preferredChannelId);
   }
 
+  public handleDeleteCharacterSlot(connection: Connection, slotIndex: number, characterName: string, confirmation: string): void {
+    if (!connection.isAuthenticated || !connection.accountId) {
+      connection.send(Opcode.S2C_ERROR, {
+        errorCode: 'UNAUTHENTICATED',
+        errorMessage: 'É necessário autenticar a conta antes de excluir um herói.',
+      } as S2CCharacterActionErrorPayload);
+      return;
+    }
+
+    if (connection.playerId) {
+      connection.send(Opcode.S2C_ERROR, {
+        errorCode: 'CHARACTER_ACTIVE',
+        errorMessage: 'Retorne à Sala dos Forjados antes de excluir um herói.',
+        slotIndex,
+      } as S2CCharacterActionErrorPayload);
+      return;
+    }
+
+    try {
+      this.db.deleteCharacterInSlot(connection.accountId, slotIndex, characterName, confirmation);
+      connection.send(Opcode.S2C_CHARACTER_LIST, {
+        accountId: connection.accountId,
+        accountUsername: connection.accountUsername || 'Aventureiro',
+        slots: this.db.getCharacterSlotsSummary(connection.accountId),
+        message: `Herói "${characterName.trim()}" excluído. O pedestal está livre para uma nova lenda.`,
+      } as S2CCharacterListPayload);
+    } catch (err: any) {
+      const code = err?.message || 'CHARACTER_NOT_FOUND';
+      const messages: Record<string, string> = {
+        INVALID_SLOT: 'Slot inválido.',
+        CHARACTER_NOT_FOUND: 'Nenhum herói encontrado nesse pedestal.',
+        DELETE_CONFIRMATION_REQUIRED: 'A confirmação precisa conter o nome exato deste herói.',
+      };
+      connection.send(Opcode.S2C_ERROR, {
+        errorCode: code,
+        errorMessage: messages[code] || 'Não foi possível excluir este herói.',
+        slotIndex,
+      } as S2CCharacterActionErrorPayload);
+    }
+  }
+
   public handleRequestChannelList(connection: Connection, payload?: C2SRequestChannelListPayload): void {
     const worldIndex = payload?.worldIndex || connection.currentWorldIndex || 1;
     const currentChannelId = connection.currentChannelId || 1;

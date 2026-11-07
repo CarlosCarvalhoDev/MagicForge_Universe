@@ -12,6 +12,7 @@ import {
   C2SRequestCharacterListPayload,
   C2SCreateCharacterSlotPayload,
   C2SSelectCharacterSlotPayload,
+  C2SDeleteCharacterSlotPayload,
   C2SRefineEquipmentPayload,
   C2SSocketGemPayload,
   C2SEquipCardPayload,
@@ -110,6 +111,10 @@ export class PacketHandler {
 
       case Opcode.C2S_SELECT_CHARACTER_SLOT:
         this.handleSelectCharacterSlot(connection, message.data as C2SSelectCharacterSlotPayload);
+        break;
+
+      case Opcode.C2S_DELETE_CHARACTER_SLOT:
+        this.handleDeleteCharacterSlot(connection, message.data as C2SDeleteCharacterSlotPayload);
         break;
 
       // --- Channels, Worlds & Instances ---
@@ -304,6 +309,13 @@ export class PacketHandler {
   private handleSelectCharacterSlot(connection: Connection, payload: C2SSelectCharacterSlotPayload): void {
     if (!payload || typeof payload.slotIndex !== 'number') return;
     this.worldManager.handleSelectCharacterSlot(connection, payload.slotIndex);
+  }
+
+  private handleDeleteCharacterSlot(connection: Connection, payload: C2SDeleteCharacterSlotPayload): void {
+    if (!payload || typeof payload.slotIndex !== 'number' || !payload.characterName || !payload.confirmation) return;
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handleDeleteCharacterSlot(connection, payload.slotIndex, payload.characterName, payload.confirmation);
+    }
   }
 
   private handleRequestChannelList(connection: Connection, payload?: C2SRequestChannelListPayload): void {

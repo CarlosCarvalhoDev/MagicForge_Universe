@@ -24,6 +24,7 @@ const ui = setupAuthSelection({
   requestList: name => calls.push('list:' + name),
   create: (slot, name, cls) => calls.push('create:' + slot + ':' + name + ':' + cls),
   select: slot => calls.push('select:' + slot),
+  delete: (slot, name, confirmation) => calls.push('delete:' + slot + ':' + name + ':' + confirmation),
 });
 const passed: string[] = [];
 function check(condition: boolean, label: string) {
@@ -83,6 +84,18 @@ try {
   const created = { ...payload, slots: payload.slots.map(slot => slot.slotIndex === 1 ? { slotIndex: 1, isEmpty: false, id: 'fixture-cleric', name: '<HeroNovo>', classType: CharacterClass.CLERIGO, level: 1, combatPower: 100 } : slot) };
   ui.onCharacterList(created);
   check(ui.isOpen() && createForm.hidden && card(1).querySelector('h3')!.textContent === '<HeroNovo>' && !card(1).querySelector('HeroNovo'), 'Confirmação atualiza lista sem login; nome exibido como texto');
+  const deleteButton = card(1).querySelector<HTMLButtonElement>('[data-slot-delete]')!;
+  deleteButton.click();
+  const deleteInput = document.getElementById('forge-delete-confirmation') as HTMLInputElement;
+  const deleteConfirm = document.getElementById('forge-confirm-delete') as HTMLButtonElement;
+  check(!document.getElementById('forge-delete-panel')!.hidden && document.getElementById('forge-delete-confirmation-hint')!.textContent === 'desejoexcluiropersonagem<heronovo>', 'Exclusão abre confirmação derivada do nome real');
+  deleteInput.value = 'desejoexcluiropersonagemerrado'; deleteInput.dispatchEvent(new Event('input')); deleteConfirm.click();
+  check(!calls.some(c => c.startsWith('delete:')), 'Confirmação incorreta não envia exclusão');
+  deleteInput.value = 'desejoexcluiropersonagem<heronovo>'; deleteInput.dispatchEvent(new Event('input')); deleteConfirm.click(); deleteConfirm.click();
+  check(calls.filter(c => c.startsWith('delete:')).length === 1, 'Exclusão aceita a frase exata e bloqueia repetição');
+  ui.onCharacterList({ ...created, message: 'Herói excluído.', slots: created.slots.map(slot => slot.slotIndex === 1 ? { slotIndex: 1, isEmpty: true } : slot) });
+  check(document.getElementById('forge-delete-panel')!.hidden && card(1).querySelector('h3')!.textContent === 'Uma nova lenda', 'Lista atualizada libera o pedestal após exclusão');
+  ui.onCharacterList(created);
   button(1).click(); button(1).click();
   check(calls.filter(c => c === 'select:1').length === 1 && ui.isOpen(), 'Seleção única aguarda login success');
   ui.onLogin();

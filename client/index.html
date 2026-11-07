@@ -4691,7 +4691,7 @@
               <span class="title-highlight">VOCÊ FORJA A LENDA.</span>
             </h1>
             <p class="forge-cover-tagline">
-              O MMORPG autoritativo e idle em pixel art com progressão profunda D&amp;D 5E, combate rúnico tático, masmorras diárias, álbum de cartas e chefes mitológicos. Desperte a Forja Ancestral.
+              Um RPG idle em pixel art: evolua heróis e resgate na Forja as recompensas acumuladas.
             </p>
 
             <!-- Ticker de Características Exclusivas -->
@@ -4714,7 +4714,7 @@
                     <span class="mechanic-sub">Progressão Real</span>
                   </div>
                 </div>
-                <p>Distribua FOR, DES, CON, INT, SAB e CAR. Cada nível eleva atributos reais e o sistema de Reborn desbloqueia títulos astrais com multiplicadores exponenciais.</p>
+                <p>Distribua seis atributos e evolua a cada nível. O Reborn libera títulos e bônus astrais.</p>
               </div>
 
               <div class="mechanic-card">
@@ -4725,18 +4725,18 @@
                     <span class="mechanic-sub">Colecionismo e Forja</span>
                   </div>
                 </div>
-                <p>Derrote monstros e chefes para selar cartas no seu grimório, engaste gemas nos equipamentos e refine suas armas até +20 na Bigorna Ancestral.</p>
+                <p>Colete cartas de monstros, equipe gemas e refine armas até +20 na Bigorna Ancestral.</p>
               </div>
 
               <div class="mechanic-card">
                 <div class="mechanic-card-header">
                   <span class="mechanic-icon-badge"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
                   <div>
-                    <h4>Boss Rush &amp; Ranking 20Hz</h4>
-                    <span class="mechanic-sub">Competitividade</span>
+                    <h4>Combate automático &amp; recompensas</h4>
+                    <span class="mechanic-sub">Progressão no seu ritmo</span>
                   </div>
                 </div>
-                <p>Enfrente ondas ininterruptas de chefes mundiais, dispute o Ranking Astral atualizado em tempo real com ticks autoritativos de 20Hz.</p>
+                <p>Deixe o farm avançar, resgate recompensas ao voltar e encare a Boss Rush diária.</p>
               </div>
             </div>
 
@@ -4746,7 +4746,7 @@
               <div class="forge-cover-classes-showcase" role="region" aria-label="Showcase de Classes">
                 <div class="classes-showcase-heading">
                   <span class="showcase-badge">ESCOLHA SEU DESTINO</span>
-                  <h2>VOCAS &amp; ARQUÉTIPOS</h2>
+                  <h2>VOCAÇÕES &amp; ARQUÉTIPOS</h2>
                   <p>Selecione uma classe para inspecionar seus atributos e estilo de combate</p>
                 </div>
 
@@ -4856,18 +4856,26 @@
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="15 6 9 12 15 18"></polyline>
             </svg>
-            <span>CONHECER O JOGO</span>
+            <span>CONHECER</span>
           </button>
-          <span class="forge-world-tag">FORJA ANCESTRAL<br>O início da sua jornada</span>
+          <span class="forge-world-tag">FORJA ANCESTRAL</span>
         </header>
         <div class="forge-intro">
-          <span class="forge-eyebrow">A QUEDA DA BIGORNA ASTRAL</span>
+          <span class="forge-eyebrow" id="forge-intro-eyebrow">A QUEDA DA BIGORNA ASTRAL</span>
           <h1 id="forge-auth-title">Entre na<br>Forja Astral.</h1>
           <p id="forge-intro-copy">Acesse sua conta para encontrar seus heróis e continuar sua jornada.</p>
           <div class="forge-runic-crests" aria-hidden="true">
             <span class="runic-crest-pill"><i>✦</i> 5 Classes Forjadas (D&amp;D 5E)</span>
             <span class="runic-crest-pill"><i>⚔</i> Grimório Rúnico &amp; Cartas</span>
             <span class="runic-crest-pill"><i>👑</i> Sala dos Forjados · 3 Pedestais</span>
+          </div>
+          <div class="forge-login-brief" aria-label="Resumo da experiência da Forja Astral">
+            <div class="forge-login-brief-heading"><span>O ciclo da Forja</span><small>progresso persistente</small></div>
+            <div class="forge-login-brief-grid">
+              <div class="forge-login-brief-item"><b>01</b><span><strong>Forje</strong><small>Escolha classe e nome do herói.</small></span></div>
+              <div class="forge-login-brief-item"><b>02</b><span><strong>Avance</strong><small>Seu grupo continua enquanto você está fora.</small></span></div>
+              <div class="forge-login-brief-item"><b>03</b><span><strong>Retorne</strong><small>Recolha recompensas e decida o próximo passo.</small></span></div>
+            </div>
           </div>
         </div>
         <div id="forge-account-session" class="forge-account-session" hidden><span id="forge-session-name"></span><button id="forge-sign-out" type="button">Trocar conta</button></div>
@@ -4879,19 +4887,19 @@
                 <span class="forge-slot-number">PEDESTAL 01</span>
                 <div class="forge-pedestal"><img src="/assets/ui/login/pedestal_runico_vazio.png" alt="" width="512" height="512"><span aria-hidden="true">I</span></div>
                 <h3>Destino por revelar</h3><p>Aguardando a lista<br>de heróis da conta.</p>
-                <button type="button" disabled aria-label="Pedestal 1: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button>
+                <div class="forge-slot-actions"><button type="button" disabled aria-label="Pedestal 1: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button><button type="button" class="forge-delete-slot" data-slot-delete="0" hidden>APAGAR</button></div>
               </article>
               <article class="forge-slot" data-slot-index="1">
                 <span class="forge-slot-number">PEDESTAL 02</span>
                 <div class="forge-pedestal"><img src="/assets/ui/login/pedestal_runico_vazio.png" alt="" width="512" height="512"><span aria-hidden="true">II</span></div>
                 <h3>Destino por revelar</h3><p>Aguardando a lista<br>de heróis da conta.</p>
-                <button type="button" disabled aria-label="Pedestal 2: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button>
+                <div class="forge-slot-actions"><button type="button" disabled aria-label="Pedestal 2: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button><button type="button" class="forge-delete-slot" data-slot-delete="1" hidden>APAGAR</button></div>
               </article>
               <article class="forge-slot" data-slot-index="2">
                 <span class="forge-slot-number">PEDESTAL 03</span>
                 <div class="forge-pedestal"><img src="/assets/ui/login/pedestal_runico_vazio.png" alt="" width="512" height="512"><span aria-hidden="true">III</span></div>
                 <h3>Destino por revelar</h3><p>Aguardando a lista<br>de heróis da conta.</p>
-                <button type="button" disabled aria-label="Pedestal 3: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button>
+                <div class="forge-slot-actions"><button type="button" disabled aria-label="Pedestal 3: seleção indisponível até carregar a conta">AGUARDANDO CONTA</button><button type="button" class="forge-delete-slot" data-slot-delete="2" hidden>APAGAR</button></div>
               </article>
             </div>
             <p class="forge-roster-note" id="forge-roster-note">Identifique sua conta para revelar seus três pedestais. Escolha um herói para entrar ou um pedestal vazio para criar.</p>
@@ -4937,17 +4945,19 @@
               <button type="submit">CRIAR HERÓI</button>
               <button id="forge-cancel-create" type="button">Cancelar criação</button>
             </form>
+            <section id="forge-delete-panel" class="forge-delete-panel" hidden aria-labelledby="forge-delete-title">
+              <span class="forge-eyebrow forge-eyebrow-danger">RITUAL IRREVERSÍVEL</span>
+              <h3 id="forge-delete-title">Apagar <strong id="forge-delete-character">este herói</strong>?</h3>
+              <p>Esta ação remove a progressão, inventário e recompensas offline. Para confirmar, escreva exatamente:</p>
+              <code id="forge-delete-confirmation-hint">desejoexcluiropersonagem...</code>
+              <label for="forge-delete-confirmation">Frase de confirmação</label>
+              <input id="forge-delete-confirmation" type="text" autocomplete="off" spellcheck="false" placeholder="Digite a frase acima">
+              <div class="forge-delete-actions"><button id="forge-confirm-delete" type="button">APAGAR PERSONAGEM</button><button id="forge-cancel-delete" type="button">CANCELAR</button></div>
+              <p id="forge-delete-status" class="forge-delete-status" role="status" aria-live="polite"></p>
+            </section>
           </section>
         </div>
         <p id="forge-auth-status" class="forge-auth-status" role="status" aria-live="polite">O acesso por conta e senha ainda não está disponível.</p>
-        <footer class="forge-footer">
-          <span class="forge-footer-legend">Sete classes. Mundos fragmentados. Uma nova lenda.</span>
-          <div class="forge-footer-actions">
-            <button id="btn-footer-back-to-cover" type="button" class="btn-back-cover" aria-label="Voltar para a tela inicial">✦ Início</button>
-            <button id="btn-replay-story" type="button">📜 Rever história</button>
-            <button id="btn-auth-switch-dev" type="button" hidden>Abrir painel de rede</button>
-          </div>
-        </footer>
       </main>
     </div>
 

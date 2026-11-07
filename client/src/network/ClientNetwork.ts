@@ -20,6 +20,7 @@ import {
   C2SRequestCharacterListPayload,
   C2SCreateCharacterSlotPayload,
   C2SSelectCharacterSlotPayload,
+  C2SDeleteCharacterSlotPayload,
   S2CCharacterListPayload,
   S2CCharacterActionErrorPayload,
   S2CLoginSuccessPayload,
@@ -350,6 +351,11 @@ export class ClientNetwork {
       slotIndex,
     };
     this.send(Opcode.C2S_SELECT_CHARACTER_SLOT, payload);
+  }
+
+  public sendDeleteCharacterSlot(slotIndex: number, characterName: string, confirmation: string): void {
+    const payload: C2SDeleteCharacterSlotPayload = { slotIndex, characterName, confirmation };
+    this.send(Opcode.C2S_DELETE_CHARACTER_SLOT, payload);
   }
 
   public sendMoveInput(targetPosition: Vector3, currentClientPosition: Vector3): number {

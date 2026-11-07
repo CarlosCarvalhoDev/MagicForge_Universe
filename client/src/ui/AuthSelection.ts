@@ -12,6 +12,7 @@ interface AuthTransport {
   requestList(username: string): void;
   create(slot: number, name: string, classType: CharacterClass): void;
   select(slot: number): void;
+  delete(slot: number, name: string, confirmation: string): void;
 }
 
 /** The server owns every slot; creating a hero never implies entering the world. */
@@ -33,6 +34,11 @@ export function setupAuthSelection(
   const portrait = document.getElementById('forge-preview-portrait') as HTMLImageElement;
   const classLabel = document.getElementById('forge-preview-class')!;
   const note = document.getElementById('forge-roster-note')!;
+  const deletePanel = document.getElementById('forge-delete-panel') as HTMLElement;
+  const deleteCharacter = document.getElementById('forge-delete-character')!;
+  const deleteHint = document.getElementById('forge-delete-confirmation-hint')!;
+  const deleteInput = document.getElementById('forge-delete-confirmation') as HTMLInputElement;
+  const deleteStatus = document.getElementById('forge-delete-status')!;
   const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-slot-index]'));
   const background = Array.from(document.body.children)
     .filter((el): el is HTMLElement => el instanceof HTMLElement && el !== root && el.tagName !== 'SCRIPT')
@@ -52,10 +58,12 @@ export function setupAuthSelection(
   let authKind: 'login' | 'register' | 'guest' = 'login';
   let slots: CharacterSlotSummary[] | null = null;
   let selected: number | null = null;
-  let pending: 'authenticate' | 'list' | 'create' | 'select' | null = null;
+  let pending: 'authenticate' | 'list' | 'create' | 'select' | 'delete' | null = null;
   let timeout: number | undefined;
   let waitingForConnection = false;
   let inWorld = false;
+  let deletingSlot: number | null = null;
+  const deletionPhrase = (name: string) => 'desejoexcluiropersonagem' + name.trim().toLocaleLowerCase('pt-BR').replace(/\s+/g, '');
 
   const show = () => {
     root.hidden = false;
@@ -94,7 +102,8 @@ export function setupAuthSelection(
     document.getElementById('forge-social-login')!.hidden = selecting;
     document.getElementById('forge-account-session')!.hidden = !selecting;
     document.getElementById('forge-session-name')!.textContent = selecting ? 'Conta: ' + account : '';
-    document.getElementById('forge-auth-title')!.textContent = selecting ? 'Sala dos Forjados' : 'Entre na Forja Astral.';
+    document.getElementById('forge-auth-title')!.textContent = selecting ? 'Sala dos Forjados.' : 'Entre na Forja Astral.';
+    document.getElementById('forge-intro-eyebrow')!.textContent = selecting ? 'ESCOLHA SEU HERÓI' : 'ACESSO À FORJA ANCESTRAL';
     document.getElementById('forge-intro-copy')!.textContent = selecting ? 'Escolha quem continuará sua jornada. Cada pedestal guarda uma nova lenda.' : 'Acesse sua conta para encontrar seus heróis e continuar sua jornada.';
     const creating = selecting && selected !== null && Boolean(slots?.[selected]?.isEmpty);
     root.querySelector<HTMLElement>('.forge-entry')!.hidden = selecting && !creating;
@@ -152,6 +161,22 @@ export function setupAuthSelection(
       button.disabled = !authenticated || !slot || Boolean(pending) || !transport.isConnected();
       button.textContent = !slot ? 'AGUARDANDO CONTA' : pending === 'select' && selected === index ? 'ENTRANDO…' : slot.isEmpty ? '+ CRIAR NOVO HERÓI' : 'ENTRAR NO MUNDO →';
       button.setAttribute('aria-label', 'Pedestal ' + (index + 1) + ': ' + (!slot ? 'aguardando conta' : slot.isEmpty ? 'criar novo herói' : 'entrar com ' + slot.name));
+      const deleteButton = card.querySelector<HTMLButtonElement>('[data-slot-delete]');
+      if (deleteButton) {
+        deleteButton.hidden = !slot || slot.isEmpty;
+        deleteButton.disabled = !authenticated || !slot || slot.isEmpty || Boolean(pending) || !transport.isConnected();
+        deleteButton.setAttribute('aria-label', slot && !slot.isEmpty ? 'Apagar ' + slot.name : 'Apagar personagem indisponível');
+      }
+    }
+    deletePanel.hidden = deletingSlot === null;
+    if (deletingSlot !== null && slots?.[deletingSlot] && !slots[deletingSlot].isEmpty) {
+      const name = slots[deletingSlot].name || 'este herói';
+      const phrase = deletionPhrase(name);
+      deleteCharacter.textContent = name;
+      deleteHint.textContent = phrase;
+      deleteInput.disabled = Boolean(pending);
+      (document.getElementById('forge-confirm-delete') as HTMLButtonElement).disabled = Boolean(pending) || deleteInput.value.trim().toLocaleLowerCase('pt-BR') !== phrase;
+      (document.getElementById('forge-cancel-delete') as HTMLButtonElement).disabled = Boolean(pending);
     }
   }
 
@@ -275,6 +300,9 @@ export function setupAuthSelection(
     confirmInput.value = ''; emailToSend = undefined; registerMode = false;
     slots = null;
     selected = null;
+    deletingSlot = null;
+    deleteInput.value = '';
+    deleteStatus.textContent = '';
     inWorld = false;
     waitingForConnection = false;
     finish();
@@ -289,6 +317,9 @@ export function setupAuthSelection(
     autoResumeSlot = null;
     inWorld = false;
     selected = null;
+    deletingSlot = null;
+    deleteInput.value = '';
+    deleteStatus.textContent = '';
     if (account) {
       try {
         storage?.setItem(SESSION_KEY, JSON.stringify({
@@ -371,7 +402,43 @@ export function setupAuthSelection(
         transport.select(selected);
       }
     });
+    card.querySelector<HTMLButtonElement>('[data-slot-delete]')?.addEventListener('click', event => {
+      event.stopPropagation();
+      if (!authenticated || pending || !slots || !transport.isConnected()) return;
+      const index = Number(card.dataset.slotIndex);
+      const slot = slots[index];
+      if (!slot || slot.isEmpty || !slot.name) return;
+      deletingSlot = index;
+      deleteInput.value = '';
+      deleteStatus.textContent = 'A exclusão exige a frase completa, sem espaços extras.';
+      deleteStatus.dataset.state = 'info';
+      render();
+      deleteInput.focus();
+    });
   }
+
+  deleteInput.addEventListener('input', () => render());
+  document.getElementById('forge-cancel-delete')!.addEventListener('click', () => {
+    deletingSlot = null;
+    deleteInput.value = '';
+    deleteStatus.textContent = '';
+    render();
+  });
+  document.getElementById('forge-confirm-delete')!.addEventListener('click', () => {
+    if (pending || deletingSlot === null || !slots || !transport.isConnected()) return;
+    const slot = slots[deletingSlot];
+    if (!slot || slot.isEmpty || !slot.name) return;
+    const expected = deletionPhrase(slot.name);
+    if (deleteInput.value.trim().toLocaleLowerCase('pt-BR') !== expected) {
+      deleteStatus.textContent = 'A frase não confere. Copie exatamente o texto exibido acima.';
+      deleteStatus.dataset.state = 'error';
+      deleteInput.focus();
+      render();
+      return;
+    }
+    begin('delete', 'Apagando ' + slot.name + ' da Forja Astral…');
+    transport.delete(deletingSlot, slot.name, deleteInput.value.trim());
+  });
   form.addEventListener('submit', event => {
     event.preventDefault();
     if (!authenticated || pending || selected === null || !slots?.[selected]?.isEmpty || !transport.isConnected()) return;
@@ -397,7 +464,7 @@ export function setupAuthSelection(
     setStatus('Escolha um herói para entrar ou um pedestal vazio para criar.');
     cards[index ?? 0].querySelector('button')!.focus();
   });
-  document.getElementById('btn-auth-switch-dev')!.addEventListener('click', () => {
+  document.getElementById('btn-auth-switch-dev')?.addEventListener('click', () => {
     if (pending) return;
     try { storage?.removeItem(SESSION_KEY); } catch {}
     autoResuming = false;
@@ -496,7 +563,8 @@ export function setupAuthSelection(
       root.classList.add('in-auth-mode');
       root.scrollTop = 0;
       setTimeout(() => {
-        accountInput?.focus();
+        accountInput?.focus({ preventScroll: true });
+        root.scrollTop = 0;
       }, 200);
     };
 
@@ -670,6 +738,14 @@ root.dataset.ready = 'true';
         }
       }
       const rawSlots = Array.isArray(payload.slots) ? payload.slots : [];
+      const rawSlotIndexes = rawSlots.map(slot => Number(slot.slotIndex));
+      if (rawSlots.length !== 3 || new Set(rawSlotIndexes).size !== 3 || rawSlotIndexes.some(index => index < 0 || index > 2)) {
+        slots = null;
+        selected = null;
+        finish();
+        setStatus('A lista de heróis veio incompleta. Carregue a conta novamente.', true);
+        return;
+      }
       // Normaliza garantindo exatamente 3 pedestais (0, 1, 2)
       const normalizedSlots = [0, 1, 2].map(index => {
         const found = rawSlots.find(s => Number(s.slotIndex) === index);
@@ -697,9 +773,15 @@ root.dataset.ready = 'true';
         return;
       }
       const wasCreate = pending === 'create';
+      const wasDelete = pending === 'delete';
       const createdSlot = selected;
       slots = normalizedSlots;
       selected = null;
+      if (wasDelete) {
+        deletingSlot = null;
+        deleteInput.value = '';
+        deleteStatus.textContent = '';
+      }
       nameInput.value = '';
       finish();
       note.textContent = 'Conta: ' + (payload.accountUsername || account) + ' · ' + slots.filter(slot => !slot.isEmpty).length + ' de 3 pedestais ocupados.';
@@ -745,6 +827,12 @@ root.dataset.ready = 'true';
         render();
         setStatus((error.errorMessage || 'Não foi possível concluir a ação.') + ' Carregue os heróis novamente.', true);
       } else if (action === 'create') nameInput.focus();
+      else if (action === 'delete') {
+        deleteStatus.textContent = error.errorMessage || 'A confirmação não foi aceita.';
+        deleteStatus.dataset.state = 'error';
+        deleteInput.focus();
+        render();
+      }
     },
     onLogin() {
       inWorld = Boolean(account);

@@ -775,6 +775,23 @@ export class DatabaseManager {
     return summaries;
   }
 
+  /** Exclui um personagem apenas quando conta, slot, nome e confirmação coincidem. */
+  public deleteCharacterInSlot(accountId: string, slotIndex: number, characterName: string, confirmation: string): void {
+    if (slotIndex < 0 || slotIndex > 2) throw new Error('INVALID_SLOT');
+    const record = this.getCharacterByAccountAndSlot(accountId, slotIndex);
+    if (!record) throw new Error('CHARACTER_NOT_FOUND');
+
+    const normalize = (value: string) => value.trim().toLocaleLowerCase('pt-BR').replace(/\s+/g, '');
+    const expected = 'desejoexcluiropersonagem' + normalize(record.name);
+    if (normalize(characterName) !== normalize(record.name) || normalize(confirmation) !== expected) {
+      throw new Error('DELETE_CONFIRMATION_REQUIRED');
+    }
+
+    const result = this.db.prepare('DELETE FROM characters WHERE id = ? AND account_id = ? AND slot_index = ?').run(record.id, accountId, slotIndex);
+    if (result.changes !== 1) throw new Error('CHARACTER_NOT_FOUND');
+    console.log(`[Database] Personagem "${record.name}" excluído do Slot ${slotIndex} da conta "${accountId}".`);
+  }
+
   /**
    * Instancia e hidrata um objeto Player em memória a partir de um CharacterRecord do SQLite
    */
