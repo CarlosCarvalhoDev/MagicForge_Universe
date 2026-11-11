@@ -1786,8 +1786,6 @@ inventoryExpansion = setupInventoryExpansion({
   },
 });
 network.onEquipmentAdvice = result => equipmentAdvice.onResult(result);
-const devPanel = setupDevPanel(command => network.sendDevControl(command));
-network.onDevState = state => devPanel.update(state);
 network.onAutoEquipResult = result => {
   if (autoEquipStatus) autoEquipStatus.textContent = result.message;
 };
@@ -1795,6 +1793,11 @@ network.onExpandInventoryResult = result => inventoryExpansion!.onResult(result)
 network.onLeaderboardUpdate = data => leaderboard.onUpdate(data);
 const bossNarrative = setupBossNarrative();
 const partyHUD = new PartyHUD(network);
+const devPanel = setupDevPanel(
+  command => network.sendDevControl(command),
+  () => renderer.visibleMonsterIds(snapshotBuffer.getInterpolatedEntities()),
+);
+network.onDevState = state => devPanel.update(state);
 const channelSelector = new ChannelSelector(network);
 const offlineRewardModal = new OfflineRewardModal({
   isReady: () => network.isConnected && network.isAuthenticated,

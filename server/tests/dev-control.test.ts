@@ -33,6 +33,13 @@ test('Dev commands require server-side admin permission and spawn a stationary, 
   assert.equal(dummy.takeDamage(1_000_000, hero).killed, false);
   world.update(.05);
   assert.deepEqual(dummy.position, { x: 3, y: 0, z: -2 });
+  const [visible, outside] = world.entityManager.getAllMonsters().filter(monster => !monster.devTarget);
+  const stageKills = world.stageKills;
+  send({ action: 'killVisible', monsterIds: [visible.id, visible.id, hero.id, 'absent'] });
+  assert.equal(visible.isDead, true);
+  assert.equal(outside.isDead, false);
+  assert.equal(world.stageKills, stageKills);
+  assert.equal(hero.isDead, false);
   send({ action: 'toggle', key: 'infiniteVitals', enabled: true });
   assert.equal(hero.takeDamage(1_000_000).effectiveDamage, 0);
   assert.equal(hero.consumeResource(1_000_000), true);

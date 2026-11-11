@@ -734,6 +734,14 @@ export class GameRenderer {
     return { x: worldX, y: 0, z: worldZ };
   }
 
+  public visibleMonsterIds(entities: readonly InterpolatedEntity[]): string[] {
+    const halfWidth = this.canvas.width / (2 * this.zoom);
+    const halfHeight = this.canvas.height / (2 * this.zoom);
+    return entities.filter(entity => entity.type === 'MONSTER' && entity.currentHp > 0 &&
+      Math.abs(entity.position.x - this.cameraOffset.x) <= halfWidth &&
+      Math.abs(entity.position.z - this.cameraOffset.y) <= halfHeight).map(entity => entity.id);
+  }
+
   public addOrUpdateDrop(payload: S2CItemDropSpawnPayload): void {
     this.activeDrops.set(payload.dropId, {
       ...payload,

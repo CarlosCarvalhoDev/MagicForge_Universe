@@ -2566,7 +2566,7 @@ export class World {
     }
   }
 
-  public handleMonsterDeath(monster: Monster, killer?: Player): void {
+  public handleMonsterDeath(monster: Monster, killer?: Player, devKill = false): void {
     const cleared = monster.clearAllStatuses();
     for (const st of cleared) {
       this.broadcastStatusTransition('CLEARED_ON_DEATH', st, {
@@ -2575,10 +2575,15 @@ export class World {
       });
     }
 
-    if (monster.devTarget) {
+    if (devKill && monster.id === this.activeBossId) {
+      this.bossTimerSec = 0;
+      return;
+    }
+    if (monster.devTarget || (devKill && !monster.autoRespawns)) {
       this.removeDevTarget(monster);
       return;
     }
+    if (devKill) return;
     // 0. Notifica DungeonManager se este monstro pertencia a uma masmorra ativa
     if (killer && killer instanceof Player) {
       this.dungeonManager.onMonsterKilled(monster.id, killer);
@@ -3405,6 +3410,38 @@ export class World {
     let message: string | undefined;
     switch (command.action) {
       case 'state':
+        break;
+      case 'killVisible': {
+        if (!Array.isArray(command.monsterIds) || command.monsterIds.length > 256) return;
+        let count = 0;
+        for (const id of new Set(command.monsterIds)) {
+          if (typeof id !== 'string') continue;
+          const monster = this.entityManager.getMonster(id);
+          if (!monster || monster.isDead) continue;
+          monster.currentHp = 0;
+          monster.isDead = true;
+          monster.isMoving = false;
+          monster.velocity = createVector3(0, 0, 0);
+          monster.respawnTimer = 0;
+          this.handleMonsterDeath(monster, undefined, true);
+          count++;
+        }
+        message = count ? `Mobs eliminados: ${count}.` : 'Nenhum mob vivo na tela.';
+        break;
+      }
+      case 'refillVitals':
+        if (!player.isDead) {
+          player.currentHp = player.maxHp;
+          player.currentResource = player.maxResource;
+        }
+        message = player.isDead ? 'Aguarde o renascimento do herói.' : 'HP e recurso restaurados.';
+        break;
+      case 'clearDrops':
+        for (const dropId of this.activeItemDrops.keys()) {
+          this.broadcast(Opcode.S2C_ITEM_DROP_DESPAWN, { dropId, reason: 'EXPIRED' } satisfies S2CItemDropDespawnPayload);
+        }
+        this.activeItemDrops.clear();
+        message = 'Drops do chão removidos.';
         break;
       case 'toggle':
         if (typeof command.enabled !== 'boolean') return;

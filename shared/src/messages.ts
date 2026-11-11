@@ -43,7 +43,8 @@ export interface S2CLoginSuccessPayload {
 
 export type DevToggle = 'pauseRespawns' | 'disableDrops' | 'doubleLegendary' | 'infiniteVitals';
 export type DevCommand =
-  | { action: 'state' | 'boss' | 'clearTargets' | 'reset' }
+  | { action: 'state' | 'boss' | 'clearTargets' | 'reset' | 'refillVitals' | 'clearDrops' }
+  | { action: 'killVisible'; monsterIds: string[] }
   | { action: 'toggle'; key: DevToggle; enabled: boolean }
   | { action: 'dummy'; x: number; z: number };
 export type DevState = Record<DevToggle, boolean> & { message?: string };
