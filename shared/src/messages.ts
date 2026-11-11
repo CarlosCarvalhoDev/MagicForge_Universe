@@ -41,13 +41,13 @@ export interface S2CLoginSuccessPayload {
   tickIntervalMs: number; // e.g. 50
 }
 
-export type DevToggle = 'pauseRespawns' | 'disableDrops' | 'doubleLegendary' | 'infiniteVitals';
+export type DevToggle = 'pauseRespawns' | 'disableDrops' | 'doubleLegendary' | 'infiniteVitals' | 'freezeMonsters';
 export type DevCommand =
-  | { action: 'state' | 'boss' | 'clearTargets' | 'reset' | 'refillVitals' | 'clearDrops' }
+  | { action: 'state' | 'boss' | 'clearTargets' | 'reset' | 'refillVitals' | 'clearDrops' | 'resetCooldowns' }
   | { action: 'killVisible'; monsterIds: string[] }
   | { action: 'toggle'; key: DevToggle; enabled: boolean }
-  | { action: 'dummy'; x: number; z: number };
-export type DevState = Record<DevToggle, boolean> & { message?: string };
+  | { action: 'dummy' | 'teleport'; x: number; z: number };
+export type DevState = Record<DevToggle, boolean> & { message?: string; cooldownsReset?: boolean };
 
 export interface S2CLoginFailurePayload {
   reason: string;

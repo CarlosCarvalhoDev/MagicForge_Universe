@@ -1777,7 +1777,10 @@ const devPanel = setupDevPanel(
   command => network.sendDevControl(command),
   () => renderer.visibleMonsterIds(snapshotBuffer.getInterpolatedEntities()),
 );
-network.onDevState = state => devPanel.update(state);
+network.onDevState = state => {
+  if (state.cooldownsReset) cooldownMap.clear();
+  devPanel.update(state);
+};
 const channelSelector = new ChannelSelector(network);
 const offlineRewardModal = new OfflineRewardModal({
   isReady: () => network.isConnected && network.isAuthenticated,

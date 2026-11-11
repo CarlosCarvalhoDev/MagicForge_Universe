@@ -31,6 +31,7 @@ import { PartyManager } from './PartyManager';
 export class WorldManager {
   public readonly db: DatabaseManager;
   public readonly partyManager: PartyManager;
+  private readonly devSpawn = { paused: false };
   private channels = new Map<string, World>();
   private connections = new Map<string, Connection>();
 
@@ -56,7 +57,7 @@ export class WorldManager {
     const key = this.getChannelKey(worldIndex, channelId);
     let world = this.channels.get(key);
     if (!world) {
-      world = new World(this.db, worldIndex, channelId);
+      world = new World(this.db, worldIndex, channelId, undefined, this.devSpawn);
       world.partyManager = this.partyManager;
       world.automaticPortalHandler = player => this.advancePlayerAutomatically(player, world!);
       this.channels.set(key, world);
