@@ -35,6 +35,7 @@ import { GameRenderer } from './renderer/GameRenderer';
 import { combatTriggersAttack, SkillRejectionEchoFilter } from './renderer/WarriorPresentation';
 import { worldAppearance } from './renderer/WorldPresentation';
 import { setupAuthSelection } from './ui/AuthSelection';
+import { skillArtUrl } from './ui/SkillArt';
 import { getGuestCredential } from './ui/GuestSession';
 import { setupFarmHelper } from './ui/FarmHelper';
 import { setupInventoryExpansion } from './ui/InventoryExpansion';
@@ -372,7 +373,7 @@ function updateEquippedSkillsUI() {
 
     if (slotUI && s) {
       slotUI.definition = s;
-      slotUI.img.src = `/assets/skills/${s.skillId}.png`;
+      slotUI.img.src = skillArtUrl(s.skillId);
       slotUI.img.alt = s.name;
       slotUI.img.onerror = () => {
         slotUI.img.style.display = 'none';
@@ -515,7 +516,7 @@ function renderGrimorioSkills(classType: CharacterClass) {
       card.innerHTML = `
         <div class="skill-v2-top">
           <div class="skill-v2-img-wrap">
-            <img src="/assets/skills/${s.skillId}.png" alt="${s.name}" class="skill-v2-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <img src="${skillArtUrl(s.skillId)}" alt="${s.name}" class="skill-v2-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
             <span class="skill-v2-emoji-icon" style="display: none;">${s.iconEmoji || '⚔️'}</span>
           </div>
           <div class="skill-v2-header-info">
@@ -2107,12 +2108,14 @@ function toggleChatBox(force?: boolean) {
   if (!gameChatBox) return;
   const willCollapse = force !== undefined ? force : !gameChatBox.classList.contains('collapsed');
   gameChatBox.classList.toggle('collapsed', willCollapse);
+  btnToggleChat?.setAttribute('aria-expanded', String(!willCollapse));
   if (chatToggleIcon) {
     chatToggleIcon.textContent = willCollapse ? '▲' : '▼';
   }
 }
 
 if (btnToggleChat) {
+  btnToggleChat.setAttribute('aria-expanded', String(!gameChatBox?.classList.contains('collapsed')));
   btnToggleChat.addEventListener('click', (e) => {
     e.stopPropagation();
     toggleChatBox();
@@ -2242,6 +2245,12 @@ network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
     const slotUI = skillSlots[event.slot];
     if (slotUI && slotUI.definition) {
       cooldownMap.set(event.slot, performance.now() + (event.cooldownRemainingSec ?? slotUI.definition.cooldownSec) * 1000);
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        slotUI.button.animate([
+          { filter: 'brightness(1.85)', boxShadow: '0 0 18px #e7be76' },
+          { filter: 'brightness(1)', boxShadow: '0 0 0 transparent' },
+        ], { duration: 360, easing: 'ease-out' });
+      }
     }
   }
 
@@ -2641,7 +2650,7 @@ network.onChangeChannelResult = (payload) => {
 
 // Skill Casting Action
 function castSkill(slot: number) {
-  if (!network.isConnected || !network.myPlayerId) return;
+  if (!network.isConnected || !network.myPlayerId || !skillRotationUI?.canCastManually()) return;
 
   const slotCfg = SLOT_CONFIGS.find((c) => c.slot === slot);
   const slotUI = skillSlots[slot];
@@ -2686,7 +2695,7 @@ function castSkill(slot: number) {
 // Bind button clicks for skills 1 - 4
 Object.entries(skillSlots).forEach(([slotStr, slotUI]) => {
   const slot = parseInt(slotStr, 10);
-  slotUI.button.addEventListener('pointerdown', (e) => {
+  slotUI.button.addEventListener('click', (e) => {
     e.stopPropagation();
     castSkill(slot);
   });
@@ -2694,7 +2703,7 @@ Object.entries(skillSlots).forEach(([slotStr, slotUI]) => {
 
 // Bind keyboard shortcuts (1, 2, 3, 4, K, I, C, F, Escape, Enter)
 window.addEventListener('keydown', (e) => {
-  if (authSelection.isOpen() || leaderboard.isOpen() || cinematic.isOpen()) return;
+  if (authSelection.isOpen() || leaderboard.isOpen() || cinematic.isOpen() || document.querySelector('#party-invite-compose[open]')) return;
   // Ignore game shortcuts while typing in any input field
   if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
     if (e.key === 'Escape' && chatInputField && document.activeElement === chatInputField) {
@@ -2704,8 +2713,9 @@ window.addEventListener('keydown', (e) => {
   }
 
   if (e.key === 'Enter') {
-    if (chatInputField) {
+    if (chatInputField && !(e.target instanceof Element && e.target.closest('button, a, [role="button"]'))) {
       e.preventDefault();
+      toggleChatBox(false);
       chatInputField.focus();
       return;
     }
@@ -2841,7 +2851,8 @@ const authSelection = setupAuthSelection({
   delete: (slot, name, confirmation) => network.sendDeleteCharacterSlot(slot, name, confirmation),
 });
 network.onCharacterList = payload => authSelection.onCharacterList(payload);
-const cinematic = setupCinematicIntro();
+const cinematic = setupCinematicIntro({ autoStart: false });
+document.getElementById('btn-cover-prologue')?.addEventListener('click', cinematic.open);
 network.onCharacterActionError = error => { authSelection.onError(error); farmHelperUI.onError(error.errorMessage); };
 network.onAuthSuccess = payload => {
   if (!payload.isActivated) { authSelection.onAuthenticationError('A conta ainda não está ativa.'); return; }

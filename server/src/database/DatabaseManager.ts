@@ -763,6 +763,9 @@ export class DatabaseManager {
     }
 
     const summaries: CharacterSlotSummary[] = [];
+    const equippedItems = this.db.prepare(
+      'SELECT item_id AS itemId, COALESCE(refine_level, 0) AS refineLevel FROM inventory WHERE character_id = ? AND is_equipped = 1 ORDER BY slot_index'
+    );
     for (let slot = 0; slot < 3; slot++) {
       const char = map.get(slot);
       if (char) {
@@ -780,6 +783,16 @@ export class DatabaseManager {
           maxHp: char.max_hp,
           gold: char.gold,
           rebornCount: char.reborn_count || 0,
+          lastPlayedAt: char.last_logout || 0,
+          attributes: {
+            forca: char.forca,
+            destreza: char.destreza,
+            constituicao: char.constituicao,
+            inteligencia: char.inteligencia,
+            sabedoria: char.sabedoria,
+            carisma: char.carisma,
+          },
+          equippedItems: equippedItems.all(char.id) as Array<{ itemId: string; refineLevel: number }>,
           slot1Skill: char.slot1_skill,
           slot2Skill: char.slot2_skill,
           slot3Skill: char.slot3_skill,

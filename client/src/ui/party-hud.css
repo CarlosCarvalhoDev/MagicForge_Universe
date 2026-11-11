@@ -1,5 +1,59 @@
 /* Party HUD & Channel Selector Styles */
 
+body #party-hud-card:is(.glass-panel, .collapsed) {
+  position: fixed;
+  top: calc(var(--party-profile-bottom, 120px) + 10px) !important;
+  left: calc(14px + var(--safe-left, 0px)) !important;
+}
+
+body #party-hud-card:not(.collapsed),
+body #party-invite-compose,
+body #party-invite-prompt-modal {
+  border: 1px solid #9e7649;
+  border-radius: 7px;
+  background: linear-gradient(155deg, #2a1c19, #171116);
+  box-shadow: 0 8px 24px #0009;
+  color: #f2e4cc;
+}
+
+body #party-hud-card:not(.collapsed) {
+  width: min(272px, calc(100vw - 32px));
+  max-height: min(45dvh, 360px);
+  overflow: auto;
+}
+
+body #party-pill-btn {
+  min-height: 28px;
+  padding: 3px 9px !important;
+  color: #f1d19a;
+  font: 700 .72rem Cinzel, Georgia, serif;
+  background: #261a17;
+  box-shadow: 0 3px 10px #0008;
+}
+
+body #party-invite-compose {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(360px, calc(100vw - 32px));
+  padding: 16px;
+}
+
+#party-invite-compose::backdrop { background: #09070b99; }
+#party-invite-compose form { display: grid; gap: 10px; }
+#party-invite-compose h2 { font: 700 1.05rem Cinzel, Georgia, serif; }
+#party-invite-name {
+  min-height: 36px;
+  width: 100%;
+  padding: 6px 9px;
+  border: 1px solid #9e7649;
+  border-radius: 4px;
+  color: inherit;
+  background: #151014;
+}
+#party-invite-compose button { min-height: 36px; }
+body #party-invite-prompt-modal { min-width: 0; width: min(340px, calc(100vw - 32px)); }
+
 /* 1. Left Party HUD Container */
 #party-hud-card {
   position: absolute;

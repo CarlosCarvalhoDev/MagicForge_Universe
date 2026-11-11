@@ -515,6 +515,9 @@ export interface CharacterSlotSummary {
   maxHp?: number;
   gold?: number;
   rebornCount?: number;
+  lastPlayedAt?: number;
+  attributes?: CharacterAttributes;
+  equippedItems?: Array<{ itemId: string; refineLevel: number }>;
   slot1Skill?: string;
   slot2Skill?: string;
   slot3Skill?: string;

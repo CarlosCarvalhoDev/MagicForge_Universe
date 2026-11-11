@@ -1,4 +1,4 @@
-import { CharacterClass, type S2CCharacterListPayload } from '@magicforge/shared';
+import { CLASS_DEFINITIONS, CharacterClass, type S2CCharacterListPayload } from '@magicforge/shared';
 import { setupAuthSelection } from '../src/ui/AuthSelection';
 import '../src/ui/auth-selection.css';
 
@@ -48,6 +48,27 @@ const payload: S2CCharacterListPayload = {
 };
 try {
   check(button(0).disabled && calls.length === 0, 'Abertura não conecta nem inventa personagens');
+  const cover = document.getElementById('forge-cover-hero')!;
+  const authScreen = document.querySelector<HTMLElement>('.forge-auth')!;
+  const step = () => document.querySelector('[data-forge-step][aria-current="step"]')?.getAttribute('data-forge-step');
+  const classButtons = [...cover.querySelectorAll<HTMLButtonElement>('[data-class-id]')];
+  check(!cover.hidden && authScreen.hidden && step() === 'cover', 'Apresentação abre com a etapa correta');
+  check(classButtons.length === Object.keys(CLASS_DEFINITIONS).length && classButtons.every(classButton => {
+    classButton.click();
+    const definition = CLASS_DEFINITIONS[classButton.dataset.classId as CharacterClass];
+    return definition
+      && classButton.getAttribute('aria-pressed') === 'true'
+      && cover.querySelectorAll('[aria-pressed="true"]').length === 1
+      && document.getElementById('cover-class-title')!.textContent === definition.displayName
+      && Object.entries(definition.baseStats).every(([key, value]) =>
+        cover.querySelector(`[data-attribute="${key}"]`)?.textContent === String(value));
+  }), 'As sete classes apresentam os atributos iniciais do jogo');
+  document.getElementById('btn-enter-gate')!.click();
+  check(cover.hidden && !authScreen.hidden && step() === 'login' && document.activeElement?.id === 'forge-auth-title', 'Entrada revela o login e move o foco');
+  document.getElementById('btn-back-to-cover')!.click();
+  check(!cover.hidden && authScreen.hidden && step() === 'cover' && document.activeElement?.id === 'forge-cover-title'
+    && classButtons.at(-1)?.getAttribute('aria-pressed') === 'true', 'Voltar preserva a classe em destaque');
+  document.getElementById('btn-enter-gate')!.click();
   check((document.getElementById('forge-account-email') as HTMLInputElement).disabled, 'Login não exige campos de cadastro ocultos');
   check(document.querySelector<HTMLElement>('.forge-roster')!.hidden && passwordInput.type === 'password', 'Primeira tela é conta e senha; sala oculta');
   check(Array.from(document.querySelectorAll<HTMLButtonElement>('[data-auth-provider]')).every(button => button.disabled === (button.dataset.authProvider !== 'GUEST')), 'Somente convidado disponível; provedores externos bloqueados');
@@ -64,6 +85,8 @@ try {
   passwordInput.value = 'fixture-only'; submit(accountForm);
   ui.onAccountAuthenticated(payload.accountUsername);
   check(calls.at(-1) === 'list:conta de teste' && accountForm.hidden, 'Confirmação de autenticação abre sala e solicita lista');
+  check(step() === 'characters' && document.getElementById('btn-back-to-cover')!.hidden
+    && document.activeElement?.id === 'forge-auth-title', 'Salão atualiza a etapa e move o foco');
   check(document.getElementById('forge-social-login')!.hidden, 'Opções de login social não aparecem dentro da sala');
   ui.onCharacterList({ ...payload, accountUsername: 'Outra conta' });
   check(button(0).disabled, 'Resposta de outra conta ignorada');
@@ -71,10 +94,19 @@ try {
   check(button(0).disabled && document.getElementById('forge-auth-status')!.dataset.state === 'error', 'Lista incompleta não habilita os pedestais');
   document.getElementById('forge-refresh-slots')!.click(); ui.onCharacterList(payload);
   check(card(0).querySelector('h3')!.textContent === 'Herói de teste' && !button(2).disabled, 'Slots fora de ordem são mapeados por índice');
+  const inspection = document.querySelector('.forge-inspection')!;
+  check(inspection.querySelector('h2')?.textContent === 'Herói de teste' &&
+    Boolean(inspection.querySelector('.forge-character-details')) &&
+    !inspection.querySelector('.forge-skill-previews'), 'A sala mostra os dados do herói salvo sem habilidades');
   button(1).click(); nameInput.value = '   '; submit(createForm);
   check(!calls.some(c => c.startsWith('create:')) && !nameInput.validity.valid, 'Nome vazio após trim não é enviado');
   nameInput.value = 'NovoClerigo'; nameInput.dispatchEvent(new Event('input'));
-  (document.getElementById('forge-hero-class') as HTMLSelectElement).value = CharacterClass.CLERIGO;
+  const classPicker = document.getElementById('forge-hero-class') as HTMLSelectElement;
+  classPicker.value = CharacterClass.CLERIGO;
+  classPicker.dispatchEvent(new Event('change'));
+  check(inspection.querySelector('h2')?.textContent === 'Clérigo' &&
+    inspection.querySelectorAll('.forge-skill-row').length === 4 &&
+    Boolean(inspection.querySelector('.forge-skill-icon[data-class-type="CLERIGO"]')), 'Trocar classe na criação atualiza a prévia e os quatro slots');
   submit(createForm); submit(createForm);
   check(calls.filter(c => c.startsWith('create:')).length === 1 && calls.at(-1) === 'create:1:NovoClerigo:CLERIGO', 'Criação usa slot/classe e bloqueia repetição');
   check(card(1).querySelector('h3')!.textContent === 'Uma nova lenda' && ui.isOpen(), 'Criar não preenche slot nem entra antes da resposta');
@@ -88,7 +120,11 @@ try {
   deleteButton.click();
   const deleteInput = document.getElementById('forge-delete-confirmation') as HTMLInputElement;
   const deleteConfirm = document.getElementById('forge-confirm-delete') as HTMLButtonElement;
-  check(!document.getElementById('forge-delete-panel')!.hidden && document.getElementById('forge-delete-confirmation-hint')!.textContent === 'desejoexcluiropersonagem<heronovo>', 'Exclusão abre confirmação derivada do nome real');
+  check(deleteInput.getClientRects().length > 0 && document.activeElement === deleteInput
+    && document.getElementById('forge-delete-confirmation-hint')!.textContent === 'desejoexcluiropersonagem<heronovo>', 'Exclusão revela e focaliza a confirmação derivada do nome real');
+  document.getElementById('forge-cancel-delete')!.click();
+  check(!deleteInput.getClientRects().length && document.activeElement === deleteButton, 'Cancelar exclusão devolve foco ao pedestal');
+  deleteButton.click();
   deleteInput.value = 'desejoexcluiropersonagemerrado'; deleteInput.dispatchEvent(new Event('input')); deleteConfirm.click();
   check(!calls.some(c => c.startsWith('delete:')), 'Confirmação incorreta não envia exclusão');
   deleteInput.value = 'desejoexcluiropersonagem<heronovo>'; deleteInput.dispatchEvent(new Event('input')); deleteConfirm.click(); deleteConfirm.click();
@@ -108,7 +144,7 @@ try {
   passwordInput.value = 'fixture-only'; submit(accountForm); ui.onAccountAuthenticated(payload.accountUsername); ui.onCharacterList(created);
   button(2).click(); document.getElementById('forge-cancel-create')!.click();
   check(createForm.hidden && document.activeElement === button(2), 'Cancelar criação devolve foco ao pedestal');
-  document.getElementById('forge-refresh-slots')!.click();
+  ui.returnToCharacterSelection();
   result.textContent = 'TESTE ISOLADO · aguardando cenário de timeout (12 segundos)…';
   await new Promise(resolve => window.setTimeout(resolve, 12500));
   check(button(0).disabled && !accountInput.disabled && document.getElementById('forge-auth-status')!.dataset.state === 'error', 'Timeout exige relistar e libera nova tentativa');

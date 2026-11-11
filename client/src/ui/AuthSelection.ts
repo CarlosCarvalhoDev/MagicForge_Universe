@@ -1,6 +1,5 @@
-import { CharacterClass, type CharacterSlotSummary, type S2CCharacterListPayload, type S2CCharacterActionErrorPayload } from '@magicforge/shared';
-import { HERO_QUOTES } from './NarrativeContent';
-import { speakNarrative } from './Narration';
+import { CLASS_DEFINITIONS, CharacterClass, type CharacterSlotSummary, type S2CCharacterListPayload, type S2CCharacterActionErrorPayload } from '@magicforge/shared';
+import { renderHeroPreview } from './HeroPreview';
 
 interface AuthTransport {
   isConnected(): boolean;
@@ -15,12 +14,23 @@ interface AuthTransport {
   delete(slot: number, name: string, confirmation: string): void;
 }
 
+function getClassPortrait(classType: CharacterClass): string {
+  return '/assets/portraits/' + classType + '.jpg';
+}
+
 /** The server owns every slot; creating a hero never implies entering the world. */
 export function setupAuthSelection(
   transport: AuthTransport,
   options: { storage?: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> } = {}
 ) {
   const root = document.getElementById('modal-auth-selection')!;
+  const cover = root.querySelector<HTMLElement>('#forge-cover-hero');
+  const authScreen = root.querySelector<HTMLElement>('.forge-auth');
+  const authTitle = document.getElementById('forge-auth-title')!;
+  const enterGate = root.querySelector<HTMLButtonElement>('#btn-enter-gate');
+  const backToCover = root.querySelector<HTMLButtonElement>('#btn-back-to-cover');
+  const steps = root.querySelectorAll<HTMLElement>('[data-forge-step]');
+  let presenting = Boolean(cover);
   const accountForm = document.getElementById('forge-account-form') as HTMLFormElement;
   const accountInput = document.getElementById('forge-account-name') as HTMLInputElement;
   const passwordInput = document.getElementById('forge-account-password') as HTMLInputElement;
@@ -31,8 +41,7 @@ export function setupAuthSelection(
   const classSelect = document.getElementById('forge-hero-class') as HTMLSelectElement;
   const legacyClass = document.getElementById('char-class') as HTMLSelectElement;
   const status = document.getElementById('forge-auth-status')!;
-  const portrait = document.getElementById('forge-preview-portrait') as HTMLImageElement;
-  const classLabel = document.getElementById('forge-preview-class')!;
+  const inspection = root.querySelector<HTMLElement>('.forge-inspection')!;
   const note = document.getElementById('forge-roster-note')!;
   const deletePanel = document.getElementById('forge-delete-panel') as HTMLElement;
   const deleteCharacter = document.getElementById('forge-delete-character')!;
@@ -46,6 +55,8 @@ export function setupAuthSelection(
 
   const storage = options.storage || (typeof window !== 'undefined' ? (window.localStorage || window.sessionStorage) : undefined);
   const SESSION_KEY = 'magicforge_active_session_v1';
+  const lastHeroKey = () => 'magicforge_last_hero_v1:' + account;
+  const refreshSlots = document.getElementById('forge-refresh-slots') as HTMLButtonElement;
   let savedPassword = '';
   let autoResuming = false;
   let autoResumeSlot: number | null = null;
@@ -85,35 +96,53 @@ export function setupAuthSelection(
 
   classSelect.replaceChildren(...Array.from(legacyClass.options, option => option.cloneNode(true)));
   classSelect.value = legacyClass.value;
-  const preview = () => {
-    portrait.src = '/assets/portraits/' + classSelect.value + '.png';
-    portrait.onerror = () => { portrait.src = '/assets/portraits/' + classSelect.value + '.jpg'; };
-    classLabel.textContent = className(classSelect.value as CharacterClass);
-    portrait.alt = 'Retrato da classe ' + classLabel.textContent;
-  };
-  classSelect.addEventListener('change', preview);
-  preview();
+  classSelect.addEventListener('change', render);
 
   function render() {
     const selecting = authenticated;
-    root.dataset.screen = selecting ? 'characters' : 'login';
+    const screen = selecting ? 'characters' : presenting ? 'cover' : 'login';
+    const previousScreen = root.dataset.screen;
+    root.dataset.screen = screen;
+    if (cover) cover.hidden = screen !== 'cover';
+    if (authScreen) authScreen.hidden = screen === 'cover';
+    if (backToCover) backToCover.hidden = screen !== 'login';
+    for (const step of steps) {
+      if (step.dataset.forgeStep === screen) step.setAttribute('aria-current', 'step');
+      else step.removeAttribute('aria-current');
+    }
     root.querySelector<HTMLElement>('.forge-roster')!.hidden = !selecting;
     accountForm.hidden = selecting;
     document.getElementById('forge-social-login')!.hidden = selecting;
     document.getElementById('forge-account-session')!.hidden = !selecting;
     document.getElementById('forge-session-name')!.textContent = selecting ? 'Conta: ' + account : '';
-    document.getElementById('forge-auth-title')!.textContent = selecting ? 'Sala dos Forjados.' : 'Entre na Forja Astral.';
-    document.getElementById('forge-intro-eyebrow')!.textContent = selecting ? 'ESCOLHA SEU HERÓI' : 'ACESSO À FORJA ANCESTRAL';
-    document.getElementById('forge-intro-copy')!.textContent = selecting ? 'Escolha quem continuará sua jornada. Cada pedestal guarda uma nova lenda.' : 'Acesse sua conta para encontrar seus heróis e continuar sua jornada.';
+    authTitle.textContent = selecting ? 'Sala dos Forjados' : 'Entre na Forja Astral';
+    document.getElementById('forge-intro-eyebrow')!.textContent = selecting ? 'Escolha seu herói' : 'Acesso à Forja';
+    document.getElementById('forge-intro-copy')!.textContent = selecting ? 'Escolha um herói para continuar ou ocupe um pedestal vazio.' : 'Acesse sua conta para criar um herói ou retomar sua aventura.';
     const creating = selecting && selected !== null && Boolean(slots?.[selected]?.isEmpty);
-    root.querySelector<HTMLElement>('.forge-entry')!.hidden = selecting && !creating;
-    document.getElementById('forge-entry-title')!.textContent = selecting ? 'Forje um novo herói' : registerMode ? 'Crie sua conta' : 'Acesse sua conta';
-    document.getElementById('forge-entry-copy')!.textContent = selecting ? 'Escolha o nome e a classe para o pedestal selecionado.' : 'Seus heróis estarão esperando na Sala dos Forjados.';
+    const inspected = selected === null ? slots?.find(slot => !slot.isEmpty) : slots?.[selected];
+    const previewClass = creating ? classSelect.value as CharacterClass : inspected?.classType;
+    const previewHero = selecting && previewClass && CLASS_DEFINITIONS[previewClass]
+      ? { classType: previewClass, character: creating ? undefined : inspected }
+      : undefined;
+    inspection.hidden = !selecting;
+    const previewKey = JSON.stringify(previewHero ?? null);
+    if (selecting && inspection.dataset.preview !== previewKey) {
+      inspection.dataset.preview = previewKey;
+      renderHeroPreview(inspection, previewHero);
+    }
+    root.querySelector<HTMLElement>('.forge-entry')!.hidden = selecting && !creating && deletingSlot === null;
+    document.getElementById('forge-entry-title')!.textContent = selecting
+      ? deletingSlot === null ? 'Forje um novo herói' : 'Excluir personagem'
+      : registerMode ? 'Crie sua conta' : 'Acesse sua conta';
+    const entryCopy = document.getElementById('forge-entry-copy')!;
+    entryCopy.hidden = deletingSlot !== null;
+    entryCopy.textContent = selecting ? 'Escolha o nome e a classe para o pedestal selecionado.' : 'Use o nome e a senha da sua conta.';
     accountForm.setAttribute('aria-busy', String(pending === 'authenticate'));
     form.setAttribute('aria-busy', String(pending === 'create'));
     for (const control of root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>('input, select, button')) {
       control.disabled = Boolean(pending);
     }
+    refreshSlots.hidden = !selecting || Boolean(slots || pending);
     const canUseCredentials = registerMode ? Boolean(transport.register) : Boolean(transport.authenticate);
     accountForm.querySelector('button')!.textContent = pending === 'authenticate' ? 'AGUARDE…' : registerMode ? 'CRIAR CONTA' : 'ENTRAR';
     (accountForm.querySelector('button') as HTMLButtonElement).disabled = Boolean(pending) || !canUseCredentials;
@@ -136,24 +165,32 @@ export function setupAuthSelection(
     for (const card of cards) {
       const index = Number(card.dataset.slotIndex);
       const slot = slots?.[index];
-      card.classList.toggle('is-selected', selected === index);
+      const highlighted = selected === index || deletingSlot === index || (selected === null && Boolean(inspected && slot === inspected));
+      card.classList.toggle('is-selected', highlighted);
       card.classList.toggle('is-occupied', Boolean(slot && !slot.isEmpty)); card.dataset.classType = slot && !slot.isEmpty && slot.classType ? slot.classType : '';
       card.querySelector('h3')!.textContent = slot ? slot.isEmpty ? 'Uma nova lenda' : slot.name! : 'Destino por revelar';
       card.querySelector('p')!.innerHTML = !slot ? 'Carregue sua conta para revelar este pedestal.'
         : slot.isEmpty ? 'Este pedestal aguarda seu próximo herói.'
-        : `<span class="forge-stat-class">${className(slot.classType)} · Nv. ${number(slot.level)}</span>\n<span class="forge-stat-economy"><span class="forge-stat-cp">CP ${number(slot.combatPower)}</span> · <span class="forge-stat-gold">Ouro ${number(slot.gold)}</span></span>\n<span class="forge-stat-hp">Vida ${number(slot.currentHp)}/${number(slot.maxHp)}</span>`;
+        : `<span class="forge-stat-class">${className(slot.classType)} · Nv. ${number(slot.level)}</span>
+          <span class="forge-stat-economy"><span class="forge-stat-cp">CP ${number(slot.combatPower)}</span><span>Ouro ${number(slot.gold)}</span><span title="Saldo de diamantes indisponível">Diamantes —</span></span>
+          <span class="forge-stat-hp">Vida ${number(slot.currentHp)}/${number(slot.maxHp)}</span>`;
       const pedestal = card.querySelector('.forge-pedestal')!;
       (pedestal as HTMLElement).tabIndex = slot && !slot.isEmpty ? 0 : -1;
-      if (slot && !slot.isEmpty) { pedestal.setAttribute('role', 'button'); pedestal.setAttribute('aria-label', 'Conhecer ' + slot.name); }
-      else { pedestal.removeAttribute('role'); pedestal.removeAttribute('aria-label'); }
-      const quote = card.querySelector<HTMLElement>('.forge-hero-quote'); if (quote) quote.hidden = true;
+      if (slot && !slot.isEmpty) {
+        pedestal.setAttribute('role', 'button');
+        pedestal.setAttribute('aria-label', 'Visualizar ' + slot.name);
+        pedestal.setAttribute('aria-pressed', String(highlighted));
+      } else {
+        pedestal.removeAttribute('role');
+        pedestal.removeAttribute('aria-label');
+        pedestal.removeAttribute('aria-pressed');
+      }
       const image = pedestal.querySelector('img') as HTMLImageElement;
       image.src = '/assets/ui/login/pedestal_runico_' + (slot && !slot.isEmpty ? 'ativo' : 'vazio') + '.png';
       let hero = pedestal.querySelector<HTMLImageElement>('.forge-slot-portrait');
       if (slot && !slot.isEmpty) {
         if (!hero) { hero = document.createElement('img'); hero.className = 'forge-slot-portrait'; pedestal.append(hero); }
-        hero.src = '/assets/portraits/' + slot.classType + '.png';
-        const portraitImg = hero; hero.onerror = () => { portraitImg.src = '/assets/portraits/' + slot.classType + '.jpg'; };
+        if (slot.classType) hero.src = getClassPortrait(slot.classType);
         hero.alt = 'Retrato de ' + slot.name + ', ' + className(slot.classType);
       } else hero?.remove();
       (pedestal.querySelector('span') as HTMLElement).hidden = Boolean(slot && !slot.isEmpty);
@@ -177,6 +214,11 @@ export function setupAuthSelection(
       deleteInput.disabled = Boolean(pending);
       (document.getElementById('forge-confirm-delete') as HTMLButtonElement).disabled = Boolean(pending) || deleteInput.value.trim().toLocaleLowerCase('pt-BR') !== phrase;
       (document.getElementById('forge-cancel-delete') as HTMLButtonElement).disabled = Boolean(pending);
+    }
+    if (previousScreen && screen !== previousScreen && !root.hidden) {
+      root.scrollTop = 0;
+      const heading = screen === 'cover' ? document.getElementById('forge-cover-title') : authTitle;
+      heading?.focus({ preventScroll: true });
     }
   }
 
@@ -210,7 +252,7 @@ export function setupAuthSelection(
     begin('list', 'Revelando os heróis da conta ' + account + '…');
     transport.requestList(account);
   }
-  document.getElementById('forge-refresh-slots')!.addEventListener('click', () => {
+  refreshSlots.addEventListener('click', () => {
     if (authenticated && !pending && transport.isConnected()) requestList();
   });
 
@@ -373,23 +415,27 @@ export function setupAuthSelection(
   }
 
   for (const card of cards) {
-    const quote = document.createElement('div'); quote.className = 'forge-hero-quote'; quote.hidden = true; quote.setAttribute('role', 'tooltip'); quote.id = 'hero-quote-' + card.dataset.slotIndex; card.append(quote);
     const pedestal = card.querySelector<HTMLElement>('.forge-pedestal')!;
-    const showQuote = (speak = false) => {
-      const slot = slots?.[Number(card.dataset.slotIndex)];
-      const text = slot && !slot.isEmpty ? HERO_QUOTES[slot.classType || ''] : '';
-      if (!text) return;
-      quote.textContent = text; quote.hidden = false; pedestal.setAttribute('aria-describedby', quote.id);
-      if (speak) speakNarrative(text);
+    const inspect = () => {
+      const index = Number(card.dataset.slotIndex);
+      const slot = slots?.[index];
+      if (!authenticated || pending || deletingSlot !== null || !slot || slot.isEmpty) return;
+      selected = index;
+      render();
     };
-    const hideQuote = () => { quote.hidden = true; pedestal.removeAttribute('aria-describedby'); };
-    card.addEventListener('mouseenter', () => showQuote()); card.addEventListener('mouseleave', hideQuote);
-    card.addEventListener('focusin', () => showQuote());
-    card.addEventListener('focusout', event => { if (!(event.relatedTarget instanceof Node) || !card.contains(event.relatedTarget)) hideQuote(); });
-    pedestal.addEventListener('click', () => showQuote(true));
-    pedestal.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); showQuote(true); } });
+    card.addEventListener('click', event => {
+      if (!(event.target instanceof Element) || event.target.closest('button')) return;
+      inspect();
+    });
+    pedestal.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        inspect();
+      }
+    });
     card.querySelector('button')!.addEventListener('click', () => {
       if (!authenticated || pending || !slots || !transport.isConnected()) return;
+      deletingSlot = null;
       selected = Number(card.dataset.slotIndex);
       const slot = slots[selected];
       if (slot.isEmpty) {
@@ -408,6 +454,7 @@ export function setupAuthSelection(
       const index = Number(card.dataset.slotIndex);
       const slot = slots[index];
       if (!slot || slot.isEmpty || !slot.name) return;
+      selected = null;
       deletingSlot = index;
       deleteInput.value = '';
       deleteStatus.textContent = 'A exclusão exige a frase completa, sem espaços extras.';
@@ -419,10 +466,12 @@ export function setupAuthSelection(
 
   deleteInput.addEventListener('input', () => render());
   document.getElementById('forge-cancel-delete')!.addEventListener('click', () => {
+    const index = deletingSlot;
     deletingSlot = null;
     deleteInput.value = '';
     deleteStatus.textContent = '';
     render();
+    if (index !== null) cards[index]?.querySelector<HTMLButtonElement>('[data-slot-delete]')?.focus();
   });
   document.getElementById('forge-confirm-delete')!.addEventListener('click', () => {
     if (pending || deletingSlot === null || !slots || !transport.isConnected()) return;
@@ -483,176 +532,57 @@ export function setupAuthSelection(
     if (raw) storedSession = JSON.parse(raw);
   } catch {}
 
-  
-  // Dados de Showcase / Mock de Classes para a Página de Rosto (UTF-8 Garantido)
-  const COVER_CLASS_MOCKS: Record<string, {
-    title: string;
-    roleBadge: string;
-    description: string;
-    portrait: string;
-    stats: { forca: number; const: number; destreza: number };
-    traits: string[];
-  }> = {
-    GUERREIRO: {
-      title: 'Guerreiro da Bigorna',
-      roleBadge: 'D&D 5E · COMBATE CORPO A CORPO & TANQUE',
-      description: 'Mestre absoluto em armas forjadas e armaduras pesadas. Absorve o impacto dos golpes inimigos e desfere contra-ataques devastadores no calor da batalha.',
-      portrait: '/assets/portraits/GUERREIRO.jpg',
-      stats: { forca: 92, const: 88, destreza: 62 },
-      traits: ['Provocação & Defesa', 'Golpe Fulminante', 'Linha de Frente']
-    },
-    BARBARO: {
-      title: 'Bárbaro Totêmico',
-      roleBadge: 'D&D 5E · FÚRIA PRIMAL & DANO MASSIVO',
-      description: 'Guerreiro selvagem imbuído com o espírito dos ursos ancestrais. Quanto mais ferido em combate, mais avassaladores e velozes se tornam seus golpes.',
-      portrait: '/assets/portraits/BARBARO.jpg',
-      stats: { forca: 98, const: 94, destreza: 55 },
-      traits: ['Fúria Incontrolável', 'Resistência Primal', 'Crítico Brutal']
-    },
-    ARQUEIRO: {
-      title: 'Patrulheiro Astral',
-      roleBadge: 'D&D 5E · ATAQUE À DISTÂNCIA & CRÍTICOS',
-      description: 'Atirador de elite que canaliza flechas de energia rúnica à longa distância. Especialista em armadilhas de campo e dano contínuo acelerado.',
-      portrait: '/assets/portraits/ARQUEIRO.jpg',
-      stats: { forca: 58, const: 65, destreza: 96 },
-      traits: ['Chuva de Flechas', 'Mira Crítica Letal', 'Passo Evasivo']
-    },
-    CLERIGO: {
-      title: 'Clérigo da Luz',
-      roleBadge: 'D&D 5E · MILAGRES DIVINOS & SUPORTE',
-      description: 'Emissário dos deuses da forja que regenera instantaneamente os pontos de vida da party e purifica maldições e enfraquecimentos cósmicos.',
-      portrait: '/assets/portraits/CLERIGO.jpg',
-      stats: { forca: 68, const: 82, destreza: 60 },
-      traits: ['Cura Milagrosa', 'Escudo da Fé', 'Prece de Guerra']
-    },
-    MAGO: {
-      title: 'Evocador Elemental',
-      roleBadge: 'D&D 5E · DESTRUIÇÃO EM ÁREA & ARCANO',
-      description: 'Estudioso dos segredos arcanos capaz de incinerar hordas inteiras com tempestades de gelo, meteoros estelares e manipulação do fluxo temporal.',
-      portrait: '/assets/portraits/MAGO.jpg',
-      stats: { forca: 42, const: 60, destreza: 72 },
-      traits: ['Chuva de Meteoros', 'Congelamento Rúnico', 'Teleporte Arcano']
-    },
-    MONGE: {
-      title: 'Mestre do Ki',
-      roleBadge: 'D&D 5E · ARTES MARCIAIS & COMBOS VELOZES',
-      description: 'Condensa a energia espiritual nos punhos para desferir sequências ultra-rápidas de golpes capazes de atordoar até os monstros mais colossais.',
-      portrait: '/assets/portraits/MONGE.jpg',
-      stats: { forca: 78, const: 76, destreza: 92 },
-      traits: ['Rajada de Golpes', 'Palma Vibratória', 'Evasão Sobrenatural']
-    },
-    BRUXO: {
-      title: 'Arauto do Pacto',
-      roleBadge: 'D&D 5E · ENERGIA SINISTRA & DRENO',
-      description: 'Firmou um juramento proibido com entidades do vazio astral. Seus feitiços drenam a vitalidade dos alvos para alimentar seus próprios atributos.',
-      portrait: '/assets/portraits/BRUXO.jpg',
-      stats: { forca: 50, const: 74, destreza: 78 },
-      traits: ['Rajada Mística', 'Dreno de Vitalidade', 'Maldição Ancestral']
-    }
+  const classDescriptions: Record<CharacterClass, { role: string; description: string }> = {
+    GUERREIRO: { role: 'Defesa', description: 'Usa armadura pesada e contra-ataques para sustentar a linha de frente.' },
+    BARBARO: { role: 'Fúria', description: 'Converte a fúria em golpes pesados e pressiona os inimigos de perto.' },
+    ARQUEIRO: { role: 'Precisão', description: 'Mantém distância e usa a destreza para acertar disparos precisos.' },
+    CLERIGO: { role: 'Cura', description: 'Invoca proteção e cura para prolongar o combate.' },
+    MAGO: { role: 'Magia elemental', description: 'Combina feitiços de fogo e gelo para atingir grupos e controlar o campo.' },
+    MONGE: { role: 'Artes marciais', description: 'Canaliza o ki em sequências rápidas de golpes corpo a corpo.' },
+    BRUXO: { role: 'Maldições', description: 'Usa o poder de um pacto para amaldiçoar e drenar a vitalidade dos inimigos.' },
   };
 
-  function setupCoverPageInteractions() {
-    const coverSection = document.getElementById('forge-cover-hero');
-    const btnEnterGate = document.getElementById('btn-enter-gate');
-    const btnBackToCover = document.getElementById('btn-back-to-cover');
-    const btnFooterBackToCover = document.getElementById('btn-footer-back-to-cover');
-    const authMain = root.querySelector('.forge-auth');
+  const classButtons = root.querySelectorAll<HTMLButtonElement>('[data-class-id]');
+  const classArt = root.querySelector<HTMLImageElement>('#cover-hero-sprite-img');
+  const classTitle = root.querySelector('#cover-class-title');
+  const classRole = root.querySelector('#cover-class-badge');
+  const classDescription = root.querySelector('#cover-class-desc');
+  const classAttributes = root.querySelectorAll<HTMLElement>('[data-attribute]');
 
-    // 1. Botão de alternar para a tela de login
-    const showLoginScreen = () => {
-      root.classList.add('in-auth-mode');
-      root.scrollTop = 0;
-      setTimeout(() => {
-        accountInput?.focus({ preventScroll: true });
-        root.scrollTop = 0;
-      }, 200);
-    };
+  for (const button of classButtons) {
+    button.addEventListener('click', () => {
+      const classId = button.dataset.classId as CharacterClass;
+      const definition = CLASS_DEFINITIONS[classId];
+      const details = classDescriptions[classId];
+      if (!definition || !details || !classArt || !classTitle || !classRole || !classDescription) return;
 
-    // 2. Botão de voltar para a página de apresentação (capa)
-    const showCoverScreen = () => {
-      root.classList.remove('in-auth-mode');
-      root.scrollTop = 0;
-    };
-
-    btnEnterGate?.addEventListener('click', showLoginScreen);
-    btnBackToCover?.addEventListener('click', showCoverScreen);
-    btnFooterBackToCover?.addEventListener('click', showCoverScreen);
-    root.querySelectorAll('.btn-back-cover, .forge-back-cover-btn').forEach(btn => {
-      btn.addEventListener('click', showCoverScreen);
-    });
-
-    // 3. Efeito Paralaxe sutil ao mover o mouse dentro da capa
-    if (coverSection) {
-      coverSection.addEventListener('mousemove', (e) => {
-        const rect = coverSection.getBoundingClientRect();
-        const normX = (e.clientX - rect.left) / rect.width - 0.5;
-        const normY = (e.clientY - rect.top) / rect.height - 0.5;
-
-        coverSection.style.setProperty('--parallax-y-back', `${normY * -24}px`);
-        coverSection.style.setProperty('--parallax-y-mid', `${normY * -12}px`);
-        coverSection.style.setProperty('--parallax-y-front', `${normY * -6}px`);
-      });
-    }
-
-    // 4. Showcase Interativo de Classes com Mock de Movimento
-    const railButtons = root.querySelectorAll<HTMLButtonElement>('.class-rail-btn');
-    const spriteActor = document.getElementById('cover-hero-sprite-actor');
-    const spriteImg = document.getElementById('cover-hero-sprite-img') as HTMLImageElement | null;
-    const classBadge = document.getElementById('cover-class-badge');
-    const classTitle = document.getElementById('cover-class-title');
-    const classDesc = document.getElementById('cover-class-desc');
-    const meterForca = document.getElementById('meter-forca');
-    const meterConst = document.getElementById('meter-const');
-    const meterDestreza = document.getElementById('meter-destreza');
-    const traitsContainer = document.getElementById('cover-class-tags');
-
-    railButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const classId = btn.dataset.classId || 'GUERREIRO';
-        const data = COVER_CLASS_MOCKS[classId];
-        if (!data) return;
-
-        // Atualiza estado ativo dos botões
-        railButtons.forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-selected', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
-
-        // Transição suave no mock de sprite em movimento
-        if (spriteActor && spriteImg) {
-          spriteActor.dataset.actorClass = classId;
-          spriteImg.style.opacity = '0.3';
-          spriteImg.style.transform = 'scale(0.92)';
-
-          setTimeout(() => {
-            spriteImg.src = data.portrait;
-            spriteImg.alt = 'Apresentação do ' + data.title;
-            spriteImg.style.opacity = '1';
-            spriteImg.style.transform = 'scale(1)';
-          }, 150);
-        }
-
-        // Atualiza card de informações e atributos
-        if (classBadge) classBadge.textContent = data.roleBadge;
-        if (classTitle) classTitle.textContent = data.title;
-        if (classDesc) classDesc.textContent = data.description;
-        if (meterForca) meterForca.style.width = data.stats.forca + '%';
-        if (meterConst) meterConst.style.width = data.stats.const + '%';
-        if (meterDestreza) meterDestreza.style.width = data.stats.destreza + '%';
-
-        if (traitsContainer) {
-          traitsContainer.innerHTML = data.traits.map(t => `<span class="trait-tag">${t}</span>`).join('');
-        }
-      });
+      for (const option of classButtons) {
+        option.setAttribute('aria-pressed', String(option === button));
+      }
+      classArt.src = getClassPortrait(classId);
+      classTitle.textContent = definition.displayName;
+      classRole.textContent = (definition.isRanged ? 'À distância' : 'Corpo a corpo') + ' · ' + details.role;
+      classDescription.textContent = details.description;
+      for (const attribute of classAttributes) {
+        const key = attribute.dataset.attribute as keyof typeof definition.baseStats;
+        attribute.textContent = String(definition.baseStats[key]);
+      }
     });
   }
 
-root.dataset.ready = 'true';
-  setupCoverPageInteractions();
+  enterGate?.addEventListener('click', () => {
+    presenting = false;
+    render();
+  });
+  backToCover?.addEventListener('click', () => {
+    presenting = true;
+    render();
+  });
+
+  root.dataset.ready = 'true';
 
   if (storedSession && storedSession.account) {
+    presenting = false;
     account = storedSession.account;
     authKind = storedSession.authKind || 'login';
     if (storedSession.password) {
@@ -776,7 +706,14 @@ root.dataset.ready = 'true';
       const wasDelete = pending === 'delete';
       const createdSlot = selected;
       slots = normalizedSlots;
-      selected = null;
+      const occupied = normalizedSlots.filter(slot => !slot.isEmpty);
+      let remembered: { id?: string; at?: number } | null = null;
+      try { remembered = JSON.parse(storage?.getItem(lastHeroKey()) ?? 'null'); } catch { /* Storage is optional. */ }
+      const recent = occupied.reduce<(typeof occupied)[number] | undefined>((best, slot) =>
+        !best || (slot.lastPlayedAt ?? 0) > (best.lastPlayedAt ?? 0) ? slot : best, undefined);
+      const local = occupied.find(slot => slot.id && slot.id === remembered?.id);
+      selected = local && (remembered?.at ?? 0) >= (recent?.lastPlayedAt ?? 0)
+        ? local.slotIndex : recent?.slotIndex ?? null;
       if (wasDelete) {
         deletingSlot = null;
         deleteInput.value = '';
@@ -839,6 +776,8 @@ root.dataset.ready = 'true';
       waitingForConnection = false;
       if (account && selected !== null) {
         try {
+          const id = slots?.[selected]?.id;
+          if (id) storage?.setItem(lastHeroKey(), JSON.stringify({ id, at: Date.now() }));
           storage?.setItem(SESSION_KEY, JSON.stringify({
             account,
             authKind,

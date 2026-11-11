@@ -63,11 +63,15 @@ try {
   ranking.onUpdate({ category: 'GOLD', entries: [], timestamp: Date.now() });
   check(text('leaderboard-status').includes('Nenhum'), 'Ranking vazio possui mensagem própria'); click('leaderboard-close');
   check(INTRO_SCENES.length === 6 && INTRO_SCENES.reduce((sum, scene) => sum + scene.duration, 0) >= 40000, 'Introdução contém seis cenas e duração planejada');
-  cinematic.open(); check(cinematic.isOpen() && text('cinematic-progress').includes('1 / 6'), 'Introdução abre na primeira cena');
-  for (let scene = 2; scene <= 6; scene++) { click('cinematic-next'); await sleep(530); check(text('cinematic-progress').includes(scene + ' / 6'), 'Transição para cena ' + scene); }
-  click('cinematic-next'); check(!cinematic.isOpen() && store.get('magicforge_intro_seen_v1') === 'true', 'Finalização registra introdução vista');
-  cinematic.open(); click('cinematic-next'); click('cinematic-skip'); await sleep(550);
-  check(!cinematic.isOpen(), 'Pular durante transição cancela timers');
+  cinematic.open();
+  const chronicle = document.getElementById('cinematic-intro')!;
+  check(cinematic.isOpen() && chronicle.scrollTop === 0, 'Prólogo abre na capa');
+  const headings = [...chronicle.querySelectorAll('.chronicle-scene h3')];
+  check(headings.length === INTRO_SCENES.length && headings.every((heading, i) =>
+    heading.textContent === INTRO_SCENES[i].title), 'Todos os trechos estão disponíveis na mesma página');
+  click('chronicle-finish'); check(!cinematic.isOpen() && store.get('magicforge_intro_seen_v1') === 'true', 'Finalização registra introdução vista');
+  cinematic.open(); click('cinematic-skip');
+  check(!cinematic.isOpen(), 'Fechar funciona sem percorrer a crônica');
   cinematic.open(); document.getElementById('cinematic-intro')!.dispatchEvent(new Event('cancel', { cancelable: true }));
   check(!cinematic.isOpen(), 'Escape encerra introdução e libera navegação');
   const bubbles = new FloatingDialogue(() => 0);

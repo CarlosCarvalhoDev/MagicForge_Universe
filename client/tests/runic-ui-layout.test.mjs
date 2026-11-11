@@ -59,14 +59,9 @@ test('RPG Dock and Potion icons exist on disk and are linked in index.html and p
   assert.match(progCss, /\.skill-arc-btn/, 'Expected skill arc buttons styling in progression.css');
 });
 
-test('Narrative and Cinematic Intro (Rever Historia) implements ornate runic frames and buttons', () => {
+test('Narrative preserves ornate frames for boss encounters', () => {
   const narrCss = fs.readFileSync(path.join(clientRoot, 'src/ui/narrative.css'), 'utf8');
-  assert.match(narrCss, /\.cinematic-caption/, 'Expected cinematic caption styling');
   assert.match(narrCss, /corner-tl\.svg/, 'Expected sculpted corner filigree in narrative.css');
-  assert.match(narrCss, /crest-header-ornament\.svg/, 'Expected header crest ornament in narrative.css');
-  assert.match(narrCss, /divider-runic-ornate\.svg/, 'Expected ornate divider in narrative.css');
-  assert.match(narrCss, /button-ornament-left\.svg/, 'Expected wing buttons on next action in narrative.css');
-  assert.match(narrCss, /#cinematic-progress/, 'Expected styled progress badge in narrative.css');
 });
 
 test('In-game viewport frame, session navigation buttons, top-right selectors, class traits, and primary attack crest are wired', () => {
@@ -111,7 +106,7 @@ test('In-game viewport frame, session navigation buttons, top-right selectors, c
   assert.match(mainTs, /setTacticalDrawerOpen\(window\.innerWidth > 1180\)/, 'Expected tactical drawer to be default collapsed on reduced/mobile viewports');
   assert.match(progCss, /\.tactical-drawer-toggle/, 'Expected .tactical-drawer-toggle styling in progression.css');
   assert.match(progCss, /#tactical-action-bar\.runic-tactical-bar/, 'Expected left vertical tactical drawer styling in progression.css');
-  assert.match(progCss, /#bottom-center-zone\s*\{[^}]*left:\s*50%\s*!important/s, 'Expected centered #bottom-center-zone chat container in progression.css');
+  assert.match(progCss, /#bottom-center-zone\s*\{[^}]*left:\s*calc\(14px/s, 'Expected chat on the left');
   assert.match(progCss, /@media \(max-width: 1180px\)/, 'Expected responsive reduced browser / tablet rules in progression.css');
   assert.match(progCss, /@media \(max-width: 900px\)/, 'Expected responsive mobile / portrait rules in progression.css');
 });
@@ -120,7 +115,7 @@ test('HUD responsiveness preserves collaborator dock and square skill stack', ()
   const progCss = fs.readFileSync(path.join(clientRoot, 'src/ui/progression.css'), 'utf8');
   const automaticCss = fs.readFileSync(path.join(clientRoot, 'src/ui/automatic-play.css'), 'utf8');
   assert.match(progCss, /#right-vertical-dock[^{]*\{[^}]*flex-direction:\s*column\s*!important/s, 'Expected dock rail to stay flex-direction column on all screens');
-  assert.match(progCss, /\.skills-square-row\s*\{[^}]*flex-direction:\s*column-reverse/s, 'Expected collaborator vertical square skill layout');
+  assert.match(progCss, /\.skills-square-row\s*\{[^}]*flex-direction:\s*row/s, 'Expected horizontal skill bar');
   assert.doesNotMatch(automaticCss, /#bottom-center-zone|#mobile-combat-arc-container/, 'Mechanics CSS must preserve collaborator HUD positioning');
   assert.match(progCss, /#skill-btn-4\s*\{[^}]*position:\s*relative\s*!important/s, 'Square skills must not use radial positioning');
 });
