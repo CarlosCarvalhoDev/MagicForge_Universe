@@ -23,7 +23,6 @@ export function setupSkillRotation(transport: {
   const cycle = document.getElementById('skill-rotation-panel')!;
   const quick = (document.getElementById('btn-toggle-auto-cast') ?? document.getElementById('btn-combat-auto-active')) as HTMLButtonElement;
   const quickLabel = quick.querySelector('.auto-btn-title') ?? quick;
-  const reactivate = document.getElementById('btn-combat-auto-reactivate') as HTMLButtonElement | null;
   const combatContainer = document.getElementById('mobile-combat-arc-container');
   const autoView = document.getElementById('combat-auto-view');
   const manualView = document.getElementById('combat-manual-view');
@@ -46,12 +45,20 @@ export function setupSkillRotation(transport: {
   function render() {
     autoCast.checked = draftAutoCast;
     autoCast.disabled = quick.disabled = !loaded || !transport.isReady() || pending;
-    quickLabel.textContent = quickLabel === quick ? (confirmedAutoCast ? 'Magias: AUTO' : 'Magias: MANUAL') : 'AUTO ON';
-    quick.title = 'Desativar conjuração automática de magias [A]. Movimento e ataque básico continuam automáticos.';
-    if (reactivate) reactivate.disabled = quick.disabled;
+    quickLabel.textContent = confirmedAutoCast ? 'AUTO ON' : 'AUTO OFF';
+    quick.title = confirmedAutoCast ? 'Desativar magias automáticas [A]. Movimento e ataque básico continuam automáticos.' : 'Ativar magias automáticas [A]. Movimento e ataque básico continuam automáticos.';
+    const basicAttack = document.getElementById('btn-primary-attack');
+    if (basicAttack) {
+      basicAttack.title = 'Ataque básico automático; clique para priorizar o monstro selecionado';
+      const key = basicAttack.querySelector('.skill-square-key');
+      if (key) key.textContent = 'AUTO';
+    }
     combatContainer?.setAttribute('data-combat-mode', confirmedAutoCast ? 'auto' : 'manual');
-    if (autoView) autoView.style.display = confirmedAutoCast ? 'flex' : 'none';
-    if (manualView) manualView.style.display = confirmedAutoCast ? 'none' : 'flex';
+    if (autoView) autoView.style.display = 'flex';
+    if (manualView) manualView.style.display = 'flex';
+    for (const slot of confirmed) {
+      document.getElementById('skill-btn-' + slot)?.setAttribute('aria-disabled', String(!loaded || confirmedAutoCast));
+    }
     quick.setAttribute('aria-pressed', String(confirmedAutoCast));
     root.replaceChildren();
     draft.forEach((slot, position) => {
@@ -78,7 +85,6 @@ export function setupSkillRotation(transport: {
   }
   autoCast.addEventListener('change', () => { draftAutoCast = autoCast.checked; });
   quick.addEventListener('click', () => persist(confirmed, !confirmedAutoCast));
-  reactivate?.addEventListener('click', () => persist(confirmed, true));
   save.addEventListener('click', () => persist(draft, draftAutoCast));
   function persist(order: number[], enabled: boolean) {
     if (!loaded || !transport.isReady() || pending) return;
@@ -109,6 +115,7 @@ export function setupSkillRotation(transport: {
   clear();
   return {
     toggleAutoCast: () => persist(confirmed, !confirmedAutoCast),
+    canCastManually: () => loaded && !confirmedAutoCast,
     refreshSkills: render,
     onDisconnected: clear,
     onLogin: clear,

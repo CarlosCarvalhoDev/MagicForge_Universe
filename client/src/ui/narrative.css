@@ -1,291 +1,85 @@
-/* ==========================================================================
-   NARRATIVA & CINEMÁTICA RÚNICA (REVER HISTÓRIA, CENAS & BOSS LORE)
-   ========================================================================== */
-
+/* Prólogo — página editorial com a paleta da entrada. */
 #cinematic-intro {
   position: fixed;
   inset: 0;
-  width: 100vw;
+  width: 100%;
   height: 100dvh;
   max-width: none;
   max-height: none;
   margin: 0;
   padding: 0;
   border: 0;
-  color: #f8fafc;
-  background: #05070d;
-  overflow: hidden;
-  z-index: 1000;
+  overflow: auto;
+  overscroll-behavior: contain;
+  color: #f3e8d6;
+  background: #140f10;
+  font: 400 1rem/1.65 Inter, system-ui, sans-serif;
+  user-select: text;
 }
 
-#cinematic-intro::backdrop {
-  background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.95), #020617 100%);
-}
-
-.cinematic-art {
-  position: absolute;
-  inset: 0;
-  opacity: 1;
-  transition: opacity 0.5s ease;
-  background: #02040a;
-}
-
-.cinematic-art.is-fading {
-  opacity: 0;
-}
-
-.cinematic-art img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.72;
-  filter: contrast(1.1) brightness(0.9);
-  animation: cinematic-zoom 14s ease-out both;
-}
-
-.cinematic-art::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 50% 30%, transparent 40%, rgba(2, 6, 23, 0.7) 100%),
-    linear-gradient(0deg, rgba(3, 7, 18, 0.98) 0%, rgba(3, 7, 18, 0.5) 45%, rgba(3, 7, 18, 0.3) 100%);
-}
-
-/* Barra Superior com Selo Rúnico de Progresso e Botão Pular */
-.cinematic-top {
-  position: absolute;
-  inset: 24px 32px auto;
+#cinematic-intro::backdrop { background: #100c0d; }
+.chronicle-wrap { width: min(1100px, calc(100% - 40px)); margin-inline: auto; }
+.chronicle-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  z-index: 10;
+  gap: 12px;
+  padding: 10px max(20px, calc((100% - 1100px) / 2));
+  border-bottom: 1px solid #604632;
+  background: #161011;
 }
-
-#cinematic-progress {
+.chronicle-brand { color: #eac48a; font: 700 clamp(1rem, 4vw, 1.45rem) Cinzel, Georgia, serif; }
+.chronicle-brand small { display: block; font: 700 0.55rem Cinzel, Georgia, serif; letter-spacing: 0.23em; }
+.chronicle-hero {
+  padding: clamp(70px, 13vw, 180px) 0 clamp(58px, 9vw, 116px);
+  background: linear-gradient(90deg, #140f10ee, #140f1055), linear-gradient(0deg, #140f10, transparent 60%), var(--chronicle-art) center 45% / cover;
+}
+.chronicle-kicker { color: #eac48a; font: 700 0.78rem/1.4 Cinzel, Georgia, serif; letter-spacing: 0.11em; }
+.chronicle-hero h2, .chronicle-copy h3 { font-family: Cinzel, Georgia, serif; line-height: 1.12; }
+.chronicle-hero h2 { font-size: clamp(2.2rem, 7vw, 5.3rem); margin: 12px 0; }
+.chronicle-hero a, .chronicle-footer button { margin-top: 22px; }
+.chronicle-story { padding-bottom: 36px; }
+.chronicle-scene {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(20px, 5vw, 66px);
+  align-items: center;
+  padding-block: clamp(26px, 6vw, 66px);
+  border-top: 1px solid #604632;
+  scroll-margin-top: 80px;
+}
+.chronicle-scene:nth-child(even) img { grid-column: 2; grid-row: 1; }
+.chronicle-scene img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: center 35%; border: 1px solid #604632; }
+.chronicle-copy h3 { font-size: clamp(1.5rem, 3vw, 2.65rem); margin: 7px 0 13px; }
+.chronicle-copy > p:not(.chronicle-kicker), .chronicle-hero .chronicle-wrap > p:last-of-type { color: #d6c4b3; }
+.chronicle-elements { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 12px 0 0; }
+.chronicle-elements li { padding: 2px 9px; border: 1px solid #604632; color: #eac48a; font-size: 0.8rem; }
+#cinematic-intro :is(button, a) {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font: 700 11px 'Cinzel', serif;
-  letter-spacing: 0.18em;
-  color: #fde68a;
-  background: linear-gradient(180deg, rgba(28, 22, 38, 0.92), rgba(12, 16, 28, 0.96));
-  border: 1px solid rgba(251, 191, 36, 0.5);
-  border-radius: 4px;
-  padding: 6px 14px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
-}
-
-#cinematic-progress::before {
-  content: '✦';
-  color: #fbbf24;
-  font-size: 10px;
-}
-
-/* Moldura Esculpida da Legenda da História */
-.cinematic-caption {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  width: min(880px, 92vw);
-  box-sizing: border-box;
-  padding: 28px 36px 24px;
-  border: 2px solid #d97706;
-  outline: 1.5px solid rgba(254, 240, 138, 0.35);
-  outline-offset: -8px;
-  border-radius: 6px;
-  background-color: #0a0d1a;
-  background-image:
-    url('/assets/ui/frames/corner-tl.svg'),
-    url('/assets/ui/frames/corner-tr.svg'),
-    url('/assets/ui/frames/corner-bl.svg'),
-    url('/assets/ui/frames/corner-br.svg'),
-    url('/assets/ui/frames/crest-header-ornament.svg'),
-    url('/assets/ui/frames/divider-runic-ornate.svg'),
-    radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.22), transparent 60%),
-    linear-gradient(175deg, rgba(26, 22, 40, 0.98) 0%, rgba(8, 11, 24, 0.99) 100%);
-  background-repeat: no-repeat;
-  background-position:
-    top 2px left 2px,
-    top 2px right 2px,
-    bottom 2px left 2px,
-    bottom 2px right 2px,
-    top 3px center,
-    bottom 76px center,
-    center,
-    center;
-  background-size:
-    46px 46px,
-    46px 46px,
-    46px 46px,
-    46px 46px,
-    220px 26px,
-    min(420px, 85%) 16px,
-    100% 100%,
-    100% 100%;
-  box-shadow:
-    inset 0 0 0 4px rgba(10, 14, 26, 0.9),
-    inset 0 0 32px rgba(245, 158, 11, 0.12),
-    0 24px 64px rgba(0, 0, 0, 0.95),
-    0 0 40px rgba(245, 158, 11, 0.2);
-}
-
-.cinematic-caption h2 {
-  font: 800 clamp(22px, 3.2vw, 36px) 'Cinzel', serif;
-  letter-spacing: 0.06em;
-  margin: 4px 0 14px;
-  text-align: center;
-  background: linear-gradient(180deg, #fffbeb 0%, #fde68a 52%, #d97706 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.9));
-}
-
-.cinematic-caption p {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: clamp(14px, 1.6vw, 17px);
-  line-height: 1.65;
-  color: #ece8dc;
-  min-height: 78px;
-  text-align: center;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
-  margin-bottom: 24px;
-}
-
-.cinematic-caption nav {
-  display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-/* Botões da Cinemática */
-#cinematic-intro button {
-  min-height: 42px;
-  padding: 8px 20px;
-  border-radius: 4px;
-  border: 1px solid rgba(251, 191, 36, 0.45);
-  color: #fde68a;
-  background: linear-gradient(180deg, rgba(38, 30, 48, 0.95), rgba(14, 18, 32, 0.98));
-  font: 700 11.5px 'Cinzel', serif;
-  letter-spacing: 0.08em;
+  min-height: 44px;
+  padding: 6px 13px;
+  border: 1px solid #9e7649;
+  border-radius: 3px;
+  background: #291c18;
+  color: #f6e7cd;
+  font: 700 0.78rem Cinzel, Georgia, serif;
+  text-decoration: none;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 14px rgba(0, 0, 0, 0.65);
-  transition: all 0.18s ease;
 }
-
-#cinematic-intro button:hover:not(:disabled) {
-  border-color: #fbbf24;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.35);
-  transform: translateY(-1px);
-}
-
-#cinematic-intro button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Botão Próxima / Começar Jornada com Asas de Ouro Forjadas */
-#cinematic-next {
-  min-height: 44px !important;
-  padding: 8px 34px !important;
-  color: #1c0f02 !important;
-  border: 1.5px solid #fef08a !important;
-  outline: 1px solid rgba(120, 53, 15, 0.65);
-  outline-offset: -3px;
-  background-color: #d97706 !important;
-  background-image:
-    url('/assets/ui/frames/button-ornament-left.svg'),
-    url('/assets/ui/frames/button-ornament-right.svg'),
-    linear-gradient(180deg, #fef08a 0%, #fbbf24 25%, #d97706 78%, #92400e 100%) !important;
-  background-repeat: no-repeat !important;
-  background-position: left 6px center, right 6px center, center !important;
-  background-size: 26px 24px, 26px 24px, 100% 100% !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    0 4px 16px rgba(217, 119, 6, 0.5) !important;
-  font-weight: 800 !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-#cinematic-next:hover:not(:disabled) {
-  filter: brightness(1.08);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    0 0 24px rgba(251, 191, 36, 0.75) !important;
-}
-
-/* Narração com Estado Ativo */
-#cinematic-voice[aria-pressed="true"] {
-  border-color: #34d399;
-  color: #a7f3d0;
-  background: linear-gradient(180deg, rgba(6, 95, 70, 0.75), rgba(6, 78, 59, 0.9));
-  box-shadow: 0 0 14px rgba(52, 211, 153, 0.35);
-}
-
-/* Orbes Elementais */
-.cinematic-elements {
-  display: none;
-  position: absolute;
-  inset: 22% 5% auto;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-  z-index: 5;
-}
-
-[data-effect="elements"] .cinematic-elements {
-  display: flex;
-}
-
-.cinematic-elements i {
-  font-style: normal;
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  border-radius: 50%;
-  width: 58px;
-  height: 58px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid rgba(251, 191, 36, 0.65);
-  color: #fef08a;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.25), transparent 70%),
-    linear-gradient(180deg, rgba(30, 36, 56, 0.9), rgba(12, 16, 28, 0.96));
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.35), inset 0 0 10px rgba(0, 0, 0, 0.8);
-}
-
-[data-effect="fracture"] img {
-  filter: contrast(1.3) saturate(0.5);
-}
-
-[data-effect="shards"]::before {
-  content: '✦  ·  ✧  ·  ✦';
-  position: absolute;
-  inset: 18% 10%;
-  z-index: 5;
-  font-size: clamp(36px, 8vw, 110px);
-  letter-spacing: 0.3em;
-  color: rgba(251, 191, 36, 0.6);
-  text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@keyframes cinematic-zoom {
-  from { transform: scale(1); }
-  to { transform: scale(1.08); }
+#cinematic-intro button[hidden] { display: none; }
+#cinematic-intro .chronicle-copy button { margin-top: 14px; }
+#cinematic-intro :is(button, a):hover { border-color: #efc88c; }
+#cinematic-intro :is(button, a):focus-visible { outline: 2px solid #efc88c; outline-offset: 3px; }
+#cinematic-intro :is(.chronicle-hero a, .chronicle-footer button) { background: #e1b880; color: #23160f; }
+.chronicle-footer { padding: 28px 0 0; border-top: 1px solid #604632; text-align: center; }
+@media (max-width: 650px) {
+  .chronicle-scene { grid-template-columns: minmax(0, 1fr); }
+  .chronicle-scene:nth-child(even) img { grid-column: auto; grid-row: auto; }
 }
 
 /* Balão de Fala do Herói na Sala dos Forjados */
@@ -385,66 +179,7 @@
   color: #e2e8f0;
 }
 
-/* Responsividade Mobile da Cinemática */
 @media (max-width: 640px) {
-  .cinematic-top {
-    inset: 12px 14px auto;
-  }
-
-  #cinematic-progress {
-    font-size: 9.5px;
-    padding: 4px 10px;
-  }
-
-  #cinematic-intro button {
-    min-height: 38px;
-    padding: 6px 14px;
-    font-size: 10px;
-  }
-
-  .cinematic-caption {
-    inset: auto 50% 16px;
-    padding: 20px 18px 16px;
-    background-size:
-      32px 32px,
-      32px 32px,
-      32px 32px,
-      32px 32px,
-      170px 20px,
-      min(300px, 90%) 14px,
-      100% 100%,
-      100% 100%;
-    background-position:
-      top 2px left 2px,
-      top 2px right 2px,
-      bottom 2px left 2px,
-      bottom 2px right 2px,
-      top 3px center,
-      bottom 62px center,
-      center,
-      center;
-  }
-
-  .cinematic-caption h2 {
-    font-size: 19px;
-    margin-bottom: 8px;
-  }
-
-  .cinematic-caption p {
-    font-size: 12.5px;
-    min-height: 85px;
-    margin-bottom: 16px;
-  }
-
-  .cinematic-caption nav {
-    gap: 8px;
-  }
-
-  #cinematic-next {
-    min-height: 38px !important;
-    padding: 6px 24px !important;
-  }
-
   .boss-story-banner {
     top: 80px;
     padding: 12px;
@@ -454,9 +189,4 @@
     width: 50px;
     height: 50px;
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cinematic-art img { animation: none; }
-  .cinematic-art { transition: none; }
 }

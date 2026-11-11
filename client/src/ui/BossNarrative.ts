@@ -1,7 +1,11 @@
 import type { S2CBossEventPayload, S2CCombatEventPayload } from '@magicforge/shared';
 export function setupBossNarrative() {
   const banner = document.createElement('aside'); banner.className = 'boss-story-banner'; banner.hidden = true; banner.setAttribute('role', 'status'); banner.setAttribute('aria-live', 'polite');
-  const image = document.createElement('img'); image.alt = ''; const body = document.createElement('div'); const title = document.createElement('strong'); const text = document.createElement('p'); body.append(title, text); banner.append(image, body); document.body.append(banner);
+  const image = document.createElement('img'); image.alt = ''; const body = document.createElement('div'); const title = document.createElement('strong'); const text = document.createElement('p'); body.append(title, text); banner.append(image, body);
+  const queue = document.getElementById('center-notification-queue') ?? document.body;
+  const timer = queue.querySelector('#boss-timer-banner');
+  if (timer) timer.after(banner);
+  else queue.append(banner);
   let bossId = '', bossName = '', halfSpoken = false, timeout: number | undefined;
   const isGrimgor = () => /grimgor|chefe goblin/i.test(bossName);
   function show(message: string) {

@@ -12,12 +12,13 @@ test('Reordenar o ciclo preserva os quatro slots e suporta ida e volta', () => {
   assert.deepEqual(moveRotationSlot(initial, 0, -1), initial);
 });
 
-test('Cliente automático preserva quatro habilidades no layout do colaborador e Grimório sem joystick', () => {
+test('HUD preserva quatro habilidades sem enviar movimento por clique', () => {
   const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const main = fs.readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
   const css = fs.readFileSync(new URL('../src/ui/progression.css', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /id="virtual-joystick-zone"/);
-  assert.doesNotMatch(main, /sendMoveDirection\(|sendMoveInput\(/);
+  assert.doesNotMatch(main, /sendMoveDirection\(/);
+  assert.doesNotMatch(main, /network\.sendMoveInput\(/);
   assert.doesNotMatch(main, /for \(let slot = 4; slot >= 1; slot--\)/);
   assert.match(html, /id="grimorio-tab-rotation"/);
   assert.match(html, /id="skill-rotation-panel"/);
@@ -51,20 +52,24 @@ test('Botão aguarda confirmação, preserva ordem e sincroniza preferência do 
   ui.onUpdate({order:[3,1,4,2],autoCastEnabled:true,success:true});
   quick.click();
   assert.deepEqual(sent, [[[3,1,4,2],false]]);
-  assert.equal(quick.textContent, 'Magias: AUTO');
+  assert.equal(quick.textContent, 'AUTO ON');
   assert.equal(quick.disabled, true);
   assert.equal(elements.get('combat-auto-view').style.display, 'flex');
+  assert.equal(elements.get('combat-manual-view').style.display, 'flex');
+  assert.equal(elements.get('skill-btn-1').attributes['aria-disabled'], 'true');
+  assert.equal(ui.canCastManually(), false);
   ui.onUpdate({order:[3,1,4,2],autoCastEnabled:false,success:true});
-  assert.equal(quick.textContent, 'Magias: MANUAL');
+  assert.equal(quick.textContent, 'AUTO OFF');
   assert.equal(checkbox.checked, false);
-  assert.equal(elements.get('combat-auto-view').style.display, 'none');
+  assert.equal(elements.get('combat-auto-view').style.display, 'flex');
+  assert.equal(ui.canCastManually(), true);
   assert.equal(elements.get('combat-manual-view').style.display, 'flex');
   checkbox.checked = true; checkbox.listeners.change();
   elements.get('btn-save-skill-rotation').click();
   assert.deepEqual(sent.at(-1), [[3,1,4,2],true]);
   ui.onUpdate({order:[3,1,4,2],autoCastEnabled:false,success:false,message:'Falha ao salvar'});
-  assert.equal(quick.textContent, 'Magias: MANUAL');
+  assert.equal(quick.textContent, 'AUTO OFF');
   assert.equal(checkbox.checked, false);
-  elements.get('btn-combat-auto-reactivate').click();
+  quick.click();
   assert.deepEqual(sent.at(-1), [[3,1,4,2],true]);
 });

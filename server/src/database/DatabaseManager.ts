@@ -333,6 +333,10 @@ export class DatabaseManager {
     `);
 
     // Migrações da Tabela de Contas (Autenticação e Multi-Provider)
+    const accountColumns = this.db.prepare('PRAGMA table_info(accounts)').all() as Array<{ name: string }>;
+    if (!accountColumns.some(column => column.name === 'is_admin')) {
+      this.db.exec('ALTER TABLE accounts ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0 CHECK (is_admin IN (0, 1))');
+    }
     try {
       this.db.exec('ALTER TABLE accounts ADD COLUMN password_hash TEXT;');
     } catch {}
@@ -763,6 +767,9 @@ export class DatabaseManager {
     }
 
     const summaries: CharacterSlotSummary[] = [];
+    const equippedItems = this.db.prepare(
+      'SELECT item_id AS itemId, COALESCE(refine_level, 0) AS refineLevel FROM inventory WHERE character_id = ? AND is_equipped = 1 ORDER BY slot_index'
+    );
     for (let slot = 0; slot < 3; slot++) {
       const char = map.get(slot);
       if (char) {
@@ -780,6 +787,16 @@ export class DatabaseManager {
           maxHp: char.max_hp,
           gold: char.gold,
           rebornCount: char.reborn_count || 0,
+          lastPlayedAt: char.last_logout || 0,
+          attributes: {
+            forca: char.forca,
+            destreza: char.destreza,
+            constituicao: char.constituicao,
+            inteligencia: char.inteligencia,
+            sabedoria: char.sabedoria,
+            carisma: char.carisma,
+          },
+          equippedItems: equippedItems.all(char.id) as Array<{ itemId: string; refineLevel: number }>,
           slot1Skill: char.slot1_skill,
           slot2Skill: char.slot2_skill,
           slot3Skill: char.slot3_skill,
@@ -793,6 +810,23 @@ export class DatabaseManager {
       }
     }
     return summaries;
+  }
+
+  /** Exclui um personagem apenas quando conta, slot, nome e confirmação coincidem. */
+  public deleteCharacterInSlot(accountId: string, slotIndex: number, characterName: string, confirmation: string): void {
+    if (slotIndex < 0 || slotIndex > 2) throw new Error('INVALID_SLOT');
+    const record = this.getCharacterByAccountAndSlot(accountId, slotIndex);
+    if (!record) throw new Error('CHARACTER_NOT_FOUND');
+
+    const normalize = (value: string) => value.trim().toLocaleLowerCase('pt-BR').replace(/\s+/g, '');
+    const expected = 'desejoexcluiropersonagem' + normalize(record.name);
+    if (normalize(characterName) !== normalize(record.name) || normalize(confirmation) !== expected) {
+      throw new Error('DELETE_CONFIRMATION_REQUIRED');
+    }
+
+    const result = this.db.prepare('DELETE FROM characters WHERE id = ? AND account_id = ? AND slot_index = ?').run(record.id, accountId, slotIndex);
+    if (result.changes !== 1) throw new Error('CHARACTER_NOT_FOUND');
+    console.log(`[Database] Personagem "${record.name}" excluído do Slot ${slotIndex} da conta "${accountId}".`);
   }
 
   /**
@@ -1099,6 +1133,12 @@ export class DatabaseManager {
       else { this.db.exec(`ROLLBACK TO SAVEPOINT ${savepoint}`); this.db.exec(`RELEASE SAVEPOINT ${savepoint}`); }
       throw error;
     } finally { this.transactionDepth--; }
+  }
+
+  public isAdminAccount(accountId: string | null): boolean {
+    if (!accountId) return false;
+    const account = this.db.prepare('SELECT is_admin FROM accounts WHERE id = ?').get(accountId);
+    return account?.is_admin === 1;
   }
 
   private migrateEquipmentLocations(): void {

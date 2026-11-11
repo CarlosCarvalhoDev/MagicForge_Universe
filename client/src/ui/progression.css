@@ -665,6 +665,7 @@
 
 /* Moldura Rúnica Esculpida da Tela do Jogo (Viewport RPG Frame) */
 #runic-viewport-frame {
+  display: none;
   position: fixed;
   inset: 0;
   pointer-events: none !important;
@@ -1782,13 +1783,13 @@
   filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.9));
 }
 
-/* Chat In-Game Centralizado na Base */
+/* Chat In-Game no canto esquerdo */
 #bottom-center-zone {
   position: fixed !important;
   bottom: 22px !important;
-  left: 50% !important;
+  left: calc(14px + var(--safe-left, 0px)) !important;
   right: auto !important;
-  transform: translateX(-50%) !important;
+  transform: none !important;
   width: min(500px, calc(100vw - 740px)) !important;
   min-width: 300px !important;
   max-width: 520px !important;
@@ -2952,8 +2953,8 @@
 /* Skills Square Column / Grid (Abre para cima, máx 5 por coluna, colunas extras para a direita) */
 .skills-square-row {
   display: flex;
-  flex-direction: column-reverse; /* Abre para cima a partir do ataque básico */
-  flex-wrap: wrap; /* Colunas adicionais avançam para o lado direito */
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-content: flex-start; /* Lado esquerdo sempre as primeiras */
   gap: 5px;
   max-height: calc(5 * 52px + 4 * 5px); /* Limite estrito de 5 skills por coluna */
@@ -3359,4 +3360,157 @@
 .skill-square-btn .attack-class-trait,
 .attack-class-trait {
   display: none !important;
+}
+
+/* Rodapé de combate. A barra e o chat ocupam áreas independentes. */
+#mobile-combat-arc-container.combat-action-container {
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  bottom: calc(24px + max(var(--safe-bottom, 0px), env(safe-area-inset-bottom, 0px))) !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+  max-width: calc(100vw - 16px) !important;
+}
+#mobile-combat-arc-container .skills-square-row {
+  padding: 4px;
+  border: 1px solid #785438;
+  border-radius: 8px;
+  background: #1b1413f2;
+  box-shadow: 0 4px 16px #0007;
+}
+#mobile-combat-arc-container .combat-manual-view { flex-direction: row-reverse; align-items: center; animation: none; }
+#mobile-combat-arc-container .combat-manual-header { width: auto; }
+#mobile-combat-arc-container {
+  --combat-control-size: clamp(42px, 4.2vw, 56px);
+  --combat-shortcut-size: clamp(30px, 3vw, 36px);
+}
+#mobile-combat-arc-container .skill-square-btn {
+  width: var(--combat-control-size) !important;
+  height: var(--combat-control-size) !important;
+}
+#mobile-combat-arc-container .combat-grimorio-btn img { width: 74%; height: 74%; object-fit: contain; }
+#mobile-combat-arc-container :is(.combat-grimorio-btn, .combat-auto-big-btn) {
+  width: var(--combat-shortcut-size) !important;
+  height: var(--combat-shortcut-size) !important;
+}
+#mobile-combat-arc-container .skill-square-btn:not(.attack-slot) .skill-square-icon-box {
+  position: absolute;
+  inset: 2px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 4px;
+}
+#mobile-combat-arc-container .skill-square-icon-box .skill-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  image-rendering: auto;
+}
+#mobile-combat-arc-container .combat-auto-view { animation: none; }
+#mobile-combat-arc-container .combat-auto-big-btn {
+  padding: 0 !important;
+  min-height: 0;
+  justify-content: center;
+  border: 1px solid #a68152;
+  border-radius: 5px;
+  background: #38261c;
+  color: #f4d09c;
+  box-shadow: none !important;
+  white-space: nowrap;
+}
+#mobile-combat-arc-container[data-combat-mode="auto"] .combat-auto-big-btn { border-color: #75a38a; background: #243b30; color: #d2f2dc; }
+#mobile-combat-arc-container[data-combat-mode="auto"] .combat-auto-big-btn::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #9ce3ad;
+}
+#mobile-combat-arc-container :is(.auto-pulse-aura, .auto-runic-orbit, .auto-btn-main-icon) { display: none; }
+#mobile-combat-arc-container .combat-auto-icon { width: 68%; height: 68%; object-fit: contain; }
+#mobile-combat-arc-container .auto-btn-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+#mobile-combat-arc-container[data-combat-mode="auto"] .skill-square-btn[aria-disabled="true"] { cursor: default; }
+#bottom-center-zone {
+  left: calc(14px + var(--safe-left, 0px)) !important;
+  right: auto !important;
+  transform: none !important;
+  width: min(320px, calc((100vw - 460px) / 2 - 24px)) !important;
+  min-width: 0 !important;
+}
+#bottom-center-zone #game-chat-box {
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  pointer-events: auto !important;
+  padding: 6px 8px !important;
+  background: #1b1413f2 !important;
+}
+#bottom-center-zone #game-chat-box.collapsed { width: fit-content !important; }
+#bottom-center-zone { align-items: flex-start !important; }
+#game-chat-box .chat-header-bar { gap: 4px !important; padding-bottom: 3px !important; margin-bottom: 4px !important; }
+#game-chat-box .chat-tabs { min-width: 0; display: flex; flex-wrap: wrap; }
+#game-chat-box.collapsed .chat-channel-tab:not(.active) { display: none !important; }
+#game-chat-box .chat-channel-tab { flex: 0 0 auto; min-height: 24px; padding: 2px 5px !important; font-size: .63rem !important; }
+#game-chat-box #btn-toggle-chat { min-width: 28px; min-height: 24px; flex: 0 0 auto; }
+#game-chat-box .chat-toggle-text { display: none !important; }
+#game-chat-box #chat-messages-container {
+  height: clamp(64px, 13dvh, 126px) !important;
+  font-size: .72rem !important;
+}
+#game-chat-box #chat-input-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px !important; }
+#game-chat-box .chat-channel-badge { display: none; }
+#game-chat-box :is(#chat-input-field, #chat-send-btn) { min-width: 0; height: 34px !important; font-size: .72rem !important; }
+#game-chat-box #chat-send-btn { min-width: 48px; }
+#skillbook-modal img.grimorio-book-icon { object-fit: contain; }
+
+#right-vertical-dock {
+  right: calc(14px + var(--safe-right, 0px)) !important;
+  gap: 6px !important;
+}
+#right-vertical-dock .dock-btn {
+  width: clamp(44px, 4.5vw, 60px) !important;
+  height: clamp(40px, 4vw, 52px) !important;
+  border-radius: 7px !important;
+  font-size: .59rem !important;
+  box-shadow: 0 3px 12px #0007 !important;
+}
+#right-vertical-dock .dock-svg-icon { width: 21px; height: 21px; }
+#tactical-action-bar.runic-tactical-bar:not(.drawer-collapsed) { padding: 6px !important; width: 124px !important; }
+#tactical-action-bar .tactical-drawer-toggle { width: 26px !important; }
+#quick-use-toast,
+#party-toast-container .party-toast,
+#levelup-banner,
+body .boss-story-banner {
+  max-width: min(360px, calc(100vw - 32px)) !important;
+  padding: 8px 12px !important;
+  border: 1px solid #a48153;
+  border-radius: 6px;
+  outline: 0;
+  background: #211816f5;
+  box-shadow: 0 5px 18px #0008;
+  overflow-wrap: anywhere;
+}
+#party-toast-container .party-toast.toast-error { border-color: #f87171; }
+#party-toast-container .party-toast.toast-success { border-color: #75a38a; }
+#quick-use-toast .toast-corner-spike,
+#party-toast-container .toast-corner-spike { display: none; }
+#levelup-banner .levelup-title { font-size: 1rem; }
+
+@media (max-width: 840px) {
+  #bottom-center-zone {
+    bottom: calc(94px + max(var(--safe-bottom, 0px), env(safe-area-inset-bottom, 0px))) !important;
+    width: min(250px, calc(100vw - 68px)) !important;
+  }
+}
+@media (max-width: 420px) {
+  #mobile-combat-arc-container.combat-action-container { --combat-control-size: clamp(32px, 9.4vw, 40px); gap: 4px !important; }
 }

@@ -23,6 +23,7 @@ export interface C2SLoginPayload {
 }
 
 export interface S2CLoginSuccessPayload {
+  isAdmin?: boolean;
   playerId: string;
   characterName: string;
   classType: CharacterClass;
@@ -39,6 +40,14 @@ export interface S2CLoginSuccessPayload {
   serverTickRate: number; // e.g. 20
   tickIntervalMs: number; // e.g. 50
 }
+
+export type DevToggle = 'pauseRespawns' | 'disableDrops' | 'doubleLegendary' | 'infiniteVitals';
+export type DevCommand =
+  | { action: 'state' | 'boss' | 'clearTargets' | 'reset' | 'refillVitals' | 'clearDrops' }
+  | { action: 'killVisible'; monsterIds: string[] }
+  | { action: 'toggle'; key: DevToggle; enabled: boolean }
+  | { action: 'dummy'; x: number; z: number };
+export type DevState = Record<DevToggle, boolean> & { message?: string };
 
 export interface S2CLoginFailurePayload {
   reason: string;
@@ -539,6 +548,9 @@ export interface CharacterSlotSummary {
   maxHp?: number;
   gold?: number;
   rebornCount?: number;
+  lastPlayedAt?: number;
+  attributes?: CharacterAttributes;
+  equippedItems?: Array<{ itemId: string; refineLevel: number }>;
   slot1Skill?: string;
   slot2Skill?: string;
   slot3Skill?: string;
@@ -562,8 +574,14 @@ export interface C2SSelectCharacterSlotPayload {
   slotIndex: number; // 0, 1 ou 2
 }
 
+export interface C2SDeleteCharacterSlotPayload {
+  slotIndex: number; // 0, 1 ou 2
+  characterName: string;
+  confirmation: string;
+}
+
 export interface S2CCharacterActionErrorPayload {
-  errorCode: 'INVALID_SLOT' | 'SLOT_OCCUPIED' | 'NAME_TAKEN' | 'INVALID_NAME' | 'CHARACTER_NOT_FOUND' | 'UNAUTHENTICATED';
+  errorCode: 'INVALID_SLOT' | 'SLOT_OCCUPIED' | 'NAME_TAKEN' | 'INVALID_NAME' | 'CHARACTER_NOT_FOUND' | 'UNAUTHENTICATED' | 'DELETE_CONFIRMATION_REQUIRED' | 'CHARACTER_ACTIVE';
   errorMessage: string;
   slotIndex?: number;
 }

@@ -70,6 +70,22 @@ test('Pacote exige identidade e booleano; proteger é idempotente e sugestão é
 
 const hero = { classType: CharacterClass.GUERREIRO, level: 30, attributes: { forca: 50, destreza: 30, constituicao: 40, inteligencia: 10, sabedoria: 10, carisma: 10 } };
 const item = (itemId: string, slotIndex: number, isEquipped = false): InventoryItemPayload => ({ itemId, slotIndex, quantity: 1, isEquipped, instanceId: `item-${slotIndex}`, refineLevel: 0 });
+test('Equipar automaticamente escolhe a melhoria elegível e preserva a peça protegida', t => {
+  const f = setup(t);
+  f.player.level = 30;
+  f.player.recalculateStatsFromEquipment();
+  assert.ok(f.db.addItemToInventory(f.player.dbCharacterId, 'sword_runic_bastard'));
+  assert.ok(f.db.setItemLocked(f.player.dbCharacterId, f.weapon().instanceId!, true));
+  const handler = new PacketHandler(f.world);
+  const equip = () => handler.handlePacket(f.conn, JSON.stringify({ op: Opcode.C2S_AUTO_EQUIP, data: {} }));
+  equip();
+  assert.ok(f.inventory().some(item => item.itemId === 'sword_runic_bastard' && item.isEquipped));
+  assert.equal(f.weapon().isLocked, true);
+  const after = f.inventory();
+  equip();
+  assert.deepEqual(f.inventory(), after);
+  assert.equal(f.packets.filter(packet => packet.op === Opcode.S2C_AUTO_EQUIP_RESULT).at(-1)?.data.equippedCount, 0);
+});
 test('Sugestões respeitam classe, nível, atributos, refino/gemas e escolhas protegidas; não equipam por CP', () => {
   const worn = item('sword_iron_broadsword', -1, true), upgrade = item('sword_runic_bastard', 5);
   const items = [worn, upgrade, item('staff_void_astral', 6)];

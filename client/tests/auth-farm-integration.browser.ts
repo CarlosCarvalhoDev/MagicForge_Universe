@@ -45,7 +45,7 @@ try {
   const auth = setupAuthSelection({
     isConnected: () => net.isConnected, connect: () => net.connect(), disconnect: () => net.disconnect(),
     authenticate: (name, password) => net.sendAuthLogin(name, password), register: (name, password, email) => net.sendAuthRegister(name, password, email),
-    requestList: name => net.sendRequestCharacterList(name), create: (slot, name, cls) => net.sendCreateCharacterSlot(slot, name, cls), select: slot => net.sendSelectCharacterSlot(slot),
+    requestList: name => net.sendRequestCharacterList(name), create: (slot, name, cls) => net.sendCreateCharacterSlot(slot, name, cls), select: slot => net.sendSelectCharacterSlot(slot), delete: (slot, name, confirmation) => net.sendDeleteCharacterSlot(slot, name, confirmation),
   });
   net.onConnectionStateChange = connected => { if (connected) auth.onConnected(); else { entered = false; queued = null; auth.onDisconnected(); farm.onDisconnected(); } };
   net.onAuthSuccess = payload => { if (payload.isActivated) auth.onAccountAuthenticated(payload.accountUsername, payload.provider); else auth.onAuthenticationError('Conta inativa.'); };

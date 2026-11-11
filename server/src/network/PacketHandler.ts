@@ -14,6 +14,7 @@ import {
   C2SRequestCharacterListPayload,
   C2SCreateCharacterSlotPayload,
   C2SSelectCharacterSlotPayload,
+  C2SDeleteCharacterSlotPayload,
   C2SRefineEquipmentPayload,
   C2SSocketGemPayload,
   C2SEquipCardPayload,
@@ -81,6 +82,9 @@ export class PacketHandler {
     }
 
     switch (message.op) {
+      case Opcode.C2S_DEV_CONTROL:
+        this.getActiveWorld(connection).handleDevControl(connection, message.data as Parameters<World['handleDevControl']>[1]);
+        break;
       // --- Autenticação de Contas & Multi-Provider ---
       case Opcode.C2S_AUTH_LOGIN:
         this.worldManager.handleAuthLogin(connection, message.data as C2SAuthLoginPayload);
@@ -112,6 +116,10 @@ export class PacketHandler {
 
       case Opcode.C2S_SELECT_CHARACTER_SLOT:
         this.handleSelectCharacterSlot(connection, message.data as C2SSelectCharacterSlotPayload);
+        break;
+
+      case Opcode.C2S_DELETE_CHARACTER_SLOT:
+        this.handleDeleteCharacterSlot(connection, message.data as C2SDeleteCharacterSlotPayload);
         break;
 
       // --- Channels, Worlds & Instances ---
@@ -194,6 +202,13 @@ export class PacketHandler {
         if (!connection.isAuthenticated || !connection.playerId) return;
         const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
         if (player) this.runInventoryAction(connection, () => world.sendEquipmentAdvice(player));
+        break;
+      }
+      case Opcode.C2S_AUTO_EQUIP: {
+        if (!connection.isAuthenticated || !connection.playerId) return;
+        const world = this.getActiveWorld(connection);
+        const player = world.entityManager.getPlayer(connection.playerId);
+        if (player) this.runInventoryAction(connection, () => world.autoEquipPlayer(player));
         break;
       }
       case Opcode.C2S_DISCARD_ITEM:
@@ -328,6 +343,13 @@ export class PacketHandler {
     this.worldManager.handleSelectCharacterSlot(connection, payload.slotIndex);
   }
 
+  private handleDeleteCharacterSlot(connection: Connection, payload: C2SDeleteCharacterSlotPayload): void {
+    if (!payload || typeof payload.slotIndex !== 'number' || !payload.characterName || !payload.confirmation) return;
+    if (this.worldManager instanceof WorldManager) {
+      this.worldManager.handleDeleteCharacterSlot(connection, payload.slotIndex, payload.characterName, payload.confirmation);
+    }
+  }
+
   private handleRequestChannelList(connection: Connection, payload?: C2SRequestChannelListPayload): void {
     if (this.worldManager instanceof WorldManager) {
       this.worldManager.handleRequestChannelList(connection, payload);
@@ -400,7 +422,7 @@ export class PacketHandler {
   }
 
   private handleMoveInput(connection: Connection, payload: C2SMoveInputPayload): void {
-    if (!connection.isAuthenticated || !connection.playerId) {
+    if (!connection.isAuthenticated || !connection.playerId || !payload || !Number.isSafeInteger(payload.inputSequence)) {
       return;
     }
 
@@ -423,12 +445,12 @@ export class PacketHandler {
       }
     }
 
-    if (payload.moveDirection) {
+    if (payload.moveDirection && Number.isFinite(payload.moveDirection.x) && Number.isFinite(payload.moveDirection.z)) {
       player.setMoveDirection(payload.moveDirection, payload.inputSequence);
       return;
     }
 
-    if (payload.targetPosition) {
+    if (payload.targetPosition && Number.isFinite(payload.targetPosition.x) && Number.isFinite(payload.targetPosition.z)) {
       player.setMoveDestination(payload.targetPosition, payload.inputSequence);
     }
   }

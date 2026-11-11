@@ -1,10 +1,12 @@
 import { ItemRarity, RARITY_COLORS, S2CItemDropSpawnPayload, S2CSkillCastEventPayload, CombatStatusTransitionPayload, SKILLS_DATABASE, Vector3, distance } from '@magicforge/shared';
 import { InterpolatedEntity } from '../interpolation/SnapshotBuffer';
-import { HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground } from './HeroAnimations';
+import { HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground, warriorDirectionRow } from './HeroAnimations';
 import { FloatingDialogue } from '../ui/FloatingDialogue';
 import { PixelWorld } from './PixelWorld';
 import { PixelVfxPlayer } from './PixelVfxPlayer';
 import { planWarriorCastFx, planMageCometPulseFx } from './PixelVfx';
+import { planWarriorWorldFx } from './WarriorWorldFx';
+import { warriorCastArt } from './HeroAnimations';
 import { WarriorPresentation } from './WarriorPresentation';
 import type { VisualStage } from './WorldPresentation';
 
@@ -171,6 +173,7 @@ export class GameRenderer {
   }
 
   public triggerEntityAnimation(entityId: string, action: 'attack' | 'hit' | 'death'): void {
+    if (action === 'death') this.pixelWorld.warriorCasts.clear(entityId);
     this.animationClock.trigger(entityId, action, performance.now());
     this.pixelWorld.clock.trigger(entityId, action, performance.now());
   }
@@ -244,7 +247,7 @@ export class GameRenderer {
     });
   }
 
-  public resetNarrative(): void { this.dialogues.reset(); this.vfx.queue.clear(); this.warriorPresentation.clear(); }
+  public resetNarrative(): void { this.dialogues.reset(); this.vfx.queue.clear(); this.warriorPresentation.clear(); this.pixelWorld.warriorCasts.reset(); this.pixelWorld.pendingHits.clear(); }
 
   public acceptSkillCast(event: S2CSkillCastEventPayload): boolean {
     return this.warriorPresentation.acceptCast(event, performance.now());
@@ -263,10 +266,26 @@ export class GameRenderer {
     return !!entityId&&this.warriorPresentation.visible(performance.now(),entities).some(status=>status.targetEntityId===entityId&&status.type==='UNBRIDLED_RAGE');
   }
 
-  public playSkillVfx(event: S2CSkillCastEventPayload, entities: InterpolatedEntity[]): void {
-    const radius = event.radius ?? SKILLS_DATABASE[event.skillId]?.aoeRadius;
-    for (const request of planWarriorCastFx(event, entities, radius)) this.vfx.queue.spawn(request, performance.now());
-    for (const status of event.appliedStatuses ?? []) this.warriorPresentation.transition({ event: 'APPLIED', serverTick: event.serverTick ?? 0, status }, performance.now());
+  public playSkillVfx(event: S2CSkillCastEventPayload, entities: InterpolatedEntity[]): Set<string> {
+    const caster = entities.find(entity => entity.id === event.casterId);
+    const skill = SKILLS_DATABASE[event.skillId];
+    const now = performance.now();
+    const skillId = skill?.skillId ?? event.skillId;
+    const warrior = this.visualStyle === 'pixel' && warriorCastArt(skillId);
+    if (warrior && caster?.classType === 'GUERREIRO') this.pixelWorld.playWarriorCast(caster.id, skillId, now);
+    const effects = warrior
+      ? planWarriorWorldFx({ ...event, skillId }, entities)
+      : planWarriorCastFx(event, entities, event.radius ?? skill?.aoeRadius);
+    const delayedHits = new Set<string>();
+    for (const request of effects) {
+      this.vfx.queue.spawn(request, now);
+      if (request.targetId) {
+        this.pixelWorld.pendingHits.set(request.targetId, now + (request.delayMs ?? 0));
+        delayedHits.add(request.targetId);
+      }
+    }
+    for (const status of event.appliedStatuses ?? []) this.warriorPresentation.transition({ event: 'APPLIED', serverTick: event.serverTick ?? 0, status }, now);
+    return delayedHits;
   }
 
   public render(entities: InterpolatedEntity[], myPlayerId: string | null): void {
@@ -389,7 +408,7 @@ export class GameRenderer {
             const frameIndex = playback.frame;
 
             const col = frameIndex % sheetSpec.cols;
-            const row = Math.floor(frameIndex / sheetSpec.cols);
+            const row = sheetSpec.directional ? warriorDirectionRow(ent.headingYaw) : Math.floor(frameIndex / sheetSpec.cols);
             const sx = col * cellW;
             const sy = row * cellH;
 
@@ -397,10 +416,11 @@ export class GameRenderer {
             const drawSize = 160;
             ctx.save();
             ctx.translate(screenX, screenY);
-            if (facingLeft) {
+            if (facingLeft && !sheetSpec.directional) {
               ctx.scale(-1, 1);
             }
-            ctx.drawImage(cleanSheet, sx, sy, cellW, cellH, -drawSize / 2, -drawSize + 36, drawSize, drawSize);
+            const anchor = sheetSpec.directional ? drawSize * (29 / 31) : drawSize - 36;
+            ctx.drawImage(cleanSheet, sx, sy, cellW, cellH, -drawSize / 2, -anchor, drawSize, drawSize);
             ctx.restore();
             drewSheet = true;
           }
@@ -702,8 +722,8 @@ export class GameRenderer {
    */
   public screenToWorld(clientX: number, clientY: number): Vector3 {
     const rect = this.canvas.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const x = (clientX - rect.left) * this.canvas.width / rect.width;
+    const y = (clientY - rect.top) * this.canvas.height / rect.height;
 
     const screenCenterX = this.canvas.width / 2;
     const screenCenterY = this.canvas.height / 2;
@@ -712,6 +732,14 @@ export class GameRenderer {
     const worldZ = (y - screenCenterY) / this.zoom + this.cameraOffset.y;
 
     return { x: worldX, y: 0, z: worldZ };
+  }
+
+  public visibleMonsterIds(entities: readonly InterpolatedEntity[]): string[] {
+    const halfWidth = this.canvas.width / (2 * this.zoom);
+    const halfHeight = this.canvas.height / (2 * this.zoom);
+    return entities.filter(entity => entity.type === 'MONSTER' && entity.currentHp > 0 &&
+      Math.abs(entity.position.x - this.cameraOffset.x) <= halfWidth &&
+      Math.abs(entity.position.z - this.cameraOffset.y) <= halfHeight).map(entity => entity.id);
   }
 
   public addOrUpdateDrop(payload: S2CItemDropSpawnPayload): void {

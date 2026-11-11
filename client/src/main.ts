@@ -12,7 +12,6 @@ import {
   RARITY_COLORS,
   ItemType,
   ItemRarity,
-  EquipmentSlot,
   S2CInventoryUpdatePayload,
   CLASS_STAT_GROWTH,
   getDefaultSkillsForClass,
@@ -35,6 +34,7 @@ import { GameRenderer } from './renderer/GameRenderer';
 import { combatTriggersAttack, SkillRejectionEchoFilter } from './renderer/WarriorPresentation';
 import { worldAppearance } from './renderer/WorldPresentation';
 import { setupAuthSelection } from './ui/AuthSelection';
+import { skillArtUrl } from './ui/SkillArt';
 import { getGuestCredential } from './ui/GuestSession';
 import { setupFarmHelper } from './ui/FarmHelper';
 import { setupInventoryExpansion } from './ui/InventoryExpansion';
@@ -60,6 +60,13 @@ import './ui/progression.css';
 import './ui/narrative.css';
 import './ui/party-hud.css';
 import './ui/automatic-play.css';
+import './ui/hero-stage.css';
+import './ui/hud-notices.css';
+import './ui/mobile-hud.css';
+import { equipmentSlots, renderEquipmentSlot } from './ui/EquipmentSlots';
+import { setupDevPanel } from './ui/DevPanel';
+import './ui/dev-panel.css';
+import { renderClassArtwork } from './ui/WarriorStage';
 
 // DOM Elements
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -94,7 +101,7 @@ const enterPortalLabel = document.getElementById('enter-portal-label') as HTMLSp
 
 const charNameInput = document.getElementById('char-name') as HTMLInputElement;
 const charClassSelect = document.getElementById('char-class') as HTMLSelectElement;
-const classPortraitImg = document.getElementById('class-portrait-img') as HTMLImageElement | null;
+const classPortrait = document.getElementById('class-portrait-img');
 const classPreviewTitle = document.getElementById('class-preview-title') as HTMLSpanElement | null;
 const classPreviewStats = document.getElementById('class-preview-stats') as HTMLSpanElement | null;
 const btnConnect = document.getElementById('btn-connect') as HTMLButtonElement;
@@ -373,7 +380,7 @@ function updateEquippedSkillsUI() {
 
     if (slotUI && s) {
       slotUI.definition = s;
-      slotUI.img.src = `/assets/skills/${s.skillId}.png`;
+      slotUI.img.src = skillArtUrl(s.skillId);
       slotUI.img.alt = s.name;
       slotUI.img.onerror = () => {
         slotUI.img.style.display = 'none';
@@ -516,7 +523,7 @@ function renderGrimorioSkills(classType: CharacterClass) {
       card.innerHTML = `
         <div class="skill-v2-top">
           <div class="skill-v2-img-wrap">
-            <img src="/assets/skills/${s.skillId}.png" alt="${s.name}" class="skill-v2-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <img src="${skillArtUrl(s.skillId)}" alt="${s.name}" class="skill-v2-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
             <span class="skill-v2-emoji-icon" style="display: none;">${s.iconEmoji || '⚔️'}</span>
           </div>
           <div class="skill-v2-header-info">
@@ -580,9 +587,7 @@ function updateClassPreview() {
   const def = CLASS_DEFINITIONS[chosenClass];
   if (!def) return;
 
-  if (classPortraitImg) {
-    classPortraitImg.src = `/assets/portraits/${chosenClass}.jpg`;
-  }
+  if (classPortrait) renderClassArtwork(classPortrait, chosenClass, 'compact');
   if (classPreviewTitle) {
     classPreviewTitle.textContent = `${def.displayName} (${def.isRanged ? 'Ranged' : 'Melee'} ${def.attackRange}m)`;
   }
@@ -1507,20 +1512,11 @@ function selectInventorySlot(slotIndex: number) {
 // ==========================================
 // Paperdoll (Equipment Manequin) & Character Modal
 // ==========================================
-const paperdollPortrait = document.getElementById('paperdoll-portrait') as HTMLImageElement | null;
+const paperdollPortrait = document.getElementById('paperdoll-portrait');
 const paperdollHeroName = document.getElementById('paperdoll-hero-name') as HTMLSpanElement | null;
 const paperdollHeroClass = document.getElementById('paperdoll-hero-class') as HTMLSpanElement | null;
 
 type PaperdollSlotKey = 'head' | 'chest' | 'legs' | 'main_hand' | 'off_hand' | 'relic';
-
-const paperdollSlotMapping: Record<PaperdollSlotKey, EquipmentSlot> = {
-  head: EquipmentSlot.ELMO,
-  chest: EquipmentSlot.ARMADURA,
-  legs: EquipmentSlot.BOTAS,
-  main_hand: EquipmentSlot.ARMA,
-  off_hand: EquipmentSlot.ESCUDO,
-  relic: EquipmentSlot.ACESSORIO,
-};
 
 const paperdollSlotElements: Record<PaperdollSlotKey, HTMLElement | null> = {
   head: document.getElementById('equip-slot-head'),
@@ -1531,14 +1527,18 @@ const paperdollSlotElements: Record<PaperdollSlotKey, HTMLElement | null> = {
   relic: document.getElementById('equip-slot-relic'),
 };
 
-const defaultSlotIcons: Record<PaperdollSlotKey, { emoji: string; label: string }> = {
-  head: { emoji: '🧢', label: 'Elmo' },
-  chest: { emoji: '🦺', label: 'Armadura' },
-  legs: { emoji: '👖', label: 'Botas' },
-  main_hand: { emoji: '⚔️', label: 'Arma' },
-  off_hand: { emoji: '🛡️', label: 'Escudo' },
-  relic: { emoji: '💍', label: 'Relíquia' },
-};
+const autoEquipStatus = document.getElementById('auto-equip-status');
+document.getElementById('btn-auto-equip')?.addEventListener('click', () => {
+  if (!network.isConnected || !network.myPlayerId) return;
+  if (autoEquipStatus) autoEquipStatus.textContent = 'Comparando equipamentos…';
+  network.sendAutoEquip();
+});
+const hudHeader = document.getElementById('hud-header');
+if (hudHeader) {
+  new ResizeObserver(() => {
+    document.body.style.setProperty('--hud-header-bottom', `${hudHeader.getBoundingClientRect().bottom}px`);
+  }).observe(hudHeader);
+}
 
 function renderCharacterModal(): void {
   const chosenClass = myPlayerClass;
@@ -1602,7 +1602,7 @@ function renderCharacterModal(): void {
 
   // Center stage avatar
   const charName = hudHeroName?.textContent?.trim() || 'Aventureiro';
-  if (paperdollPortrait) paperdollPortrait.src = `/assets/portraits/${chosenClass}.jpg`;
+  if (paperdollPortrait) renderClassArtwork(paperdollPortrait, chosenClass);
   if (paperdollHeroName) paperdollHeroName.textContent = charName;
   if (paperdollHeroClass) paperdollHeroClass.textContent = `${classDef.displayName} (Nv. ${playerLevel})`;
 
@@ -1610,61 +1610,10 @@ function renderCharacterModal(): void {
   Object.entries(paperdollSlotElements).forEach(([slotKeyStr, slotEl]) => {
     if (!slotEl) return;
     const slotKey = slotKeyStr as PaperdollSlotKey;
-    const equipSlot = paperdollSlotMapping[slotKey];
-    const equippedItem = playerInventory.find((i) => {
-      if (!i.isEquipped) return false;
-      const def = ITEMS_DATABASE[i.itemId];
-      return def && def.equipmentSlot === equipSlot;
-    });
-
-    if (equippedItem) {
-      const def = ITEMS_DATABASE[equippedItem.itemId]!;
-      const rarityTheme = RARITY_COLORS[def.rarity] || { border: '#fbbf24', text: '#fbbf24', glow: 'rgba(251,191,36,0.3)' };
-      const refineStr = equippedItem.refineLevel ? ` (+${equippedItem.refineLevel})` : '';
-      slotEl.style.borderColor = rarityTheme.border;
-      slotEl.style.boxShadow = `0 0 12px ${rarityTheme.glow}`;
-      slotEl.innerHTML = `
-        <span class="slot-placeholder-icon" style="font-size: 1.5rem;"></span>
-        <span class="slot-label" style="color: ${rarityTheme.text}; font-weight: 700;">${def.name}${refineStr}</span>
-      `;
-      renderItemIcon(slotEl.querySelector<HTMLElement>('.slot-placeholder-icon')!, def.itemId, getItemEmoji(def.itemId, def.type));
-      slotEl.title = `[Equipado] ${def.name}${refineStr} (${def.rarity})\nClique para inspecionar, refinar ou desequipar`;
-      slotEl.onclick = () => {
-        selectInventorySlot(equippedItem.slotIndex);
-      };
-    } else {
-      const defSlot = defaultSlotIcons[slotKey];
-      slotEl.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-      slotEl.style.boxShadow = 'none';
-      slotEl.innerHTML = `
-        <span class="slot-placeholder-icon">${defSlot.emoji}</span>
-        <span class="slot-label">${defSlot.label}</span>
-      `;
-      slotEl.title = `[Vazio] Slot de ${defSlot.label}\nAbra a Mochila [I] para equipar`;
-      slotEl.onclick = () => {
-        openInventory();
-      };
-    }
-    // Render refinement badges on equipment slots
-    Object.keys(paperdollSlotMapping).forEach((slotKeyStr) => {
-      const slotKey = slotKeyStr as PaperdollSlotKey;
-      const badgeEl = document.getElementById(`refine-badge-${slotKey}`);
-      if (badgeEl) {
-        const equipSlot = paperdollSlotMapping[slotKey];
-        const eqItem = playerInventory.find((i) => {
-          if (!i.isEquipped) return false;
-          const def = ITEMS_DATABASE[i.itemId];
-          return def && def.equipmentSlot === equipSlot;
-        });
-        const tier = eqItem?.refineLevel || 0;
-        if (tier > 0) {
-          badgeEl.textContent = `+${tier}`;
-          badgeEl.style.display = 'block';
-        } else {
-          badgeEl.style.display = 'none';
-        }
-      }
-    });
+    const equippedItem = playerInventory.find(item => item.isEquipped &&
+      ITEMS_DATABASE[item.itemId]?.equipmentSlot === equipmentSlots[slotKey].slot);
+    renderEquipmentSlot(slotEl, slotKey, equippedItem);
+    slotEl.onclick = equippedItem ? () => selectInventorySlot(equippedItem.slotIndex) : openInventory;
   });
 }
 
@@ -1839,10 +1788,18 @@ inventoryExpansion = setupInventoryExpansion({
   },
 });
 network.onEquipmentAdvice = result => equipmentAdvice.onResult(result);
+network.onAutoEquipResult = result => {
+  if (autoEquipStatus) autoEquipStatus.textContent = result.message;
+};
 network.onExpandInventoryResult = result => inventoryExpansion!.onResult(result);
 network.onLeaderboardUpdate = data => leaderboard.onUpdate(data);
 const bossNarrative = setupBossNarrative();
 const partyHUD = new PartyHUD(network);
+const devPanel = setupDevPanel(
+  command => network.sendDevControl(command),
+  () => renderer.visibleMonsterIds(snapshotBuffer.getInterpolatedEntities()),
+);
+network.onDevState = state => devPanel.update(state);
 const channelSelector = new ChannelSelector(network);
 const offlineRewardModal = new OfflineRewardModal({
   isReady: () => network.isConnected && network.isAuthenticated,
@@ -1852,7 +1809,7 @@ const offlineRewardModal = new OfflineRewardModal({
 const offlineChestButton = document.createElement('button');
 offlineChestButton.type = 'button';
 offlineChestButton.className = 'dock-btn';
-offlineChestButton.textContent = '⏳ Baú do Tempo';
+offlineChestButton.innerHTML = '<span class="dock-time-icon" aria-hidden="true">⌛</span><span>Baú do Tempo</span>';
 offlineChestButton.style.display = 'none';
 btnDockFarm?.insertAdjacentElement('afterend', offlineChestButton);
 const offlineInventoryButton = document.createElement('button');
@@ -2110,12 +2067,14 @@ function toggleChatBox(force?: boolean) {
   if (!gameChatBox) return;
   const willCollapse = force !== undefined ? force : !gameChatBox.classList.contains('collapsed');
   gameChatBox.classList.toggle('collapsed', willCollapse);
+  btnToggleChat?.setAttribute('aria-expanded', String(!willCollapse));
   if (chatToggleIcon) {
     chatToggleIcon.textContent = willCollapse ? '▲' : '▼';
   }
 }
 
 if (btnToggleChat) {
+  btnToggleChat.setAttribute('aria-expanded', String(!gameChatBox?.classList.contains('collapsed')));
   btnToggleChat.addEventListener('click', (e) => {
     e.stopPropagation();
     toggleChatBox();
@@ -2174,6 +2133,7 @@ if (btnOpenFarmGear) {
 
 // Network Event Wiring
 network.onConnectionStateChange = (connected) => {
+  if (!connected) devPanel.setAdmin(false);
   if (connected) {
     if (statusDot) statusDot.classList.add('online');
     if (connectionStatus) connectionStatus.textContent = 'Conectado (Online)';
@@ -2237,7 +2197,7 @@ network.onCombatEvent = (event) => {
 network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
   if (!renderer.acceptSkillCast(event)) return;
   renderer.triggerEntityAnimation(event.casterId, 'attack');
-  if (event.targetId && event.targetId !== event.casterId && event.targetResults?.some(result=>result.targetId===event.targetId&&result.effectiveDamage>0)) {
+  if (!event.targetResults && event.targetId && event.targetId !== event.casterId && !event.isHeal && event.affectedEntityIds.includes(event.targetId)) {
     renderer.triggerEntityAnimation(event.targetId, 'hit');
   }
 
@@ -2245,15 +2205,21 @@ network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
     const slotUI = skillSlots[event.slot];
     if (slotUI && slotUI.definition) {
       cooldownMap.set(event.slot, performance.now() + (event.cooldownRemainingSec ?? slotUI.definition.cooldownSec) * 1000);
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        slotUI.button.animate([
+          { filter: 'brightness(1.85)', boxShadow: '0 0 18px #e7be76' },
+          { filter: 'brightness(1)', boxShadow: '0 0 0 transparent' },
+        ], { duration: 360, easing: 'ease-out' });
+      }
     }
   }
 
   const entities = snapshotBuffer.getInterpolatedEntities();
-  renderer.playSkillVfx(event, entities);
+  const delayedHits = renderer.playSkillVfx(event, entities);
   if (event.targetResults) {
     for (const result of event.targetResults) {
       if (result.isDead) renderer.triggerEntityAnimation(result.targetId, 'death');
-      else if (result.effectiveDamage > 0) renderer.triggerEntityAnimation(result.targetId, 'hit');
+      else if (result.effectiveDamage > 0 && !delayedHits.has(result.targetId)) renderer.triggerEntityAnimation(result.targetId, 'hit');
       if (result.effectiveDamage > 0) renderer.addSkillEffectText(result.impactPosition, event.skillName, result.effectiveDamage, false, result.isCritical);
       if (result.effectiveHeal > 0) renderer.addSkillEffectText(result.impactPosition, event.skillName, result.effectiveHeal, true, result.isCritical);
     }
@@ -2451,6 +2417,7 @@ network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
 };
 
 network.onLoginSuccess = (payload) => {
+  devPanel.setAdmin(payload.isAdmin === true);
   farmPlayerReady = true;
   farmHelperUI.onCharacterLogin();
   huntReportUI.onCharacterLogin();
@@ -2644,7 +2611,7 @@ network.onChangeChannelResult = (payload) => {
 
 // Skill Casting Action
 function castSkill(slot: number) {
-  if (!network.isConnected || !network.myPlayerId) return;
+  if (!network.isConnected || !network.myPlayerId || !skillRotationUI?.canCastManually()) return;
 
   const slotCfg = SLOT_CONFIGS.find((c) => c.slot === slot);
   const slotUI = skillSlots[slot];
@@ -2689,7 +2656,7 @@ function castSkill(slot: number) {
 // Bind button clicks for skills 1 - 4
 Object.entries(skillSlots).forEach(([slotStr, slotUI]) => {
   const slot = parseInt(slotStr, 10);
-  slotUI.button.addEventListener('pointerdown', (e) => {
+  slotUI.button.addEventListener('click', (e) => {
     e.stopPropagation();
     castSkill(slot);
   });
@@ -2697,7 +2664,7 @@ Object.entries(skillSlots).forEach(([slotStr, slotUI]) => {
 
 // Bind keyboard shortcuts (1, 2, 3, 4, K, I, C, F, Escape, Enter)
 window.addEventListener('keydown', (e) => {
-  if (authSelection.isOpen() || leaderboard.isOpen() || cinematic.isOpen()) return;
+  if (authSelection.isOpen() || leaderboard.isOpen() || cinematic.isOpen() || document.querySelector('#party-invite-compose[open]')) return;
   // Ignore game shortcuts while typing in any input field
   if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
     if (e.key === 'Escape' && chatInputField && document.activeElement === chatInputField) {
@@ -2707,8 +2674,9 @@ window.addEventListener('keydown', (e) => {
   }
 
   if (e.key === 'Enter') {
-    if (chatInputField) {
+    if (chatInputField && !(e.target instanceof Element && e.target.closest('button, a, [role="button"]'))) {
       e.preventDefault();
+      toggleChatBox(false);
       chatInputField.focus();
       return;
     }
@@ -2841,9 +2809,11 @@ const authSelection = setupAuthSelection({
   requestList: username => { legacyLoginRequested = false; network.sendRequestCharacterList(username); },
   create: (slot, name, classType) => network.sendCreateCharacterSlot(slot, name, classType),
   select: slot => network.sendSelectCharacterSlot(slot),
+  delete: (slot, name, confirmation) => network.sendDeleteCharacterSlot(slot, name, confirmation),
 });
 network.onCharacterList = payload => authSelection.onCharacterList(payload);
-const cinematic = setupCinematicIntro();
+const cinematic = setupCinematicIntro({ autoStart: false });
+document.getElementById('btn-cover-prologue')?.addEventListener('click', cinematic.open);
 network.onCharacterActionError = error => { authSelection.onError(error); farmHelperUI.onError(error.errorMessage); };
 network.onAuthSuccess = payload => {
   if (!payload.isActivated) { authSelection.onAuthenticationError('A conta ainda não está ativa.'); return; }
@@ -2877,14 +2847,20 @@ canvas.addEventListener('pointermove', (e) => {
   }
 });
 
-// Optional target selection and loot clicks never control movement.
 canvas.addEventListener('pointerdown', (event) => {
-  if (!network.isConnected || !network.myPlayerId) return;
+  if (!event.isPrimary || event.button !== 0 || !network.isConnected || !network.myPlayerId) return;
   const drop = renderer.getDropAtScreenPos(event.clientX, event.clientY, 34);
   if (drop) { network.sendLootItem(drop.dropId); return; }
   const position = renderer.screenToWorld(event.clientX, event.clientY);
-  const target = snapshotBuffer.getInterpolatedEntities().find(entity => entity.type === 'MONSTER' && entity.currentHp > 0 && distance(position, entity.position) < 2.8);
-  if (target) renderer.selectedTargetId = target.id;
+  const entities = snapshotBuffer.getInterpolatedEntities();
+  const target = entities.find(entity => entity.type === 'MONSTER' && entity.currentHp > 0 && distance(position, entity.position) < 2.8);
+  renderer.selectedTargetId = target?.id ?? null;
+});
+
+btnPrimaryAttack?.addEventListener('click', () => {
+  if (skillRotationUI?.canCastManually() && renderer.selectedTargetId) {
+    network.sendAttackTarget(renderer.selectedTargetId);
+  }
 });
 
 // Render Loop (60Hz / 120Hz native display rate)

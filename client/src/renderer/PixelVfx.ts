@@ -1,10 +1,12 @@
-export type FxKind = 'slash' | 'heal' | 'whirlwind' | 'avatar' | 'impact' | 'shield' | 'levelUp' | 'line' | 'judgment' | 'cone';
+export type WarriorWorldFxKind = 'warriorTrail' | 'warriorWave' | 'warriorBlade' | 'warriorContact' | 'warriorAura' | 'warriorSigil' | 'warriorAftermath';
+export type FxKind = 'slash' | 'heal' | 'whirlwind' | 'avatar' | 'impact' | 'shield' | 'levelUp' | 'line' | 'judgment' | 'cone' | WarriorWorldFxKind;
 export type FxPosition = { x: number; y: number; z: number };
 export type FxEntity = { id: string; position: FxPosition; headingYaw: number; currentHp: number };
 export type SlashVariant = 'bleed' | 'rupture' | 'haste' | 'stun';
-export type FxRequest = { kind: FxKind; position: FxPosition; yaw?: number; followId?: string; radius?: number; lineLength?: number; lineWidth?: number; coneRange?:number;coneAngleDeg?:number;delayMs?:number;variant?: SlashVariant };
+export type FxRequest = { kind: FxKind; position: FxPosition; yaw?: number; followId?: string; radius?: number; lineLength?: number; lineWidth?: number; coneRange?:number;coneAngleDeg?:number;delayMs?:number;variant?: SlashVariant; destination?: FxPosition; tone?: string; artwork?: number; targetId?: string };
 export type FxInstance = FxRequest & { startedAt: number; duration: number };
-export const FX_DURATION: Record<FxKind, number> = { slash: 330, heal: 800, whirlwind: 650, avatar: 1000, impact: 400, shield: 900, levelUp: 1100, line: 650, judgment: 850, cone:600 };
+export const FX_DURATION: Record<FxKind, number> = { slash: 330, heal: 800, whirlwind: 650, avatar: 1000, impact: 400, shield: 900, levelUp: 1100, line: 650, judgment: 850, cone:600,
+  warriorTrail: 400, warriorWave: 560, warriorBlade: 680, warriorContact: 350, warriorAura: 760, warriorSigil: 430, warriorAftermath: 900 };
 export const FX_SHEETS = {
   heal: { file: '/assets/pixel/craftpix/vfx/heal.png', cell: 72, frames: 8, fps: 10 },
   impact: { file: '/assets/pixel/craftpix/vfx/impact.png', cell: 72, frames: 4, fps: 10 },

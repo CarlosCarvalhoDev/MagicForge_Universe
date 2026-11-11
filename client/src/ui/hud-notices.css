@@ -1,0 +1,87 @@
+#game-canvas { touch-action: none; }
+
+#center-notification-queue {
+  width: min(356px, calc(100vw - 24px));
+  gap: 6px;
+  z-index: 60;
+}
+
+#center-notification-queue :is(#boss-timer-banner, .boss-story-banner, #quick-use-toast, .party-toast, #levelup-banner) {
+  box-sizing: border-box;
+  border: 1px solid var(--notice-border, #a48153);
+  border-radius: 5px;
+  background: linear-gradient(155deg, #2b211d, #141319);
+  box-shadow: inset 0 0 0 2px #171215, 0 5px 16px #0008;
+  color: #f2e4cc;
+}
+
+#center-notification-queue #boss-timer-banner {
+  --notice-border: #c48a57;
+  animation: none;
+  padding: 6px 11px;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.boss-timer-copy {
+  display: grid;
+  gap: 1px;
+  font-size: .72rem;
+}
+
+.boss-timer-copy strong, .boss-story-banner strong {
+  color: #f0cb8e;
+  font: 700 .8rem Cinzel, Georgia, serif;
+}
+
+#boss-banner-timer { color: #eed3b2; font-variant-numeric: tabular-nums; }
+
+#center-notification-queue .boss-story-banner {
+  position: static;
+  transform: none;
+  width: 100%;
+  gap: 9px;
+}
+
+.boss-story-banner img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  box-shadow: none;
+}
+
+#center-notification-queue .toast-error { --notice-border: #d17d73; }
+#center-notification-queue .toast-success { --notice-border: #75a38a; }
+#center-notification-queue #levelup-banner { position: static; display: none; transform: none; }
+#center-notification-queue #levelup-banner.active { display: flex; }
+
+dialog#offline-reward-dialog {
+  box-sizing: border-box;
+  width: min(420px, calc(100vw - 28px));
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  border: 1px solid #b79059 !important;
+  outline: 1px solid #b7905955;
+  outline-offset: -5px;
+  background: linear-gradient(150deg, #30221e, #181318 70%) !important;
+  box-shadow: 0 16px 50px #000a !important;
+}
+
+#offline-reward-dialog .offline-reward-container { gap: 12px; }
+#offline-reward-dialog .offline-title { color: #f1cc92; font-family: Cinzel, Georgia, serif; }
+#offline-reward-dialog .offline-subtitle, #offline-reward-dialog .reward-label { color: #d0bba2; }
+#offline-reward-dialog .offline-icon-crest, .dock-time-icon { font-family: Georgia, serif; color: #e2b573; }
+#offline-reward-dialog .offline-icon-crest { font-size: 1.6rem; }
+#offline-reward-dialog :is(.offline-time-banner, .offline-card, .offline-loot-section) { background: #191418; border: 1px solid #856a464d; }
+#offline-reward-dialog .offline-time-banner { flex-wrap: wrap; }
+#offline-reward-dialog .offline-time-value { color: #f2d29f; white-space: nowrap; }
+#offline-reward-dialog .offline-time-cap { flex-basis: 100%; color: #c0a991; }
+#offline-reward-dialog .offline-actions { display: grid; gap: 8px; }
+#offline-claim-status:empty { display: none; }
+#offline-reward-dialog .offline-actions button { width: 100%; min-height: 38px; font: 700 .78rem Cinzel, Georgia, serif; cursor: pointer; }
+#offline-reward-dialog #btn-claim-offline { background: linear-gradient(#f2d9a4, #bd8c55); border: 1px solid #d5b27a; color: #231710; box-shadow: none; }
+#offline-reward-dialog #btn-organize-offline { background: #30231e; border: 1px solid #967345; border-radius: 5px; color: #f4dfbe; }
+#offline-reward-dialog .offline-actions button:focus-visible { outline: 2px solid #ffdb9c; outline-offset: 2px; }
+
+#right-vertical-dock .dock-time-icon { display: block; font-size: 1rem; line-height: 1; }

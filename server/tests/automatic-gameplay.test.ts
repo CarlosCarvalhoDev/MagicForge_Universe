@@ -159,6 +159,25 @@ test('Reconectar na fase 10 inicia o chefe sem precisar clicar ou mover', (t) =>
   assert.equal(loaded.currentStage, 10);
 });
 
+test('Magias manuais preservam perseguição e ignoram movimento por clique', t => {
+  const f = setup(t);
+  f.target.position = createVector3(15, 0, 0);
+  f.target.spawnPosition = createVector3(15, 0, 0);
+  f.world.spatialGrid.updateEntity(f.target);
+  f.world.update(0.05);
+  assert.equal(f.player.isMoving, true);
+  f.world.handleUpdateSkillRotation(f.connection, { order: [1, 2, 3, 4], autoCastEnabled: false });
+  const targetId = f.player.targetId;
+  new PacketHandler(f.world).handlePacket(f.connection, JSON.stringify({ op: Opcode.C2S_MOVE_INPUT,
+    data: { targetPosition: createVector3(-3, 0, 2), inputSequence: 99 } }));
+  assert.equal(f.player.targetId, targetId);
+  assert.equal(f.player.targetDestination, null);
+  const beforeX = f.player.position.x;
+  for (let tick = 0; tick < 10; tick++) f.world.update(0.05);
+  assert.ok(f.player.position.x > beforeX);
+  assert.equal(f.casts().length, 0);
+});
+
 test('Magias manuais persistem; ataque básico e conjuração por clique continuam disponíveis', t => {
   const f = setup(t);
   f.world.handleUpdateSkillRotation(f.connection, {order:[1,2,3,4], autoCastEnabled:false});

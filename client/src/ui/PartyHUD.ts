@@ -34,7 +34,15 @@ export class PartyHUD {
     this.rootCard = document.createElement('div');
     this.rootCard.id = 'party-hud-card';
     this.rootCard.className = 'glass-panel collapsed';
-    document.body.appendChild(this.rootCard);
+    const profile = document.getElementById('hero-status-card');
+    if (profile) profile.after(this.rootCard);
+    else document.body.appendChild(this.rootCard);
+    if (profile) {
+      const align = () => this.rootCard?.style.setProperty('--party-profile-bottom', profile.getBoundingClientRect().bottom + 'px');
+      new ResizeObserver(align).observe(profile);
+      window.addEventListener('resize', align);
+      align();
+    }
 
     // Toast Container
     this.toastContainer = document.getElementById('party-toast-container');
@@ -86,8 +94,9 @@ export class PartyHUD {
       <span class="toast-corner-spike top-right" aria-hidden="true"></span>
       <span class="toast-corner-spike bottom-left" aria-hidden="true"></span>
       <span class="toast-corner-spike bottom-right" aria-hidden="true"></span>
-      <span class="toast-content-text">${message}</span>
+      <span class="toast-content-text"></span>
     `;
+    toast.querySelector('.toast-content-text')!.textContent = message;
     this.toastContainer.appendChild(toast);
     setTimeout(() => {
       if (toast.parentElement) toast.parentElement.removeChild(toast);
@@ -166,11 +175,40 @@ export class PartyHUD {
   }
 
   private promptInvitePlayer(): void {
-    const name = window.prompt('Digite o nome do jogador para convidar ao grupo:');
-    if (name && name.trim().length > 0) {
-      this.network.sendPartyInvite(name.trim());
-      this.showToast(`Convite enviado para "${name.trim()}"...`, 'info');
-    }
+    if (document.getElementById('party-invite-compose')) return;
+    const dialog = document.createElement('dialog');
+    dialog.id = 'party-invite-compose';
+    dialog.setAttribute('aria-labelledby', 'party-invite-compose-title');
+    dialog.innerHTML = `
+      <form>
+        <h2 id="party-invite-compose-title">Convidar para o grupo</h2>
+        <label for="party-invite-name">Nome do jogador</label>
+        <input id="party-invite-name" required maxlength="20" autocomplete="off" autofocus>
+        <div class="party-invite-buttons">
+          <button class="party-invite-btn-decline" type="button">Cancelar</button>
+          <button class="party-invite-btn-accept" type="submit">Enviar convite</button>
+        </div>
+      </form>`;
+    const input = dialog.querySelector('input')!;
+    input.addEventListener('input', () => input.setCustomValidity(''));
+    dialog.querySelector('form')!.addEventListener('submit', event => {
+      event.preventDefault();
+      const name = input.value.trim();
+      if (!name) {
+        input.setCustomValidity('Informe o nome do jogador.');
+        input.reportValidity();
+        return;
+      }
+      this.network.sendPartyInvite(name);
+      dialog.close();
+    });
+    dialog.querySelector('button')!.onclick = () => dialog.close();
+    dialog.addEventListener('close', () => {
+      dialog.remove();
+      this.rootCard?.querySelector<HTMLElement>('#party-btn-solo-invite, #party-btn-add-more, #party-pill-btn')?.focus();
+    }, { once: true });
+    document.body.append(dialog);
+    dialog.showModal();
   }
 
   public render(): void {
@@ -185,10 +223,9 @@ export class PartyHUD {
     if (this.isCollapsed) {
       this.rootCard.classList.add('collapsed');
       this.rootCard.innerHTML = `
-        <div class="party-pill-view" id="party-pill-btn" role="button" tabindex="0" title="Grupo: +5% EXP compartilhada (Toque para abrir)">
-          <span class="party-pill-icon">👥</span>
-          <span class="party-pill-bonus">+5%</span>
-        </div>
+        <button type="button" class="party-pill-view" id="party-pill-btn" aria-expanded="false">
+          Grupo${memberCount > 1 ? ` · ${memberCount}/4` : ''}
+        </button>
       `;
       this.rootCard.querySelector('#party-pill-btn')?.addEventListener('click', () => this.toggleCollapse());
       return;
@@ -201,7 +238,7 @@ export class PartyHUD {
       <div class="party-hud-header">
         <div class="party-hud-title">
           <span>👥</span> ${party && memberCount > 1 ? `GRUPO (${memberCount}/4)` : 'GRUPO'}
-          <span class="party-badge-exp">+10% XP</span>
+          <span class="party-badge-exp">+10% XP por aliado</span>
         </div>
         <button id="party-btn-toggle" class="party-hud-toggle-btn" title="Minimizar para ícone">▾</button>
       </div>
@@ -269,7 +306,7 @@ export class PartyHUD {
     // Footer actions
     let footerHtml = `
       <div class="party-footer-actions">
-        ${memberCount < 4 ? `
+        ${isLeader && memberCount < 4 ? `
           <button id="party-btn-add-more" class="party-btn-secondary" title="Convidar mais aliados">
             <span>➕</span> Convidar
           </button>

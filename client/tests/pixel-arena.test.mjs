@@ -4,6 +4,24 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { PracticeArena } from '../src/pixel/PracticeArena.ts';
 import { PIXEL_SHEETS, PIXEL_PROPS, directionRow, facingFromYaw, pixelFamily } from '../src/renderer/PixelAssets.ts';
+import { WarriorCastClock, warriorCastArt, warriorDirectionRow } from '../src/renderer/HeroAnimations.ts';
+
+test('warrior has eight movement directions and twelve distinct authored casts', () => {
+  assert.deepEqual([0, 45, 90, 135, 180, 225, 270, 315].map(warriorDirectionRow), [0, 7, 6, 5, 4, 3, 2, 1]);
+  for (const [slot, group] of ['truque', 'nv1', 'nv2', 'nv3'].entries()) {
+    for (const variant of [1, 2, 3]) {
+      const art = warriorCastArt(`guerreiro_${group}_${variant}`);
+      assert.ok(art.file.endsWith(`_slot_${slot + 1}_sheet.png`));
+      assert.equal(art.row, variant - 1);
+      assert.ok(art.ground > 0 && art.ground < 1);
+    }
+  }
+  const casts = new WarriorCastClock();
+  assert.equal(casts.trigger('hero', 'guerreiro_nv3_2', 100), true);
+  assert.deepEqual(casts.sample('hero', 350), { ...warriorCastArt('guerreiro_nv3_2'), frame: 2 });
+  assert.equal(casts.sample('hero', 600), undefined);
+  assert.equal(casts.trigger('hero', 'unknown', 600), false);
+});
 
 test('cardinal heading selects actual directional rows without mirroring', () => {
   assert.deepEqual([0, 90, 180, 270, -90, 360].map(facingFromYaw), ['south', 'east', 'north', 'west', 'west', 'south']);
@@ -16,9 +34,11 @@ test('every shipped sheet has the declared native cell grid and every prop exist
   for (const set of Object.values(PIXEL_SHEETS)) for (const spec of Object.values(set)) {
     const bytes = readFileSync(file(spec.file));
     assert.equal(bytes.toString('ascii', 1, 4), 'PNG');
-    assert.equal(bytes.readUInt32BE(16), spec.cols * 64, spec.file);
-    assert.equal(bytes.readUInt32BE(20), 256, spec.file);
-    assert.equal(spec.frames, spec.cols); assert.equal(spec.fps, 1000 / 150);
+    const cell = spec.directional ? 222 : 64;
+    assert.equal(bytes.readUInt32BE(16), spec.cols * cell, spec.file);
+    assert.equal(bytes.readUInt32BE(20), spec.rows * cell, spec.file);
+    assert.equal(spec.frames, spec.cols);
+    if (!spec.directional) assert.equal(spec.fps, 1000 / 150);
   }
   for (const path of Object.values(PIXEL_PROPS)) assert.ok(readFileSync(file(path)).length > 0);
 });

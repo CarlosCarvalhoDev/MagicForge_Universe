@@ -1,13 +1,19 @@
 import { FX_SHEETS, PixelVfxQueue } from './PixelVfx';
 import type { FxEntity } from './PixelVfx';
 import type { CombatStatusStatePayload } from '@magicforge/shared';
+import { warriorCastArt } from './HeroAnimations';
+import { drawWarriorUltimate, drawWarriorWorldFx, WARRIOR_ULTIMATE_ATLAS, WARRIOR_WORLD_ATLAS } from './WarriorWorldFxDraw';
 
 /** Native sheets + code-authored pixel primitives. Never edits vendor pixels. */
 export class PixelVfxPlayer {
   readonly queue = new PixelVfxQueue();
   readonly ready: Promise<void>;
   private images = new Map<string, HTMLImageElement>();
+  private readonly warriorAtlas = new Image();
+  private readonly ultimateAtlas = new Image();
   constructor() {
+    this.warriorAtlas.src = WARRIOR_WORLD_ATLAS;
+    this.ultimateAtlas.src = WARRIOR_ULTIMATE_ATLAS;
     this.ready = Promise.all(Object.values(FX_SHEETS).map(spec => new Promise<void>((resolve, reject) => {
       const image = new Image(); this.images.set(spec.file, image);
       image.onload = () => image.naturalWidth === spec.cell * spec.frames && image.naturalHeight === spec.cell ? resolve() : reject(new Error(`Grade VFX inválida: ${spec.file}`));
@@ -23,6 +29,12 @@ export class PixelVfxPlayer {
       if (x < -300 || y < -300 || x > ctx.canvas.width + 300 || y > ctx.canvas.height + 300) continue;
       const progress = Math.min(1, (now - fx.startedAt) / fx.duration);
       ctx.globalAlpha = Math.min(1, (1 - progress) * 3);
+      if (fx.artwork !== undefined) {
+        if (!drawWarriorUltimate(ctx, this.ultimateAtlas, fx, x, y, zoom, progress)) {
+          drawWarriorWorldFx(ctx, this.warriorAtlas, fx, x, y, zoom, progress);
+        }
+        continue;
+      }
       const dot = (dx: number, dy: number, size = 2) => ctx.fillRect(x + Math.round(dx) * scale, y + Math.round(dy) * scale, size * scale, size * scale);
       const ring = (radius: number, color: string, squash = .5, start = 0, end = Math.PI * 2) => {
         ctx.fillStyle = color;
@@ -71,9 +83,10 @@ export class PixelVfxPlayer {
         const length = Math.min(15, Math.max(1, fx.lineLength ?? 4.5)) * zoom / scale;
         const width = Math.min(6, Math.max(.5, fx.lineWidth ?? 3)) * zoom / scale;
         const angle = (fx.yaw ?? 0) * Math.PI / 180;
-        for (let i = 0; i < 20 * progress; i++) {
+        const front = Math.min(1, progress / (fx.tone ? .8 : 1));
+        for (let i = 0; i < 20 * front; i++) {
           const along = i / 20 * length;
-          for (const side of [-.5, 0, .5]) { ctx.fillStyle = side === 0 ? '#f4dca5' : '#b49976'; dot(Math.sin(angle) * along + Math.cos(angle) * side * width, Math.cos(angle) * along - Math.sin(angle) * side * width, 3); }
+          for (const side of [-.5, 0, .5]) { ctx.fillStyle = side === 0 ? fx.tone ?? '#f4dca5' : '#b49976'; dot(Math.sin(angle) * along + Math.cos(angle) * side * width, Math.cos(angle) * along - Math.sin(angle) * side * width, fx.tone && side === 0 ? 5 : 3); }
         }
       } else if (fx.kind === 'whirlwind' || fx.kind === 'avatar') {
         const radius = Math.min(60, Math.max(18, (fx.radius ?? 4) * zoom / scale)) * (.25 + progress * .75);
@@ -112,7 +125,7 @@ export class PixelVfxPlayer {
         const absorption = status.type === 'SHIELD' && Number.isFinite(status.remainingAbsorption) ? Math.max(0, Math.ceil(status.remainingAbsorption!)) : undefined;
         const label = labels[status.type] + (absorption !== undefined ? ` ${absorption}` : '');
         const w = ctx.measureText(label).width + 10; ctx.fillRect(x - w / 2, y - 120 - index * 15, w, 13); ctx.fillStyle = color; ctx.fillText(label, x, y - 110 - index * 15);
-        if (status.type === 'SHIELD' || status.type === 'DEATH_IMMUNITY') {
+        if ((status.type === 'SHIELD' || status.type === 'DEATH_IMMUNITY') && !warriorCastArt(status.skillId)) {
           ctx.strokeStyle = status.type === 'SHIELD' ? '#83daf0' : '#f5cf85'; ctx.lineWidth = 2;
           ctx.beginPath(); ctx.ellipse(x, y - 30, 34, 49, 0, 0, Math.PI * 2); ctx.stroke();
         } else if (status.type === 'STUN') {

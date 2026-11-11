@@ -1,2951 +1,972 @@
+#farm-helper-modal .modal-content{max-height:90dvh;overflow-y:auto}.hunt-report{margin:12px 6px;padding:14px;border:1px solid #fbbf2444;border-radius:10px;background:#0f172a99;color:#e2e8f0}.hunt-report h3{margin:0 0 10px;font-size:16px;color:#fbbf24}.hunt-report p{font-size:12px;line-height:1.5;color:#cbd5e1;overflow-wrap:anywhere}.hunt-report dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hunt-report dl>div{min-width:0;padding:8px;border-radius:6px;background:#0003}.hunt-report dt{font-size:11px;color:#94a3b8}.hunt-report dd{margin:4px 0 0;font-size:15px;font-weight:700;overflow-wrap:anywhere}.hunt-report button{width:100%;min-height:44px}@media(max-width:380px){.hunt-report dl{grid-template-columns:minmax(0,1fr)}}@keyframes starsTwinkle{0%{opacity:.35;transform:translateY(0)}to{opacity:.75;transform:translateY(-12px)}}@keyframes runesGlow{0%{transform:scale(.98);opacity:.5}to{transform:scale(1.03);opacity:.85}}.pulse-dot{width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 10px #10b981;animation:pulseDot 1.8s infinite}@keyframes pulseDot{0%,to{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}.pill-title{font:700 11px Cinzel,serif;color:#34d399;letter-spacing:.1em}.pill-meta{font:500 11px system-ui,sans-serif;color:#fff9;border-left:1px solid rgba(255,255,255,.2);padding-left:8px}@keyframes runePulse{0%{transform:scale(.9);opacity:.4}to{transform:scale(1.15);opacity:.85}}@keyframes heroActorBreathe{0%{transform:translateY(0) scale(1);filter:drop-shadow(0 10px 14px rgba(0,0,0,.6))}50%{transform:translateY(-5px) scale(1.02);filter:drop-shadow(0 16px 20px rgba(245,158,11,.35))}to{transform:translateY(-2px) scale(1.01);filter:drop-shadow(0 12px 16px rgba(0,0,0,.7))}}.ranking-card-header{text-align:center;border-bottom:1px solid rgba(245,158,11,.25);padding-bottom:8px;position:relative}.ranking-header-badge{font:700 9px Cinzel,serif;letter-spacing:.18em;color:#fbbf24;text-transform:uppercase;display:block}.ranking-card-header h3{font:700 16px Cinzel,serif;color:#f8fafc;margin:3px 0 6px;letter-spacing:.08em}.ranking-live-beacon{display:inline-flex;align-items:center;gap:6px;background:#10b9811a;border:1px solid rgba(16,185,129,.35);padding:2px 10px;border-radius:999px}.beacon-pulse{width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation:pulseDot 1.8s infinite}.beacon-text{font:700 9px Cinzel,serif;color:#34d399;letter-spacing:.1em}.ranking-list-mock{display:flex;flex-direction:column;gap:7px;margin:10px 0}.ranking-row{display:flex;align-items:center;gap:10px;background:#0f172aa6;border:1px solid rgba(245,158,11,.18);border-radius:6px;padding:6px 10px;transition:all .2s ease}.ranking-row:hover{background:#f59e0b1f;border-color:#f59e0b73;transform:translate(2px)}.ranking-row.top-1{border-color:#fbbf2499;background:linear-gradient(90deg,#f59e0b33,#0f172ab3)}.ranking-pos{font:800 13px Cinzel,serif;color:#fbbf24;width:22px;text-align:center;flex-shrink:0}.ranking-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;border:1.5px solid rgba(245,158,11,.6);flex-shrink:0}.ranking-avatar img{width:100%;height:100%;object-fit:cover}.ranking-info{display:flex;flex-direction:column;flex:1;min-width:0;text-align:left}.ranking-name{font:700 11px Cinzel,serif;color:#fef08a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ranking-details{font:400 9.5px system-ui,sans-serif;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ranking-status-tag{font:600 8.5px Cinzel,serif;letter-spacing:.05em;background:#10b98126;color:#34d399;border:1px solid rgba(16,185,129,.3);padding:2px 6px;border-radius:4px;flex-shrink:0}.ranking-footer-note{border-top:1px solid rgba(245,158,11,.2);padding-top:6px;text-align:center;font:500 9.5px system-ui,sans-serif;color:#cbd5e199}@keyframes ctaRingPulse{0%{transform:scale(.96);opacity:.8}to{transform:scale(1.08);opacity:0}}.pulse-dot{background:#8fb89a;box-shadow:0 0 8px #8fb89a99}.pill-title{color:#d7e6da;letter-spacing:.12em}@keyframes ctaChevronPulse{0%,to{transform:translate(0);opacity:.8}50%{transform:translate(-4px);opacity:1}}:root{--safe-top: env(safe-area-inset-top, 0px);--safe-bottom: env(safe-area-inset-bottom, 0px);--safe-left: env(safe-area-inset-left, 0px);--safe-right: env(safe-area-inset-right, 0px)}.modal-content,.grimorio-modal-content,.unified-hero-modal-content,.skill-card-modal-content,#leaderboard-dialog{position:relative;border:2px solid #d97706!important;outline:1.5px solid rgba(254,240,138,.35);outline-offset:-8px;border-radius:6px!important;background-color:#090d18!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),url(/assets/ui/frames/crest-header-ornament.svg),radial-gradient(circle at 50% 0%,rgba(217,119,6,.24),transparent 58%),radial-gradient(circle at 85% 90%,rgba(139,92,246,.12),transparent 50%),linear-gradient(170deg,#181526fa,#080b16fc)!important;background-repeat:no-repeat!important;background-position:top 2px left 2px,top 2px right 2px,bottom 2px left 2px,bottom 2px right 2px,top 4px center,center,center,center!important;background-size:52px 52px,52px 52px,52px 52px,52px 52px,240px 28px,100% 100%,100% 100%,100% 100%!important;box-shadow:inset 0 0 0 4px #0a0e1aeb,inset 0 0 28px #f59e0b1f,0 28px 68px #000000f2,0 0 42px #f59e0b2e!important;color:#ece8dc}.modal-content:before,#leaderboard-dialog:before{content:none!important}.modal-header,.unified-modal-header,.ranking-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:6px!important;padding-bottom:18px!important;border-bottom:none!important;background-image:url(/assets/ui/frames/divider-runic-ornate.svg)!important;background-repeat:no-repeat!important;background-position:bottom center!important;background-size:min(460px,90%) 18px!important;position:relative}.modal-header:after,.unified-modal-header:after,.ranking-header:after{content:none!important}.modal-title,.modal-title-main,.ranking-header h2,#skill-card-modal-title{font-family:Cinzel,serif!important;font-weight:800!important;letter-spacing:.06em!important;background:linear-gradient(180deg,#fffbeb,#fde68a 52%,#d97706);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 8px rgba(0,0,0,.9))}.btn-close,#leaderboard-close{width:36px!important;height:36px!important;min-height:36px!important;padding:0!important;border-radius:4px!important;border:1.5px solid rgba(251,191,36,.65)!important;outline:1px solid rgba(254,240,138,.25);outline-offset:-4px;background:linear-gradient(180deg,#2c2030f5,#0f121efa)!important;color:#fde68a!important;font-size:1rem!important;font-weight:800!important;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:inset 0 1px #ffffff29,0 4px 12px #000000a6;transition:all .18s ease}.btn-close:hover,#leaderboard-close:hover{border-color:#f87171!important;background:linear-gradient(180deg,#b91c1c,#7f1d1d)!important;color:#fff!important;box-shadow:0 0 16px #ef4444a6;transform:scale(1.05)}.grimorio-strategy-banner{background-color:#101525!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(90deg,#241a30f2,#0f1422f2)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center!important;background-size:24px 24px,24px 24px,24px 24px,24px 24px,100% 100%!important;border:1.5px solid rgba(251,191,36,.48)!important;border-left:4px solid #fbbf24!important;border-radius:4px!important;box-shadow:inset 0 0 16px #fbbf2414,0 6px 18px #00000080}.strategy-badge{font-family:Cinzel,serif;letter-spacing:.06em;background:linear-gradient(180deg,#fbbf243d,#b453093d)!important;color:#fef08a!important;border:1px solid rgba(251,191,36,.6)!important;border-radius:3px!important}.grimorio-slot-section{background-color:#0b101e!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),radial-gradient(circle at 0% 0%,rgba(251,191,36,.09),transparent 55%),linear-gradient(180deg,#121726eb,#0a0e1af5)!important;background-repeat:no-repeat!important;background-position:top 2px left 2px,top 2px right 2px,bottom 2px left 2px,bottom 2px right 2px,center,center!important;background-size:32px 32px,32px 32px,32px 32px,32px 32px,100% 100%,100% 100%!important;border:1.5px solid rgba(251,191,36,.35)!important;outline:1px solid rgba(254,240,138,.16);outline-offset:-6px;border-radius:6px!important;box-shadow:inset 0 0 0 1px #ffffff0a,0 10px 26px #0009}.grimorio-slot-section.unlocked{border-color:#fbbf248c!important}.slot-circle-pill{font-family:Cinzel,serif;letter-spacing:.08em!important}.skill-card-v2{position:relative;background-color:#0c1120!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),radial-gradient(circle at 50% 0%,rgba(251,191,36,.12),transparent 65%),linear-gradient(165deg,#1c2034f2,#0b0f1cfa)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center,center!important;background-size:28px 28px,28px 28px,28px 28px,28px 28px,100% 100%,100% 100%!important;border:1.5px solid rgba(251,191,36,.42)!important;outline:1px solid rgba(254,240,138,.18);outline-offset:-5px;border-radius:5px!important;box-shadow:inset 0 0 0 1px #ffffff0a,0 10px 22px #000000a6}.skill-card-v2:after{content:none!important}.skill-card-v2:hover{border-color:#fbbf24!important;outline-color:#fef08a6b;box-shadow:inset 0 0 16px #fbbf2424,0 14px 28px #000c,0 0 20px #fbbf2440}.skill-card-v2.is-equipped{border-color:#34d399!important;outline-color:#34d39959;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),radial-gradient(circle at 50% 0%,rgba(16,185,129,.22),transparent 65%),linear-gradient(165deg,#0e2626f2,#0a121cfa)!important;box-shadow:inset 0 0 0 1px #34d39947,0 0 24px #10b9814d!important}.skill-v2-img-wrap{border:2px solid #fbbf24!important;outline:1px solid rgba(254,240,138,.35);outline-offset:2px;border-radius:6px!important;box-shadow:0 0 14px #fbbf2466,inset 0 0 8px #000000d9}.skill-v2-desc{background:#060912d1!important;border:1px solid rgba(251,191,36,.22)!important;border-radius:4px!important}.btn-equip-skill{font-family:Cinzel,serif!important;letter-spacing:.08em;text-transform:uppercase;border-radius:4px!important}.btn-equip-skill.equip{border:1.5px solid #fef08a!important;outline:1px solid rgba(120,53,15,.65);outline-offset:-3px;background-color:#d97706!important;background-image:url(/assets/ui/frames/button-ornament-left.svg),url(/assets/ui/frames/button-ornament-right.svg),linear-gradient(180deg,#fef08a,#fbbf24 25%,#d97706 78%,#92400e)!important;background-repeat:no-repeat!important;background-position:left 6px center,right 6px center,center!important;background-size:28px 26px,28px 26px,100% 100%!important;color:#1c0f02!important;box-shadow:inset 0 1px #ffffffbf,0 4px 12px #d9770673!important}.btn-equip-skill.active{background:linear-gradient(180deg,#065f46c7,#064e3beb)!important;border:1.5px solid #34d399!important;outline:1px solid rgba(167,243,208,.25);outline-offset:-3px;color:#a7f3d0!important}.unified-hero-left-pane{background-color:#090d18!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),url(/assets/ui/frames/crest-header-ornament.svg),radial-gradient(circle at 50% 35%,rgba(245,158,11,.16),transparent 65%),linear-gradient(180deg,#16182af5,#090d18fc)!important;background-repeat:no-repeat!important;background-position:top 2px left 2px,top 2px right 2px,bottom 2px left 2px,bottom 2px right 2px,top 4px center,center,center!important;background-size:42px 42px,42px 42px,42px 42px,42px 42px,200px 24px,100% 100%,100% 100%!important;border:1.5px solid rgba(251,191,36,.55)!important;outline:1px solid rgba(254,240,138,.25);outline-offset:-6px;border-radius:6px!important;box-shadow:inset 0 0 0 1px #fbbf2429,inset 0 0 28px #000000c7!important}.hero-center-pedestal{background-image:url(/assets/ui/frames/magic-circle-halo.svg),radial-gradient(circle at 50% 50%,rgba(251,191,36,.18),transparent 70%)!important;background-repeat:no-repeat!important;background-position:center center!important;background-size:92% 92%,100% 100%!important}.hero-cp-banner{background-color:#1a1410!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(135deg,#2e2012f5,#121422fa)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center!important;background-size:22px 22px,22px 22px,22px 22px,22px 22px,100% 100%!important;border:1.5px solid #fbbf24!important;outline:1px solid rgba(254,240,138,.3);outline-offset:-4px;border-radius:5px!important;box-shadow:inset 0 1px #ffffff38,0 0 20px #fbbf244d!important}.cp-label{font-family:Cinzel,serif;color:#fde68a!important}.equipment-slot{background-color:#0b101e!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),radial-gradient(circle at 50% 50%,#1e293beb,#090d18fa)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center!important;background-size:16px 16px,16px 16px,16px 16px,16px 16px,100% 100%!important;border:1.5px solid rgba(251,191,36,.45)!important;border-radius:5px!important;box-shadow:inset 0 0 10px #000000d9,0 4px 12px #000000a6!important}.equipment-slot.equipped{border-color:#fbbf24!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),radial-gradient(circle at 50% 50%,#f59e0b42,#0f172af5)!important}.hero-stats-accordion{background:#080b14e0!important;border:1px solid rgba(251,191,36,.32)!important;border-radius:5px!important}.mini-stat{background:linear-gradient(180deg,#1a2032d9,#0c101cf2)!important;border:1px solid rgba(251,191,36,.22)!important;border-radius:4px!important}.submenu-tab-btn{font-family:Cinzel,serif!important;letter-spacing:.05em;background-color:#101525!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),linear-gradient(180deg,#1c2234e6,#0c101cf5)!important;background-repeat:no-repeat!important;background-position:top 1px left 1px,top 1px right 1px,center!important;background-size:16px 16px,16px 16px,100% 100%!important;border:1px solid rgba(251,191,36,.35)!important;border-radius:4px!important;color:#d4c59e!important}.submenu-tab-btn.active{background-color:#d97706!important;background-image:url(/assets/ui/frames/button-ornament-left.svg),url(/assets/ui/frames/button-ornament-right.svg),linear-gradient(180deg,#fef08a,#fbbf24 25%,#d97706 78%,#92400e)!important;background-repeat:no-repeat!important;background-position:left 4px center,right 4px center,center!important;background-size:22px 20px,22px 20px,100% 100%!important;border:1.5px solid #fef08a!important;outline:1px solid rgba(120,53,15,.6);outline-offset:-3px;color:#1c0f02!important;box-shadow:inset 0 1px #ffffffb3,0 0 16px #fbbf2473!important}.inventory-slot{background:linear-gradient(145deg,#181e30e6,#0a0e1af5)!important;border:1.5px solid rgba(251,191,36,.28)!important;border-radius:4px!important;box-shadow:inset 0 2px 6px #000c}.inventory-slot:hover{border-color:#fbbf24!important;box-shadow:0 0 12px #fbbf2466,inset 0 0 8px #fbbf242e}.inventory-inspector,.refino-forge-card,.pedras-socket-card,.cartas-album-card{background-color:#0b101e!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),url(/assets/ui/frames/crest-header-ornament.svg),radial-gradient(circle at 50% 0%,rgba(245,158,11,.14),transparent 60%),linear-gradient(180deg,#14192af0,#0a0e1afa)!important;background-repeat:no-repeat!important;background-position:top 2px left 2px,top 2px right 2px,bottom 2px left 2px,bottom 2px right 2px,top 3px center,center,center!important;background-size:32px 32px,32px 32px,32px 32px,32px 32px,180px 22px,100% 100%,100% 100%!important;border:1.5px solid rgba(251,191,36,.45)!important;outline:1px solid rgba(254,240,138,.2);outline-offset:-5px;border-radius:5px!important;box-shadow:inset 0 0 0 1px #fbbf241f,0 10px 26px #000000a6}.btn-action-primary,.btn-refine-action{font-family:Cinzel,serif!important;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid #fef08a!important;outline:1px solid rgba(120,53,15,.65);outline-offset:-3px;border-radius:4px!important;background-color:#d97706!important;background-image:url(/assets/ui/frames/button-ornament-left.svg),url(/assets/ui/frames/button-ornament-right.svg),linear-gradient(180deg,#fef08a,#fbbf24 25%,#d97706 78%,#92400e)!important;background-repeat:no-repeat!important;background-position:left 6px center,right 6px center,center!important;background-size:28px 26px,28px 26px,100% 100%!important;color:#1c0f02!important;box-shadow:inset 0 1px #ffffffb8,0 4px 14px #d977067a!important}#leaderboard-dialog{width:min(1000px,94vw);max-height:90vh;padding:22px 26px;color:#ece8dc}#leaderboard-dialog::backdrop{background:#030712d6;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}.ranking-header h2{font:700 22px Cinzel,serif;display:flex;align-items:center;gap:8px}.ranking-header h2:before{content:"🏆";-webkit-text-fill-color:initial}.ranking-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}#leaderboard-dialog button,#inventory-expansion-confirm button{min-height:40px;padding:8px 14px;border:1px solid rgba(251,191,36,.45);border-radius:4px;color:#f3dfa6;background:linear-gradient(180deg,#1e2336eb,#0e1220f5);font:700 11.5px Cinzel,serif;letter-spacing:.06em;cursor:pointer;transition:all .18s ease}#leaderboard-dialog button:hover,#inventory-expansion-confirm button:hover{border-color:#fbbf24;box-shadow:0 0 14px #fbbf244d}.ranking-tabs [aria-selected=true]{background:linear-gradient(180deg,#fde68a,#f59e0b 48%,#b45309)!important;color:#1c1204!important;border-color:#fef08a!important;box-shadow:inset 0 1px #ffffffa6,0 0 16px #fbbf2466}.ranking-table-wrap{overflow-x:auto;border:1.5px solid rgba(251,191,36,.35);border-radius:5px;background:#090d18d6}.ranking-table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}.ranking-table-wrap th{font:700 11px Cinzel,serif;letter-spacing:.08em;text-transform:uppercase;color:#fde68a;background:#fbbf2424;padding:11px 12px;text-align:left;border-bottom:1px solid rgba(251,191,36,.35);white-space:nowrap}.ranking-table-wrap td{text-align:left;padding:10px 12px;border-bottom:1px solid rgba(148,163,184,.14);white-space:nowrap}.ranking-me{background:linear-gradient(90deg,#fbbf242e,#fbbf240d);color:#fde68a;font-weight:700}#leaderboard-personal{padding:12px 16px;margin:12px 0;border:1px solid rgba(251,191,36,.42);border-left:3px solid #fbbf24;border-radius:5px;background:#0f172acc;color:#fde68a;font-size:12.5px}#leaderboard-status,#inventory-expansion-status{font-size:12px;color:#cbd5e1;line-height:1.5;margin-top:8px}#inventory-expansion-confirm{border:1.5px solid rgba(251,191,36,.48);background:#0f172af0;padding:12px;border-radius:5px;margin:8px 0}#inventory-expansion-confirm[hidden]{display:none}#runic-viewport-frame{position:fixed;top:0;right:0;bottom:0;left:0;pointer-events:none!important;z-index:18;border:3px solid rgba(217,119,6,.78);outline:1.5px solid rgba(254,240,138,.34);outline-offset:-7px;box-shadow:inset 0 0 0 4px #080c18eb,inset 0 0 0 5.5px #fbbf2447,inset 0 0 52px #040710b8,inset 0 0 22px #d9770624}#runic-viewport-frame:before{content:"";position:absolute;top:2px;left:50%;transform:translate(-50%);width:min(340px,46vw);height:18px;background:url(/assets/ui/frames/crest-header-ornament.svg) no-repeat center top / contain;opacity:.85;filter:drop-shadow(0 2px 6px rgba(0,0,0,.9))}.viewport-rune-corner{position:absolute;width:48px;height:48px;background-repeat:no-repeat;background-size:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.95));opacity:.94}.viewport-rune-corner.tl{top:2px;left:2px;background-image:url(/assets/ui/frames/corner-tl.svg)}.viewport-rune-corner.tr{top:2px;right:2px;background-image:url(/assets/ui/frames/corner-tr.svg)}.viewport-rune-corner.bl{bottom:18px;left:2px;background-image:url(/assets/ui/frames/corner-bl.svg)}.viewport-rune-corner.br{bottom:18px;right:2px;background-image:url(/assets/ui/frames/corner-br.svg)}.viewport-rune-pillar{position:absolute;top:26%;bottom:26%;width:4px;background:linear-gradient(180deg,transparent 0%,rgba(251,191,36,.45) 20%,#fef08a 50%,rgba(251,191,36,.45) 80%,transparent 100%);box-shadow:0 0 10px #fbbf2459;opacity:.72}.viewport-rune-pillar.left{left:3px}.viewport-rune-pillar.right{right:3px}#exp-bar-container{position:fixed!important;bottom:0!important;left:0!important;right:0!important;height:calc(16px + env(safe-area-inset-bottom,0px))!important;padding-bottom:env(safe-area-inset-bottom,0px)!important;box-sizing:border-box!important;background:#070b15!important;border-top:1.5px solid rgba(251,191,36,.65)!important;border-bottom:2px solid #78350f!important;box-shadow:inset 0 2px 6px #000000e6,0 -4px 16px #000000d9!important;z-index:20!important}.exp-bar-track{background:repeating-linear-gradient(90deg,transparent 0%,transparent calc(10% - 1px),rgba(254,240,138,.18) calc(10% - 1px),rgba(254,240,138,.18) 10%),linear-gradient(180deg,#0a0e1af5,#121726f5)!important}.exp-bar-fill{background:linear-gradient(90deg,#92400e,#d97706 45%,#fbbf24 85%,#fef08a)!important;box-shadow:0 0 12px #fbbf24bf,inset 0 1px #ffffff8c!important}.exp-bar-text{font-family:Cinzel,serif!important;font-size:.66rem!important;font-weight:800!important;letter-spacing:.08em!important;color:#fffbeb!important;text-shadow:0 1px 4px rgba(0,0,0,.98),0 0 8px rgba(120,53,15,.9)!important}#hero-status-card,#top-center-wave-card,.zone-info-pill,#game-chat-box,.gold-wallet-capsule{opacity:1!important;border:1.5px solid rgba(251,191,36,.55)!important;outline:1px solid rgba(254,240,138,.22);outline-offset:-4px;border-radius:6px!important;background-color:#0b101e!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(165deg,#161a2a,#0a0e1a)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center!important;background-size:20px 20px,20px 20px,20px 20px,20px 20px,100% 100%!important;box-shadow:inset 0 0 0 1px #fbbf2424,0 8px 24px #000000d9!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}#hero-status-card{--class-accent: #fbbf24;--class-accent-soft: rgba(251, 191, 36, .24);--class-accent-border: rgba(251, 191, 36, .65);padding:10px 14px!important;gap:12px!important;min-width:288px!important;z-index:28!important}#hero-status-card[data-hero-class=GUERREIRO]{--class-accent: #f59e0b;--class-accent-soft: rgba(245, 158, 11, .25);--class-accent-border: rgba(251, 191, 36, .78)}#hero-status-card[data-hero-class=CLERIGO]{--class-accent: #fde047;--class-accent-soft: rgba(253, 224, 71, .24);--class-accent-border: rgba(254, 240, 138, .82)}#hero-status-card[data-hero-class=BARBARO]{--class-accent: #ef4444;--class-accent-soft: rgba(239, 68, 68, .26);--class-accent-border: rgba(248, 113, 113, .78)}#hero-status-card[data-hero-class=ARQUEIRO]{--class-accent: #34d399;--class-accent-soft: rgba(52, 211, 153, .24);--class-accent-border: rgba(110, 231, 183, .78)}.hero-avatar-box{width:58px!important;height:58px!important;border:2px solid var(--class-accent, #fbbf24)!important;outline:1.5px solid rgba(254,240,138,.45);outline-offset:2px;border-radius:50%!important;box-shadow:0 0 16px var(--class-accent-soft, rgba(251, 191, 36, .45)),inset 0 0 10px #000000e0!important}.hero-level-badge{font-family:Cinzel,serif!important;font-weight:800!important;border:1.2px solid #fef08a!important;background:linear-gradient(180deg,#d97706,#78350f)!important;color:#fffbeb!important;box-shadow:0 2px 6px #000000d9!important}.hero-honor-tag{position:static!important;transform:none!important;background:linear-gradient(180deg,#1e162b,#0c101d)!important;border:1px solid var(--class-accent-border, rgba(251, 191, 36, .75))!important;color:#fef08a!important;font-family:Cinzel,serif!important;font-size:.56rem!important;font-weight:800!important;letter-spacing:.08em;padding:1px 6px!important;border-radius:999px!important;white-space:nowrap;box-shadow:0 2px 6px #000000d9}.hero-info-name{font-family:Cinzel,serif!important;font-weight:800!important;letter-spacing:.04em;color:#fde68a!important;font-size:.92rem!important}.hero-cp-pill{font-family:Cinzel,serif!important;font-weight:700!important;border:1px solid rgba(251,191,36,.55)!important;background:linear-gradient(180deg,#261c12eb,#0f1420f5)!important;color:#fef08a!important}.hero-class-identity-row{display:flex;align-items:center;margin:1px 0 2px}.hero-class-trait-pill{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:4px;border:1px solid var(--class-accent-border, rgba(251, 191, 36, .55));background:linear-gradient(90deg,var(--class-accent-soft, rgba(251, 191, 36, .18)),rgba(12,16,28,.92));color:#fef3c7;font-family:Cinzel,serif;font-size:.62rem;font-weight:700;letter-spacing:.04em;text-shadow:0 1px 3px rgba(0,0,0,.9)}.hero-vitals-bars{width:100%!important;min-width:220px;gap:4px!important}.mini-bar-track{position:relative!important;width:100%!important;height:13px!important;border-radius:4px!important;border:1px solid rgba(251,191,36,.42)!important;box-shadow:inset 0 1px 4px #000000eb;overflow:hidden!important}.mini-bar-tag{position:absolute;left:6px;top:50%;transform:translateY(-50%);z-index:3;font-family:Cinzel,serif;font-size:.54rem;font-weight:900;letter-spacing:.06em;color:#fffbeb;text-shadow:0 1px 3px rgba(0,0,0,.98);pointer-events:none}.mini-bar-tag.resource{color:#fef08a}.stage-world-title{font-family:Cinzel,serif!important;font-weight:700!important;letter-spacing:.05em;color:#fde68a!important}.stage-phase-badge{font-family:Cinzel,serif!important;font-weight:800!important;border:1px solid #fef08a!important;background:linear-gradient(180deg,#d97706,#78350f)!important;color:#fffbeb!important;border-radius:3px!important;box-shadow:0 2px 6px #000000b3!important}#top-right-location-card{position:absolute!important;top:calc(14px + var(--safe-top, 0px))!important;right:calc(14px + var(--safe-right, 0px))!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:6px!important;z-index:28!important;pointer-events:auto!important;background:transparent!important;border:none!important;outline:none!important;box-shadow:none!important;background-image:none!important;padding:0!important}.top-right-header-row{display:flex;align-items:stretch;justify-content:flex-end;gap:8px;flex-wrap:wrap}.zone-title{font-family:Cinzel,serif!important;color:#fde68a!important;letter-spacing:.03em}.hud-session-controls{display:inline-flex;align-items:center;gap:6px}.hud-session-btn{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:6px 12px;border-radius:5px!important;font-family:Cinzel,serif!important;font-size:.72rem!important;font-weight:800!important;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:1.5px solid rgba(251,191,36,.62)!important;outline:1px solid rgba(254,240,138,.22);outline-offset:-3px;background-color:#0d1222!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(180deg,#201c30f5,#0b0f1cfc)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center!important;background-size:13px 13px,13px 13px,13px 13px,13px 13px,100% 100%!important;color:#fde68a!important;box-shadow:inset 0 1px #ffffff24,0 6px 16px #000c!important;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.hud-session-btn:hover{border-color:#fef08a!important;transform:translateY(-1px);box-shadow:inset 0 0 10px #fbbf2440,0 0 16px #fbbf2473!important}.hud-session-btn.logout{border-color:#f87171a6!important;color:#fecaca!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(180deg,#45121af2,#180a12fc)!important}.hud-session-btn.logout:hover{border-color:#f87171!important;color:#fff!important;box-shadow:inset 0 0 10px #ef444452,0 0 16px #ef444485!important}.hud-session-svg{width:17px;height:17px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.85))}.top-status-lux-bar{display:flex;align-items:center;justify-content:flex-end;gap:6px!important;flex-wrap:wrap}.gold-wallet-capsule,.lux-zoom-capsule,.lux-ping-pill,.lux-icon-btn{border:1.5px solid rgba(251,191,36,.58)!important;outline:1px solid rgba(254,240,138,.2);outline-offset:-3px;border-radius:5px!important;background-color:#0b101e!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(180deg,#1a1e30f5,#0a0e1afc)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center!important;background-size:12px 12px,12px 12px,12px 12px,12px 12px,100% 100%!important;box-shadow:inset 0 1px #ffffff1f,0 6px 16px #000000c7!important;min-height:34px}.gold-wallet-capsule{padding:4px 12px!important;gap:6px!important}.gold-coin-svg{width:18px;height:18px;display:block;filter:drop-shadow(0 1px 4px rgba(0,0,0,.9))}.gold-amount-text{font-family:Cinzel,serif!important;font-weight:800!important;color:#fef08a!important}.gold-currency-label{font-family:Cinzel,serif!important;font-size:.72rem;font-weight:800;color:#f59e0b}.lux-zoom-capsule{padding:3px 6px!important;gap:5px!important}.zoom-btn{width:24px!important;height:24px!important;border-radius:3px!important;border:1px solid rgba(251,191,36,.55)!important;background:linear-gradient(180deg,#b45309,#451a03)!important;color:#fef08a!important;font-family:Cinzel,serif!important;font-weight:900!important;box-shadow:inset 0 1px #ffffff40,0 2px 6px #000000bf}.zoom-btn:hover{background:linear-gradient(180deg,#fbbf24,#b45309)!important;color:#1c0f02!important;border-color:#fffbeb!important}.zoom-label{font-family:Cinzel,serif!important;color:#fde68a!important;font-weight:800!important;min-width:30px!important}.lux-icon-btn{width:auto!important;min-width:34px;height:34px!important;padding:0 9px!important;gap:5px;color:#fde68a!important;font-family:Cinzel,serif!important;font-size:.7rem!important;font-weight:700!important;letter-spacing:.04em}.lux-icon-btn:hover,.lux-icon-btn[data-fullscreen=true]{border-color:#fef08a!important;color:#fffbeb!important;box-shadow:inset 0 0 10px #fbbf2440,0 0 14px #fbbf247a!important;transform:translateY(-1px)!important}.lux-svg-icon{width:16px;height:16px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.85))}.lux-ping-pill{padding:4px 10px!important;gap:6px!important}.lux-ping-text{font-family:Cinzel,serif!important;font-weight:800!important;color:#6ee7b7!important}.boss-alert-badge{font-family:Cinzel,serif!important;font-weight:800!important;letter-spacing:.06em;border:1.5px solid #ef4444!important;background:linear-gradient(180deg,#dc2626,#7f1d1d)!important;color:#fff!important;box-shadow:0 0 16px #ef444499!important;text-shadow:0 1px 4px rgba(0,0,0,.9)}#right-vertical-dock,#dock-navigation-bar{position:fixed!important;right:16px!important;top:41%!important;transform:translateY(-50%)!important;display:flex!important;flex-direction:column!important;gap:10px!important;z-index:26!important}.dock-btn{width:74px!important;height:68px!important;font-family:Cinzel,serif!important;font-size:.68rem!important;font-weight:800!important;letter-spacing:.06em;border-radius:12px!important;background-color:#0d1222!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),radial-gradient(circle at 50% 25%,rgba(251,191,36,.18),transparent 70%),linear-gradient(180deg,#1a1e30f5,#0a0e1afc)!important;background-repeat:no-repeat!important;background-position:left 2px top 2px,right 2px top 2px,left 2px bottom 2px,right 2px bottom 2px,center,center!important;background-size:16px 16px,16px 16px,16px 16px,16px 16px,100% 100%,100% 100%!important;border:1.5px solid rgba(251,191,36,.65)!important;color:#fde68a!important;box-shadow:inset 0 0 0 1px #fbbf242e,0 8px 20px #000000d9!important;transition:all .18s ease}.dock-btn:hover{border-color:#fde047!important;box-shadow:inset 0 0 10px #fbbf244d,0 0 18px #fbbf2480!important;transform:translateY(-2px)}.dock-svg-icon{width:28px!important;height:28px!important;display:block;margin:0 auto 4px;object-fit:contain;filter:drop-shadow(0 2px 5px rgba(0,0,0,.85));transition:transform .18s ease,filter .18s ease}.dock-btn:hover .dock-svg-icon{transform:scale(1.14);filter:drop-shadow(0 0 8px rgba(251,191,36,.75))}#mobile-combat-arc-container{position:fixed!important;bottom:24px!important;right:22px!important;width:340px!important;height:340px!important;transform:none!important;z-index:25!important}#btn-primary-attack{width:112px!important;height:112px!important;bottom:8px!important;right:8px!important;border:2.5px solid #fef08a!important;outline:2px solid rgba(251,191,36,.75);outline-offset:3px;border-radius:50%!important;background:radial-gradient(circle at 50% 28%,rgba(254,240,138,.45) 0%,transparent 55%),radial-gradient(circle at 50% 50%,#7f1d1d,#450a0a 58%,#1a070d)!important;box-shadow:inset 0 0 0 2px #fbbf248c,inset 0 -8px 16px #000000d9,0 10px 28px #000000eb,0 0 28px #f59e0b7a,0 0 16px #ef444466!important;color:#fef08a!important;font-family:Cinzel,serif!important;font-weight:900!important;letter-spacing:.08em;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,filter .16s ease;overflow:visible!important}.attack-seal-ring{position:absolute;top:-10px;right:-10px;bottom:-10px;left:-10px;background:url(/assets/ui/frames/attack-runic-ring.svg) center / contain no-repeat;pointer-events:none;filter:drop-shadow(0 0 8px rgba(251,191,36,.45));transition:transform .35s ease}#btn-primary-attack:hover{filter:brightness(1.1);box-shadow:inset 0 0 0 2.5px #fef08a,0 12px 30px #000000f2,0 0 36px #fbbf24d1,0 0 22px #ef4444a6!important;transform:scale(1.06)}#btn-primary-attack:hover .attack-seal-ring{transform:rotate(22deg) scale(1.03)}#btn-primary-attack:active{transform:scale(.95)}.attack-crest-svg{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.95)) drop-shadow(0 0 8px rgba(251,191,36,.55));margin-bottom:2px}#attack-btn-label{font-family:Cinzel,serif!important;font-size:.76rem!important;font-weight:900!important;letter-spacing:.1em!important;color:#fffbeb!important;text-shadow:0 1px 4px rgba(0,0,0,.95);line-height:1.05}.attack-class-trait{font-family:Cinzel,serif;font-size:.54rem;font-weight:700;color:#fde68a;letter-spacing:.04em;opacity:.95;max-width:92px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.95)}.attack-hotkey-pill{position:absolute;bottom:-9px;left:50%;transform:translate(-50%);padding:2px 8px;border-radius:999px;border:1px solid #fef08a;background:linear-gradient(180deg,#b45309,#451a03);color:#fffbeb;font-family:Cinzel,serif;font-size:.52rem;font-weight:800;letter-spacing:.08em;box-shadow:0 2px 6px #000000e6;white-space:nowrap}.skill-arc-btn{width:82px!important;height:82px!important;border:2.2px solid rgba(251,191,36,.78)!important;outline:1.5px solid rgba(254,240,138,.35);outline-offset:-4px;border-radius:50%!important;background:radial-gradient(circle at 50% 30%,rgba(251,191,36,.16),transparent 65%),radial-gradient(circle at 50% 50%,#1e293bf5,#090d18fc)!important;box-shadow:inset 0 0 0 2px #0a0e1aeb,0 8px 20px #000000e6,0 0 18px #f59e0b52!important;transition:all .15s ease}.skill-arc-btn{width:78px!important;height:78px!important}#skill-btn-1{bottom:18px!important;right:150px!important}#skill-btn-2{bottom:106px!important;right:106px!important}#skill-btn-3{bottom:150px!important;right:18px!important}#skill-btn-4{bottom:204px!important;right:84px!important;width:88px!important;height:88px!important;border-width:2.6px!important}.skill-arc-btn.slot-locked .skill-footer-gradient,.skill-arc-btn.locked .skill-footer-gradient{display:none!important}.skill-arc-btn:hover{border-color:#fde047!important;box-shadow:inset 0 0 0 2px #0a0e1aeb,0 8px 22px #000000eb,0 0 24px #fbbf2499!important;transform:scale(1.06)}.skill-arc-btn[data-slot="4"]{border-color:#f59e0b!important;box-shadow:inset 0 0 0 2px #0a0e1aeb,0 8px 24px #000000e0,0 0 28px #ef44448c!important}.skill-key-badge{font-family:Cinzel,serif!important;font-size:.74rem!important;font-weight:800!important;border:1.2px solid #fef08a!important;background:linear-gradient(180deg,#b45309,#451a03)!important;color:#fef08a!important;box-shadow:0 2px 6px #000000d9!important}.skill-cost{font-family:Cinzel,serif!important;font-size:.68rem!important;font-weight:800!important;letter-spacing:.05em;color:#67e8f9!important;text-shadow:0 1px 4px rgba(0,0,0,.95)}#tactical-action-bar.runic-tactical-bar{position:fixed!important;left:16px!important;top:41%!important;bottom:auto!important;right:auto!important;transform:translateY(-50%)!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;width:152px!important;padding:10px!important;gap:8px!important;border-radius:10px!important;border:1.5px solid rgba(251,191,36,.62)!important;outline:1px solid rgba(254,240,138,.22);outline-offset:-3px;background-color:#0a0e1af2!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(180deg,#181c2ef5,#090d18fc)!important;background-repeat:no-repeat!important;background-position:left 2px top 2px,right 2px top 2px,left 2px bottom 2px,right 2px bottom 2px,center!important;background-size:16px 16px,16px 16px,16px 16px,16px 16px,100% 100%!important;box-shadow:inset 0 1px #ffffff24,0 12px 30px #000000e6!important;z-index:90!important;pointer-events:auto!important;transition:transform .26s cubic-bezier(.22,1,.36,1),box-shadow .22s ease!important}#tactical-action-bar.runic-tactical-bar.drawer-collapsed,#tactical-action-bar.runic-tactical-bar[data-drawer-open=false]{transform:translateY(-50%) translate(calc(-100% - 16px))!important;box-shadow:none!important}.tactical-drawer-items{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%}.tactical-drawer-toggle{position:absolute;right:-30px;top:50%;transform:translateY(-50%);width:30px;height:68px;display:flex;align-items:center;justify-content:center;border-radius:0 10px 10px 0;border:1.5px solid rgba(251,191,36,.72);border-left:none;background:linear-gradient(180deg,#1e243af7,#0b0f1cfc);color:#fde68a;box-shadow:inset 0 1px #ffffff29,4px 6px 18px #000000d9;cursor:pointer;pointer-events:auto!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;z-index:91!important;transition:background .18s ease,color .18s ease,box-shadow .18s ease,width .18s ease}.tactical-drawer-toggle:hover{color:#fffbeb;border-color:#fde047;box-shadow:inset 0 0 8px #fbbf244d,0 0 16px #fbbf248c}.tactical-drawer-arrow{font-size:.92rem;font-weight:900;line-height:1;text-shadow:0 1px 4px rgba(0,0,0,.95);transition:transform .22s ease}.btn-auto-toggle{display:inline-flex;align-items:center;justify-content:flex-start;width:100%;gap:8px;min-height:42px;padding:8px 12px!important;font-family:Cinzel,serif!important;font-size:.74rem!important;font-weight:800!important;letter-spacing:.08em;border-radius:6px!important;border:1.5px solid #34d399!important;background-color:#064e3b!important;background-image:url(/assets/ui/frames/wing-left.svg),url(/assets/ui/frames/wing-right.svg),linear-gradient(180deg,#059669,#064e3b)!important;background-repeat:no-repeat!important;background-position:left 4px center,right 4px center,center!important;background-size:14px 10px,14px 10px,100% 100%!important;color:#ecfdf5!important;box-shadow:inset 0 1px #ffffff4d,0 4px 12px #000000bf,0 0 14px #10b98161!important}.btn-auto-toggle.off{border-color:#fbbf2480!important;background-color:#121728!important;background-image:url(/assets/ui/frames/wing-left.svg),url(/assets/ui/frames/wing-right.svg),linear-gradient(180deg,#261e30f2,#0f121efa)!important;color:#fde68a!important;box-shadow:0 4px 10px #000000bf!important}.btn-farm-gear{display:inline-flex!important;align-items:center;justify-content:space-between;width:100%;gap:6px;min-height:42px;padding:8px 12px!important;font-family:Cinzel,serif!important;font-size:.74rem!important;font-weight:800!important;letter-spacing:.06em;border-radius:6px!important;border:1.5px solid rgba(251,191,36,.62)!important;background-color:#121728!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(180deg,#261e30f2,#0e1220fa)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center!important;background-size:11px 11px,11px 11px,11px 11px,11px 11px,100% 100%!important;color:#fde68a!important;box-shadow:inset 0 1px #ffffff24,0 4px 12px #000000bf!important}.btn-farm-gear:hover{border-color:#fbbf24!important;box-shadow:0 0 14px #fbbf2473!important}.tactical-btn-svg{width:18px;height:18px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.85))}.tactical-key-hint{padding:1px 5px;border-radius:3px;border:1px solid rgba(254,240,138,.45);background:#090d18bf;color:#fef08a;font-family:Cinzel,serif;font-size:.58rem;font-weight:800}.quick-potion-chip{display:inline-flex!important;align-items:center;justify-content:flex-start;width:100%;min-height:40px;padding:7px 12px!important;gap:8px!important;border-radius:6px!important;border:1.5px solid rgba(251,191,36,.55)!important;background-color:#101526!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(180deg,#1c1626f2,#0a0e1afa)!important;background-repeat:no-repeat!important;background-position:left 1px top 1px,right 1px top 1px,left 1px bottom 1px,right 1px bottom 1px,center!important;background-size:11px 11px,11px 11px,11px 11px,11px 11px,100% 100%!important;box-shadow:inset 0 1px #ffffff1f,0 4px 12px #000000bf!important;font-family:Cinzel,serif!important;font-size:.74rem!important;font-weight:800!important}.quick-potion-chip.hp-chip{border-color:#f87171a6!important}.quick-potion-chip.mp-chip{border-color:#60a5faa6!important}.quick-potion-chip:hover{transform:translateY(-1px);border-color:#fef08a!important;box-shadow:0 0 14px #fbbf246b!important}.tactical-potion-svg{width:19px;height:19px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.9))}#bottom-center-zone{position:fixed!important;bottom:22px!important;left:50%!important;right:auto!important;transform:translate(-50%)!important;width:min(500px,calc(100vw - 740px))!important;min-width:300px!important;max-width:520px!important;display:flex!important;flex-direction:column!important;align-items:center!important;z-index:22!important}#game-chat-box{width:100%!important}.chat-channel-tab.active{font-family:Cinzel,serif!important;color:#fde68a!important;border-bottom:2px solid #fbbf24!important}.chat-send-btn{font-family:Cinzel,serif!important;font-weight:700!important;letter-spacing:.06em;border-radius:4px!important;border:1.2px solid rgba(251,191,36,.5)!important;background:linear-gradient(180deg,#b45309,#78350f)!important;color:#fffbeb!important}.chat-msg-malak{background:linear-gradient(90deg,#272532,#111827);border-left:2px solid #a8a29e;padding:7px}.chat-tag-malak{color:#e7e5e4;font-weight:700}@media(max-width:1380px){.zone-info-pill{display:none!important}#hero-status-card{min-width:280px!important;max-width:320px!important;padding:8px 12px!important}#top-center-wave-card{min-width:250px!important;max-width:310px!important;padding:7px 12px!important}}@media(max-width:1180px){#hero-status-card{top:calc(10px + var(--safe-top))!important;left:calc(10px + var(--safe-left))!important;min-width:235px!important;max-width:275px!important;padding:7px 10px!important;gap:8px!important}#hud-hero-level{white-space:nowrap!important;flex-shrink:0!important}#hud-hero-honor-tag{max-width:96px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}.hero-avatar-box{width:46px!important;height:46px!important}.hero-vitals-bars{min-width:155px!important}#top-center-wave-card{top:10px!important;left:48%!important;transform:translate(-50%)!important;min-width:280px!important;max-width:325px!important;padding:6px 10px!important}#stage-world-title{white-space:nowrap!important}#top-right-location-card{top:calc(10px + var(--safe-top))!important;right:calc(10px + var(--safe-right))!important;max-width:300px!important;gap:4px!important}.lux-control-row{flex-wrap:wrap!important;justify-content:flex-end!important;max-width:310px!important;gap:4px!important}.lux-btn-text,.gold-currency-label{display:none!important}#right-vertical-dock,#dock-navigation-bar{right:10px!important;top:38%!important;transform:translateY(-50%)!important;gap:6px!important}.dock-btn{width:60px!important;height:54px!important;font-size:.58rem!important}.dock-svg-icon{width:22px!important;height:22px!important;margin-bottom:2px}#tactical-action-bar.runic-tactical-bar{left:10px!important;top:40%!important;width:138px!important;padding:8px!important;gap:6px!important}#tactical-action-bar.runic-tactical-bar.drawer-collapsed,#tactical-action-bar.runic-tactical-bar[data-drawer-open=false]{transform:translateY(-50%) translate(calc(-100% - 10px))!important}.btn-auto-toggle,.btn-farm-gear,.quick-potion-chip{min-height:36px;padding:6px 10px!important;font-size:.68rem!important}#mobile-combat-arc-container{width:296px!important;height:296px!important;bottom:20px!important;right:14px!important}#btn-primary-attack{width:96px!important;height:96px!important}.attack-crest-svg{width:34px;height:34px}.skill-arc-btn{width:68px!important;height:68px!important}.skill-arc-btn{width:56px!important;height:56px!important}#skill-btn-1{bottom:16px!important;right:122px!important}#skill-btn-2{bottom:88px!important;right:88px!important}#skill-btn-3{bottom:122px!important;right:16px!important}#skill-btn-4{bottom:164px!important;right:68px!important;width:66px!important;height:66px!important}#bottom-center-zone{bottom:calc(20px + var(--safe-bottom, 0px))!important;left:calc(50% - 14px)!important;right:auto!important;transform:translate(-50%)!important;width:auto!important;max-width:calc(100vw - 110px)!important;min-width:0!important;z-index:26!important;pointer-events:none!important;display:flex!important;flex-direction:column!important;align-items:center!important}#game-chat-box{pointer-events:auto!important;max-height:110px!important;width:184px!important;max-width:calc(100vw - 110px)!important;padding:4px 6px 5px!important;box-sizing:border-box!important;overflow:hidden!important;background:#0b101ef0!important;border:1px solid rgba(251,191,36,.35)!important;border-radius:6px!important}#game-chat-box .chat-header-bar{display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important;padding-bottom:2px!important;margin-bottom:2px!important;gap:3px!important;cursor:pointer!important}.chat-toggle-btn{width:20px!important;height:18px!important;padding:0!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;background:#1e293be6!important;border:1px solid rgba(251,191,36,.45)!important;border-radius:4px!important;color:#fde047!important;cursor:pointer!important;pointer-events:auto!important;z-index:5!important}.chat-toggle-text{display:none!important}#chat-toggle-icon{font-size:.6rem!important;line-height:1!important}#game-chat-box.collapsed{padding:3px 8px!important;background:#0b101ef0!important;border:1px solid rgba(251,191,36,.6)!important;border-radius:6px!important;width:auto!important;min-width:65px!important;max-width:110px!important;box-shadow:0 4px 14px #000c!important;cursor:pointer!important}#game-chat-box.collapsed .chat-header-bar{margin:0!important;padding:0!important;border-bottom:none!important;gap:6px!important;justify-content:space-between!important}#game-chat-box.collapsed .chat-channel-tab:not(.active){display:none!important}#game-chat-box.collapsed #chat-messages-container,#game-chat-box.collapsed .chat-input-form{display:none!important}#game-chat-box #chat-messages-container{height:42px!important;max-height:42px!important;font-size:.6rem!important;line-height:1.25!important;gap:2px!important;display:flex!important;flex-direction:column!important;overflow-y:auto!important;word-break:normal!important;overflow-wrap:break-word!important}.chat-msg{display:block!important;line-height:1.25!important;text-shadow:0 1px 2px rgba(0,0,0,.9)!important}.chat-msg>[class^=chat-tag-]{display:inline-block!important;margin-right:4px!important;white-space:nowrap!important;font-weight:700!important}.chat-body{display:inline!important;word-break:break-word!important;overflow-wrap:break-word!important}#game-chat-box .chat-channel-badge{display:none!important}#game-chat-box .chat-input-form{padding:4px 0 0!important;margin-top:3px!important;gap:4px!important;width:100%!important;box-sizing:border-box!important}#game-chat-box .chat-input-field{height:24px!important;padding:2px 6px!important;font-size:.62rem!important;min-width:0!important;width:0!important;flex:1 1 0%!important;box-sizing:border-box!important}#game-chat-box .chat-send-btn{height:24px!important;padding:0 7px!important;font-size:.56rem!important;flex-shrink:0!important}#leaderboard-dialog{padding:14px;width:96vw}.ranking-header h2{font-size:17px}.ranking-tabs{margin:10px 0;gap:6px}#leaderboard-dialog button{min-height:36px;padding:6px 10px;font-size:10.5px}}@media(max-width:900px),(max-height:560px){html,body{overflow-x:hidden!important}#runic-viewport-frame{top:3px;right:3px;bottom:3px;left:3px}.viewport-rune-corner{width:28px;height:28px}.viewport-rune-pillar{display:none}#hero-status-card{top:calc(8px + var(--safe-top, 0px))!important;left:calc(8px + var(--safe-left, 0px))!important;width:172px!important;max-width:172px!important;min-width:0!important;padding:5px 8px!important;gap:6px!important;box-sizing:border-box!important}#hero-status-card .hero-avatar-box{width:38px!important;height:38px!important;flex-shrink:0!important}#hero-status-card .hero-info-col{min-width:0!important;flex:1 1 0%!important}#hero-status-card .hero-title-row{display:flex!important;align-items:center!important;gap:4px!important;min-width:0!important;white-space:nowrap!important}#hud-hero-level,#hud-hero-level-pill,#hero-status-card .hero-level-badge{white-space:nowrap!important;flex-shrink:0!important;width:auto!important;min-width:max-content!important;font-size:.52rem!important;padding:1px 5px!important}#hud-hero-name{font-size:.66rem!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}#hud-hero-honor-tag,.hero-class-trait-pill{display:none!important}#hero-status-card .hero-cp-brand{margin:1px 0!important;gap:3px!important}#hero-status-card .hero-cp-tag{font-size:.5rem!important}#hero-status-card .hero-cp-number{font-size:.66rem!important}#hero-status-card .hero-vitals-bars{width:100%!important;min-width:0!important;max-width:100%!important;gap:2px!important}#hero-status-card .mini-bar-track{height:8px!important}#top-right-location-card{top:calc(8px + var(--safe-top, 0px))!important;right:calc(8px + var(--safe-right, 0px))!important;width:auto!important;max-width:calc(100vw - 190px)!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:4px!important;z-index:28!important;background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important}.top-right-header-row{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:4px!important;flex-wrap:nowrap!important;max-width:100%!important}.hud-session-controls{display:flex!important;align-items:center!important;gap:4px!important}.hud-session-btn{height:24px!important;min-height:24px!important;padding:0 7px!important;font-size:.54rem!important;gap:4px!important}.hud-session-svg{width:12px!important;height:12px!important}.top-status-lux-bar{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:3px!important;flex-wrap:nowrap!important;max-width:100%!important}.zone-info-pill,#btn-fullscreen-toggle,#btn-toggle-inspector,.gold-currency-label,.lux-ping-pill,.attack-hotkey-pill{display:none!important}.gold-wallet-capsule{height:24px!important;min-height:24px!important;padding:0 6px!important;gap:4px!important;flex-shrink:0!important}.gold-coin-svg{width:13px!important;height:13px!important}.gold-amount-text{font-size:.6rem!important;white-space:nowrap!important}.lux-zoom-capsule{height:24px!important;min-height:24px!important;padding:0 3px!important;gap:2px!important;flex-shrink:0!important}.zoom-btn{width:17px!important;height:17px!important;min-width:17px!important;padding:0!important;font-size:.65rem!important;line-height:1!important}.zoom-label{min-width:18px!important;font-size:.52rem!important;text-align:center!important}.lux-icon-btn{width:24px!important;min-width:24px!important;height:24px!important;min-height:24px!important;padding:0!important;font-size:.62rem!important;flex-shrink:0!important}#top-center-wave-card{top:calc(82px + var(--safe-top, 0px))!important;left:50%!important;transform:translate(-50%)!important;width:max-content!important;min-width:200px!important;max-width:min(336px,calc(100vw - 20px))!important;padding:4px 10px!important;z-index:27!important}#right-vertical-dock,#dock-navigation-bar{top:39%!important;right:8px!important;transform:translateY(-50%)!important;flex-direction:column!important;gap:6px!important;z-index:26!important}.dock-btn{width:52px!important;height:48px!important;font-size:.52rem!important}.dock-svg-icon{width:20px!important;height:20px!important;margin-bottom:1px}#tactical-action-bar.runic-tactical-bar{left:8px!important;top:38%!important;width:124px!important;padding:7px!important;gap:5px!important}#tactical-action-bar.runic-tactical-bar.drawer-collapsed,#tactical-action-bar.runic-tactical-bar[data-drawer-open=false]{transform:translateY(-50%) translate(calc(-100% - 8px))!important}.tactical-drawer-toggle{right:-28px;width:28px;height:64px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.btn-auto-toggle,.btn-farm-gear,.quick-potion-chip{min-height:32px;padding:4px 8px!important;font-size:.62rem!important}#leaderboard-dialog{padding:14px;width:96vw}.ranking-header h2{font-size:17px}.ranking-tabs{margin:10px 0;gap:6px}#leaderboard-dialog button{min-height:36px;padding:6px 10px;font-size:10.5px}}@media(max-width:380px){#hero-status-card{width:158px!important;max-width:158px!important}#top-right-location-card{max-width:calc(100vw - 174px)!important}.hud-session-label,#btn-power-save{display:none!important}}@media all and (display-mode:standalone){#hero-status-card,#top-right-location-card{top:calc(14px + max(env(safe-area-inset-top,0px),44px))!important}#top-center-wave-card{top:calc(88px + max(env(safe-area-inset-top,0px),44px))!important}#mobile-combat-arc-container,#bottom-center-zone{bottom:calc(20px + max(env(safe-area-inset-bottom,0px),28px))!important}#exp-bar-container{height:calc(16px + max(env(safe-area-inset-bottom,0px),28px))!important;padding-bottom:max(env(safe-area-inset-bottom,0px),28px)!important}}#offline-reward-dialog{border:2px solid #d97706!important;border-radius:8px!important;background:#0d111e!important;color:#fef3c7!important;max-width:440px;width:92vw;padding:24px 20px;margin:auto;box-shadow:0 10px 40px #000000e6,0 0 30px #d977064d!important}#offline-reward-dialog::backdrop{background:#000000c7;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}.offline-reward-container{display:flex;flex-direction:column;gap:16px;text-align:center}.offline-header .offline-icon-crest{font-size:38px;line-height:1;margin-bottom:6px;filter:drop-shadow(0 0 10px rgba(245,158,11,.6))}.offline-header .offline-title{font-size:22px;font-weight:800;color:#fbbf24;margin:0;text-shadow:0 2px 4px rgba(0,0,0,.8);letter-spacing:.5px}.offline-header .offline-subtitle{font-size:12px;color:#a3a3a3;text-transform:uppercase;letter-spacing:1px}.offline-time-banner{background:#111827cc;border:1px solid rgba(217,119,6,.3);border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px}.offline-time-value{font-weight:700;color:#60a5fa}.offline-time-cap{font-size:11px;color:#71717a}.offline-rewards-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.offline-card{background:#1e293b99;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 10px;display:flex;align-items:center;gap:10px}.offline-card .reward-icon{font-size:26px}.offline-card .reward-info{display:flex;flex-direction:column;text-align:left}.offline-card .reward-label{font-size:11px;color:#94a3b8}.offline-card .reward-amount{font-size:14px;font-weight:700;color:#fef08a}.reward-exp .reward-amount{color:#93c5fd}.offline-loot-section{background:#11182780;border:1px dashed rgba(217,119,6,.3);border-radius:6px;padding:10px;text-align:left}.offline-loot-title{margin:0 0 6px;font-size:12px;color:#e5e7eb}.offline-loot-list{display:flex;flex-wrap:wrap;gap:8px}.offline-loot-item{background:#0006;border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:4px 8px;font-size:11px;display:flex;gap:6px}.offline-loot-item .item-qty{color:#fbbf24;font-weight:700}.btn-claim-offline{width:100%;padding:12px 16px;font-size:15px;font-weight:700;color:#0b0f19;background:linear-gradient(180deg,#f59e0b,#d97706);border:1px solid #fef08a;border-radius:6px;cursor:pointer;box-shadow:0 4px 14px #d9770666;transition:transform .15s ease,filter .15s ease}.btn-claim-offline:hover{filter:brightness(1.1);transform:translateY(-1px)}.btn-claim-offline:active{transform:translateY(1px)}.chat-tabs{display:flex;align-items:center;gap:4px}.chat-channel-tab{background:transparent;border:1px solid transparent;border-radius:4px;padding:2px 6px;font-family:Cinzel,serif;font-size:.62rem;font-weight:700;color:#94a3b8;cursor:pointer;transition:all .15s ease;-webkit-user-select:none;user-select:none;display:inline-flex;align-items:center;gap:2px;white-space:nowrap}.chat-channel-tab:hover:not(.locked){color:#fef08a;background:#fbbf2414}.chat-channel-tab.active{color:#fbbf24!important;background:#fbbf2424!important;border-color:#fbbf2466!important;box-shadow:inset 0 1px #ffffff26}.chat-channel-tab.locked{opacity:.55;cursor:not-allowed}.chat-channel-tab.locked:hover{background:#ef44441f;border-color:#ef444459;color:#fca5a5}.tab-lock-icon{font-size:.48rem;margin-left:1px;opacity:.8}#game-chat-box.collapsed{padding:5px 12px!important;background:#0f172ae0!important;border:1px solid rgba(251,191,36,.4)!important;box-shadow:0 4px 14px #000000b3!important;width:auto!important}#game-chat-box.collapsed #chat-messages-container,#game-chat-box.collapsed .chat-input-form{display:none!important}#game-chat-box.collapsed .chat-header-bar{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}#mobile-combat-arc-container,.combat-action-container{position:fixed!important;bottom:calc(20px + var(--safe-bottom, 0px))!important;right:calc(16px + var(--safe-right, 0px))!important;width:auto!important;height:auto!important;max-width:480px!important;z-index:28!important;pointer-events:none!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:6px!important}#mobile-combat-arc-container>*{pointer-events:auto!important}.combat-auto-view{display:flex;justify-content:flex-end;animation:combatFadeIn .2s ease-out}.combat-auto-big-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#10b9814d,#05966980,#047857bf),linear-gradient(165deg,#161a2a,#0a0e1a);border:1.5px solid #34d399;outline:1.2px solid rgba(52,211,153,.35);outline-offset:-3px;box-shadow:0 0 16px #10b98173,0 6px 18px #000c,inset 0 1px #ffffff59;cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1);-webkit-user-select:none;user-select:none;max-width:100%;box-sizing:border-box;overflow:hidden;white-space:nowrap}.combat-auto-big-btn:hover{transform:translateY(-2px) scale(1.03);border-color:#6ee7b7;box-shadow:0 0 24px #10b981b3,0 10px 24px #000000d9}.combat-auto-big-btn:active{transform:scale(.96)}.auto-pulse-aura{position:absolute;top:-4px;right:-4px;bottom:-4px;left:-4px;border-radius:12px;border:1.5px solid rgba(52,211,153,.55);animation:autoPulseRing 2s infinite ease-out;pointer-events:none}@keyframes autoPulseRing{0%{transform:scale(.97);opacity:.9}to{transform:scale(1.1);opacity:0}}.auto-btn-main-icon{font-size:1.3rem;filter:drop-shadow(0 0 6px rgba(52,211,153,.8));animation:swordWiggle 3s infinite ease-in-out;flex-shrink:0}@keyframes swordWiggle{0%,to{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}.auto-btn-title{font-family:Cinzel,serif;font-size:.92rem;font-weight:900;color:#ecfdf5;letter-spacing:.05em;line-height:1;text-shadow:0 0 8px rgba(52,211,153,.85),0 2px 4px rgba(0,0,0,.95);white-space:nowrap}.auto-btn-sub,.auto-btn-hotkey-badge{display:none!important}.combat-manual-view{display:flex;flex-direction:column;gap:5px;align-items:flex-end;animation:combatFadeIn .2s ease-out}@keyframes combatFadeIn{0%{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}.combat-manual-header{display:flex;align-items:center;justify-content:flex-end;gap:4px;width:52px}.combat-auto-reactivate-btn,.combat-grimorio-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:0!important;width:24px!important;height:24px!important;border-radius:6px!important;cursor:pointer!important;-webkit-user-select:none!important;user-select:none!important;box-sizing:border-box!important;flex-shrink:0!important;transition:all .15s ease!important}.combat-auto-reactivate-btn{background:linear-gradient(135deg,#065f46f2,#047857f2)!important;border:1.5px solid #34d399!important;color:#ecfdf5!important;font-size:.85rem!important;box-shadow:0 2px 8px #000c,0 0 8px #34d39966!important}.combat-auto-reactivate-btn:hover{transform:translateY(-1px) scale(1.06)!important;border-color:#6ee7b7!important;box-shadow:0 4px 12px #10b98199!important}.combat-auto-reactivate-btn:active{transform:scale(.95)}.combat-grimorio-btn{background:#0b101e!important;border:1.5px solid rgba(251,191,36,.65)!important;color:#fef08a!important;font-size:.8rem!important;box-shadow:0 2px 8px #000c,0 0 6px #fbbf2440!important}.combat-grimorio-btn:hover{transform:translateY(-1px) scale(1.06)!important;border-color:#fde047!important;box-shadow:0 4px 12px #fbbf2473!important}.combat-grimorio-btn:active{transform:scale(.95)}.skills-square-row{display:flex;flex-direction:column-reverse;flex-wrap:wrap;align-content:flex-start;gap:5px;max-height:280px}.skill-square-btn{position:relative!important;width:52px!important;height:52px!important;border-radius:8px!important;background-color:#0b101e!important;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg)!important;background-position:top 1px left 1px,top 1px right 1px,bottom 1px left 1px,bottom 1px right 1px!important;background-repeat:no-repeat!important;background-size:8px 8px!important;border:1.5px solid rgba(251,191,36,.75)!important;outline:1px solid rgba(254,240,138,.22)!important;outline-offset:-3px!important;padding:0;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;box-shadow:0 4px 12px #000c,inset 0 1px 1px #ffffff26!important;cursor:pointer!important;-webkit-user-select:none!important;user-select:none!important;overflow:hidden!important;transition:all .15s cubic-bezier(.16,1,.3,1)!important}.skill-square-btn:hover{transform:translateY(-2px) scale(1.04)!important;border-color:#fde047!important;box-shadow:0 6px 16px #000000e6,0 0 12px #fbbf2473!important}.skill-square-btn:active{transform:scale(.95)!important}.skill-square-btn.attack-slot{border-color:#f59e0b!important;background-color:#1a0808!important}.skill-square-btn.attack-slot:hover{border-color:#fef08a!important;box-shadow:0 0 16px #ef444499!important}.skill-square-svg{width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9))}.skill-square-btn.ultimate-slot{border-color:#fbbf24!important;border-width:2px!important;box-shadow:0 4px 14px #000c,0 0 12px #f59e0b73!important}.skill-square-btn.ultimate-slot:hover{border-color:#fef08a!important;box-shadow:0 0 20px #fbbf24bf!important}.ultimate-crown-badge{position:absolute;top:-1px;right:2px;font-size:.68rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.9));z-index:5}.skill-square-key{position:absolute;top:2px;left:2px;font-family:Cinzel,serif;font-size:.5rem;font-weight:800;padding:0 3px;border-radius:3px;background:#0f172ae0;border:1px solid rgba(251,191,36,.45);color:#fef08a;line-height:1.1;z-index:5}.skill-square-icon-box{width:30px;height:30px;display:flex;align-items:center;justify-content:center;margin-top:1px}.skill-square-icon-box img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}.skill-square-footer{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(10,14,26,.95) 0%,rgba(10,14,26,.75) 70%,transparent 100%);display:flex;justify-content:center;align-items:center;padding-bottom:2px;z-index:4}.skill-square-label{font-family:Cinzel,serif;font-size:.5rem;font-weight:800;color:#fef08a}.skill-square-btn .skill-cost{font-family:Cinzel,serif;font-size:.52rem;font-weight:800;color:#facc15;letter-spacing:.02em}.skill-square-btn .cooldown-overlay{position:absolute;top:0;right:0;bottom:0;left:0;background:#0a0e1ae0;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:6;opacity:0;pointer-events:none;transition:opacity .15s ease}.skill-square-btn .cooldown-overlay.active{opacity:1}.skill-square-btn .cooldown-text{font-family:Cinzel,serif;font-size:.85rem;font-weight:900;color:#fde68a;text-shadow:0 0 8px rgba(251,191,36,.8)}.skill-square-btn.slot-locked{filter:grayscale(.85) brightness(.65);border-color:#94a3b866;outline-color:transparent}.skill-square-btn.slot-locked .skill-square-icon-box{opacity:.4}.slot-lock-overlay{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0f172aa6;z-index:7}.slot-lock-overlay .lock-icon{font-size:.85rem}.slot-lock-overlay .lock-lvl{font-family:Cinzel,serif;font-size:.55rem;font-weight:800;color:#cbd5e1}.attack-seal-ring{display:none!important}#btn-primary-attack,#skill-btn-1,#skill-btn-2,#skill-btn-3,#skill-btn-4{position:relative!important;bottom:auto!important;right:auto!important;left:auto!important;top:auto!important;width:52px!important;height:52px!important;border-radius:8px!important;transform:none!important;margin:0!important}#btn-primary-attack{outline:1px solid rgba(254,240,138,.25)!important;outline-offset:-3px!important}#btn-primary-attack:hover,#skill-btn-1:hover,#skill-btn-2:hover,#skill-btn-3:hover,#skill-btn-4:hover{transform:translateY(-2px) scale(1.04)!important}#btn-primary-attack:active,#skill-btn-1:active,#skill-btn-2:active,#skill-btn-3:active,#skill-btn-4:active{transform:scale(.95)!important}@media(max-width:768px),(max-height:500px){#top-center-wave-card{max-width:min(270px,calc(100vw - 75px))!important}#game-chat-box{max-width:min(48vw,190px)!important;padding:3px 6px!important;border-radius:8px!important}.chat-tabs{gap:2px!important}.chat-channel-tab{padding:1px 4px!important;font-size:.5rem!important;border-radius:3px!important;letter-spacing:.01em!important}.tab-lock-icon{font-size:.4rem!important}#chat-messages-container{height:36px!important;font-size:.55rem!important;gap:1px!important}#chat-input-form{margin-top:2px!important;padding-top:2px!important;gap:2px!important}#chat-input-field{padding:2px 4px!important;font-size:.55rem!important;height:22px!important}#chat-send-btn{padding:2px 6px!important;font-size:.55rem!important;height:22px!important}#mobile-combat-arc-container,.combat-action-container{bottom:calc(18px + var(--safe-bottom, 0px))!important;right:calc(6px + var(--safe-right, 0px))!important;gap:4px!important}.combat-auto-big-btn{padding:4px 10px 4px 8px!important;gap:5px!important;border-radius:6px!important;max-width:95px!important;border-width:1.5px!important;box-shadow:0 0 10px #10b98166,0 4px 10px #000c!important}.auto-pulse-aura{top:-3px!important;right:-3px!important;bottom:-3px!important;left:-3px!important;border-radius:9px!important}.auto-btn-main-icon{font-size:1rem!important}.auto-btn-title{font-size:.76rem!important;letter-spacing:.04em!important;line-height:1!important}.auto-btn-sub,.auto-btn-hotkey-badge{display:none!important}.combat-manual-header{gap:4px!important;width:42px!important;justify-content:space-between!important}.combat-auto-reactivate-btn,.combat-grimorio-btn{width:19px!important;height:19px!important;border-radius:4px!important}.combat-auto-reactivate-btn{font-size:.7rem!important}.combat-grimorio-btn{font-size:.65rem!important}.skills-square-row{max-height:232px!important;gap:3px!important}#btn-primary-attack,#skill-btn-1,#skill-btn-2,#skill-btn-3,#skill-btn-4,.skill-square-btn{width:42px!important;height:42px!important;border-radius:6px!important;background-size:6px 6px!important}.skill-square-icon-box{width:24px!important;height:24px!important}.skill-square-svg{width:22px!important;height:22px!important}.skill-square-key{font-size:.4rem!important;padding:0 2px!important}.skill-square-label,.skill-square-btn .skill-cost{font-size:.44rem!important}.ultimate-crown-badge{font-size:.55rem!important}}.skill-square-btn .attack-class-trait,.attack-class-trait{display:none!important}#cinematic-intro{position:fixed;top:0;right:0;bottom:0;left:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;color:#f8fafc;background:#05070d;overflow:hidden;z-index:1000}#cinematic-intro::backdrop{background:radial-gradient(circle at 50% 50%,#0f172af2,#020617)}.cinematic-art{position:absolute;top:0;right:0;bottom:0;left:0;opacity:1;transition:opacity .5s ease;background:#02040a}.cinematic-art.is-fading{opacity:0}.cinematic-art img{width:100%;height:100%;object-fit:cover;opacity:.72;filter:contrast(1.1) brightness(.9);animation:cinematic-zoom 14s ease-out both}.cinematic-art:after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:radial-gradient(circle at 50% 30%,transparent 40%,rgba(2,6,23,.7) 100%),linear-gradient(0deg,#030712fa,#03071280 45%,#0307124d)}.cinematic-top{position:absolute;inset:24px 32px auto;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:10}#cinematic-progress{display:inline-flex;align-items:center;gap:8px;font:700 11px Cinzel,serif;letter-spacing:.18em;color:#fde68a;background:linear-gradient(180deg,#1c1626eb,#0c101cf5);border:1px solid rgba(251,191,36,.5);border-radius:4px;padding:6px 14px;box-shadow:0 4px 14px #000000b3,inset 0 1px #ffffff1f;text-shadow:0 0 10px rgba(251,191,36,.4)}#cinematic-progress:before{content:"✦";color:#fbbf24;font-size:10px}.cinematic-caption{position:absolute;bottom:40px;left:50%;transform:translate(-50%);z-index:10;width:min(880px,92vw);box-sizing:border-box;padding:28px 36px 24px;border:2px solid #d97706;outline:1.5px solid rgba(254,240,138,.35);outline-offset:-8px;border-radius:6px;background-color:#0a0d1a;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),url(/assets/ui/frames/crest-header-ornament.svg),url(/assets/ui/frames/divider-runic-ornate.svg),radial-gradient(circle at 50% 0%,rgba(217,119,6,.22),transparent 60%),linear-gradient(175deg,#1a1628fa,#080b18fc);background-repeat:no-repeat;background-position:top 2px left 2px,top 2px right 2px,bottom 2px left 2px,bottom 2px right 2px,top 3px center,bottom 76px center,center,center;background-size:46px 46px,46px 46px,46px 46px,46px 46px,220px 26px,min(420px,85%) 16px,100% 100%,100% 100%;box-shadow:inset 0 0 0 4px #0a0e1ae6,inset 0 0 32px #f59e0b1f,0 24px 64px #000000f2,0 0 40px #f59e0b33}.cinematic-caption h2{font:800 clamp(22px,3.2vw,36px) "Cinzel",serif;letter-spacing:.06em;margin:4px 0 14px;text-align:center;background:linear-gradient(180deg,#fffbeb,#fde68a 52%,#d97706);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 10px rgba(0,0,0,.9))}.cinematic-caption p{font-family:Inter,system-ui,sans-serif;font-size:clamp(14px,1.6vw,17px);line-height:1.65;color:#ece8dc;min-height:78px;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.85);margin-bottom:24px}.cinematic-caption nav{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}#cinematic-intro button{min-height:42px;padding:8px 20px;border-radius:4px;border:1px solid rgba(251,191,36,.45);color:#fde68a;background:linear-gradient(180deg,#261e30f2,#0e1220fa);font:700 11.5px Cinzel,serif;letter-spacing:.08em;cursor:pointer;box-shadow:inset 0 1px #ffffff24,0 4px 14px #000000a6;transition:all .18s ease}#cinematic-intro button:hover:not(:disabled){border-color:#fbbf24;box-shadow:0 0 16px #fbbf2459;transform:translateY(-1px)}#cinematic-intro button:disabled{opacity:.45;cursor:not-allowed;transform:none}#cinematic-next{min-height:44px!important;padding:8px 34px!important;color:#1c0f02!important;border:1.5px solid #fef08a!important;outline:1px solid rgba(120,53,15,.65);outline-offset:-3px;background-color:#d97706!important;background-image:url(/assets/ui/frames/button-ornament-left.svg),url(/assets/ui/frames/button-ornament-right.svg),linear-gradient(180deg,#fef08a,#fbbf24 25%,#d97706 78%,#92400e)!important;background-repeat:no-repeat!important;background-position:left 6px center,right 6px center,center!important;background-size:26px 24px,26px 24px,100% 100%!important;box-shadow:inset 0 1px #ffffffbf,0 4px 16px #d9770680!important;font-weight:800!important;text-shadow:0 1px 0 rgba(255,255,255,.4)}#cinematic-next:hover:not(:disabled){filter:brightness(1.08);box-shadow:inset 0 1px #ffffffd9,0 0 24px #fbbf24bf!important}#cinematic-voice[aria-pressed=true]{border-color:#34d399;color:#a7f3d0;background:linear-gradient(180deg,#065f46bf,#064e3be6);box-shadow:0 0 14px #34d39959}.cinematic-elements{display:none;position:absolute;inset:22% 5% auto;gap:16px;justify-content:center;flex-wrap:wrap;z-index:5}[data-effect=elements] .cinematic-elements{display:flex}.cinematic-elements i{font-style:normal;font-family:Cinzel,serif;font-weight:700;font-size:11px;letter-spacing:.1em;border-radius:50%;width:58px;height:58px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid rgba(251,191,36,.65);color:#fef08a;background:radial-gradient(circle at 50% 50%,rgba(251,191,36,.25),transparent 70%),linear-gradient(180deg,#1e2438e6,#0c101cf5);box-shadow:0 0 20px #fbbf2459,inset 0 0 10px #000c}[data-effect=fracture] img{filter:contrast(1.3) saturate(.5)}[data-effect=shards]:before{content:"✦  ·  ✧  ·  ✦";position:absolute;top:18%;right:10%;bottom:18%;left:10%;z-index:5;font-size:clamp(36px,8vw,110px);letter-spacing:.3em;color:#fbbf2499;text-shadow:0 0 30px rgba(251,191,36,.5);display:flex;align-items:center;justify-content:center}@keyframes cinematic-zoom{0%{transform:scale(1)}to{transform:scale(1.08)}}.boss-story-banner{position:fixed;top:100px;left:50%;transform:translate(-50%);width:min(640px,94vw);z-index:550;display:flex;gap:14px;align-items:center;padding:16px 20px;border:2px solid #dc2626;outline:1.5px solid rgba(251,191,36,.5);outline-offset:-5px;border-radius:6px;background-color:#120914;background-image:url(/assets/ui/frames/corner-tl.svg),url(/assets/ui/frames/corner-tr.svg),url(/assets/ui/frames/corner-bl.svg),url(/assets/ui/frames/corner-br.svg),linear-gradient(110deg,#30101afa,#0f1424fa);background-repeat:no-repeat;background-position:top 1px left 1px,top 1px right 1px,bottom 1px left 1px,bottom 1px right 1px,center;background-size:24px 24px,24px 24px,24px 24px,24px 24px,100% 100%;color:#fff0ce;box-shadow:inset 0 0 0 1px #dc26264d,0 14px 44px #000000e6,0 0 28px #dc262659;pointer-events:none}.boss-story-banner[hidden]{display:none}.boss-story-banner img{width:68px;height:68px;object-fit:contain;border:1.5px solid #fbbf24;border-radius:4px;box-shadow:0 0 14px #fbbf2466}.boss-story-banner strong{display:block;font-family:Cinzel,serif;font-size:15px;color:#fbbf24;margin-bottom:4px;letter-spacing:.05em;text-shadow:0 2px 6px rgba(0,0,0,.8)}.boss-story-banner p{font-size:12.5px;line-height:1.45;margin:0;color:#e2e8f0}@media(max-width:640px){.cinematic-top{inset:12px 14px auto}#cinematic-progress{font-size:9.5px;padding:4px 10px}#cinematic-intro button{min-height:38px;padding:6px 14px;font-size:10px}.cinematic-caption{inset:auto 50% 16px;padding:20px 18px 16px;background-size:32px 32px,32px 32px,32px 32px,32px 32px,170px 20px,min(300px,90%) 14px,100% 100%,100% 100%;background-position:top 2px left 2px,top 2px right 2px,bottom 2px left 2px,bottom 2px right 2px,top 3px center,bottom 62px center,center,center}.cinematic-caption h2{font-size:19px;margin-bottom:8px}.cinematic-caption p{font-size:12.5px;min-height:85px;margin-bottom:16px}.cinematic-caption nav{gap:8px}#cinematic-next{min-height:38px!important;padding:6px 24px!important}.boss-story-banner{top:80px;padding:12px}.boss-story-banner img{width:50px;height:50px}}@media(prefers-reduced-motion:reduce){.cinematic-art img{animation:none}.cinematic-art{transition:none}}#party-hud-card{position:absolute;top:120px!important;left:14px!important;width:230px;display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:14px;z-index:35!important;pointer-events:auto;-webkit-user-select:none;user-select:none;background:#0f172ad9;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(251,191,36,.4);box-shadow:0 8px 24px #0009;transition:all .2s ease-in-out}#party-hud-card.collapsed{width:auto;padding:0;border-radius:4px;border:none;background:transparent;box-shadow:none;top:120px!important;left:14px!important;z-index:35!important}#party-hud-card.collapsed .party-members-list,#party-hud-card.collapsed .party-footer-actions,#party-hud-card.collapsed .party-solo-view,#party-hud-card.collapsed .party-hud-header{display:none!important}.party-pill-view{display:inline-flex;align-items:center;gap:2.5px;padding:2px 5px;border-radius:4px;background:#0b101e;border:1.5px solid rgba(251,191,36,.75);outline:1px solid rgba(254,240,138,.25);outline-offset:-2px;box-shadow:0 3px 10px #000000bf,0 0 8px #fbbf242e;cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1);-webkit-user-select:none;user-select:none;white-space:nowrap!important;box-sizing:border-box!important;width:auto!important;max-width:none!important;overflow:visible!important}.party-pill-view:hover{transform:translateY(-1px);border-color:#fde047;outline-color:#fef08a73;box-shadow:0 4px 14px #000000d9,0 0 10px #fbbf2459}.party-pill-view:active{transform:scale(.96)}.party-pill-icon{font-size:.68rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));flex-shrink:0}.party-pill-bonus{font-family:system-ui,-apple-system,sans-serif;font-size:.5rem;font-weight:800;color:#10b981;background:#10b98129;border:1px solid rgba(16,185,129,.5);padding:0 3px;border-radius:3px;white-space:nowrap!important;display:inline-block;line-height:1.1;animation:pulseXp 2s infinite ease-in-out;box-sizing:border-box;flex-shrink:0}@keyframes pulseXp{0%,to{opacity:.9}50%{opacity:1}}.party-hud-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08)}.party-hud-title{font-family:Cinzel,serif;font-size:.78rem;font-weight:700;color:#fbbf24;display:flex;align-items:center;gap:5px;letter-spacing:.05em}.party-hud-toggle-btn{background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:.85rem;padding:2px 4px;line-height:1}.party-hud-toggle-btn:hover{color:#f1f5f9}.party-solo-view{display:flex;flex-direction:column;gap:6px;padding:4px 0}.party-solo-hint{font-size:.7rem;color:#94a3b8;line-height:1.3}.party-btn-quick-invite{background:linear-gradient(135deg,#fbbf2433,#d977064d);border:1px solid rgba(251,191,36,.4);color:#fef08a;border-radius:8px;padding:6px 10px;font-size:.72rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s ease}.party-btn-quick-invite:hover{background:linear-gradient(135deg,#fbbf2459,#d9770680);border-color:#fbbf24;transform:translateY(-1px)}.party-members-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto}.party-member-card{position:relative;background:#1e293bb3;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;transition:border-color .15s}.party-member-card:hover{border-color:#fbbf244d}.party-member-card.is-local{border-left:3px solid #3b82f6}.party-member-card.is-leader{border-left:3px solid #fbbf24}.party-member-top{display:flex;align-items:center;justify-content:space-between;gap:6px}.party-member-info{display:flex;align-items:center;gap:5px;min-width:0;overflow:hidden}.party-member-crown{font-size:.75rem;color:#fbbf24;filter:drop-shadow(0 0 4px rgba(251,191,36,.6))}.party-member-name{font-size:.75rem;font-weight:700;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.party-member-level{font-size:.65rem;font-weight:700;color:#94a3b8;background:#0006;padding:1px 4px;border-radius:4px}.party-member-actions-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:.85rem;padding:0 4px;line-height:1}.party-member-actions-btn:hover{color:#fbbf24}.party-vitals-container{display:flex;flex-direction:column;gap:3px}.party-bar-track{height:6px;background:#0009;border-radius:3px;overflow:hidden;position:relative}.party-bar-fill-hp{height:100%;background:linear-gradient(90deg,#10b981,#34d399);transition:width .2s ease-out}.party-bar-fill-hp.low{background:linear-gradient(90deg,#ef4444,#f87171)}.party-bar-fill-mp{height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);transition:width .2s ease-out}.party-bar-numbers{display:flex;justify-content:space-between;font-size:.6rem;color:#cbd5e1;font-weight:600;padding:0 1px}.party-action-menu{position:absolute;top:100%;right:0;background:#0f172af2;border:1px solid rgba(251,191,36,.4);border-radius:6px;padding:4px;display:flex;flex-direction:column;gap:2px;z-index:50;box-shadow:0 6px 16px #0009;min-width:120px}.party-action-menu-item{background:none;border:none;color:#cbd5e1;text-align:left;padding:5px 8px;font-size:.7rem;font-weight:600;border-radius:4px;cursor:pointer}.party-action-menu-item:hover{background:#fbbf2426;color:#fbbf24}.party-action-menu-item.danger:hover{background:#ef444433;color:#fca5a5}.party-footer-actions{display:flex;gap:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}.party-btn-secondary{flex:1;background:#33415580;border:1px solid rgba(255,255,255,.1);color:#cbd5e1;border-radius:6px;padding:4px 8px;font-size:.68rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}.party-btn-secondary:hover{background:#334155cc;color:#f1f5f9}.party-btn-leave{background:#ef444426;border-color:#ef44444d;color:#fca5a5}.party-btn-leave:hover{background:#ef44444d;color:#fff}#party-invite-prompt-modal{position:fixed;top:70px;left:50%;transform:translate(-50%);z-index:1000;background:#0f172af2;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1.5px solid #fbbf24;box-shadow:0 10px 30px #000000b3,0 0 20px #fbbf244d;border-radius:14px;padding:16px 20px;min-width:300px;display:flex;flex-direction:column;gap:12px;animation:partySlideDown .25s ease-out}@keyframes partySlideDown{0%{opacity:0;transform:translate(-50%,-20px)}to{opacity:1;transform:translate(-50%)}}.party-invite-title{font-family:Cinzel,serif;font-size:.9rem;font-weight:700;color:#fbbf24;display:flex;align-items:center;gap:8px}.party-invite-text{font-size:.8rem;color:#e2e8f0;line-height:1.4}.party-invite-highlight{color:#60a5fa;font-weight:700}.party-invite-buttons{display:flex;gap:10px}.party-invite-btn-accept{flex:1;background:linear-gradient(135deg,#10b981,#059669);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-size:.78rem;font-weight:700;cursor:pointer;transition:filter .15s}.party-invite-btn-accept:hover{filter:brightness(1.15)}.party-invite-btn-decline{flex:1;background:#ef444433;border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:8px;padding:8px 12px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s}.party-invite-btn-decline:hover{background:#ef444459;color:#fff}.channel-pill-btn{display:inline-flex;align-items:center;gap:6px;background:#1e293bb3;border:1px solid rgba(251,191,36,.3);color:#fef08a;border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .15s;pointer-events:auto}.channel-pill-btn:hover{background:#fbbf2433;border-color:#fbbf24;transform:translateY(-1px)}.channel-indicator-dot{width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981}#channel-selector-modal{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000a6;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:999;display:flex;align-items:center;justify-content:center}.channel-modal-card{background:#0f172af2;border:1px solid rgba(251,191,36,.35);box-shadow:0 12px 36px #000c;border-radius:16px;padding:20px;width:360px;max-width:90vw;display:flex;flex-direction:column;gap:14px}.channel-modal-header{display:flex;justify-content:space-between;align-items:center}.channel-modal-title{font-family:Cinzel,serif;font-size:1rem;font-weight:700;color:#fbbf24}.channel-modal-close{background:none;border:none;color:#94a3b8;font-size:1.2rem;cursor:pointer;line-height:1}.channel-modal-close:hover{color:#f1f5f9}.channel-list-container{display:flex;flex-direction:column;gap:8px}.channel-item-row{display:flex;align-items:center;justify-content:space-between;background:#1e293b99;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;transition:all .15s}.channel-item-row:hover{border-color:#fbbf244d;background:#1e293be6}.channel-item-row.is-current{border-color:#10b981;background:#10b9811a}.channel-item-name{font-size:.85rem;font-weight:700;color:#f1f5f9}.channel-status-badge{font-size:.65rem;font-weight:800;padding:2px 6px;border-radius:4px;text-transform:uppercase}.channel-status-badge.livre{background:#10b98133;color:#34d399}.channel-status-badge.normal{background:#fbbf2433;color:#fef08a}.channel-status-badge.lotado{background:#ef444433;color:#fca5a5}.channel-btn-switch{background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;border-radius:6px;padding:6px 12px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s}.channel-btn-switch:hover{filter:brightness(1.15)}.channel-btn-current{background:#10b98126;border:1px solid #10b981;color:#34d399;border-radius:6px;padding:5px 10px;font-size:.7rem;font-weight:700;cursor:default}#party-toast-container{display:flex;flex-direction:column;align-items:center;gap:8px;z-index:1000;pointer-events:none;width:100%;max-width:min(380px,92vw)}.party-toast{position:relative;background:radial-gradient(circle at 50% 50%,#141b2df7,#0b101efc);border:1.5px solid #fbbf24;box-shadow:0 0 0 2px #070a14,0 0 0 3.5px #f59e0bbf,0 8px 24px #000000d9,0 0 14px #fbbf2440;outline:1px solid rgba(254,240,138,.4);outline-offset:-3.5px;border-radius:4px;padding:8px 18px;color:#fef08a;font-family:Cinzel,serif,system-ui;font-size:.76rem;font-weight:700;letter-spacing:.04em;text-shadow:0 1px 3px rgba(0,0,0,.9);text-align:center;box-sizing:border-box;animation:partyToastFade 3.2s forwards;pointer-events:auto}.party-toast.toast-error{border-color:#f87171;box-shadow:0 0 0 2px #070a14,0 0 0 3.5px #ef4444bf,0 8px 24px #000000d9,0 0 14px #ef44444d;color:#fecaca}.party-toast.toast-success{border-color:#34d399;box-shadow:0 0 0 2px #070a14,0 0 0 3.5px #10b981bf,0 8px 24px #000000d9,0 0 14px #10b9814d;color:#a7f3d0}.toast-corner-spike{position:absolute;width:6px;height:6px;background:#fbbf24;border:1px solid #78350f;transform:rotate(45deg);box-shadow:0 0 3px #fbbf24d9;pointer-events:none;z-index:3}.toast-corner-spike.top-left{top:-3.5px;left:-3.5px}.toast-corner-spike.top-right{top:-3.5px;right:-3.5px}.toast-corner-spike.bottom-left{bottom:-3.5px;left:-3.5px}.toast-corner-spike.bottom-right{bottom:-3.5px;right:-3.5px}@keyframes partyToastFade{0%{opacity:0;transform:translateY(-8px)}12%{opacity:1;transform:translateY(0)}85%{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-4px)}}@media(max-width:768px){#party-hud-card{top:calc(82px + var(--safe-top, 0px))!important;left:calc(8px + var(--safe-left, 0px))!important;z-index:35!important;max-width:calc(100vw - 20px)}#party-hud-card.collapsed{top:calc(82px + var(--safe-top, 0px))!important;left:calc(8px + var(--safe-left, 0px))!important;z-index:35!important;width:auto!important;max-width:none!important}.party-pill-view{padding:1px 4px!important;gap:2px!important;border-radius:3px!important;width:auto!important;max-width:none!important;overflow:visible!important}.party-pill-icon{font-size:.62rem!important;line-height:1!important}.party-pill-bonus{font-size:.46rem!important;padding:0 2px!important;white-space:nowrap!important;line-height:1.1!important}#party-toast-container{gap:6px!important;max-width:min(300px,86vw)!important}.party-toast{font-size:.68rem!important;padding:6px 14px!important}}.grimorio-tabs{display:flex;gap:10px;padding:12px}.grimorio-tabs button{flex:1;min-height:44px;color:#eee0bf;background:#182238;border:1px solid #856a39;border-radius:8px}.grimorio-tabs button[aria-selected=true]{background:#514020;border-color:#fbbf24}#skillbook-slots-container[hidden],#skill-rotation-panel[hidden]{display:none!important}#skill-rotation-panel{padding:16px;color:#e2e8f0}#skill-rotation-panel p{font-size:13px;line-height:1.5}#skill-rotation-editor{display:grid;grid-template-columns:repeat(4,minmax(112px,1fr));gap:8px;margin:14px 0;overflow-x:auto}.rotation-slot{min-width:0;padding:12px 8px;border:1px solid #856a39;border-radius:10px;background:#121c2e}.rotation-slot strong,.rotation-slot span{display:block;overflow-wrap:anywhere}.rotation-slot strong{color:#fbbf24;font-size:13px}.rotation-slot span{color:#b9c4d4;font-size:11px;margin:8px 0}.rotation-slot button{width:50%;min-height:44px;color:#e2e8f0;background:#24314b;border:1px solid #856a39}#btn-save-skill-rotation{width:100%;min-height:44px}#btn-toggle-auto:disabled{opacity:1;cursor:default}.auto-cast-setting{display:flex;align-items:center;gap:10px;min-height:44px}.skill-upgrade-controls{margin-top:10px;padding-top:10px;border-top:1px solid #856a39}.skill-upgrade-controls p{color:#cbd5e1;font-size:12px;line-height:1.5;overflow-wrap:anywhere}.btn-upgrade-skill{width:100%;min-height:44px;border:1px solid #b99954;border-radius:8px;color:#fef3c7;background:#514020;cursor:pointer}.btn-upgrade-skill:disabled{opacity:.65;cursor:default}#skill-upgrade-status{margin:8px 16px;color:#e8dcb7;font-size:13px;line-height:1.5}
+
+
+/* LOGIN ALIGNMENT FINAL: mesmo eixo da capa, portal compacto de idle RPG. */
+
+/* O login ocupa o mesmo viewport da capa; não pode entrar no fluxo abaixo dela. */
+
+/* MAGICFORGE UX PASS — CTA espelhado, portal de entrada e gestão segura. */
+
+/* REDESIGN VISÍVEL — o login deixa de ser apenas formulário e passa a explicar o ciclo idle. */
+
 /* ==========================================================================
-   SALA DOS FORJADOS & PORTAL DE LOGIN — MOLDURAS RÚNICAS TRABALHADAS (RPG AAA)
+   PORTAL UNIFICADO — FORJA EDITORIAL (passada final)
+   Capa, login e Sala dos Forjados compartilham uma única linguagem:
+   superfícies quietas, ouro como único sinal de ação, e molduras apenas
+   em objetos-herói (showcase de classes e pedestais ocupados).
+   ========================================================================== */
+
+/* ---------- Tokens e base compartilhada ---------- */
+
+/* ---------- Capa: página de rosto ---------- */
+
+/* ---------- Login ---------- */
+
+/* ---------- Sala dos Forjados (seleção/criação de personagem) ---------- */
+
+/* ---------- Responsivo ---------- */
+
+/* ==========================================================================
+   AJUSTES FINOS — alinhamento da capa, login compacto e aba "CONHECER"
+   espelhada na borda esquerda (somente tela de login).
+   ========================================================================== */
+
+/* ---------- Capa: alinhar larguras e distribuir o rail de classes ---------- */
+
+/* ---------- Login: agrupar informações com menos respiro ---------- */
+
+/* ---------- Aba "CONHECER" espelhada (borda esquerda, só no login) ---------- */
+/* Na Sala dos Forjados o botão não aparece */
+
+/* ==========================================================================
+   LOGIN CENTRALIZADO — remove a coluna editorial e centraliza o card.
+   ========================================================================== */
+
+/* Centralização definitiva: precisa vencer as regras .in-auth-mode (maior especificidade). */
+
+/* ==========================================================================
+   TRANSIÇÃO LATERAL — capa ⇄ login
+   O login entra pela direita e empurra a capa para a esquerda;
+   ao voltar, a capa retorna da esquerda e o login sai pela direita.
+   ========================================================================== */
+
+/* ==========================================================================
+   BOTÕES DE CANTO — mesmo tamanho e mesmo padrão na capa e no login
+   (abas verticais espelhadas nas bordas direita/esquerda).
+   ========================================================================== */
+
+/* ==========================================================================
+   PADRONIZAÇÃO DOS CABEÇALHOS — capa/vocações, login e seleção de herói
+   Mesmo grid de masthead (wordmark à esquerda, selo de status à direita)
+   e mesma linguagem visual dourada em todos os selos.
    ========================================================================== */
 
 #modal-auth-selection {
+  --forge-ink: #f8ecda;
+  --forge-muted: #cbbcac;
+  --forge-gold: #ecc88a;
+  --forge-line: #98704a;
+  --forge-title: Cinzel, Georgia, serif;
+  --forge-corners:
+    url(/assets/ui/frames/corner-tl.svg) top left / 26px 26px no-repeat,
+    url(/assets/ui/frames/corner-tr.svg) top right / 26px 26px no-repeat,
+    url(/assets/ui/frames/corner-bl.svg) bottom left / 26px 26px no-repeat,
+    url(/assets/ui/frames/corner-br.svg) bottom right / 26px 26px no-repeat;
   position: fixed;
   inset: 0;
   z-index: 1000;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: clamp(12px, 1.8vh, 22px) clamp(16px, 3vw, 44px);
-  background:
-    radial-gradient(circle at 72% 42%, rgba(245, 158, 11, 0.16), transparent 46%),
-    radial-gradient(circle at 22% 55%, rgba(168, 85, 247, 0.14), transparent 50%),
-    linear-gradient(105deg, rgba(4, 7, 15, 0.96) 0%, rgba(9, 13, 24, 0.8) 50%, rgba(5, 8, 17, 0.94) 100%),
-    url('/assets/ui/login/bg_login_forja_astral.jpg') center / cover fixed;
+  overflow: auto;
   overscroll-behavior: contain;
-  color: #f1ead8;
+  padding: 0 clamp(16px, 4vw, 56px) max(28px, env(safe-area-inset-bottom));
+  color: var(--forge-ink);
+  color-scheme: dark;
+  font-family: system-ui, sans-serif;
+  background:
+    linear-gradient(90deg, #0b090af5, #120c0bc2 45%, #130d0c8c),
+    linear-gradient(0deg, #0b090c 3%, transparent 68%),
+    url(/assets/ui/login/bg_cover_astral.jpg) center / cover fixed #100d0e;
 }
 
-#modal-auth-selection[hidden] {
-  display: none !important;
-}
-
+#modal-auth-selection[hidden],
 #modal-auth-selection [hidden] {
   display: none !important;
 }
 
-/* Container Principal que se adapta a 100dvh sem gerar barra de rolagem */
+#modal-auth-selection :focus-visible {
+  outline: 2px solid var(--forge-gold);
+  outline-offset: 3px;
+}
+
+#modal-auth-selection :is(h1, h2, h3) {
+  margin: 0;
+  color: var(--forge-ink);
+  font-family: var(--forge-title);
+  overflow-wrap: anywhere;
+}
+
+#modal-auth-selection p {
+  margin: 0;
+  color: var(--forge-muted);
+  line-height: 1.55;
+}
+
+#modal-auth-selection button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #876343;
+  border-radius: 3px;
+  background: linear-gradient(#30211c, #1c1414);
+  color: var(--forge-ink);
+  font: 700 .78rem/1.25 var(--forge-title);
+  cursor: pointer;
+}
+
+#modal-auth-selection button:enabled:hover {
+  border-color: var(--forge-gold);
+  background: linear-gradient(#493126, #281a18);
+}
+
+#modal-auth-selection button:disabled {
+  opacity: .58;
+  cursor: default;
+}
+
+#modal-auth-selection :is(.forge-primary, button[type="submit"], .forge-slot-actions > button:first-child) {
+  border-color: #e4b879;
+  background: linear-gradient(#f3d59b, #be884e);
+  color: #21120d;
+  box-shadow: inset 0 0 0 2px #78502f5e, 0 5px 18px #0a050967;
+}
+
+#modal-auth-selection :is(.forge-primary, button[type="submit"], .forge-slot-actions > button:first-child):enabled:hover {
+  background: linear-gradient(#ffe8b8, #dca368);
+}
+
+.forge-masthead,
+.forge-cover-hero,
 .forge-auth {
-  width: 100%;
-  max-width: 1260px;
-  min-height: calc(100dvh - clamp(24px, 3.6vh, 44px));
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: clamp(8px, 1.4vh, 16px);
+  width: min(100%, 1240px);
+  margin-inline: auto;
 }
 
-/* ==========================================================================
-   MASTHEAD RÚNICO SUPERIOR COM DIVISOR ORNAMENTAL SVG
-   ========================================================================== */
 .forge-masthead {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  min-height: 85px;
+  padding-block: max(14px, env(safe-area-inset-top)) 14px;
+  display: flex;
   align-items: center;
-  gap: 16px;
-  padding-bottom: clamp(10px, 1.5vh, 16px);
-  border-bottom: 1px solid rgba(251, 191, 36, 0.35);
-  position: relative;
-}
-
-.forge-masthead::after {
-  content: '';
-  position: absolute;
-  bottom: -11px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(360px, 70vw);
-  height: 22px;
-  background: url('/assets/ui/frames/divider-runic-ornate.svg') center / contain no-repeat;
-  pointer-events: none;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid #c794635e;
 }
 
 .forge-wordmark {
-  justify-self: start;
-  font: 700 clamp(21px, 2.5vw, 30px) 'Cinzel', serif;
-  letter-spacing: 0.15em;
-  background: linear-gradient(180deg, #fffbeb 0%, #fde68a 42%, #f59e0b 75%, #92400e 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 3px 12px rgba(245, 158, 11, 0.38));
+  color: var(--forge-gold);
+  font: 700 clamp(1.2rem, 2.4vw, 1.85rem)/1 var(--forge-title);
+  letter-spacing: .08em;
+  text-align: center;
 }
 
 .forge-wordmark small {
   display: block;
-  margin-top: 2px;
-  font: 700 9.5px 'Cinzel', serif;
-  letter-spacing: 0.54em;
-  color: #e2c887;
-  -webkit-text-fill-color: #e2c887;
+  margin-top: 6px;
+  font-size: .56rem;
+  letter-spacing: .48em;
+  text-transform: uppercase;
 }
 
-.forge-world-tag {
-  justify-self: end;
-  position: relative;
-  color: #f3dfa6;
-  font: 700 10.5px 'Cinzel', serif;
-  letter-spacing: 0.08em;
-  text-align: right;
-  line-height: 1.35;
-  padding: 6px 14px;
-  border: 1.5px solid rgba(251, 191, 36, 0.55);
-  border-radius: 4px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 14px 14px no-repeat,
-    linear-gradient(180deg, rgba(30, 24, 38, 0.94), rgba(11, 15, 28, 0.98));
-  box-shadow:
-    inset 0 0 0 1px rgba(254, 240, 138, 0.22),
-    0 6px 18px rgba(0, 0, 0, 0.65);
+.forge-journey {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  color: var(--forge-muted);
+  font-size: .75rem;
 }
 
-/* ==========================================================================
-   ALTAR NARRATIVO ESQUERDO & INSÍGNIAS EM MOLDURA FORJADA
-   ========================================================================== */
-.forge-intro {
-  position: relative;
-  max-width: 630px;
-  padding: 12px 0;
+.forge-journey li + li::before {
+  content: "◇";
+  margin-right: 16px;
+  color: var(--forge-line);
 }
 
-#modal-auth-selection[data-screen="login"] .forge-intro::before {
-  content: '';
-  position: absolute;
-  left: -36px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 290px;
-  height: 290px;
-  background: url('/assets/ui/frames/magic-circle-halo.svg') center / contain no-repeat;
-  opacity: 0.22;
-  pointer-events: none;
-  z-index: -1;
+.forge-journey [aria-current="step"] {
+  color: var(--forge-gold);
+  font-weight: 700;
 }
 
-.forge-eyebrow {
+.forge-cover-hero,
+#modal-auth-selection[data-screen="login"] .forge-auth {
+  display: grid;
+  grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr);
+  align-items: center;
+  column-gap: clamp(24px, 4vw, 64px);
+  padding-block: clamp(30px, 6vh, 80px);
+}
+
+#modal-auth-selection[data-screen="login"] .forge-auth {
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 450px);
+  max-width: 1040px;
+}
+
+#modal-auth-selection[data-screen="characters"] .forge-auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 22px;
+  padding-top: clamp(24px, 4vh, 48px);
+}
+
+.forge-cover-hero,
+#modal-auth-selection[data-screen="login"] .forge-intro,
+#modal-auth-selection[data-screen="login"] .forge-layout {
+  animation: forge-screen-enter 260ms ease-out both;
+}
+
+#modal-auth-selection[data-screen="characters"] .forge-roster,
+#modal-auth-selection[data-screen="characters"] .forge-account-session {
+  animation: forge-screen-enter 260ms ease-out both;
+}
+
+@keyframes forge-screen-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#modal-auth-selection .forge-eyebrow {
+  display: block;
+  color: var(--forge-gold);
+  font: 700 .74rem/1.5 var(--forge-title);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+#modal-auth-selection :is(.forge-cover-intro, .forge-intro) h1 {
+  margin: 10px 0 14px;
+  font-size: clamp(2.1rem, 4.6vw, 4.25rem);
+  line-height: 1.04;
+  text-wrap: balance;
+  text-shadow: 0 4px 20px #100806;
+}
+
+#modal-auth-selection[data-screen="characters"] .forge-intro h1 {
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+}
+
+#modal-auth-selection :is(.forge-cover-tagline, #forge-intro-copy) {
+  max-width: 39ch;
+  font-size: 1rem;
+}
+
+.forge-cover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 24px;
+}
+
+#modal-auth-selection .forge-primary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: #fde68a;
-  font: 700 10.5px 'Cinzel', serif;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  padding: 4px 12px;
-  border: 1px solid rgba(251, 191, 36, 0.42);
-  border-radius: 3px;
-  background: linear-gradient(90deg, rgba(120, 53, 15, 0.35), rgba(24, 20, 36, 0.8), rgba(120, 53, 15, 0.35));
-  box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.14);
-}
-
-.forge-eyebrow::before,
-.forge-eyebrow::after {
-  content: '❖';
-  font-size: 10px;
-  color: #fbbf24;
-}
-
-.forge-intro h1 {
-  font: 700 clamp(28px, 3.6vw, 48px)/1.08 'Cinzel', serif;
-  margin: 10px 0 8px;
-  background: linear-gradient(180deg, #ffffff 0%, #fef08a 48%, #f59e0b 82%, #b45309 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 5px 18px rgba(0, 0, 0, 0.92));
-  letter-spacing: 0.04em;
-}
-
-#modal-auth-selection[data-screen="login"] .forge-intro h1::after {
-  content: '';
-  display: block;
-  width: min(320px, 85%);
-  height: 18px;
-  margin-top: 8px;
-  background: url('/assets/ui/frames/divider-runic-ornate.svg') left center / contain no-repeat;
-}
-
-.forge-intro p {
-  max-width: 520px;
-  color: #dfd9c8;
-  font-size: clamp(13px, 1.1vw, 14.5px);
-  line-height: 1.55;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+  gap: 24px;
+  min-height: 50px;
+  padding-inline: 20px;
+  font-size: .9rem;
 }
 
 .forge-runic-crests {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 8px 18px;
+  padding: 15px 0 0;
+  margin: 24px 0 0;
+  border-top: 1px solid #c794635e;
+  list-style: none;
+  color: var(--forge-muted);
+  font-size: .79rem;
 }
 
-#modal-auth-selection[data-screen="characters"] .forge-runic-crests {
-  display: none;
+.forge-runic-crests li::before {
+  content: "◆";
+  color: var(--forge-gold);
+  font-size: .58em;
+  margin-right: 6px;
 }
 
-.runic-crest-pill {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
+.forge-frame {
+  border: 1px solid var(--forge-line);
   border-radius: 4px;
-  border: 1.5px solid rgba(251, 191, 36, 0.52);
-  outline: 1px solid rgba(254, 240, 138, 0.18);
-  outline-offset: -4px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 15px 15px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 15px 15px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 15px 15px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 15px 15px no-repeat,
-    linear-gradient(160deg, rgba(31, 26, 44, 0.95), rgba(11, 15, 28, 0.98));
-  color: #fde68a;
-  font: 700 11px 'Cinzel', serif;
-  letter-spacing: 0.04em;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.65);
+  background: var(--forge-corners), linear-gradient(155deg, #2e1e1bf7, #171113fc 70%);
+  box-shadow: inset 0 0 0 4px #130e0d99, 0 16px 38px #0007;
 }
 
-.runic-crest-pill i {
-  font-style: normal;
-  color: #fbbf24;
-  text-shadow: 0 0 8px rgba(251, 191, 36, 0.75);
-}
-
-/* ==========================================================================
-   DESKTOP GRID INTELIGENTE (LOGIN 2 COLUNAS / PERSONAGENS COMPACTO SEM SCROLL)
-   ========================================================================== */
-@media (min-width: 960px) {
-  #modal-auth-selection[data-screen="login"] .forge-auth {
-    display: grid;
-    grid-template-columns: minmax(360px, 1.06fr) minmax(415px, 460px);
-    grid-template-rows: auto 1fr auto auto;
-    column-gap: clamp(32px, 5vw, 68px);
-    row-gap: 8px;
-    align-items: center;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-masthead {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-intro {
-    grid-column: 1;
-    grid-row: 2 / 4;
-    align-self: center;
-    padding-right: 12px;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-layout {
-    grid-column: 2;
-    grid-row: 2;
-    display: block;
-    width: 100%;
-    max-width: 460px;
-    margin: 0;
-    align-self: center;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-auth-status {
-    grid-column: 2;
-    grid-row: 3;
-    max-width: 460px;
-    margin: 0;
-    text-align: center;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-footer {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    margin-top: 2px;
-  }
-
-  /* Na Sala dos Forjados (characters), alinha título à esquerda e sessão à direita na mesma faixa */
-  #modal-auth-selection[data-screen="characters"] .forge-auth {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto 1fr auto auto;
-    column-gap: 24px;
-    row-gap: 8px;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-masthead {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-intro {
-    grid-column: 1;
-    grid-row: 2;
-    padding: 0;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-intro h1 {
-    font-size: clamp(22px, 2.5vw, 32px);
-    margin: 3px 0;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-intro p {
-    font-size: 12.5px;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-account-session {
-    grid-column: 2;
-    grid-row: 2;
-    align-self: center;
-    padding-bottom: 0;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-layout {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    align-self: center;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-auth-status {
-    grid-column: 1 / -1;
-    grid-row: 4;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-footer {
-    grid-column: 1 / -1;
-    grid-row: 5;
-    margin-top: 0;
-  }
-}
-
-/* ==========================================================================
-   BARRA DE SESSÃO DA CONTA & COMANDOS DA SALA DOS FORJADOS EM MOLDURA RÚNICA
-   ========================================================================== */
-.forge-account-session {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1.5px solid rgba(251, 191, 36, 0.58);
-  outline: 1px solid rgba(254, 240, 138, 0.22);
-  outline-offset: -5px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 22px 22px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 22px 22px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 22px 22px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 22px 22px no-repeat,
-    linear-gradient(135deg, rgba(28, 25, 42, 0.96), rgba(11, 15, 28, 0.98));
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.68);
-  color: #fde68a;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-#forge-session-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Cinzel', serif;
-  color: #fef08a;
-  letter-spacing: 0.05em;
-}
-
-#forge-session-name::before {
-  content: '🛡️';
-  font-size: 13px;
-}
-
-.forge-account-session button,
-#forge-refresh-slots {
-  min-height: 36px;
-  padding: 6px 14px;
-  border: 1.5px solid rgba(251, 191, 36, 0.62);
-  outline: 1px solid rgba(254, 240, 138, 0.2);
-  outline-offset: -4px;
-  border-radius: 4px;
-  color: #fef08a;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 14px 14px no-repeat,
-    linear-gradient(180deg, rgba(58, 42, 22, 0.94), rgba(20, 18, 30, 0.98));
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
-  cursor: pointer;
-  font: 700 11px 'Cinzel', serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transition: all 0.18s ease;
-}
-
-#forge-sign-out::before {
-  content: '⇄ ';
-  color: #fbbf24;
-}
-
-#forge-refresh-slots::before {
-  content: '↻ ';
-  color: #fbbf24;
-}
-
-.forge-account-session button:hover:not(:disabled),
-#forge-refresh-slots:hover:not(:disabled) {
-  border-color: #fde047;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.45);
-  transform: translateY(-1px);
-}
-
-/* ==========================================================================
-   ALTARES DOS 3 PEDESTAIS RÚNICOS (SALA DOS FORJADOS) COM CANTONEIRAS & HALO
-   ========================================================================== */
-.forge-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 350px;
-  gap: 20px;
-  align-items: center;
-}
-
-#modal-auth-selection[data-screen="characters"] .forge-layout:has(.forge-entry[hidden]) {
-  grid-template-columns: 1fr;
-}
-
-.forge-roster {
+.forge-codex,
+.forge-entry {
   min-width: 0;
+  padding: clamp(16px, 2.6vw, 28px);
 }
 
-.forge-section-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-  padding: 7px 16px;
-  border-radius: 6px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 20px 20px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 20px 20px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 20px 20px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 20px 20px no-repeat,
-    linear-gradient(90deg, rgba(28, 25, 42, 0.94), rgba(14, 19, 34, 0.88), rgba(28, 25, 42, 0.94));
-  border: 1.5px solid rgba(251, 191, 36, 0.45);
-  outline: 1px solid rgba(254, 240, 138, 0.16);
-  outline-offset: -5px;
+.forge-codex-heading {
+  padding-bottom: 13px;
+  border-bottom: 1px solid #c794635e;
 }
 
-.forge-section-heading h2 {
-  margin-right: auto;
-  font: 700 16px 'Cinzel', serif;
-  color: #fef08a;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+#modal-auth-selection :is(.forge-codex-heading, .forge-entry) h2 {
+  font-size: clamp(1.22rem, 2vw, 1.6rem);
 }
 
-.forge-section-heading h2::before {
-  content: '⚔';
-  color: #fbbf24;
+#modal-auth-selection :is(.forge-codex-heading, .forge-entry) p {
+  font-size: .85rem;
 }
 
-.forge-section-heading span {
-  font: 700 10.5px 'Cinzel', serif;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #fde68a;
-  padding: 4px 12px;
-  border-radius: 4px;
-  background: rgba(120, 53, 15, 0.35);
-  border: 1px solid rgba(251, 191, 36, 0.45);
-}
-
-.forge-slots {
+.class-stage-display {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: minmax(120px, .85fr) minmax(0, 1.15fr);
+  gap: clamp(12px, 2.2vw, 28px);
+  align-items: center;
+  margin-block: 16px;
 }
 
-/* Moldura Monumental de Altar Rúnico em cada Pedestal (.forge-slot) */
-.forge-slot {
-  position: relative;
-  min-width: 0;
+.forge-class-art {
   overflow: hidden;
-  padding: 16px 16px 15px;
-  text-align: center;
-  border: 2px solid rgba(180, 190, 215, 0.35);
-  outline: 1px solid rgba(251, 191, 36, 0.25);
-  outline-offset: -7px;
-  border-radius: 8px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 44px 44px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 44px 44px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 44px 44px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 44px 44px no-repeat,
-    url('/assets/ui/frames/crest-header-ornament.svg') top center / 210px 26px no-repeat,
-    radial-gradient(circle at 50% 28%, rgba(168, 85, 247, 0.14), transparent 62%),
-    linear-gradient(180deg, rgba(22, 27, 46, 0.96) 0%, rgba(8, 12, 24, 0.99) 100%);
-  box-shadow:
-    inset 0 0 28px rgba(0, 0, 0, 0.85),
-    0 16px 38px rgba(0, 0, 0, 0.78);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  aspect-ratio: 4 / 5;
+  max-height: 300px;
+  border: 1px solid var(--forge-line);
+  background: #161013;
 }
 
-.forge-slot.is-occupied {
-  border-color: #d97706;
-  outline-color: rgba(254, 240, 138, 0.42);
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 46px 46px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 46px 46px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 46px 46px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 46px 46px no-repeat,
-    url('/assets/ui/frames/crest-header-ornament.svg') top center / 220px 28px no-repeat,
-    radial-gradient(circle at 50% 28%, rgba(245, 158, 11, 0.22), transparent 62%),
-    linear-gradient(180deg, rgba(34, 28, 46, 0.97) 0%, rgba(9, 13, 25, 0.99) 100%);
-  box-shadow:
-    inset 0 0 24px rgba(245, 158, 11, 0.1),
-    0 18px 42px rgba(0, 0, 0, 0.85),
-    0 0 24px rgba(245, 158, 11, 0.16);
-}
-
-
-
-.forge-slot:hover {
-  transform: translateY(-3px);
-  border-color: #fde047;
-  box-shadow:
-    inset 0 0 26px rgba(251, 191, 36, 0.16),
-    0 20px 44px rgba(0, 0, 0, 0.9),
-    0 0 28px rgba(251, 191, 36, 0.28);
-}
-
-.forge-slot.is-selected {
-  border-color: #c084fc;
-  outline-color: rgba(192, 132, 252, 0.55);
-  box-shadow: 0 0 32px rgba(192, 132, 252, 0.4);
-}
-
-.forge-slot-number {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  margin-left: 8px;
-  margin-top: 2px;
-  color: #fef08a;
-  font: 700 9.5px 'Cinzel', serif;
-  letter-spacing: 0.16em;
-  padding: 3px 10px;
-  border-radius: 3px;
-  background: linear-gradient(180deg, rgba(38, 29, 18, 0.92), rgba(14, 18, 32, 0.96));
-  border: 1px solid rgba(251, 191, 36, 0.5);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-}
-
-.forge-slot-number::before {
-  content: '❖';
-  color: #fbbf24;
-  font-size: 9px;
-}
-
-/* Pedestal com Círculo Mágico Rúnico SVG ao Fundo */
-.forge-pedestal {
-  position: relative;
-  width: 100%;
-  max-width: 158px;
-  margin: 2px auto;
-  aspect-ratio: 1;
-  background:
-    url('/assets/ui/frames/magic-circle-halo.svg') 50% 34% / 74% 74% no-repeat,
-    radial-gradient(ellipse at 50% 65%, rgba(251, 191, 36, 0.2), transparent 68%);
-}
-
-.forge-pedestal img {
+.forge-class-art img,
+.class-rail-btn img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.8));
-}
-
-.forge-pedestal span {
-  position: absolute;
-  inset: 14% 0 auto;
-  font: 700 32px 'Cinzel', serif;
-  color: rgba(233, 213, 255, 0.55);
-  text-shadow: 0 0 24px rgba(192, 132, 252, 0.65);
-}
-
-.forge-pedestal img.forge-slot-portrait {
-  position: absolute;
-  width: 54%;
-  height: 54%;
-  left: 23%;
-  top: 4%;
-  border: 2.5px solid #fef08a;
-  border-radius: 50%;
   object-fit: cover;
-  box-shadow:
-    0 0 0 3px #78350f,
-    0 0 0 5px rgba(251, 191, 36, 0.55),
-    0 0 26px rgba(251, 191, 36, 0.65);
+  object-position: center 26%;
 }
 
-/* Faixa / Estandarte Rúnico para o Nome do Herói */
-.forge-slot h3 {
-  margin: 2px auto 0;
-  width: 94%;
-  padding: 5px 14px;
-  background: url('/assets/ui/frames/pedestal-banner-ribbon.svg') center / 100% 100% no-repeat;
-  color: #fffbeb;
-  font: 700 15px 'Cinzel', serif;
-  letter-spacing: 0.06em;
-  overflow-wrap: anywhere;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+#modal-auth-selection .stage-info-card h3 {
+  margin: 4px 0 7px;
+  font-size: clamp(1.35rem, 2.8vw, 2.2rem);
+  line-height: 1.1;
 }
 
-/* Tábua de Atributos Esculpida no Pedestal */
-.forge-slot p {
-  margin: 6px 4px 10px;
-  color: #e2e8f0;
-  font-size: 11px;
-  line-height: 1.45;
-  white-space: pre-line;
-  min-height: 58px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 6px 10px;
-  border-radius: 4px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat,
-    linear-gradient(180deg, rgba(8, 11, 22, 0.9), rgba(14, 19, 34, 0.92));
-  border: 1px solid rgba(251, 191, 36, 0.35);
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+#modal-auth-selection #cover-class-desc {
+  font-size: .88rem;
 }
 
-.forge-stat-class {
-  font: 700 11.5px 'Cinzel', serif;
-  color: #fef08a;
-  letter-spacing: 0.05em;
-}
-
-.forge-stat-economy {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #e2e8f0;
-}
-
-.forge-stat-cp {
-  color: #fbbf24;
-  font-weight: 700;
-}
-
-.forge-stat-gold {
-  color: #fde68a;
-}
-
-.forge-stat-hp {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #6ee7b7;
-  background: rgba(6, 78, 59, 0.45);
-  border: 1px solid rgba(52, 211, 153, 0.45);
-  padding: 1px 10px;
-  border-radius: 3px;
-}
-
-/* Placas de Botão Forjadas nos Pedestais */
-.forge-slot button {
-  min-height: 42px;
-  width: calc(100% - 8px);
-  margin: 0 auto;
-  border: 1.5px solid rgba(251, 191, 36, 0.45);
-  border-radius: 4px;
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.96));
-  color: #fde68a;
-  font: 700 11.5px 'Cinzel', serif;
-  letter-spacing: 0.1em;
-  cursor: not-allowed;
-  transition: all 0.18s ease;
-}
-
-/* Pedestal Ocupado -> Placa de Guerra em Ouro Forjado com Ornamentos Laterais SVG */
-.forge-slot.is-occupied button:enabled {
-  cursor: pointer;
-  color: #1c1104;
-  border: 1.5px solid #fef08a;
-  background:
-    url('/assets/ui/frames/button-ornament-left.svg') left 6px center / 28px 26px no-repeat,
-    url('/assets/ui/frames/button-ornament-right.svg') right 6px center / 28px 26px no-repeat,
-    linear-gradient(180deg, #fef08a 0%, #f59e0b 46%, #b45309 90%, #78350f 100%);
-  box-shadow:
-    inset 0 0 0 2px rgba(120, 53, 15, 0.65),
-    inset 0 0 0 3px rgba(254, 240, 138, 0.55),
-    inset 0 2px 1px rgba(255, 255, 255, 0.75),
-    0 6px 18px rgba(245, 158, 11, 0.45);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-.forge-slot.is-occupied button:enabled:hover {
-  filter: brightness(1.08);
-  box-shadow:
-    inset 0 0 0 2px rgba(120, 53, 15, 0.65),
-    inset 0 0 0 3px rgba(254, 240, 138, 0.8),
-    0 0 24px rgba(251, 191, 36, 0.8);
-  transform: translateY(-1px);
-}
-
-/* Pedestal Vazio -> Placa Rúnica Arcana com Cantoneiras */
-.forge-slot:not(.is-occupied) button:enabled {
-  cursor: pointer;
-  color: #fef08a;
-  border: 1.5px solid rgba(251, 191, 36, 0.7);
-  outline: 1px solid rgba(254, 240, 138, 0.25);
-  outline-offset: -4px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat,
-    linear-gradient(180deg, rgba(68, 46, 22, 0.88), rgba(24, 20, 36, 0.96));
-  box-shadow: inset 0 0 14px rgba(251, 191, 36, 0.18), 0 4px 14px rgba(0, 0, 0, 0.6);
-}
-
-.forge-slot:not(.is-occupied) button:enabled:hover {
-  border-color: #fde047;
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
-}
-
-.forge-slot button:disabled {
-  opacity: 0.6;
-}
-
-.forge-roster-note {
-  margin-top: 8px;
-  padding: 6px 14px;
-  border-left: 3px solid #fbbf24;
-  border-right: 3px solid #fbbf24;
-  border-radius: 4px;
-  background: linear-gradient(90deg, rgba(24, 20, 36, 0.88), rgba(12, 16, 29, 0.88));
-  border-top: 1px solid rgba(251, 191, 36, 0.25);
-  border-bottom: 1px solid rgba(251, 191, 36, 0.25);
-  font-size: 11.5px;
-  line-height: 1.45;
-  color: #e2dac9;
-}
-
-/* ==========================================================================
-   MOLDURA MONUMENTAL DO CARD DE LOGIN & FORJA DE HERÓI (.forge-entry)
-   ========================================================================== */
-.forge-entry {
-  position: relative;
-  padding: clamp(18px, 2.2vh, 24px) clamp(20px, 2.2vw, 28px);
-  border: 2px solid #d97706;
-  outline: 1.5px solid rgba(254, 240, 138, 0.38);
-  outline-offset: -8px;
-  border-radius: 8px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 54px 54px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 54px 54px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 54px 54px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 54px 54px no-repeat,
-    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.24), transparent 58%),
-    linear-gradient(165deg, rgba(28, 25, 43, 0.98) 0%, rgba(9, 13, 25, 0.99) 100%);
-  box-shadow:
-    inset 0 0 0 3px rgba(10, 14, 26, 0.95),
-    inset 0 0 36px rgba(0, 0, 0, 0.85),
-    0 24px 60px rgba(0, 0, 0, 0.92),
-    0 0 38px rgba(245, 158, 11, 0.18);
-}
-
-/* Frontão / Brasão Rúnico Esculpido no Topo do Card de Login */
-.forge-entry::before {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 28px;
-  margin: -6px auto 6px;
-  background: url('/assets/ui/frames/crest-header-ornament.svg') center / contain no-repeat;
-  pointer-events: none;
-}
-
-/* Divisor de Filigrana Rúnica na Base do Card de Login */
-.forge-entry::after {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 16px;
-  margin: 8px auto -4px;
-  background: url('/assets/ui/frames/divider-runic-ornate.svg') center / contain no-repeat;
-  pointer-events: none;
-}
-
-.forge-entry h2 {
-  font: 700 clamp(19px, 1.9vw, 24px) 'Cinzel', serif;
-  background: linear-gradient(180deg, #fffbeb 0%, #fde68a 55%, #f59e0b 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 4px 0 3px;
-  letter-spacing: 0.07em;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
-}
-
-.forge-entry > p {
-  color: #d5dbe8;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.forge-entry form {
+.forge-class-attributes {
   display: grid;
-  gap: 7px;
-  margin-top: 10px;
-}
-
-.forge-entry form[hidden] {
-  display: none !important;
-}
-
-.forge-entry label {
-  display: flex;
-  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
-  font: 700 11px 'Cinzel', serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #fde68a;
-  margin-top: 2px;
+  margin: 16px 0 0;
+  text-align: center;
 }
 
-.forge-entry label::before {
-  content: '◆';
-  font-size: 8px;
-  color: #f59e0b;
+.forge-class-attributes div {
+  padding: 6px 2px;
+  border: 1px solid #c7946354;
+  background: #100b0caa;
 }
 
-/* Molduras de Campos de Entrada Esculpidas em Pedra Rúnica com Medalhão Interno */
+.forge-class-attributes dt {
+  color: var(--forge-muted);
+  font-size: .65rem;
+}
+
+.forge-class-attributes dd {
+  margin: 1px 0 0;
+  color: var(--forge-gold);
+  font: 700 1.05rem var(--forge-title);
+}
+
+.classes-selector-rail {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+#modal-auth-selection .class-rail-btn {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+  padding: 3px;
+  font: 600 .68rem/1.3 system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.class-rail-btn img {
+  height: auto;
+  aspect-ratio: 1;
+}
+
+#modal-auth-selection .class-rail-btn[aria-pressed="true"] {
+  border-color: var(--forge-gold);
+  color: #fff1d6;
+  background: #5c3b29;
+  box-shadow: inset 0 0 0 1px var(--forge-gold);
+}
+
+#modal-auth-selection .forge-back-cover-btn {
+  margin-bottom: 20px;
+}
+
+.forge-layout,
 .forge-entry input,
 .forge-entry select {
-  width: 100%;
   min-width: 0;
-  min-height: 42px;
-  border: 1.5px solid rgba(245, 158, 11, 0.55);
-  outline: 1px solid rgba(254, 240, 138, 0.18);
-  outline-offset: -4px;
-  border-radius: 4px;
-  padding: 8px 12px 8px 40px;
-  background-color: #070a14;
-  background-image:
-    url('/assets/ui/frames/input-icon-user.svg'),
-    url('/assets/ui/frames/corner-tl.svg'),
-    url('/assets/ui/frames/corner-tr.svg'),
-    url('/assets/ui/frames/corner-bl.svg'),
-    url('/assets/ui/frames/corner-br.svg'),
-    linear-gradient(180deg, rgba(6, 9, 18, 0.98), rgba(14, 19, 34, 0.95));
-  background-position:
-    left 8px center,
-    top left,
-    top right,
-    bottom left,
-    bottom right,
-    center;
-  background-size:
-    22px 22px,
-    14px 14px,
-    14px 14px,
-    14px 14px,
-    14px 14px,
-    100% 100%;
-  background-repeat: no-repeat;
-  color: #fffbeb;
-  font: 600 13.5px 'Inter', sans-serif;
-  box-shadow:
-    inset 0 3px 10px rgba(0, 0, 0, 0.92),
-    0 2px 8px rgba(0, 0, 0, 0.5);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, outline-color 0.18s ease;
 }
 
-/* Medalhão de Chave Rúnica nos Campos de Senha */
-#forge-account-password,
-#forge-password-confirm {
-  background-image:
-    url('/assets/ui/frames/input-icon-key.svg'),
-    url('/assets/ui/frames/corner-tl.svg'),
-    url('/assets/ui/frames/corner-tr.svg'),
-    url('/assets/ui/frames/corner-bl.svg'),
-    url('/assets/ui/frames/corner-br.svg'),
-    linear-gradient(180deg, rgba(6, 9, 18, 0.98), rgba(14, 19, 34, 0.95));
-}
-
-.forge-entry input {
-  user-select: text;
-}
-
-.forge-entry input::placeholder {
-  color: #7c859b;
-  font-weight: 400;
-}
-
-/* Foco Rúnico Integrado (Sem Anel Externo Duplo do Navegador!) */
-.forge-entry input:focus,
-.forge-entry select:focus,
-.forge-entry input:focus-visible,
-.forge-entry select:focus-visible {
-  border-color: #fef08a !important;
-  outline: 1px solid rgba(254, 240, 138, 0.55) !important;
-  outline-offset: -4px !important;
-  box-shadow:
-    inset 0 2px 12px rgba(245, 158, 11, 0.22),
-    0 0 18px rgba(251, 191, 36, 0.45) !important;
-}
-
+.forge-entry form,
 #forge-register-fields {
   display: grid;
   gap: 7px;
 }
 
-/* Placa de Guerra Principal Forjada (ENTRAR / CRIAR CONTA / CRIAR HERÓI) */
-.forge-entry button[type="submit"] {
-  position: relative;
-  width: 100%;
-  min-height: 46px;
-  margin-top: 4px;
-  border: 2px solid #fef08a;
-  border-radius: 5px;
-  background:
-    url('/assets/ui/frames/button-ornament-left.svg') left 8px center / 32px 30px no-repeat,
-    url('/assets/ui/frames/button-ornament-right.svg') right 8px center / 32px 30px no-repeat,
-    linear-gradient(180deg, #fef9c3 0%, #fde047 18%, #f59e0b 55%, #b45309 92%, #78350f 100%);
-  color: #1c1002;
-  font: 700 13.5px 'Cinzel', serif;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow:
-    inset 0 0 0 2px rgba(120, 53, 15, 0.72),
-    inset 0 0 0 3.5px rgba(254, 249, 195, 0.65),
-    inset 0 2px 2px rgba(255, 255, 255, 0.85),
-    0 8px 22px rgba(245, 158, 11, 0.48);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
-  transition: all 0.18s ease;
-}
-
-.forge-entry button[type="submit"]::before {
-  content: '✦ ';
-}
-
-.forge-entry button[type="submit"]::after {
-  content: ' ✦';
-}
-
-.forge-entry button[type="submit"]:hover:not(:disabled) {
-  filter: brightness(1.08);
-  box-shadow:
-    inset 0 0 0 2px rgba(120, 53, 15, 0.72),
-    inset 0 0 0 3.5px rgba(254, 249, 195, 0.9),
-    0 0 28px rgba(251, 191, 36, 0.85);
-  transform: translateY(-1px);
-}
-
-/* Placa Secundária Forjada em Obsidiana & Ouro (Criar uma nova conta / Cancelar criação) */
-#forge-toggle-register,
-#forge-cancel-create {
-  min-height: 40px;
-  padding: 7px 14px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat,
-    linear-gradient(180deg, rgba(38, 31, 48, 0.92), rgba(14, 18, 32, 0.98));
-  color: #fef08a;
-  border: 1.5px solid rgba(251, 191, 36, 0.55);
-  outline: 1px solid rgba(254, 240, 138, 0.2);
-  outline-offset: -4px;
-  border-radius: 4px;
-  font: 700 11.5px 'Cinzel', serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
-  transition: all 0.18s ease;
-}
-
-#forge-toggle-register:hover:not(:disabled),
-#forge-cancel-create:hover:not(:disabled) {
-  border-color: #fde047;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.38);
-}
-
-/* ==========================================================================
-   PLACAS RÚNICAS DE LOGIN SOCIAL & CONVIDADO COM CANTONEIRAS & MEDALHÕES
-   ========================================================================== */
+.forge-entry form,
 .forge-social-login {
-  position: relative;
-  margin-top: 12px;
-  padding-top: 14px;
-  border-top: none;
+  margin-top: 16px;
 }
 
-.forge-social-login::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: 0;
-  right: 0;
-  height: 14px;
-  background: url('/assets/ui/frames/divider-runic-ornate.svg') center / contain no-repeat;
-  pointer-events: none;
+.forge-entry label {
+  color: var(--forge-ink);
+  font-size: .85rem;
 }
 
-.forge-social-login h3 {
-  margin: 2px 0 8px;
-  font: 700 10.5px 'Cinzel', serif;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #fde68a;
-  text-align: center;
+.forge-entry :is(input, select) {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 11px;
+  border: 1px solid #927053;
+  border-radius: 3px;
+  background: #110d0f;
+  color: var(--forge-ink);
+  font: 1rem system-ui, sans-serif;
+  user-select: text;
+}
+
+.forge-entry button[type="submit"] {
+  margin-top: 6px;
+}
+
+.forge-social-login {
+  border-top: 1px solid #c794635e;
+  padding-top: 12px;
+}
+
+#modal-auth-selection .forge-social-login h3 {
+  margin-bottom: 8px;
+  font-size: .83rem;
 }
 
 .forge-social-buttons {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
+#modal-auth-selection .forge-social-buttons button {
+  display: flex;
+  align-items: center;
   gap: 8px;
-}
-
-.forge-social-buttons button {
-  min-height: 46px;
-  padding: 6px 10px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  text-align: left;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 15px 15px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 15px 15px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 15px 15px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 15px 15px no-repeat,
-    linear-gradient(155deg, rgba(28, 33, 54, 0.94), rgba(10, 14, 26, 0.98));
-  color: #e2e8f0;
-  border: 1.5px solid rgba(251, 191, 36, 0.42);
-  outline: 1px solid rgba(254, 240, 138, 0.15);
-  outline-offset: -4px;
-  border-radius: 5px;
-  font: inherit;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.55);
-  transition: all 0.18s ease;
-}
-
-/* Medalhão Octogonal/Rúnico Cravejado para os Ícones Sociais */
-.forge-provider-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: #080b16;
-  border: 1.5px solid rgba(251, 191, 36, 0.55);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    inset 0 0 8px rgba(0, 0, 0, 0.85),
-    0 2px 6px rgba(0, 0, 0, 0.65);
-}
-
-.forge-provider-icon.google {
-  border-color: rgba(251, 191, 36, 0.6);
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.16), #080b16 80%);
-}
-
-.forge-provider-icon.apple {
-  color: #f8fafc;
-  border-color: rgba(226, 232, 240, 0.6);
-  background: radial-gradient(circle, rgba(226, 232, 240, 0.18), #080b16 80%);
-}
-
-.forge-provider-icon.discord {
-  border-color: rgba(129, 140, 248, 0.65);
-  background: radial-gradient(circle, rgba(88, 101, 242, 0.24), #080b16 80%);
-}
-
-.forge-provider-icon.guest {
-  border-color: #fde047;
-  background: radial-gradient(circle, rgba(251, 191, 36, 0.3), #080b16 80%);
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
-}
-
-.forge-provider-copy {
-  display: flex;
-  flex-direction: column;
   min-width: 0;
-  line-height: 1.15;
+  padding-inline: 8px;
+  text-align: left;
+  font-family: system-ui, sans-serif;
 }
 
-.forge-provider-copy strong {
-  font: 700 11.5px 'Cinzel', serif;
-  color: #fffbeb;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.forge-provider-icon { display: flex; flex: none; }
+.forge-provider-copy { min-width: 0; overflow-wrap: anywhere; }
+.forge-provider-copy small { display: block; color: var(--forge-muted); }
+
+.forge-auth-status {
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
+  font-size: .85rem;
 }
 
-.forge-provider-copy small {
-  font-size: 9.5px;
-  color: #cbd5e1;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+#modal-auth-selection[data-screen="login"] .forge-auth-status {
+  grid-column: 2;
+  margin-top: 10px;
 }
 
-/* Destaque Rúnico Dourado para o Botão Convidado Ativo */
-.forge-social-buttons button[data-auth-provider="GUEST"]:enabled {
-  cursor: pointer;
-  border-color: #f59e0b;
-  outline-color: rgba(254, 240, 138, 0.35);
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat,
-    linear-gradient(145deg, rgba(64, 44, 18, 0.95), rgba(18, 22, 38, 0.98));
-  box-shadow: 0 0 18px rgba(251, 191, 36, 0.25);
+#modal-auth-selection [data-state="error"] {
+  color: #ffc5b9;
 }
 
-.forge-social-buttons button[data-auth-provider="GUEST"]:enabled .forge-provider-copy strong {
-  color: #fef08a;
+.forge-account-session,
+.forge-section-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  min-width: 0;
 }
 
-.forge-social-buttons button[data-auth-provider="GUEST"]:enabled .forge-provider-copy small {
-  color: #fcd34d;
+.forge-account-session {
+  justify-content: end;
+  font-size: .85rem;
+  overflow-wrap: anywhere;
 }
 
-.forge-social-buttons button[data-auth-provider="GUEST"]:enabled:hover {
-  border-color: #fef08a;
-  box-shadow: 0 0 24px rgba(251, 191, 36, 0.5);
-  transform: translateY(-1px);
+#modal-auth-selection[data-screen="characters"] .forge-layout {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
 }
 
-.forge-social-buttons button:disabled {
-  opacity: 0.82;
-  cursor: not-allowed;
+.forge-section-heading {
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.forge-social-login p {
-  font-size: 10.5px;
-  line-height: 1.35;
-  color: #94a3b8;
-  margin-top: 6px;
+#modal-auth-selection .forge-section-heading h2 {
+  font-size: 1.25rem;
+}
+
+.forge-slots {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.forge-slot {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 12px;
+  min-width: 0;
+  padding: 13px;
+  text-align: left;
+}
+
+.forge-slot.is-occupied { cursor: pointer; }
+.forge-slot-number, .forge-slot-actions { grid-column: 1 / -1; }
+.forge-slot .forge-pedestal {
+  grid-row: span 2;
+  height: 84px;
+  margin: 0;
   text-align: center;
 }
 
-/* ==========================================================================
-   PAINEL DE CRIAÇÃO DE HERÓI (#forge-entry-form)
-   ========================================================================== */
-#forge-entry-form {
-  border-top: 1px solid rgba(251, 191, 36, 0.32);
-  padding-top: 12px;
+.forge-inspection { min-width: 0; padding: clamp(16px, 3vw, 28px); }
+.forge-inspection-identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+  margin-block: 16px 22px;
+}
+.forge-inspection-identity img {
+  width: min(100%, 230px);
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 25%;
+  border: 1px solid #9e7649;
+}
+.forge-inspection-identity blockquote {
+  flex: 1 1 165px;
+  color: var(--forge-gold);
+  font: italic 1rem/1.6 Georgia, serif;
+}
+.forge-skill-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
+  gap: 10px;
+  margin-top: 12px;
+  list-style: none;
+}
+.forge-skill-previews li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #72563c;
+  border-radius: 4px;
+  background: #151012;
+  overflow-wrap: anywhere;
+}
+.forge-skill-previews :is(img, .forge-skill-fallback) {
+  width: 64px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #271a17;
+}
+.forge-skill-fallback { display: grid; place-items: center; }
+.forge-skill-previews small { display: block; margin: 3px 0 6px; color: var(--forge-gold); }
+#modal-auth-selection .forge-skill-previews p { font-size: .82rem; }
+
+.forge-slot.is-selected {
+  border-color: var(--forge-gold);
+  box-shadow: inset 0 0 0 2px #deb47959, 0 10px 32px #0007;
 }
 
-#forge-entry-form h3 {
-  color: #fef08a;
-  font: 700 15px 'Cinzel', serif;
-  letter-spacing: 0.06em;
+.forge-slot-number {
+  color: var(--forge-gold);
+  font: 700 .7rem var(--forge-title);
+  letter-spacing: .1em;
+}
+
+.forge-pedestal {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 200px);
+  height: clamp(110px, 19vh, 178px);
+  margin: 8px auto;
+  background: radial-gradient(ellipse at center, #e9ae6f3d, transparent 68%);
+}
+
+.forge-pedestal > img:first-child {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.forge-pedestal > span {
+  position: absolute;
+  inset: 14% 0 auto;
+  color: var(--forge-gold);
+  font: 700 1.4rem var(--forge-title);
+}
+
+.forge-slot-portrait {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  width: min(65%, 106px);
+  height: 72%;
+  transform: translateX(-50%);
+  object-fit: cover;
+  object-position: center 24%;
+  border: 1px solid var(--forge-gold);
+  border-radius: 48% 48% 4px 4px;
+  box-shadow: 0 4px 15px #000a;
+}
+
+#modal-auth-selection .forge-slot h3 {
+  font-size: 1rem;
+}
+
+#modal-auth-selection .forge-slot p {
+  flex: 1;
+  margin-block: 5px 10px;
+  font-size: .82rem;
+  overflow-wrap: anywhere;
+}
+
+.forge-stat-class,
+.forge-stat-economy,
+.forge-stat-hp {
+  display: block;
+}
+
+.forge-stat-cp {
+  color: var(--forge-gold);
+}
+
+.forge-slot-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.forge-slot-actions > button:only-of-type,
+.forge-slot-actions > button:has(+ [hidden]) {
+  grid-column: 1 / -1;
+}
+
+#modal-auth-selection .forge-delete-slot,
+#modal-auth-selection #forge-confirm-delete {
+  color: #ffcbc1;
+  border-color: #ad6459;
+  background: #40201f;
+}
+
+#modal-auth-selection #forge-confirm-delete:enabled:hover {
+  background: #612d29;
+}
+
+#modal-auth-selection .forge-roster-note {
+  margin-top: 10px;
+  font-size: .83rem;
 }
 
 .forge-class-preview {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: 5px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat,
-    rgba(8, 11, 22, 0.9);
-  border: 1.5px solid rgba(251, 191, 36, 0.45);
+  gap: 9px;
+  margin: 3px 0;
+  color: var(--forge-gold);
 }
 
 .forge-class-preview img {
-  width: 52px;
-  height: 52px;
   object-fit: cover;
-  border: 2px solid #fef08a;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px #78350f, 0 0 14px rgba(251, 191, 36, 0.45);
-}
-
-.forge-class-preview span {
-  display: block;
-  font: 700 13px 'Cinzel', serif;
-  color: #fef08a;
+  border: 1px solid var(--forge-line);
 }
 
 .forge-class-preview small {
   display: block;
-  margin-top: 2px;
-  color: #cbd5e1;
-  font-size: 10.5px;
+  color: var(--forge-muted);
 }
 
-.forge-entry button:disabled {
-  opacity: 0.65;
-  cursor: wait;
+.forge-delete-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
 }
 
-/* ==========================================================================
-   BARRA DE STATUS & RODAPÉ RÚNICO
-   ========================================================================== */
-.forge-auth-status {
-  margin-top: 2px;
-  min-height: 20px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #e2dac9;
-  line-height: 1.4;
+.forge-delete-panel code {
+  padding: 8px;
+  border: 1px solid #ad6459;
+  color: #ffe0d4;
+  overflow-wrap: anywhere;
+  user-select: text;
 }
 
-.forge-auth-status[data-state="error"] {
-  color: #fca5a5;
-  font-weight: 700;
-}
-
-.forge-footer {
+.forge-delete-actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 8px 0 2px;
-  border-top: 1px solid rgba(251, 191, 36, 0.28);
-  color: #cbd5e1;
-  font-size: 11px;
+  gap: 8px;
 }
 
-.forge-footer span,
-.forge-footer-legend {
-  font: 700 11px 'Cinzel', serif;
-  letter-spacing: 0.08em;
-  color: #e2c887;
+@media (min-width: 801px) {
+  #modal-auth-selection[data-screen="characters"] .forge-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 36%);
+    grid-template-rows: min-content 1fr;
+  }
+  .forge-inspection { grid-area: 1 / 1 / 3 / 2; }
+  .forge-roster { grid-area: 1 / 2; }
+  #modal-auth-selection[data-screen="characters"] .forge-entry { grid-area: 2 / 2; }
 }
 
-.forge-footer-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+@media (max-width: 800px) {
+  .forge-inspection { order: 1; }
 }
 
-.forge-footer button,
-.forge-footer-actions button {
-  min-height: 36px;
-  padding: 6px 16px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 14px 14px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 14px 14px no-repeat,
-    linear-gradient(180deg, rgba(35, 30, 48, 0.92), rgba(12, 16, 29, 0.96));
-  border: 1.5px solid rgba(251, 191, 36, 0.5);
-  outline: 1px solid rgba(254, 240, 138, 0.18);
-  outline-offset: -4px;
-  border-radius: 4px;
-  color: #fef08a;
-  font: 700 11px 'Cinzel', serif;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.forge-footer button:hover,
-.forge-footer-actions button:hover {
-  border-color: #fde047;
-  box-shadow: 0 0 14px rgba(251, 191, 36, 0.4);
-  transform: translateY(-1px);
-}
-
-#modal-auth-selection button:focus-visible {
-  outline: 2px solid #fde047;
-  outline-offset: 2px;
-}
-
-/* ==========================================================================
-   RESPONSIVIDADE MOBILE & TABLET (EQUIVALÊNCIA TOTAL SEM SCROLL)
-   ========================================================================== */
-@media (max-width: 959px) {
-  #modal-auth-selection {
-    padding: 12px 14px;
-  }
-
-  .forge-auth {
-    gap: 10px;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-intro {
-    text-align: center;
-    margin: 0 auto;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-intro h1::after {
-    margin-inline: auto;
-    background-position: center;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-intro p {
-    margin-inline: auto;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-runic-crests {
-    justify-content: center;
-    margin-top: 8px;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-layout {
-    display: block;
-    width: 100%;
-    max-width: 440px;
-    margin: 0 auto;
+@media (max-width: 800px) {
+  .forge-cover-hero,
+  #modal-auth-selection[data-screen="login"] .forge-auth,
+  #modal-auth-selection[data-screen="characters"] .forge-auth {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 22px;
+    padding-block: 24px;
   }
 
   #modal-auth-selection[data-screen="login"] .forge-auth-status {
-    text-align: center;
-  }
-
-  .forge-layout {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .forge-entry {
-    grid-row: 1;
-  }
-}
-
-@media (max-width: 720px) {
-  #modal-auth-selection {
-    padding: 8px 10px;
-  }
-
-  .forge-auth {
-    min-height: calc(100dvh - 16px);
-    gap: 5px;
-  }
-
-  .forge-masthead {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 4px;
-  }
-
-  .forge-masthead::after {
-    height: 14px;
-    bottom: -7px;
-  }
-
-  .forge-wordmark {
-    font-size: 15px;
-  }
-
-  .forge-wordmark small {
-    font-size: 7px;
-    letter-spacing: 0.28em;
-  }
-
-  .forge-back-cover-btn {
-    justify-self: center;
-    padding: 4px 8px;
-    font-size: 9px;
-    gap: 4px;
-    background-size: 8px 8px;
-  }
-
-  .forge-back-cover-btn svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .forge-world-tag {
-    font-size: 7.5px;
-    line-height: 1.25;
-    letter-spacing: 0.04em;
-    padding: 3px 6px;
-    border-width: 1px;
-    background-size: 8px 8px;
-    max-width: 105px;
-    text-align: right;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  }
-
-  .forge-intro {
-    padding: 0;
-  }
-
-  .forge-intro h1 {
-    font-size: clamp(18px, 5vw, 22px);
-    margin: 2px 0;
-  }
-
-  #modal-auth-selection[data-screen="login"] .forge-intro h1::after {
-    height: 11px;
-    margin-top: 3px;
-  }
-
-  .forge-intro p {
-    font-size: 11px;
-    line-height: 1.28;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-intro p {
-    display: none;
-  }
-
-  .forge-runic-crests {
-    gap: 4px;
-    margin-top: 5px !important;
-  }
-
-  .runic-crest-pill {
-    font-size: 9px;
-    padding: 3px 7px;
+    grid-column: 1;
+    margin: 0;
   }
 
   .forge-account-session {
-    justify-content: space-between;
-    padding: 4px 10px;
-  }
-
-  .forge-account-session button,
-  #forge-refresh-slots {
-    min-height: 30px;
-    padding: 4px 9px;
-    font-size: 10px;
-  }
-
-  .forge-section-heading {
-    padding: 4px 10px;
-    margin-bottom: 6px;
-    gap: 6px;
-  }
-
-  .forge-section-heading h2 {
-    font-size: 12.5px;
-  }
-
-  .forge-section-heading span {
-    font-size: 8.5px;
-    padding: 2px 6px;
-  }
-
-  .forge-slots {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-
-  .forge-slot {
-    display: grid;
-    grid-template-columns: 74px 1fr;
-    grid-template-rows: auto auto auto;
-    column-gap: 10px;
-    row-gap: 3px;
-    padding: 8px 12px;
-    text-align: left;
-    align-items: center;
-    background-size: 28px 28px, 28px 28px, 28px 28px, 28px 28px, 140px 18px, 100% 100%, 100% 100%;
-  }
-
-  .forge-slot-number {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: start;
-    margin-left: 0;
-    font-size: 8px;
-    padding: 1px 6px;
-    letter-spacing: 0.1em;
-  }
-
-  .forge-pedestal {
-    grid-column: 1;
-    grid-row: 1 / 4;
-    max-width: 74px;
-    margin: 0;
-  }
-
-  .forge-slot h3 {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: end;
-    width: auto;
-    max-width: 155px;
-    padding: 2px 10px;
-    font-size: 11px;
-    margin: 0;
-    background-size: 100% 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .forge-slot p {
-    grid-column: 2;
-    grid-row: 2;
-    margin: 0;
-    min-height: 0;
-    align-items: flex-start;
-    padding: 3px 7px;
-    font-size: 10px;
-    line-height: 1.3;
-    gap: 2px;
-  }
-
-  .forge-stat-class {
-    font-size: 10px;
-  }
-
-  .forge-stat-economy {
-    font-size: 9.5px;
-  }
-
-  .forge-stat-hp {
-    font-size: 9px;
-    padding: 0 6px;
-  }
-
-  .forge-slot button {
-    grid-column: 2;
-    grid-row: 3;
-    width: 100%;
-    min-height: 30px;
-    font-size: 10px;
-    padding: 4px 8px;
-  }
-
-  .forge-roster-note {
-    margin-top: 4px;
-    padding: 4px 8px;
-    font-size: 10.5px;
-  }
-
-  .forge-entry {
-    padding: 10px 14px;
-    background-size: 36px 36px, 36px 36px, 36px 36px, 36px 36px, 100% 100%, 100% 100%;
-  }
-
-  .forge-entry::before {
-    height: 18px;
-    margin: -4px auto 2px;
-  }
-
-  .forge-entry::after {
-    height: 11px;
-    margin: 4px auto -2px;
-  }
-
-  .forge-entry h2 {
-    font-size: 16px;
-    margin: 2px 0;
-  }
-
-  .forge-entry > p {
-    font-size: 11px;
-  }
-
-  .forge-entry form {
-    gap: 4px;
-    margin-top: 6px;
-  }
-
-  .forge-entry label {
-    font-size: 9.5px;
-  }
-
-  .forge-entry input,
-  .forge-entry select {
-    min-height: 35px;
-    padding: 5px 10px 5px 34px;
-    font-size: 12px;
-    background-size: 18px 18px, 12px 12px, 12px 12px, 12px 12px, 12px 12px, 100% 100%;
-  }
-
-  .forge-entry button[type="submit"] {
-    min-height: 38px;
-    font-size: 12px;
-  }
-
-  #forge-toggle-register,
-  #forge-cancel-create {
-    min-height: 32px;
-    padding: 4px 10px;
-    font-size: 10px;
-  }
-
-  .forge-social-login {
-    margin-top: 6px;
-    padding-top: 9px;
-  }
-
-  .forge-social-login h3 {
-    margin-bottom: 4px;
-    font-size: 9.5px;
-  }
-
-  .forge-social-buttons {
-    gap: 5px;
-  }
-
-  .forge-social-buttons button {
-    min-height: 37px;
-    padding: 4px 8px;
-    gap: 6px;
-  }
-
-  .forge-provider-icon {
-    width: 25px;
-    height: 25px;
-  }
-
-  .forge-provider-copy strong {
-    font-size: 10px;
-  }
-
-  .forge-provider-copy small {
-    font-size: 8.5px;
-  }
-
-  .forge-social-login p {
-    margin-top: 4px;
-    font-size: 9px;
-  }
-
-  .forge-auth-status {
-    min-height: 15px;
-    font-size: 10px;
-    margin-top: 1px;
-  }
-
-  .forge-footer {
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 0 0;
-    font-size: 9px;
-  }
-
-  .forge-footer-actions {
-    width: 100%;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .forge-footer button,
-  .forge-footer-actions button {
-    flex: 1;
-    max-width: 160px;
-    min-height: 28px;
-    padding: 4px 10px;
-    font-size: 9.5px;
-    background-size: 10px 10px;
-  }
-}
-
-@media (max-height: 620px) and (min-width: 721px) {
-  #modal-auth-selection {
-    padding: 8px 16px;
-  }
-
-  .forge-pedestal {
-    max-width: 120px;
-  }
-
-  .forge-slot {
-    padding: 10px;
-  }
-
-  .forge-slot p {
-    min-height: 44px;
-    margin: 4px 0 8px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #modal-auth-selection *,
-  #modal-auth-selection *::before,
-  #modal-auth-selection *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
-
-/* ==========================================================================
-   PORTAL ANCESTRAL / COVER HERO — PÁGINA DE ROSTO & TRANSIÇÃO CINEMÁTICA
-   Layout fiel aos benchmarks profissionais (Ravox, OT Idle, Lootera, RagnaIdle).
-   - Linha dupla: Showcase de Classes + Ranking de Servidores ao lado.
-   - Grid de 3 colunas para os destaques mecânicos.
-   - Molduras rúnicas elegantes do sistema em todos os cards.
-   - Encerra milímetros abaixo do botão CTA.
-   - Animação de subida suave para a tela de login ao clicar.
-   ========================================================================== */
-
-#modal-auth-selection {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-  background:
-    radial-gradient(circle at 72% 42%, rgba(245, 158, 11, 0.16), transparent 46%),
-    radial-gradient(circle at 22% 55%, rgba(168, 85, 247, 0.14), transparent 50%),
-    linear-gradient(105deg, rgba(4, 7, 15, 0.96) 0%, rgba(9, 13, 24, 0.8) 50%, rgba(5, 8, 17, 0.94) 100%),
-    url('/assets/ui/login/bg_login_forja_astral.jpg') center / cover fixed;
-  color: #f1ead8;
-}
-
-/* ==========================================================================
-   PÁGINA DE ROSTO (COVER HERO) - TRANSIÇÃO SUAVE
-   ========================================================================== */
-.forge-cover-hero {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: clamp(12px, 1.8vh, 22px) clamp(16px, 3.5vw, 48px) 14px; /* Termina alguns milímetros abaixo do botão */
-  z-index: 10;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(245, 158, 11, 0.4) transparent;
-  background:
-    radial-gradient(ellipse 90% 60% at 50% 18%, rgba(245, 158, 11, 0.18), transparent 70%),
-    radial-gradient(circle at 15% 85%, rgba(139, 92, 246, 0.22), transparent 50%),
-    radial-gradient(circle at 85% 85%, rgba(225, 29, 72, 0.18), transparent 50%),
-    linear-gradient(180deg, rgba(4, 7, 15, 0.72) 0%, rgba(6, 10, 20, 0.88) 50%, rgba(3, 5, 12, 0.98) 100%),
-    url('/assets/portraits/world_magicforge_anvil.jpg') center / cover no-repeat;
-  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-  transform: translateY(0);
-  opacity: 1;
-}
-
-#modal-auth-selection.in-auth-mode .forge-cover-hero {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Camadas Paralaxe Decorativas */
-.forge-cover-bg-wrap {
-  position: absolute;
-  inset: -10%;
-  width: 120%;
-  height: 120%;
-  pointer-events: none;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.forge-cover-parallax-layer {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  will-change: transform;
-}
-
-.layer-stars {
-  background-image: radial-gradient(1px 1px at 20px 30px, #ffffff, transparent),
-                    radial-gradient(1.5px 1.5px at 140px 90px, #fbbf24, transparent),
-                    radial-gradient(1px 1px at 220px 180px, #60a5fa, transparent),
-                    radial-gradient(2px 2px at 320px 260px, #f59e0b, transparent);
-  background-size: 380px 380px;
-  opacity: 0.6;
-  animation: starsTwinkle 6s ease-in-out infinite alternate;
-}
-
-@keyframes starsTwinkle {
-  0% { opacity: 0.35; transform: translateY(0); }
-  100% { opacity: 0.75; transform: translateY(-12px); }
-}
-
-.layer-runes {
-  background-image: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 65%);
-  animation: runesGlow 8s ease-in-out infinite alternate;
-}
-
-@keyframes runesGlow {
-  0% { transform: scale(0.98); opacity: 0.5; }
-  100% { transform: scale(1.03); opacity: 0.85; }
-}
-
-.layer-vignette {
-  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(3, 5, 12, 0.85) 90%);
-}
-
-/* Container Centralizado da Capa */
-.forge-cover-container {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: 1320px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(14px, 2.2vh, 26px);
-}
-
-/* Topo / Masthead */
-.forge-cover-masthead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
-  position: relative;
-}
-
-.forge-cover-masthead::after {
-  content: '';
-  position: absolute;
-  bottom: -11px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(340px, 60vw);
-  height: 22px;
-  background: url('/assets/ui/frames/divider-runic-ornate.svg') center / contain no-repeat;
-  pointer-events: none;
-}
-
-/* Pill de Status do Servidor 20Hz */
-.forge-cover-server-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(10, 16, 28, 0.88);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  padding: 6px 14px;
-  border-radius: 999px;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
-}
-
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 10px #10b981;
-  animation: pulseDot 1.8s infinite;
-}
-
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
-}
-
-.pill-title {
-  font: 700 11px 'Cinzel', serif;
-  color: #34d399;
-  letter-spacing: 0.1em;
-}
-
-.pill-meta {
-  font: 500 11px system-ui, sans-serif;
-  color: rgba(255, 255, 255, 0.6);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  padding-left: 8px;
-}
-
-/* Centerpiece */
-.forge-cover-centerpiece {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: clamp(8px, 1.4vh, 16px);
-  margin-top: clamp(4px, 1vh, 12px);
-}
-
-.forge-cover-badge-top {
-  font: 700 11px 'Cinzel', serif;
-  letter-spacing: 0.22em;
-  color: #fbbf24;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  padding: 4px 16px;
-  border-radius: 999px;
-  text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
-}
-
-.forge-cover-title {
-  font: 800 clamp(26px, 3.8vw, 50px) 'Cinzel', serif;
-  line-height: 1.15;
-  letter-spacing: 0.08em;
-  margin: 0;
-  color: #f8fafc;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.2);
-}
-
-.title-highlight {
-  background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));
-}
-
-.forge-cover-tagline {
-  max-width: 820px;
-  font: 400 clamp(12.5px, 1.2vw, 14.5px) system-ui, -apple-system, sans-serif;
-  line-height: 1.55;
-  color: #cbd5e1;
-  margin: 0;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
-}
-
-/* Ticker de Destaques */
-.forge-cover-stats-ticker {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px 12px;
-  margin-top: 2px;
-}
-
-.ticker-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  padding: 4px 12px;
-  border-radius: 6px;
-  font: 600 11.5px 'Cinzel', serif;
-  color: #e2e8f0;
-  letter-spacing: 0.05em;
-  backdrop-filter: blur(4px);
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.ticker-item:hover {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.5);
-  color: #fef08a;
-}
-
-.ticker-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #f59e0b;
-}
-
-/* ==========================================================================
-   GRID DE MECÂNICAS: 3 COLUNAS ALINHADAS COM MOLDURA RÚNICA
-   ========================================================================== */
-.forge-mechanics-grid {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: clamp(12px, 1.6vw, 20px) !important;
-  width: 100%;
-  max-width: 1260px;
-  margin: 4px auto 0;
-}
-
-.mechanic-card {
-  position: relative;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat,
-    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.12), transparent 70%),
-    linear-gradient(165deg, rgba(20, 24, 40, 0.94) 0%, rgba(9, 13, 25, 0.98) 100%);
-  border: 1.5px solid #d97706;
-  outline: 1px solid rgba(254, 240, 138, 0.3);
-  outline-offset: -5px;
-  border-radius: 6px;
-  padding: clamp(12px, 1.4vw, 18px);
-  text-align: left;
-  overflow: hidden;
-  box-shadow:
-    inset 0 0 18px rgba(0, 0, 0, 0.8),
-    0 10px 24px rgba(0, 0, 0, 0.6),
-    0 0 16px rgba(245, 158, 11, 0.1);
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.mechanic-card:hover {
-  transform: translateY(-2px);
-  border-color: #fbbf24;
-  outline-color: rgba(254, 240, 138, 0.6);
-  box-shadow:
-    inset 0 0 20px rgba(245, 158, 11, 0.15),
-    0 14px 30px rgba(0, 0, 0, 0.8),
-    0 0 24px rgba(245, 158, 11, 0.25);
-}
-
-.mechanic-card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 6px;
-}
-
-.mechanic-icon-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 10px 10px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 10px 10px no-repeat,
-    rgba(245, 158, 11, 0.14);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  flex-shrink: 0;
-}
-
-.mechanic-card-header h4 {
-  font: 700 clamp(12.5px, 1.1vw, 14.5px) 'Cinzel', serif;
-  color: #fef08a;
-  margin: 0;
-  letter-spacing: 0.05em;
-}
-
-.mechanic-sub {
-  font: 600 9.5px system-ui, sans-serif;
-  color: #fbbf24;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.mechanic-card p {
-  font: 400 11.5px system-ui, sans-serif;
-  line-height: 1.5;
-  color: #cbd5e1;
-  margin: 0;
-}
-
-/* ==========================================================================
-   LINHA DUPLA: SHOWCASE DE CLASSES + RANKING DE SERVIDORES AO LADO
-   ========================================================================== */
-.forge-cover-showcase-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: clamp(14px, 1.8vw, 24px);
-  width: 100%;
-  max-width: 1260px;
-  margin: 6px auto 0;
-  align-items: stretch;
-}
-
-/* 1. Container do Showcase de Classes */
-.forge-cover-classes-showcase {
-  position: relative;
-  width: 100%;
-  padding: clamp(14px, 1.8vw, 20px);
-  border: 2px solid #d97706;
-  outline: 1.5px solid rgba(254, 240, 138, 0.35);
-  outline-offset: -7px;
-  border-radius: 8px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 40px 40px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 40px 40px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 40px 40px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 40px 40px no-repeat,
-    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.16), transparent 60%),
-    linear-gradient(165deg, rgba(22, 26, 42, 0.95) 0%, rgba(8, 12, 23, 0.98) 100%);
-  box-shadow:
-    inset 0 0 32px rgba(0, 0, 0, 0.85),
-    0 16px 42px rgba(0, 0, 0, 0.8),
-    0 0 28px rgba(245, 158, 11, 0.15);
-}
-
-.forge-cover-classes-showcase::before {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 20px;
-  margin: -6px auto 4px;
-  background: url('/assets/ui/frames/crest-header-ornament.svg') center / contain no-repeat;
-  pointer-events: none;
-}
-
-.classes-showcase-heading {
-  text-align: center;
-  margin-bottom: clamp(8px, 1.2vh, 14px);
-}
-
-.showcase-badge {
-  font: 700 9.5px 'Cinzel', serif;
-  letter-spacing: 0.2em;
-  color: #fbbf24;
-  text-transform: uppercase;
-}
-
-.classes-showcase-heading h2 {
-  font: 700 clamp(17px, 2vw, 24px) 'Cinzel', serif;
-  color: #f8fafc;
-  margin: 2px 0;
-  letter-spacing: 0.1em;
-}
-
-.classes-showcase-heading p {
-  font: 400 11.5px system-ui, sans-serif;
-  color: #cbd5e1;
-  margin: 0;
-}
-
-.classes-showcase-layout {
-  display: grid;
-  grid-template-columns: 210px 1fr;
-  gap: clamp(10px, 1.5vw, 18px);
-  align-items: center;
-}
-
-/* Trilho Seletor de Classes */
-.classes-selector-rail {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.class-rail-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 10px 10px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 10px 10px no-repeat,
-    rgba(17, 24, 39, 0.8);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  border-radius: 6px;
-  padding: 6px 10px;
-  color: #cbd5e1;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.class-rail-btn:hover {
-  background-color: rgba(245, 158, 11, 0.18);
-  border-color: #fbbf24;
-  transform: translateX(3px);
-  color: #fff;
-}
-
-.class-rail-btn.active {
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 12px 12px no-repeat,
-    linear-gradient(90deg, rgba(245, 158, 11, 0.28) 0%, rgba(245, 158, 11, 0.1) 100%);
-  border: 1.5px solid #d97706;
-  outline: 1px solid rgba(254, 240, 138, 0.4);
-  outline-offset: -3px;
-  color: #fef08a;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
-}
-
-.rail-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #fbbf24;
-  flex-shrink: 0;
-}
-
-.rail-name {
-  font: 700 11.5px 'Cinzel', serif;
-  letter-spacing: 0.05em;
-  display: block;
-}
-
-.rail-role {
-  font: 400 9.5px system-ui, sans-serif;
-  color: #94a3b8;
-  display: block;
-}
-
-/* Palco de Apresentação da Classe */
-.class-stage-display {
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: clamp(10px, 1.5vw, 18px);
-  border: 1.5px solid rgba(217, 119, 6, 0.6);
-  outline: 1px solid rgba(254, 240, 138, 0.25);
-  outline-offset: -5px;
-  border-radius: 8px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 18px 18px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 18px 18px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 18px 18px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 18px 18px no-repeat,
-    linear-gradient(180deg, rgba(14, 18, 32, 0.9) 0%, rgba(7, 10, 20, 0.95) 100%);
-  padding: clamp(12px, 1.5vw, 16px);
-  align-items: center;
-  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.8);
-}
-
-/* Pedestal com Animação */
-.stage-pedestal-platform {
-  position: relative;
-  width: 100%;
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pedestal-rune-glow {
-  position: absolute;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
-  animation: runePulse 4s ease-in-out infinite alternate;
-}
-
-@keyframes runePulse {
-  0% { transform: scale(0.9); opacity: 0.4; }
-  100% { transform: scale(1.15); opacity: 0.85; }
-}
-
-.pedestal-shadow {
-  position: absolute;
-  bottom: 8px;
-  width: 120px;
-  height: 22px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.75) 0%, transparent 75%);
-}
-
-.hero-sprite-actor {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hero-actor-animated {
-  animation: heroActorBreathe 3s ease-in-out infinite alternate;
-}
-
-@keyframes heroActorBreathe {
-  0% { transform: translateY(0) scale(1); filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.6)); }
-  50% { transform: translateY(-5px) scale(1.02); filter: drop-shadow(0 16px 20px rgba(245, 158, 11, 0.35)); }
-  100% { transform: translateY(-2px) scale(1.01); filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.7)); }
-}
-
-.hero-sprite-actor img {
-  width: 135px;
-  height: 135px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid rgba(245, 158, 11, 0.75);
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-  transition: transform 0.3s ease;
-}
-
-/* Card de Informações da Classe */
-.stage-info-card {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.stage-badge {
-  font: 700 9.5px 'Cinzel', serif;
-  letter-spacing: 0.15em;
-  color: #fbbf24;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  padding: 2px 8px;
-  border-radius: 4px;
-  display: inline-block;
-  margin-bottom: 2px;
-}
-
-.stage-card-header h3 {
-  font: 700 clamp(15px, 1.6vw, 20px) 'Cinzel', serif;
-  color: #fef08a;
-  margin: 0;
-  letter-spacing: 0.05em;
-}
-
-.stage-card-header p {
-  font: 400 11.5px system-ui, sans-serif;
-  line-height: 1.45;
-  color: #cbd5e1;
-  margin: 3px 0 0;
-}
-
-/* Barras de Atributos D&D */
-.stage-stats-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin: 2px 0;
-}
-
-.stat-bar-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.stat-name {
-  font: 600 10.5px 'Cinzel', serif;
-  color: #cbd5e1;
-  width: 120px;
-  flex-shrink: 0;
-}
-
-.stat-meter {
-  flex: 1;
-  height: 5px;
-  background: rgba(30, 41, 59, 0.85);
-  border-radius: 3px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.meter-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #f59e0b, #fbbf24);
-  border-radius: 3px;
-  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
-}
-
-/* Tags de Habilidades e Traços com Moldura Rúnica */
-.stage-traits-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 2px;
-}
-
-.trait-tag {
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 8px 8px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 8px 8px no-repeat,
-    rgba(30, 41, 59, 0.75);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  padding: 3px 8px;
-  border-radius: 4px;
-  font: 600 10px system-ui, sans-serif;
-  color: #e2e8f0;
-  letter-spacing: 0.03em;
-}
-
-/* ==========================================================================
-   CARD LATERAL: RANKING DE SERVIDORES (BENCHMARKS RAVOX / OT IDLE / GACHA)
-   ========================================================================== */
-.forge-cover-ranking-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(14px, 1.8vw, 18px);
-  border: 2px solid #d97706;
-  outline: 1.5px solid rgba(254, 240, 138, 0.35);
-  outline-offset: -7px;
-  border-radius: 8px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 36px 36px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 36px 36px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 36px 36px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 36px 36px no-repeat,
-    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.14), transparent 60%),
-    linear-gradient(165deg, rgba(20, 24, 38, 0.95) 0%, rgba(7, 10, 20, 0.98) 100%);
-  box-shadow:
-    inset 0 0 28px rgba(0, 0, 0, 0.85),
-    0 16px 42px rgba(0, 0, 0, 0.8),
-    0 0 24px rgba(245, 158, 11, 0.12);
-}
-
-.ranking-card-header {
-  text-align: center;
-  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
-  padding-bottom: 8px;
-  position: relative;
-}
-
-.ranking-header-badge {
-  font: 700 9px 'Cinzel', serif;
-  letter-spacing: 0.18em;
-  color: #fbbf24;
-  text-transform: uppercase;
-  display: block;
-}
-
-.ranking-card-header h3 {
-  font: 700 16px 'Cinzel', serif;
-  color: #f8fafc;
-  margin: 3px 0 6px;
-  letter-spacing: 0.08em;
-}
-
-.ranking-live-beacon {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  padding: 2px 10px;
-  border-radius: 999px;
-}
-
-.beacon-pulse {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  animation: pulseDot 1.8s infinite;
-}
-
-.beacon-text {
-  font: 700 9px 'Cinzel', serif;
-  color: #34d399;
-  letter-spacing: 0.1em;
-}
-
-/* Lista de Rankings */
-.ranking-list-mock {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin: 10px 0;
-}
-
-.ranking-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(15, 23, 42, 0.65);
-  border: 1px solid rgba(245, 158, 11, 0.18);
-  border-radius: 6px;
-  padding: 6px 10px;
-  transition: all 0.2s ease;
-}
-
-.ranking-row:hover {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.45);
-  transform: translateX(2px);
-}
-
-.ranking-row.top-1 {
-  border-color: rgba(251, 191, 36, 0.6);
-  background: linear-gradient(90deg, rgba(245, 158, 11, 0.2) 0%, rgba(15, 23, 42, 0.7) 100%);
-}
-
-.ranking-pos {
-  font: 800 13px 'Cinzel', serif;
-  color: #fbbf24;
-  width: 22px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.ranking-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 1.5px solid rgba(245, 158, 11, 0.6);
-  flex-shrink: 0;
-}
-
-.ranking-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.ranking-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  text-align: left;
-}
-
-.ranking-name {
-  font: 700 11px 'Cinzel', serif;
-  color: #fef08a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ranking-details {
-  font: 400 9.5px system-ui, sans-serif;
-  color: #94a3b8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ranking-status-tag {
-  font: 600 8.5px 'Cinzel', serif;
-  letter-spacing: 0.05em;
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 2px 6px;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-
-.ranking-footer-note {
-  border-top: 1px solid rgba(245, 158, 11, 0.2);
-  padding-top: 6px;
-  text-align: center;
-  font: 500 9.5px system-ui, sans-serif;
-  color: rgba(203, 213, 225, 0.6);
-}
-
-/* ==========================================================================
-   RODAPÉ DO COVER COM BOTÃO CTA — TERMINA ALGUNS MM ABAIXO DO BOTÃO
-   ========================================================================== */
-.forge-cover-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: clamp(14px, 2vh, 26px);
-  padding-bottom: 8px; /* Termina alguns milímetros abaixo do botão */
-}
-
-.forge-cover-cta {
-  position: relative;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  max-width: 100%;
-}
-
-.cta-pulse-ring {
-  position: absolute;
-  inset: -6px;
-  border-radius: 12px;
-  border: 2px solid rgba(245, 158, 11, 0.4);
-  animation: ctaRingPulse 2s infinite ease-out;
-  pointer-events: none;
-}
-
-@keyframes ctaRingPulse {
-  0% { transform: scale(0.96); opacity: 0.8; }
-  100% { transform: scale(1.08); opacity: 0; }
-}
-
-.cta-inner {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 1.5vw, 16px);
-  padding: clamp(11px, 1.5vh, 15px) clamp(22px, 2.8vw, 36px);
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
-  border: 1.5px solid #fef08a;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transition: all 0.25s ease;
-  white-space: nowrap;
-}
-
-.forge-cover-cta:hover .cta-inner {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-  box-shadow: 0 12px 32px rgba(245, 158, 11, 0.55), inset 0 1px 0 #ffffff;
-}
-
-.cta-text-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.cta-super {
-  font: 700 9.5px 'Cinzel', serif;
-  letter-spacing: 0.18em;
-  color: #451a03;
-  text-transform: uppercase;
-}
-
-.cta-main {
-  font: 800 clamp(13px, 1.3vw, 16px) 'Cinzel', serif;
-  letter-spacing: 0.08em;
-  color: #0f172a;
-}
-
-.cta-arrow-box {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.18);
-  color: #451a03;
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.forge-cover-cta:hover .cta-arrow-box {
-  transform: translateY(3px);
-  background: rgba(0, 0, 0, 0.25);
-  color: #000;
-}
-
-/* ==========================================================================
-   TELA DE LOGIN (.forge-auth) - DESLIZA DE BAIXO PARA CIMA
-   ========================================================================== */
-.forge-auth {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  max-width: 1260px;
-  height: 100%;
-  margin: 0 auto;
-  box-sizing: border-box;
-  padding: clamp(14px, 2vh, 26px) clamp(16px, 3.5vw, 48px);
-  z-index: 20;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(245, 158, 11, 0.4) transparent;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: clamp(8px, 1.4vh, 16px);
-  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-  transform: translateY(100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-#modal-auth-selection.in-auth-mode .forge-auth {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-@media (min-width: 960px) {
-  #modal-auth-selection[data-screen="login"] .forge-auth,
-  #modal-auth-selection.in-auth-mode[data-screen="login"] .forge-auth {
-    display: grid !important;
-    grid-template-columns: minmax(360px, 1.06fr) minmax(415px, 460px);
-    grid-template-rows: auto 1fr auto auto;
-    column-gap: clamp(32px, 5vw, 68px);
-    row-gap: 8px;
-    align-items: center;
-  }
-
-  #modal-auth-selection[data-screen="characters"] .forge-auth,
-  #modal-auth-selection.in-auth-mode[data-screen="characters"] .forge-auth {
-    display: grid !important;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto 1fr auto auto;
-    column-gap: 24px;
-    row-gap: 8px;
-  }
-}
-
-/* Botão de Retorno para a Capa — Moldura Rúnica Padronizada */
-.forge-back-cover-btn {
-  justify-self: center;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 12px 12px no-repeat,
-    linear-gradient(180deg, rgba(35, 30, 48, 0.94) 0%, rgba(12, 16, 29, 0.98) 100%);
-  border: 1.5px solid rgba(251, 191, 36, 0.55);
-  outline: 1px solid rgba(254, 240, 138, 0.22);
-  outline-offset: -3px;
-  border-radius: 4px;
-  color: #fef08a;
-  padding: 6px 16px;
-  font: 700 11px 'Cinzel', serif;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow:
-    inset 0 0 10px rgba(0, 0, 0, 0.7),
-    0 4px 14px rgba(0, 0, 0, 0.5),
-    0 0 12px rgba(245, 158, 11, 0.12);
-  white-space: nowrap;
-}
-
-.forge-back-cover-btn:hover {
-  background:
-    url('/assets/ui/frames/corner-tl.svg') top left / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-tr.svg') top right / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-bl.svg') bottom left / 12px 12px no-repeat,
-    url('/assets/ui/frames/corner-br.svg') bottom right / 12px 12px no-repeat,
-    linear-gradient(180deg, rgba(45, 38, 62, 0.96) 0%, rgba(18, 24, 42, 0.98) 100%);
-  border-color: #fde047;
-  outline-color: rgba(254, 240, 138, 0.45);
-  color: #ffffff;
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 0 12px rgba(245, 158, 11, 0.2),
-    0 6px 18px rgba(0, 0, 0, 0.65),
-    0 0 18px rgba(245, 158, 11, 0.35);
-}
-
-.forge-back-cover-btn svg {
-  color: #fbbf24;
-  transition: transform 0.2s ease;
-}
-
-.forge-back-cover-btn:hover svg {
-  color: #fef08a;
-  transform: translateY(-2px);
-}
-
-/* ==========================================================================
-   RESPONSIVIDADE MOBILE & TABLET
-   ========================================================================== */
-@media (max-width: 1080px) {
-  .forge-cover-showcase-row {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-}
-
-@media (max-width: 900px) {
-  .forge-cover-hero {
-    padding: 14px 12px 14px;
-  }
-
-  .forge-mechanics-grid {
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-
-  .classes-showcase-layout {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .classes-selector-rail {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    scrollbar-width: thin;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .class-rail-btn {
-    flex-shrink: 0;
-    min-width: 130px;
-    padding: 6px 10px;
-  }
-
-  .class-stage-display {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
-
-  .stage-pedestal-platform {
-    height: 160px;
-  }
-
-  .hero-sprite-actor img {
-    width: 120px;
-    height: 120px;
-  }
-
-  .stage-info-card {
-    text-align: center;
-  }
-
-  .stat-name {
-    width: 110px;
-    font-size: 10px;
-  }
-
-  .stage-traits-tags {
-    justify-content: center;
+    justify-content: start;
   }
 }
 
 @media (max-width: 540px) {
-  .forge-cover-masthead {
+  .forge-masthead {
+    min-height: 0;
+    align-items: start;
     flex-direction: column;
     gap: 10px;
+  }
+
+  .forge-journey {
+    gap: 8px;
+  }
+
+  .forge-journey li + li::before {
+    margin-right: 8px;
+  }
+
+  .forge-codex {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .class-stage-display {
+    grid-template-columns: minmax(80px, .7fr) minmax(0, 1fr);
+    order: 1;
+    margin-bottom: 0;
+  }
+
+  .classes-selector-rail {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 12px;
+  }
+
+  .forge-slots {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .forge-slot {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
     align-items: center;
+    gap: 5px 12px;
+    text-align: left;
   }
 
-  .forge-cover-title {
-    font-size: 24px;
+  .forge-slot-number {
+    grid-column: 1 / -1;
   }
 
-  .forge-cover-tagline {
-    font-size: 12px;
+  .forge-pedestal {
+    grid-row: span 2;
+    height: 88px;
+    margin: 0;
+    text-align: center;
   }
 
-  .cta-inner {
-    padding: 10px 16px;
-    gap: 10px;
+  #modal-auth-selection .forge-slot p {
+    margin: 0;
   }
 
-  .cta-main {
-    font-size: 13px;
-  }
-
-  .cta-arrow-box {
-    width: 28px;
-    height: 28px;
-  }
-
-  .cta-arrow-icon {
-    width: 20px;
-    height: 20px;
+  .forge-slot-actions {
+    grid-column: 1 / -1;
+    margin-top: 3px;
   }
 }
 
-
-/* ==========================================================================
-   POLIMENTO RESPONSIVO FINAL DO MASTHEAD & CARD FORJA ANCESTRAL NO MOBILE
-   ========================================================================== */
-@media (max-width: 768px) {
-  .forge-masthead {
-    display: grid !important;
-    grid-template-columns: auto 1fr auto !important;
-    align-items: center !important;
-    gap: 6px !important;
-    padding-bottom: 6px !important;
-  }
-
-  .forge-masthead::after {
-    height: 14px !important;
-    bottom: -7px !important;
-  }
-
-  .forge-wordmark {
-    font-size: 13.5px !important;
-  }
-
-  .forge-wordmark small {
-    font-size: 6.5px !important;
-    letter-spacing: 0.22em !important;
-  }
-
-  .forge-back-cover-btn {
-    justify-self: center !important;
-    padding: 4px 8px !important;
-    font-size: 8.5px !important;
-    letter-spacing: 0.04em !important;
-    gap: 4px !important;
-    background-size: 8px 8px !important;
-    white-space: nowrap !important;
-  }
-
-  .forge-back-cover-btn svg {
-    width: 12px !important;
-    height: 12px !important;
-  }
-
-  .forge-world-tag {
-    justify-self: end !important;
-    font-size: 7.5px !important;
-    line-height: 1.2 !important;
-    letter-spacing: 0.03em !important;
-    padding: 3px 6px !important;
-    border-width: 1px !important;
-    background-size: 7px 7px !important;
-    max-width: 95px !important;
-    text-align: right !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
-    white-space: normal !important;
+@media (prefers-reduced-motion: reduce) {
+  .forge-cover-hero,
+  #modal-auth-selection[data-screen="login"] .forge-intro,
+  #modal-auth-selection[data-screen="login"] .forge-layout,
+  #modal-auth-selection[data-screen="characters"] .forge-roster,
+  #modal-auth-selection[data-screen="characters"] .forge-account-session {
+    animation: none;
   }
 }
 
-@media (max-width: 480px) {
-  .forge-masthead {
-    gap: 4px !important;
-  }
+.forge-runic-crests li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
 
-  .forge-wordmark {
-    font-size: 12px !important;
-  }
+.forge-runic-crests li strong { color: #e4c77e; font: 700 12px Cinzel, serif; }
+.forge-runic-crests li span { color: #9ba5b5; font-size: 11px; }
 
-  .forge-wordmark small {
-    font-size: 5.5px !important;
-    letter-spacing: 0.18em !important;
-  }
+.forge-entry-facts {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
 
-  .forge-back-cover-btn {
-    padding: 3px 6px !important;
-    font-size: 8px !important;
-    gap: 3px !important;
-    background-size: 6px 6px !important;
-  }
+.forge-entry-facts > div {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(13, 18, 28, 0.72);
+}
 
-  .forge-back-cover-btn svg {
-    width: 10px !important;
-    height: 10px !important;
-  }
+.forge-entry-facts :is(strong, span) { display: block; }
+.forge-entry-facts strong { margin-bottom: 4px; color: #dfc383; font: 700 11px Cinzel, serif; }
+.forge-entry-facts span { color: #8994a4; font-size: 10px; line-height: 1.35; }
+.forge-section-heading > div { min-width: 0; }
+.forge-section-kicker { display: block; margin-bottom: 5px; color: #8e99a8; font-size: 9px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; }
 
-  .forge-world-tag {
-    font-size: 7px !important;
-    line-height: 1.15 !important;
-    padding: 2px 5px !important;
-    max-width: 84px !important;
-    background-size: 5px 5px !important;
-  }
+@media (max-width: 720px) {
+  .forge-entry-facts { grid-template-columns: 1fr; margin-top: 16px; }
+  .forge-entry-facts > div { display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 8px; padding: 8px 10px; }
+  .forge-entry-facts strong { margin: 0; }
+}
+
+#modal-auth-selection[data-screen="characters"] :is(.forge-entry-facts, #forge-intro-copy, #forge-intro-eyebrow, .forge-section-kicker, .forge-roster-note, .forge-stat-hp) {
+  display: none;
+}
+
+#modal-auth-selection[data-screen="characters"] .forge-auth {
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+}
+
+#modal-auth-selection[data-screen="characters"] .forge-intro h1 {
+  font-size: clamp(1.4rem, 3.4vw, 2.6rem);
+}
+
+.forge-roster .forge-slots { gap: 8px; }
+.forge-roster-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.forge-roster > #forge-refresh-slots { margin-bottom: 8px; }
+.forge-character-details { min-width: 0; margin-top: 10px; overflow-wrap: anywhere; }
+.forge-character-details dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 78px), 1fr)); gap: 6px; margin: 0 0 14px; }
+.forge-character-details dl > div { padding: 6px; border: 1px solid #72563c; border-radius: 4px; background: #171013; }
+.forge-character-details dt { color: var(--forge-gold); font-size: .68rem; text-transform: capitalize; }
+.forge-character-details dd { margin: 2px 0 0; font-size: .82rem; }
+.forge-character-details ul { padding: 0; margin: 6px 0 0; list-style: none; font-size: .78rem; }
+.forge-character-details li { padding: 4px 0; border-bottom: 1px solid #72563c55; }
+.forge-roster .forge-slot {
+  grid-template-columns: 52px minmax(0, 1fr);
+  padding: 8px 12px;
+}
+.forge-roster .forge-slot-number { display: none; }
+.forge-roster .forge-pedestal { height: 52px; }
+#modal-auth-selection .forge-roster .forge-slot p { margin: 0; }
+.forge-roster .forge-slot-actions { margin-top: 3px; }
+.forge-roster .forge-stat-economy { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: .73rem; }
+
+.forge-inspection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  column-gap: clamp(10px, 2vw, 24px);
+}
+.forge-inspection > :is(h2, p) { grid-column: 1 / -1; }
+.forge-inspection .forge-inspection-identity { display: block; margin-block: 10px 0; }
+.forge-inspection .forge-inspection-identity img { display: block; width: min(100%, 200px); }
+.forge-abilities { min-width: 0; margin-top: 10px; }
+#modal-auth-selection .forge-abilities h3 { font-size: .9rem; }
+.forge-abilities .forge-skill-previews {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 300px;
+  gap: 5px;
+  padding: 0;
+  margin-top: 8px;
+}
+.forge-skill-row { display: grid; grid-template-columns: 3.25em minmax(0, 1fr); align-items: center; gap: 5px; }
+.forge-skill-row > span { font: 700 .68rem var(--forge-title); color: var(--forge-gold); white-space: nowrap; }
+.forge-skill-row ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; list-style: none; padding: 0; }
+.forge-abilities .forge-skill-previews li { display: block; min-width: 0; padding: 0; border: 0; }
+#modal-auth-selection .forge-skill-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 34px;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 2px;
+}
+.forge-skill-icon :is(img, .forge-skill-fallback) { display: block; width: 100%; height: 100%; min-width: 0; }
+#modal-auth-selection .forge-skill-icon[data-class-type] { background: radial-gradient(ellipse at 50% 30%, var(--skill-tint, #735327), #171019 76%); }
+.forge-skill-icon[data-class-type="MAGO"] { --skill-tint: #26446b; }
+.forge-skill-icon[data-class-type="BRUXO"] { --skill-tint: #633675; }
+.forge-skill-icon[data-class-type="ARQUEIRO"] { --skill-tint: #365a37; }
+.forge-skill-icon[data-class-type="CLERIGO"] { --skill-tint: #806c32; }
+.forge-skill-icon[data-class-type="MONGE"] { --skill-tint: #295957; }
+.forge-skill-tooltip { position: fixed; z-index: 20; pointer-events: none; width: min(280px, calc(100vw - 16px)); padding: 10px 12px; background: #151012; border: 1px solid #a48153; border-radius: 4px; box-shadow: 0 8px 26px #0009; overflow-wrap: anywhere; }
+.forge-skill-tooltip :is(small, span, meter) { display: block; }
+.forge-skill-tooltip :is(small, span) { color: var(--forge-gold); font-size: .72rem; }
+#modal-auth-selection .forge-skill-tooltip p { margin-block: 3px 5px; font-size: .78rem; line-height: 1.35; }
+.forge-skill-tooltip meter { width: 100%; height: 10px; }
+.forge-skill-tooltip meter::-webkit-meter-bar { background: #3a3030; border: 0; }
+.forge-skill-tooltip meter::-webkit-meter-optimum-value { background: #d7a251; }
+.forge-skill-tooltip meter[data-resource="Mana"]::-webkit-meter-optimum-value { background: #6398e5; }
+
+@media (max-width: 800px) {
+  #modal-auth-selection[data-screen="characters"] .forge-auth { grid-template-columns: minmax(0, 1fr); }
+  .forge-roster .forge-slot-actions { grid-column: 1 / -1; }
 }
