@@ -82,6 +82,9 @@ export class PacketHandler {
     }
 
     switch (message.op) {
+      case Opcode.C2S_DEV_CONTROL:
+        this.getActiveWorld(connection).handleDevControl(connection, message.data as Parameters<World['handleDevControl']>[1]);
+        break;
       // --- Autenticação de Contas & Multi-Provider ---
       case Opcode.C2S_AUTH_LOGIN:
         this.worldManager.handleAuthLogin(connection, message.data as C2SAuthLoginPayload);
@@ -199,6 +202,13 @@ export class PacketHandler {
         if (!connection.isAuthenticated || !connection.playerId) return;
         const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
         if (player) this.runInventoryAction(connection, () => world.sendEquipmentAdvice(player));
+        break;
+      }
+      case Opcode.C2S_AUTO_EQUIP: {
+        if (!connection.isAuthenticated || !connection.playerId) return;
+        const world = this.getActiveWorld(connection);
+        const player = world.entityManager.getPlayer(connection.playerId);
+        if (player) this.runInventoryAction(connection, () => world.autoEquipPlayer(player));
         break;
       }
       case Opcode.C2S_DISCARD_ITEM:
@@ -412,14 +422,13 @@ export class PacketHandler {
   }
 
   private handleMoveInput(connection: Connection, payload: C2SMoveInputPayload): void {
-    if (!connection.isAuthenticated || !connection.playerId) {
+    if (!connection.isAuthenticated || !connection.playerId || !payload || !Number.isSafeInteger(payload.inputSequence)) {
       return;
     }
 
     const world = this.getActiveWorld(connection);
-    if (world.automationEnabled) return;
     const player = world.entityManager.getPlayer(connection.playerId);
-    if (!player || player.isDead) {
+    if (!player || player.isDead || (world.automationEnabled && player.autoCastEnabled)) {
       return;
     }
 
@@ -435,12 +444,14 @@ export class PacketHandler {
       }
     }
 
-    if (payload.moveDirection) {
+    if (payload.moveDirection && Number.isFinite(payload.moveDirection.x) && Number.isFinite(payload.moveDirection.z)) {
+      if (!player.autoCastEnabled) player.targetId = null;
       player.setMoveDirection(payload.moveDirection, payload.inputSequence);
       return;
     }
 
-    if (payload.targetPosition) {
+    if (payload.targetPosition && Number.isFinite(payload.targetPosition.x) && Number.isFinite(payload.targetPosition.z)) {
+      if (!player.autoCastEnabled) player.targetId = null;
       player.setMoveDestination(payload.targetPosition, payload.inputSequence);
     }
   }

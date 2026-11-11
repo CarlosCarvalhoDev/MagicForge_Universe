@@ -10,6 +10,9 @@ import {
   C2SSellItemPayload,
   C2SDiscardItemPayload,
   EquipmentAdvicePayload,
+  AutoEquipResult,
+  DevCommand,
+  DevState,
   FusionRequest,
   FusionResult,
   C2SExpandInventoryPayload,
@@ -135,6 +138,8 @@ export class ClientNetwork {
   public onInventoryUpdate: MessageListener<S2CInventoryUpdatePayload> | null = null;
   public onFusionResult: MessageListener<FusionResult> | null = null;
   public onEquipmentAdvice: MessageListener<EquipmentAdvicePayload> | null = null;
+  public onAutoEquipResult: MessageListener<AutoEquipResult> | null = null;
+  public onDevState: MessageListener<DevState> | null = null;
   private inventorySnapshot = new Map<number, InventoryItemPayload>();
   public onPlayerExpUpdate: MessageListener<S2CPlayerExpUpdatePayload> | null = null;
   public onPlayerLevelUp: MessageListener<S2CPlayerLevelUpPayload> | null = null;
@@ -440,6 +445,8 @@ export class ClientNetwork {
   public sendFuseEquipment(request: FusionRequest): void { this.send(Opcode.C2S_FUSE_EQUIPMENT, request); }
 
   public sendRequestEquipmentAdvice(): void { this.send(Opcode.C2S_REQUEST_EQUIPMENT_ADVICE, {}); }
+  public sendAutoEquip(): void { this.send(Opcode.C2S_AUTO_EQUIP, {}); }
+  public sendDevControl(command: DevCommand): void { this.send(Opcode.C2S_DEV_CONTROL, command); }
 
   public sendExpandInventory(expectedMaxSlots?: number): void {
     this.send(Opcode.C2S_EXPAND_INVENTORY, { expectedMaxSlots });
@@ -641,6 +648,13 @@ export class ClientNetwork {
           this.onEquipmentAdvice?.(packet.data as EquipmentAdvicePayload);
           break;
         }
+        case Opcode.S2C_AUTO_EQUIP_RESULT: {
+          this.onAutoEquipResult?.(packet.data as AutoEquipResult);
+          break;
+        }
+        case Opcode.S2C_DEV_STATE:
+          this.onDevState?.(packet.data as DevState);
+          break;
         case Opcode.S2C_INVENTORY_UPDATE: {
           this.inventorySnapshot = new Map((packet.data as S2CInventoryUpdatePayload).slots.map(item => [item.slotIndex, item]));
           this.onInventoryUpdate?.(packet.data as S2CInventoryUpdatePayload);

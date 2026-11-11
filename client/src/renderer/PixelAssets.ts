@@ -1,4 +1,5 @@
 import type { HeroAction, HeroSheetSet } from './HeroAnimations.ts';
+import { WARRIOR_DIRECTIONAL_SHEETS } from './HeroAnimations.ts';
 
 export type PixelFamily = 'hero' | 'barbarian' | 'slime' | 'orc';
 export type Facing = 'south' | 'west' | 'east' | 'north';
@@ -11,7 +12,7 @@ function family(folder: PixelFamily, prefix: string, names: string[], counts: nu
   }])) as HeroSheetSet;
 }
 export const PIXEL_SHEETS: Record<PixelFamily, HeroSheetSet> = {
-  hero: family('hero', 'Swordsman_lvl3', ['Idle', 'Walk', 'attack', 'Hurt', 'Death'], [12, 6, 8, 5, 7]),
+  hero: WARRIOR_DIRECTIONAL_SHEETS,
   barbarian: family('barbarian', 'Barbarian', ['Idle', 'Walk', 'attack', 'Hurt', 'Death'], [4, 8, 6, 4, 6]),
   slime: family('slime', 'Slime1', ['Idle', 'Walk', 'Attack', 'Hurt', 'Death'], [6, 8, 10, 5, 10]),
   orc: family('orc', 'orc1', ['idle', 'walk', 'attack', 'hurt', 'death'], [4, 6, 8, 6, 8]),

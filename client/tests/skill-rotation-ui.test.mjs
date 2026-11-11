@@ -12,12 +12,13 @@ test('Reordenar o ciclo preserva os quatro slots e suporta ida e volta', () => {
   assert.deepEqual(moveRotationSlot(initial, 0, -1), initial);
 });
 
-test('Cliente automático preserva quatro habilidades no layout do colaborador e Grimório sem joystick', () => {
+test('HUD preserva quatro habilidades e envia movimento por clique apenas no modo manual', () => {
   const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const main = fs.readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
   const css = fs.readFileSync(new URL('../src/ui/progression.css', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /id="virtual-joystick-zone"/);
-  assert.doesNotMatch(main, /sendMoveDirection\(|sendMoveInput\(/);
+  assert.doesNotMatch(main, /sendMoveDirection\(/);
+  assert.match(main, /if \(player && player\.currentHp > 0 && skillRotationUI\?\.canCastManually\(\)\)\s*\{\s*network\.sendMoveInput\(/);
   assert.doesNotMatch(main, /for \(let slot = 4; slot >= 1; slot--\)/);
   assert.match(html, /id="grimorio-tab-rotation"/);
   assert.match(html, /id="skill-rotation-panel"/);

@@ -1,0 +1,26 @@
+.dev-panel {
+  width: min(32rem, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  box-sizing: border-box;
+  background: #201815;
+  color: #f6e5c6;
+  border: 1px solid #bb9155;
+  border-radius: 6px;
+  padding: 16px;
+}
+.dev-panel::backdrop { background: #08090bbd; }
+.dev-panel header, .dev-panel form, .dev-panel footer { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dev-panel header { justify-content: space-between; }
+.dev-panel h2 { margin: 0; font: 700 1.05rem Cinzel, serif; }
+.dev-panel p { font-size: .82rem; }
+.dev-panel fieldset { display: grid; gap: 9px; margin: 0 0 12px; border: 1px solid #74573a; }
+.dev-panel form { margin-bottom: 12px; }
+.dev-panel input[type="number"] { width: 5rem; }
+.dev-panel button, .dev-panel input[type="number"] {
+  background: #33251d;
+  color: inherit;
+  border: 1px solid #a37e4b;
+  border-radius: 4px;
+  min-height: 34px;
+  padding: 4px 8px;
+}

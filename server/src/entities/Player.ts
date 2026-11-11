@@ -10,7 +10,6 @@ import {
   getManaAttribute,
   PrimaryStatType,
   Vector3,
-  cloneVector3,
   createVector3,
   EntitySnapshotState,
   InventoryItemPayload,
@@ -74,6 +73,7 @@ export class Player extends Entity {
   public skillRotationCursor = 0;
   public autoSkillDecisionTimerSec = 0;
   public autoCastEnabled = true;
+  public devInfiniteVitals = false;
   public readonly huntSession = new HuntSession();
   public lastHuntReportRequestAt: number = 0;
   public lastHuntReportResetAt: number = 0;
@@ -294,7 +294,11 @@ export class Player extends Entity {
   }
 
   public setMoveDestination(destination: Vector3, inputSeq: number): void {
-    this.targetDestination = cloneVector3(destination);
+    const { minX, maxX, minZ, maxZ } = SERVER_CONFIG.MAP_BOUNDS;
+    this.targetDestination = createVector3(
+      Math.max(minX, Math.min(maxX, destination.x)), 0,
+      Math.max(minZ, Math.min(maxZ, destination.z)),
+    );
     this.moveDirection = null;
     this.lastProcessedInputSeq = inputSeq;
     this.isMoving = true;
@@ -437,6 +441,7 @@ export class Player extends Entity {
   }
 
   public consumeResource(amount: number): boolean {
+    if (this.devInfiniteVitals) return true;
     if (this.currentResource >= amount) {
       this.currentResource -= amount;
       return true;
@@ -449,6 +454,7 @@ export class Player extends Entity {
   }
 
   public override takeDamage(damage: number, source?: Entity, isReflected = false): TakeDamageResult {
+    if (this.devInfiniteVitals) return { effectiveDamage: 0, absorbed: 0, reflected: 0, killed: false };
     const result = super.takeDamage(damage, source, isReflected);
     if (result.killed) this.huntSession.add('deaths');
     return result;

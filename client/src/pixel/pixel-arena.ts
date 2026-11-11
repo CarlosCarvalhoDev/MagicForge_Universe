@@ -3,7 +3,7 @@ import { PracticeArena } from './PracticeArena';
 import type { FxKind } from '../renderer/PixelVfx';
 import { CharacterClass, getSkillsForClass, type CombatStatusType } from '@magicforge/shared';
 import type { WarriorCastFx } from '../renderer/PixelVfx';
-import { planWarriorCastFx } from '../renderer/PixelVfx';
+import { planWarriorWorldFx } from '../renderer/WarriorWorldFx';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#pixel-arena')!;
 const renderer = new GameRenderer(canvas), arena = new PracticeArena();
@@ -32,7 +32,7 @@ function previewFx(kind: FxKind): void {
   if (kind === 'shield') previewShield(false);
   else renderer.vfx.queue.spawn({ kind, position: hero.position, followId: ['heal', 'levelUp'].includes(kind) ? hero.id : undefined, yaw: hero.headingYaw, radius: kind === 'avatar' ? 7 : 5 }, performance.now());
   nextFx = performance.now() + 1400;
-  const labels: Record<FxKind, string> = { cone: 'Cone de Fogo', slash: 'Corte V2 · aprovado provisoriamente', heal: 'Cura', whirlwind: 'Redemoinho', avatar: 'Avatar', impact: 'Impacto', shield: 'Escudo', levelUp: 'Subida de nível', line: 'Golpe Colossal', judgment: 'Lâmina do Julgamento' };
+  const labels: Partial<Record<FxKind, string>> = { cone: 'Cone de Fogo', slash: 'Corte V2 · aprovado provisoriamente', heal: 'Cura', whirlwind: 'Redemoinho', avatar: 'Avatar', impact: 'Impacto', shield: 'Escudo', levelUp: 'Subida de nível', line: 'Golpe Colossal', judgment: 'Lâmina do Julgamento' };
   fxStatus.textContent = `Prévia visual: ${labels[kind]}. A vida e os atributos não são alterados.`;
 }
 document.querySelectorAll<HTMLButtonElement>('[data-fx]').forEach(button => button.addEventListener('click', () => previewFx(button.dataset.fx as FxKind)));
@@ -51,7 +51,8 @@ function previewWarriorSkill(): void {
     originPosition: hero.position, headingYaw: yaw, targetPosition: target, geometry: ['guerreiro_nv2_1', 'guerreiro_nv3_1'].includes(skill.skillId) ? 'CIRCLE_SELF' : 'CIRCLE_TARGET', radius: skill.aoeRadius,
     lineLength: 4.5, lineWidth: 3, targetResults: [{ targetId: self ? hero.id : 'preview-target', impactPosition: self ? hero.position : target, effectiveDamage: self ? 0 : 1, effectiveHeal: skill.isHeal ? 1 : 0 }] };
   if (skill.skillId === 'guerreiro_nv3_3') event.targetResults!.push({ targetId: 'preview-target', impactPosition: target, effectiveDamage: 1, effectiveHeal: 0 });
-  for (const fx of planWarriorCastFx(event, arena.entities)) renderer.vfx.queue.spawn(fx, now);
+  renderer.pixelWorld.playWarriorCast(hero.id, skill.skillId, now);
+  for (const fx of planWarriorWorldFx(event, arena.entities)) renderer.vfx.queue.spawn(fx, now);
   const types: Record<string, CombatStatusType> = { guerreiro_truque_2: 'BLEED', guerreiro_truque_3: 'ARMOR_BREAK', guerreiro_nv1_2: 'ATTACK_SPEED_BUFF', guerreiro_nv1_3: 'STUN', guerreiro_nv2_2: 'SHIELD', guerreiro_nv3_1: 'DAMAGE_BUFF', guerreiro_nv3_3: 'DEATH_IMMUNITY' };
   const type = types[skill.skillId];
   // Decorative status sample is attached to a living practice entity, never to multiplayer.

@@ -80,6 +80,7 @@ import {
   C2SUpgradeSkillPayload,
   S2CSkillUpgradeResultPayload,
   getEquipmentSuggestions,
+  findAutoEquipUpgrade,
   FusionRequest,
   getSkillLevel,
   INVENTORY_EXPANSIONS,
@@ -94,6 +95,8 @@ import {
   MARTIAL_EFFECTS,
   isInMageCone,
   splitMagePower,
+  type DevCommand,
+  type DevState,
 } from '@magicforge/shared';
 import { EntityManager } from './EntityManager';
 import { Entity, ActiveCombatStatus } from '../entities/Entity';
@@ -109,6 +112,8 @@ import { PartyManager } from './PartyManager';
 import { calculateOfflineReward, OFFLINE_REWARD_POLICY } from './OfflineRewards';
 
 export class World {
+  private devSettings = { pauseRespawns: false, disableDrops: false, doubleLegendary: false };
+  private devTargetSequence = 0;
   public automationEnabled = true;
   public automaticPortalHandler?: (player: Player) => void;
   private automaticPortalTimerSec = 0;
@@ -710,6 +715,7 @@ export class World {
 
     // 8. Envia confirmação definitiva de login bem-sucedido
     connection.send(Opcode.S2C_LOGIN_SUCCESS, {
+      isAdmin: this.db.isAdminAccount(connection.accountId),
       playerId: player.id,
       characterName: player.name,
       classType: player.classType,
@@ -823,11 +829,16 @@ export class World {
     }
     try {
       this.db.updateSkillCastOrder(player.dbCharacterId, payload.order, payload.autoCastEnabled);
-      if (payload.autoCastEnabled !== undefined) player.autoCastEnabled = payload.autoCastEnabled;
+      if (payload.autoCastEnabled !== undefined && payload.autoCastEnabled !== player.autoCastEnabled) {
+        player.autoCastEnabled = payload.autoCastEnabled;
+        player.stopMoving();
+        player.targetId = null;
+        player.autoSkillDecisionTimerSec = 0;
+      }
       player.skillCastOrder = [...payload.order];
       player.skillRotationCursor = 0;
       connection.send(Opcode.S2C_SKILL_ROTATION, {
-        order: [...player.skillCastOrder], autoCastEnabled: player.autoCastEnabled, success: true, message: player.autoCastEnabled ? 'Magias automáticas ativadas. O ciclo segue da esquerda para a direita.' : 'Magias manuais ativadas. Movimento, ataque básico e avanço continuam automáticos.',
+        order: [...player.skillCastOrder], autoCastEnabled: player.autoCastEnabled, success: true, message: player.autoCastEnabled ? 'Combate automático ativado. O ciclo segue da esquerda para a direita.' : 'Modo manual ativado. Clique ou toque no mapa para se mover.',
       } satisfies S2CSkillRotationPayload);
     } catch {
       connection.send(Opcode.S2C_SKILL_ROTATION, {
@@ -895,18 +906,18 @@ export class World {
   public update(deltaTimeSec: number): void {
     this.currentTick++;
     if (this.automationEnabled && this.automaticPortalHandler &&
-      (this.isPortalOpen || this.entityManager.getAllPlayers().some(player => player.unlockedWorld > player.currentWorld))) {
+      (this.isPortalOpen || this.entityManager.getAllPlayers().some(player => player.autoCastEnabled && player.unlockedWorld > player.currentWorld))) {
       this.automaticPortalTimerSec += deltaTimeSec;
       if (this.automaticPortalTimerSec >= 3) {
         for (const player of this.entityManager.getAllPlayers()) {
-          if (!player.isDead && player.unlockedWorld > player.currentWorld && !this.dungeonManager.isPlayerInDungeon(player.id)) this.automaticPortalHandler(player);
+          if (player.autoCastEnabled && !player.isDead && player.unlockedWorld > player.currentWorld && !this.dungeonManager.isPlayerInDungeon(player.id)) this.automaticPortalHandler(player);
         }
       }
     } else { this.automaticPortalTimerSec = 0; }
     if (this.automationEnabled && this.isBossAvailable && !this.isBossActive && !this.isPortalOpen) {
       this.automaticBossRetrySec += deltaTimeSec;
       if (this.automaticBossRetrySec >= 60) {
-        const player = this.entityManager.getAllPlayers().find(candidate => !candidate.isDead && !this.dungeonManager.isPlayerInDungeon(candidate.id));
+        const player = this.entityManager.getAllPlayers().find(candidate => candidate.autoCastEnabled && !candidate.isDead && !this.dungeonManager.isPlayerInDungeon(candidate.id));
         if (player) { this.automaticBossRetrySec = 0; this.challengeStageBoss(player); }
       }
     } else { this.automaticBossRetrySec = 0; }
@@ -936,6 +947,12 @@ export class World {
     // 2. Update all Monsters & Spatial Cell Index
     const monsters = this.entityManager.getAllMonsters();
     for (const monster of monsters) {
+      if (monster.trainingDummy) {
+        monster.position = cloneVector3(monster.spawnPosition);
+        this.spatialGrid.updateEntity(monster);
+        continue;
+      }
+      if (monster.isDead && this.devSettings.pauseRespawns) continue;
       // Monster Aggro targeting
       if (monster.state === MonsterState.IDLE && !monster.isDead) {
         const nearestPlayer = this.entityManager.findNearestPlayer(monster.position, monster.aggroRadius);
@@ -1023,14 +1040,14 @@ export class World {
     // If player has a target, check validity
     let target = player.targetId ? this.entityManager.getMonster(player.targetId) : null;
 
-    if (!target || target.isDead) {
+    if ((!target || target.isDead) && player.autoCastEnabled) {
       // Auto-target nearest monster within radar (60m)
       target = this.entityManager.findNearestMonster(player.position, 60.0);
       player.targetId = target ? target.id : null;
     }
 
     if (!target || target.isDead) {
-      if (this.automationEnabled) {
+      if (this.automationEnabled && player.autoCastEnabled) {
         if (Math.hypot(player.position.x, player.position.z) > 3) player.setMoveDirection(createVector3(-player.position.x, 0, -player.position.z), 0);
         else player.stopMoving();
       }
@@ -1038,7 +1055,7 @@ export class World {
     }
 
     const dist = distance(player.position, target.position);
-    if (this.automationEnabled) {
+    if (this.automationEnabled && player.autoCastEnabled) {
       const readySkills = new Map(player.skillCastOrder.map(slot => [slot, SKILLS_DATABASE[player.getEquippedSkill(slot)]] as const).filter(([, skill]) => {
         if (!skill || skill.classType !== player.classType || player.level < skill.unlockLevel || player.currentResource < this.getEffectiveSkillCost(player,skill.cost) || !isSkillEffectAvailable(skill)) return false;
         const category = getSkillTargeting(skill).category;
@@ -1046,7 +1063,7 @@ export class World {
         return !(skill.isHeal && !isHybridHealingSkill(skill) && !['clerigo_nv2_3','barbaro_nv2_2','guerreiro_nv3_3'].includes(skill.skillId) && (category === 'SELF_HEAL' || category === 'AOE_SELF') && player.currentHp >= player.maxHp);
       }).filter(([slot]) => (player.skillCooldowns.get(slot) ?? 0) <= 0));
       let approachRange = player.attackRange;
-      if (player.autoCastEnabled) for (const skill of readySkills.values()) {
+      for (const skill of readySkills.values()) {
         const targeting = getSkillTargeting(skill);
         if (targeting.category !== 'SELF_HEAL' && targeting.category !== 'SELF_BUFF' && !(targeting.category === 'AOE_SELF' && skill.isHeal && !isHybridHealingSkill(skill))) approachRange = Math.min(approachRange, targeting.reach);
       }
@@ -1055,7 +1072,7 @@ export class World {
         player.setMoveDirection(createVector3(target.position.x - player.position.x, 0, target.position.z - player.position.z), 0);
       } else {
         player.stopMoving();
-        if (player.autoCastEnabled && player.autoSkillDecisionTimerSec <= 0) {
+        if (player.autoSkillDecisionTimerSec <= 0) {
           player.autoSkillDecisionTimerSec = hasArcaneHaste?player.autoSkillDecisionTimerSec+0.1/MAGE_SECOND_CIRCLE_EFFECTS.hasteDecisionMultiplier:0.1;
           const next = selectNextSkillSlot(player.skillCastOrder, player.skillRotationCursor, slot => {
             const skill = readySkills.get(slot); if (!skill) return false;
@@ -2558,6 +2575,10 @@ export class World {
       });
     }
 
+    if (monster.devTarget) {
+      this.removeDevTarget(monster);
+      return;
+    }
     // 0. Notifica DungeonManager se este monstro pertencia a uma masmorra ativa
     if (killer && killer instanceof Player) {
       this.dungeonManager.onMonsterKilled(monster.id, killer);
@@ -2688,7 +2709,9 @@ export class World {
     }
 
     // 3. Loot Generation & Drop Scattering
-    const rolledDrops = monster.rollLoot();
+    if (this.devSettings.disableDrops) return;
+    const rolledDrops = monster.rollLoot(itemId =>
+      this.devSettings.doubleLegendary && ITEMS_DATABASE[itemId]?.rarity === ItemRarity.LENDARIO ? 2 : 1);
     const now = Date.now();
 
     for (const drop of rolledDrops) {
@@ -2919,6 +2942,38 @@ export class World {
     this.connections.get(player.id)?.send(Opcode.S2C_EQUIPMENT_ADVICE, {
       characterId: player.dbCharacterId,
       suggestions: getEquipmentSuggestions(player.inventory, { classType: player.classType, level: player.level, attributes: player.attributes }),
+    });
+  }
+
+  public autoEquipPlayer(player: Player): void {
+    const connection = this.connections.get(player.id);
+    let count: number;
+    try {
+      count = this.db.runInTransaction(() => {
+        let equippedCount = 0;
+        let attributes = player.attributes;
+        while (true) {
+          const upgrade = findAutoEquipUpgrade(this.db.getInventory(player.dbCharacterId), {
+            classType: player.classType, level: player.level, attributes,
+          });
+          if (!upgrade) return equippedCount;
+          const result = this.db.toggleEquipItem(player.dbCharacterId, upgrade.candidate.slotIndex, player.classType, player.level, attributes);
+          if (!result.success) throw new Error(result.reason ?? 'Falha ao equipar item.');
+          attributes = upgrade.attributes;
+          equippedCount++;
+        }
+      });
+    } catch {
+      connection?.send(Opcode.S2C_AUTO_EQUIP_RESULT, { equippedCount: 0, message: 'Não foi possível equipar. Tente novamente.' });
+      return;
+    }
+    if (count > 0) {
+      player.inventory = this.db.getInventory(player.dbCharacterId);
+      player.recalculateStatsFromEquipment();
+      this.sendInventoryUpdate(player);
+    }
+    connection?.send(Opcode.S2C_AUTO_EQUIP_RESULT, {
+      equippedCount: count, message: count ? `${count} troca(s) de equipamento concluída(s).` : 'Nenhuma melhoria elegível disponível.',
     });
   }
 
@@ -3343,7 +3398,78 @@ export class World {
     return { success: true, message };
   }
 
-  public challengeStageBoss(player?: Player): { success: boolean; reason?: string } {
+  public handleDevControl(connection: Connection, command?: DevCommand): void {
+    if (!connection.isAuthenticated || !connection.playerId || !this.db.isAdminAccount(connection.accountId)) return;
+    const player = this.entityManager.getPlayer(connection.playerId);
+    if (!player || !command) return;
+    let message: string | undefined;
+    switch (command.action) {
+      case 'state':
+        break;
+      case 'toggle':
+        if (typeof command.enabled !== 'boolean') return;
+        if (command.key === 'infiniteVitals') {
+          player.devInfiniteVitals = command.enabled;
+          if (command.enabled && !player.isDead) {
+            player.currentHp = player.maxHp;
+            player.currentResource = player.maxResource;
+          }
+        } else if (Object.hasOwn(this.devSettings, command.key)) {
+          this.devSettings[command.key] = command.enabled;
+        } else return;
+        break;
+      case 'dummy': {
+        const { minX, maxX, minZ, maxZ } = SERVER_CONFIG.MAP_BOUNDS;
+        if (!Number.isFinite(command.x) || !Number.isFinite(command.z) ||
+            command.x < minX || command.x > maxX || command.z < minZ || command.z > maxZ) {
+          message = 'Informe coordenadas dentro do mapa.';
+          break;
+        }
+        if (this.entityManager.getAllMonsters().filter(monster => monster.trainingDummy).length >= 8) {
+          message = 'O canal já tem oito bonecos. Remova os alvos para criar mais.';
+          break;
+        }
+        const dummy = new Monster(`dev_dummy_${++this.devTargetSequence}`, 'Boneco de Palha', createVector3(command.x, 0, command.z), 100000, 0, 'training_dummy');
+        dummy.trainingDummy = dummy.devTarget = true;
+        dummy.autoRespawns = false;
+        this.addDevTarget(dummy);
+        message = 'Boneco posicionado.';
+        break;
+      }
+      case 'boss': {
+        const result = this.challengeStageBoss(player, true);
+        message = result.success ? 'Chefe de treino invocado.' : result.reason;
+        break;
+      }
+      case 'reset':
+        this.devSettings = { pauseRespawns: false, disableDrops: false, doubleLegendary: false };
+        player.devInfiniteVitals = false;
+        // Reset also removes the test entities.
+      case 'clearTargets':
+        for (const monster of this.entityManager.getAllMonsters()) {
+          if (monster.devTarget) this.removeDevTarget(monster);
+        }
+        message = command.action === 'reset' ? 'Configuração restaurada.' : 'Alvos de teste removidos.';
+        break;
+      default:
+        return;
+    }
+    connection.send(Opcode.S2C_DEV_STATE, { ...this.devSettings, infiniteVitals: player.devInfiniteVitals, message } satisfies DevState);
+  }
+
+  private addDevTarget(monster: Monster): void {
+    this.entityManager.addMonster(monster);
+    this.spatialGrid.updateEntity(monster);
+    this.broadcast(Opcode.S2C_ENTITY_SPAWN, { entity: monster.toSnapshotState() } satisfies S2CEntitySpawnPayload);
+  }
+
+  private removeDevTarget(monster: Monster): void {
+    this.entityManager.removeMonster(monster.id);
+    this.spatialGrid.removeEntity(monster.id);
+    this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: monster.id, reason: 'DEAD' } satisfies S2CEntityDespawnPayload);
+  }
+
+  public challengeStageBoss(player?: Player, devOnly = false): { success: boolean; reason?: string } {
     if (this.isBossActive) {
       return { success: false, reason: 'Um Chefão já está em combate na arena!' };
     }
@@ -3394,6 +3520,14 @@ export class World {
     boss.speed = 3.2;
     boss.expReward = bossExp;
 
+    if (devOnly) {
+      if (this.entityManager.getAllMonsters().some(monster => monster.devTarget && monster.isBoss)) {
+        return { success: false, reason: 'Já existe um chefe de treino no canal.' };
+      }
+      boss.devTarget = true;
+      this.addDevTarget(boss);
+      return { success: true };
+    }
     this.entityManager.addMonster(boss);
     this.spatialGrid.updateEntity(boss);
 

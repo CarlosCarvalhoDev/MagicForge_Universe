@@ -333,6 +333,10 @@ export class DatabaseManager {
     `);
 
     // Migrações da Tabela de Contas (Autenticação e Multi-Provider)
+    const accountColumns = this.db.prepare('PRAGMA table_info(accounts)').all() as Array<{ name: string }>;
+    if (!accountColumns.some(column => column.name === 'is_admin')) {
+      this.db.exec('ALTER TABLE accounts ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0 CHECK (is_admin IN (0, 1))');
+    }
     try {
       this.db.exec('ALTER TABLE accounts ADD COLUMN password_hash TEXT;');
     } catch {}
@@ -1129,6 +1133,12 @@ export class DatabaseManager {
       else { this.db.exec(`ROLLBACK TO SAVEPOINT ${savepoint}`); this.db.exec(`RELEASE SAVEPOINT ${savepoint}`); }
       throw error;
     } finally { this.transactionDepth--; }
+  }
+
+  public isAdminAccount(accountId: string | null): boolean {
+    if (!accountId) return false;
+    const account = this.db.prepare('SELECT is_admin FROM accounts WHERE id = ?').get(accountId);
+    return account?.is_admin === 1;
   }
 
   private migrateEquipmentLocations(): void {

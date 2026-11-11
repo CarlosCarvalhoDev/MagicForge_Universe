@@ -1,0 +1,230 @@
+.class-artwork-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 5;
+  background: #171519 var(--class-backdrop) center / cover no-repeat;
+}
+
+.class-artwork-stage::before {
+  content: '';
+  position: absolute;
+  inset: auto 29% 11%;
+  height: 8%;
+  background: radial-gradient(ellipse, #08080cd9, transparent 72%);
+}
+
+.class-artwork-idle {
+  position: absolute;
+  top: 86%;
+  width: 84%;
+  aspect-ratio: 1;
+  left: 46%;
+  transform: translate(-50%, -94%);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: class-artwork-idle steps(var(--idle-steps), end) infinite;
+}
+
+.class-artwork-stage[data-variant='compact'] .class-artwork-idle {
+  width: 94%;
+  top: 93%;
+}
+
+@keyframes class-artwork-idle {
+  from { background-position: 0 0; }
+  to { background-position: var(--idle-end) 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .class-artwork-idle { animation: none; }
+}
+
+.forge-inspection .forge-inspection-identity > :is(.class-artwork-portrait, .class-artwork-stage) {
+  width: min(100%, 230px);
+  border: 1px solid var(--forge-line);
+}
+.forge-inspection .forge-inspection-identity > .class-artwork-stage { height: auto; }
+.forge-inspection-identity { position: relative; }
+.forge-inspection.has-equipped-preview {
+  grid-template-columns: minmax(0, 1fr) clamp(58px, 8vw, 120px) minmax(0, 1.4fr);
+  column-gap: clamp(6px, 1.2vw, 18px);
+}
+.forge-equipped-slots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
+  gap: 5px;
+  margin-top: 10px;
+  align-content: center;
+  align-self: stretch;
+}
+.forge-equipped-slots .equipment-slot {
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  cursor: default;
+}
+.forge-equipped-slots .equipment-slot:hover { transform: none; }
+.forge-equipped-slots .slot-label {
+  max-width: 100%;
+  font-size: clamp(.42rem, .6vw, .55rem);
+  letter-spacing: 0;
+}
+.equipment-slot.equipped {
+  border-color: var(--equipment-color, #fbbf24) !important;
+  box-shadow: inset 0 0 10px var(--equipment-glow, #fbbf2444), 0 0 9px var(--equipment-glow, #fbbf2444) !important;
+}
+.equipment-slot.equipped .slot-placeholder-icon {
+  opacity: 1;
+  filter: brightness(1.22) drop-shadow(0 0 4px var(--equipment-glow, #fbbf2444));
+}
+.equipment-slot.equipped .slot-label { color: #fff1d5; }
+
+.forge-roster .forge-slot { grid-template-columns: clamp(58px, 6vw, 76px) minmax(0, 1fr); }
+.forge-roster .forge-pedestal { height: clamp(60px, 6.2vw, 78px); }
+.forge-roster .forge-slot-portrait { width: 88%; height: 94%; overflow: hidden; border-radius: 35% 35% 5px 5px; }
+
+:is(.forge-slot-portrait, .hero-paperdoll-avatar, .class-artwork-badge) > .class-artwork-portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-paperdoll-avatar, .class-artwork-badge { overflow: hidden; }
+.class-artwork-badge { width: 48px; height: 48px; flex: 0 0 48px; border-radius: 6px; border: 1px solid #b99356; }
+.class-rail-art { display: block; width: 100%; aspect-ratio: 1; overflow: hidden; }
+
+.forge-class-art { position: relative; }
+.class-artwork-stage.casting .class-artwork-idle { visibility: hidden; }
+.class-skill-sheet {
+  position: absolute;
+  top: 86%;
+  left: 46%;
+  width: 112%;
+  aspect-ratio: 1;
+  transform: translate(-50%, calc(-1 * var(--skill-ground, 85%)));
+  background-repeat: no-repeat;
+  background-size: 400% 300%;
+  image-rendering: pixelated;
+}
+
+.class-skill-illustration {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(ellipse, #161019aa, transparent 76%);
+  animation: class-skill-reveal .85s both;
+}
+.forge-class-art .class-skill-illustration img {
+  width: 42%;
+  height: auto;
+  aspect-ratio: 1;
+  box-shadow: 0 0 24px #f4bc7480;
+  border: 1px solid #e3b478;
+  border-radius: 8px;
+}
+@keyframes class-skill-reveal {
+  from { opacity: 0; transform: scale(.85); }
+  24%, 74% { opacity: 1; transform: scale(1); }
+  to { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .class-skill-illustration { animation-name: class-skill-hold; }
+  @keyframes class-skill-hold { to { opacity: 1; } }
+}
+
+#cover-class-attributes { margin-top: 12px; }
+.forge-stat-grid, .forge-character-details .forge-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 8px;
+}
+.forge-stat-grid > div, .forge-character-details .forge-stat-grid > div {
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid #72563c;
+  border-radius: 4px;
+  background: #171013;
+}
+.forge-stat-grid dt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #e4c79e;
+  font-size: .7rem;
+  line-height: 1.2;
+  overflow-wrap: normal;
+}
+.forge-stat-icon {
+  flex: 0 0 1.1em;
+  text-align: center;
+  color: #f0b96f;
+  font: 1em 'Segoe UI Symbol', sans-serif;
+}
+.forge-stat-grid dd, .forge-character-details .forge-stat-grid dd {
+  margin: 4px 0 0;
+  color: #fff2dc;
+  font-size: .84rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.forge-showcase-skills h4 { margin: 12px 0 6px; font: 700 .85rem var(--forge-title); }
+.forge-showcase-skill-layout {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(5px, 1vw, 10px);
+}
+.forge-showcase-skill-list { display: grid; gap: 4px; }
+.forge-showcase-skill-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 33px;
+  grid-auto-columns: clamp(23px, 2.2vw, 32px);
+  gap: 4px;
+  align-items: center;
+}
+.forge-showcase-skill-row > span { color: var(--forge-muted); font-size: .72rem; }
+#modal-auth-selection .forge-showcase-skill-row .forge-skill-icon { width: 100%; padding: 0; }
+#modal-auth-selection .forge-showcase-skill-row .forge-skill-icon[aria-pressed='true'] {
+  outline: 2px solid #f0c789;
+  outline-offset: -2px;
+}
+.forge-showcase-skill-details {
+  min-width: 0;
+  height: clamp(104px, 10vw, 140px);
+  box-sizing: border-box;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 7px;
+  border: 1px solid #72563c;
+  border-radius: 4px;
+  background: #171013;
+  font-size: .75rem;
+}
+.forge-showcase-skill-details meter { width: 100%; height: 8px; accent-color: #d5a66e; }
+.forge-inspection .forge-showcase-skill-row {
+  grid-template-columns: 32px;
+  grid-auto-columns: clamp(28px, 3.2vw, 44px);
+}
+.forge-inspection .forge-showcase-skill-details {
+  height: clamp(124px, 13vw, 190px);
+}
+.forge-showcase-skill-details small { display: block; color: #e6c68d; }
+#modal-auth-selection .forge-showcase-skill-details p { margin: 3px 0 0; font-size: inherit; }
+@media (max-width: 560px) {
+  .forge-stat-grid dt { flex-wrap: wrap; }
+  .forge-stat-grid > div { padding-inline: 4px; }
+}
+@media (max-width: 480px) {
+  .forge-inspection:has(.forge-abilities) .forge-abilities { grid-column: 1 / -1; }
+}

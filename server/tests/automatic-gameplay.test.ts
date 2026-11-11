@@ -159,13 +159,40 @@ test('Reconectar na fase 10 inicia o chefe sem precisar clicar ou mover', (t) =>
   assert.equal(loaded.currentStage, 10);
 });
 
-test('Magias manuais persistem; ataque básico e conjuração por clique continuam disponíveis', t => {
+test('Desligar o Auto cancela a perseguição e aguarda um clique para se mover', t => {
+  const f = setup(t);
+  f.target.position = createVector3(15, 0, 0);
+  f.target.spawnPosition = createVector3(15, 0, 0);
+  f.world.spatialGrid.updateEntity(f.target);
+  f.world.update(0.05);
+  assert.equal(f.player.isMoving, true);
+  f.world.handleUpdateSkillRotation(f.connection, { order: [1, 2, 3, 4], autoCastEnabled: false });
+  const stopped = { ...f.player.position };
+  for (let tick = 0; tick < 10; tick++) f.world.update(0.05);
+  assert.deepEqual(f.player.position, stopped);
+  assert.equal(f.player.targetId, null);
+  const destination = createVector3(-3, 0, 2);
+  new PacketHandler(f.world).handlePacket(f.connection, JSON.stringify({ op: Opcode.C2S_MOVE_INPUT,
+    data: { targetPosition: destination, inputSequence: 99 } }));
+  for (let tick = 0; tick < 80; tick++) f.world.update(0.05);
+  assert.deepEqual(f.player.position, destination);
+  assert.equal(f.player.isMoving, false);
+  f.world.handleUpdateSkillRotation(f.connection, { order: [1, 2, 3, 4], autoCastEnabled: true });
+  f.world.update(0.05);
+  assert.equal(f.player.isMoving, true);
+});
+
+test('Modo manual persiste e aceita ataque a um alvo escolhido e conjuração manual', t => {
   const f = setup(t);
   f.world.handleUpdateSkillRotation(f.connection, {order:[1,2,3,4], autoCastEnabled:false});
   f.player.attackTimer = 0;
   const hp = f.target.currentHp;
   f.world.update(0.05);
   assert.equal(f.casts().length, 0);
+  assert.equal(f.target.currentHp, hp);
+  new PacketHandler(f.world).handlePacket(f.connection, JSON.stringify({ op: Opcode.C2S_ATTACK_TARGET,
+    data: { targetEntityId: f.target.id } }));
+  f.world.update(0.05);
   assert.ok(f.target.currentHp < hp);
   assert.ok(f.packets.some(p => p.op === Opcode.S2C_COMBAT_EVENT && p.data.damageSource === 'BASIC_ATTACK'));
   assert.equal(f.world.castPlayerSkill(f.player, 1, f.target.id), true);

@@ -1,5 +1,8 @@
 import { CLASS_DEFINITIONS, CharacterClass, type CharacterSlotSummary, type S2CCharacterListPayload, type S2CCharacterActionErrorPayload } from '@magicforge/shared';
 import { renderHeroPreview } from './HeroPreview';
+import { renderClassArtwork } from './WarriorStage';
+import { renderHeroStats } from './HeroStats';
+import { renderClassSkillShowcase } from './ClassSkillShowcase';
 
 interface AuthTransport {
   isConnected(): boolean;
@@ -14,9 +17,6 @@ interface AuthTransport {
   delete(slot: number, name: string, confirmation: string): void;
 }
 
-function getClassPortrait(classType: CharacterClass): string {
-  return '/assets/portraits/' + classType + '.jpg';
-}
 
 /** The server owns every slot; creating a hero never implies entering the world. */
 export function setupAuthSelection(
@@ -187,11 +187,10 @@ export function setupAuthSelection(
       }
       const image = pedestal.querySelector('img') as HTMLImageElement;
       image.src = '/assets/ui/login/pedestal_runico_' + (slot && !slot.isEmpty ? 'ativo' : 'vazio') + '.png';
-      let hero = pedestal.querySelector<HTMLImageElement>('.forge-slot-portrait');
-      if (slot && !slot.isEmpty) {
-        if (!hero) { hero = document.createElement('img'); hero.className = 'forge-slot-portrait'; pedestal.append(hero); }
-        if (slot.classType) hero.src = getClassPortrait(slot.classType);
-        hero.alt = 'Retrato de ' + slot.name + ', ' + className(slot.classType);
+      let hero = pedestal.querySelector<HTMLElement>('.forge-slot-portrait');
+      if (slot && !slot.isEmpty && slot.classType) {
+        if (!hero) { hero = document.createElement('div'); hero.className = 'forge-slot-portrait'; pedestal.append(hero); }
+        renderClassArtwork(hero, slot.classType, 'portrait');
       } else hero?.remove();
       (pedestal.querySelector('span') as HTMLElement).hidden = Boolean(slot && !slot.isEmpty);
       const button = card.querySelector('button')!;
@@ -543,11 +542,17 @@ export function setupAuthSelection(
   };
 
   const classButtons = root.querySelectorAll<HTMLButtonElement>('[data-class-id]');
-  const classArt = root.querySelector<HTMLImageElement>('#cover-hero-sprite-img');
+  const classArt = root.querySelector<HTMLElement>('#cover-class-art');
+  if (classArt) renderClassArtwork(classArt, CharacterClass.GUERREIRO);
+  const warriorThumbnail = root.querySelector<HTMLElement>('.class-rail-art');
+  if (warriorThumbnail) renderClassArtwork(warriorThumbnail, CharacterClass.GUERREIRO, 'portrait');
   const classTitle = root.querySelector('#cover-class-title');
   const classRole = root.querySelector('#cover-class-badge');
   const classDescription = root.querySelector('#cover-class-desc');
-  const classAttributes = root.querySelectorAll<HTMLElement>('[data-attribute]');
+  const classAttributes = root.querySelector<HTMLElement>('#cover-class-attributes');
+  const classSkills = root.querySelector<HTMLElement>('#cover-class-skills');
+  if (classAttributes) renderHeroStats(classAttributes, CLASS_DEFINITIONS.GUERREIRO.baseStats);
+  if (classArt && classSkills) renderClassSkillShowcase(classSkills, classArt, CharacterClass.GUERREIRO);
 
   for (const button of classButtons) {
     button.addEventListener('click', () => {
@@ -559,14 +564,12 @@ export function setupAuthSelection(
       for (const option of classButtons) {
         option.setAttribute('aria-pressed', String(option === button));
       }
-      classArt.src = getClassPortrait(classId);
+      renderClassArtwork(classArt, classId);
       classTitle.textContent = definition.displayName;
       classRole.textContent = (definition.isRanged ? 'À distância' : 'Corpo a corpo') + ' · ' + details.role;
       classDescription.textContent = details.description;
-      for (const attribute of classAttributes) {
-        const key = attribute.dataset.attribute as keyof typeof definition.baseStats;
-        attribute.textContent = String(definition.baseStats[key]);
-      }
+      if (classAttributes) renderHeroStats(classAttributes, definition.baseStats);
+      if (classSkills) renderClassSkillShowcase(classSkills, classArt, classId);
     });
   }
 

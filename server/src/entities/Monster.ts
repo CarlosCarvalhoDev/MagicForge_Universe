@@ -7,7 +7,7 @@ import {
   createVector3,
   EntitySnapshotState,
 } from '@magicforge/shared';
-import { Entity } from './Entity';
+import { Entity, type TakeDamageResult } from './Entity';
 
 export enum MonsterState {
   IDLE = 'IDLE',
@@ -38,6 +38,8 @@ export class Monster extends Entity {
   public respawnDelaySec: number = 6.5; // Respawn mais lento e natural
   public autoRespawns: boolean = true;
   public isBoss: boolean = false;
+  public devTarget = false;
+  public trainingDummy = false;
   public monsterType: string = 'melee';
   private wanderTimer: number = 0;
   private wanderIntervalSec: number = 4.0;
@@ -147,17 +149,22 @@ export class Monster extends Entity {
     }
   }
 
-  public rollLoot(): Array<{ itemId: string; quantity: number }> {
+  public rollLoot(chanceMultiplier: (itemId: string) => number = () => 1): Array<{ itemId: string; quantity: number }> {
     const drops: Array<{ itemId: string; quantity: number }> = [];
 
     for (const entry of this.lootTable) {
-      if (Math.random() <= entry.dropChance) {
+      if (Math.random() <= Math.min(1, entry.dropChance * chanceMultiplier(entry.itemId))) {
         const qty = Math.floor(Math.random() * (entry.maxQty - entry.minQty + 1)) + entry.minQty;
         drops.push({ itemId: entry.itemId, quantity: qty });
       }
     }
 
     return drops;
+  }
+
+  public override takeDamage(damage: number, source?: Entity, reflected = false): TakeDamageResult {
+    if (this.trainingDummy) return { effectiveDamage: Math.max(0, damage), absorbed: 0, reflected: 0, killed: false };
+    return super.takeDamage(damage, source, reflected);
   }
 
   public override update(deltaTimeSec: number): void {

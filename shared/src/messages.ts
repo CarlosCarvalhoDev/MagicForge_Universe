@@ -23,6 +23,7 @@ export interface C2SLoginPayload {
 }
 
 export interface S2CLoginSuccessPayload {
+  isAdmin?: boolean;
   playerId: string;
   characterName: string;
   classType: CharacterClass;
@@ -39,6 +40,13 @@ export interface S2CLoginSuccessPayload {
   serverTickRate: number; // e.g. 20
   tickIntervalMs: number; // e.g. 50
 }
+
+export type DevToggle = 'pauseRespawns' | 'disableDrops' | 'doubleLegendary' | 'infiniteVitals';
+export type DevCommand =
+  | { action: 'state' | 'boss' | 'clearTargets' | 'reset' }
+  | { action: 'toggle'; key: DevToggle; enabled: boolean }
+  | { action: 'dummy'; x: number; z: number };
+export type DevState = Record<DevToggle, boolean> & { message?: string };
 
 export interface S2CLoginFailurePayload {
   reason: string;

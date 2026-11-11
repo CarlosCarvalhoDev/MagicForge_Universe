@@ -46,7 +46,7 @@ export class OfflineRewardModal {
     dialog.innerHTML = `
       <div class="offline-reward-container">
         <header class="offline-header">
-          <div class="offline-icon-crest">⏳</div>
+          <div class="offline-icon-crest" aria-hidden="true">⌛</div>
           <h2 class="offline-title">Baú do Tempo</h2>
           <span class="offline-subtitle">Progresso e Recompensas AFK</span>
         </header>

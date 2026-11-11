@@ -132,6 +132,10 @@ export enum Opcode {
   S2C_EQUIPMENT_ADVICE = 0xC9,
   C2S_FUSE_EQUIPMENT = 0xCA,
   S2C_FUSION_RESULT = 0xCB,
+  C2S_AUTO_EQUIP = 0xCC,
+  S2C_AUTO_EQUIP_RESULT = 0xCD,
+  C2S_DEV_CONTROL = 0xCE,
+  S2C_DEV_STATE = 0xCF,
 
   // --- Heartbeat & Quality of Service (0xF0 - 0xFF) ---
   C2S_PING = 0xF0,

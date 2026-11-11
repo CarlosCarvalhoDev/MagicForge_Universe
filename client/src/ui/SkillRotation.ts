@@ -46,7 +46,13 @@ export function setupSkillRotation(transport: {
     autoCast.checked = draftAutoCast;
     autoCast.disabled = quick.disabled = !loaded || !transport.isReady() || pending;
     quickLabel.textContent = confirmedAutoCast ? 'AUTO ON' : 'AUTO OFF';
-    quick.title = confirmedAutoCast ? 'Desativar conjuração automática [A]' : 'Ativar conjuração automática [A]';
+    quick.title = confirmedAutoCast ? 'Desativar combate e movimento automáticos [A]' : 'Ativar combate e movimento automáticos [A]';
+    const basicAttack = document.getElementById('btn-primary-attack');
+    if (basicAttack) {
+      basicAttack.title = confirmedAutoCast ? 'Ataque básico automático' : 'Atacar o monstro selecionado';
+      const key = basicAttack.querySelector('.skill-square-key');
+      if (key) key.textContent = confirmedAutoCast ? 'AUTO' : 'ALVO';
+    }
     combatContainer?.setAttribute('data-combat-mode', confirmedAutoCast ? 'auto' : 'manual');
     if (autoView) autoView.style.display = 'flex';
     if (manualView) manualView.style.display = 'flex';

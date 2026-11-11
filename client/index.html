@@ -3747,6 +3747,7 @@
     </style>
   </head>
   <body>
+    <div id="hud-header">
     <!-- 1. Top-Left Hero Status Card (Estilo Mobile Ragnarok / Stickman Go) -->
     <div id="hero-status-card" class="glass-panel" data-hero-class="GUERREIRO">
       <div class="hero-avatar-box" id="hud-avatar-btn" title="Abrir Ficha de Personagem & Equipamentos [C]">
@@ -3811,10 +3812,10 @@
     <div id="center-notification-queue">
       <!-- Active Boss Challenge Banner & Countdown -->
       <div id="boss-timer-banner">
-        <span style="font-size: 1.2rem;">💀</span>
-        <div style="display: flex; flex-direction: column;">
-          <span id="boss-banner-name" style="font-size: 0.8rem; font-weight: 900; color: #fecaca; letter-spacing: 0.05em;">CHEFÃO DA FASE EM COMBATE</span>
-          <span id="boss-banner-timer" style="font-size: 0.75rem; font-weight: 800; color: #fef08a;">TEMPO RESTANTE: 60s</span>
+        <img src="/assets/ui/icons/icon-attack-crest.svg" alt="" width="22" height="22">
+        <div class="boss-timer-copy">
+          <strong id="boss-banner-name">Chefe da fase</strong>
+          <span id="boss-banner-timer">Tempo restante: 60s</span>
         </div>
       </div>
 
@@ -3834,6 +3835,11 @@
 
       <!-- Floating Toasts Container (PartyHUD.ts appends .party-toast here) -->
       <div id="party-toast-container"></div>
+      <div id="levelup-banner" class="levelup-banner" role="status">
+        <div class="levelup-title">✦ NÍVEL SUPERADO! ✦</div>
+        <div class="levelup-subtitle" id="levelup-subtitle">Você alcançou o Nível 2!</div>
+        <div class="levelup-stats" id="levelup-stats">+Atributos D&D • HP & Recurso Totalmente Restaurados!</div>
+      </div>
     </div>
 
     <!-- 3. Top-Right Location, Session Navigation & Luxury Runic Status Bar -->
@@ -3888,6 +3894,7 @@
       </div>
     </div>
 
+    </div>
     <!-- Moldura Rúnica Esculpida da Tela do Jogo (Non-interactive RPG Viewport Frame) -->
     <div id="runic-viewport-frame" aria-hidden="true">
       <span class="viewport-rune-corner tl"></span>
@@ -3924,7 +3931,7 @@
         </select>
 
         <div id="class-preview-card" style="display: flex; align-items: center; gap: 10px; margin-top: 6px; padding: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 8px;">
-          <img id="class-portrait-img" src="/assets/portraits/GUERREIRO.jpg" alt="Retrato da Classe" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1.5px solid #fbbf24;" />
+          <div id="class-portrait-img" class="class-artwork-badge"></div>
           <div style="display: flex; flex-direction: column; gap: 2px;">
             <span id="class-preview-title" style="font-size: 0.8rem; font-weight: 700; color: #fbbf24;">Guerreiro (Forjado)</span>
             <span id="class-preview-stats" style="font-size: 0.7rem; color: #cbd5e1;">HP: 940 • Dano: 89 • CP: 1150</span>
@@ -4080,7 +4087,7 @@
     <!-- Barra de habilidades e controle de conjuração -->
     <div id="mobile-combat-arc-container" class="combat-action-container" data-combat-mode="auto">
       <div id="combat-auto-view" class="combat-auto-view">
-        <button id="btn-combat-auto-active" class="combat-auto-big-btn" type="button" title="Magias automáticas ativas [A]. Movimento e ataque básico permanecem automáticos." aria-label="Combate Automático Ativo">
+        <button id="btn-combat-auto-active" class="combat-auto-big-btn" type="button" title="Alternar combate e movimento automáticos [A]" aria-label="Alternar combate automático">
           <span class="auto-pulse-aura" aria-hidden="true"></span>
           <span class="auto-runic-orbit" aria-hidden="true"></span>
           <img class="combat-auto-icon" src="/assets/ui/icons/icon-attack-crest.svg" alt="" width="22" height="22" />
@@ -4177,13 +4184,6 @@
       </div>
     </div>
 
-    <!-- Level Up Celebration Banner Popup -->
-    <div id="levelup-banner" class="levelup-banner">
-      <div class="levelup-title">✦ NÍVEL SUPERADO! ✦</div>
-      <div class="levelup-subtitle" id="levelup-subtitle">Você alcançou o Nível 2!</div>
-      <div class="levelup-stats" id="levelup-stats">+Atributos D&D • HP & Recurso Totalmente Restaurados!</div>
-    </div>
-
     <!-- Skill Book Modal (Grimório de Habilidades & Magias D&D 5e) -->
     <div id="skillbook-modal" class="modal-backdrop" style="display: none;">
       <div class="glass-panel modal-content grimorio-modal-content">
@@ -4220,8 +4220,8 @@
         <section id="skill-rotation-panel" role="tabpanel" hidden>
           <p>As quatro habilidades selecionadas mantêm suas categorias. Organize a conjuração da esquerda para a direita.</p>
           <p>O ciclo pula habilidades em recarga, bloqueadas ou sem recurso e continua pela próxima. Você ainda pode tocar numa habilidade para conjurá-la.</p>
-          <label class="auto-cast-setting"><input id="chk-auto-cast-enabled" type="checkbox" checked disabled> Conjurar magias automaticamente</label>
-          <p>Ao desativar, movimento, ataque básico e avanço continuam automáticos. Toque nas habilidades para conjurar quando estiverem prontas.</p>
+          <label class="auto-cast-setting"><input id="chk-auto-cast-enabled" type="checkbox" checked disabled> Combate e movimento automáticos</label>
+          <p>No modo manual, clique ou toque no mapa para andar. Selecione um monstro e use Atacar ou uma habilidade disponível.</p>
           <div id="skill-rotation-editor"></div>
           <button id="btn-save-skill-rotation" type="button" class="btn-action-primary" disabled>Salvar ciclo</button>
           <p id="skill-rotation-status" role="status" aria-live="polite"></p>
@@ -4291,19 +4291,19 @@
                 <!-- Head -->
                 <div class="equipment-slot" id="equip-slot-head" data-slot="head" title="Elmo / Cabeça">
                   <div class="slot-refine-badge" id="refine-badge-head">+0</div>
-                  <span class="slot-placeholder-icon">🧢</span>
+                  <img class="slot-placeholder-icon" src="/assets/ui/slots/slot_helmet.png" alt="">
                   <span class="slot-label">Elmo</span>
                 </div>
                 <!-- Chest -->
                 <div class="equipment-slot" id="equip-slot-chest" data-slot="chest" title="Peitoral / Armadura">
                   <div class="slot-refine-badge" id="refine-badge-chest">+0</div>
-                  <span class="slot-placeholder-icon">🦺</span>
+                  <img class="slot-placeholder-icon" src="/assets/ui/slots/slot_armor.png" alt="">
                   <span class="slot-label">Armadura</span>
                 </div>
                 <!-- Legs -->
                 <div class="equipment-slot" id="equip-slot-legs" data-slot="legs" title="Botas / Calça">
                   <div class="slot-refine-badge" id="refine-badge-legs">+0</div>
-                  <span class="slot-placeholder-icon">👖</span>
+                  <img class="slot-placeholder-icon" src="/assets/ui/slots/slot_boots.png" alt="">
                   <span class="slot-label">Botas</span>
                 </div>
               </div>
@@ -4311,7 +4311,7 @@
               <!-- Center Pedestal & Avatar -->
               <div class="hero-center-pedestal">
                 <div class="pedestal-character-wrap">
-                  <img id="paperdoll-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Herói" class="hero-paperdoll-avatar" />
+                  <div id="paperdoll-portrait" class="hero-paperdoll-avatar"></div>
                   <div class="pedestal-rock-base"></div>
                 </div>
                 <div class="hero-pedestal-identity">
@@ -4325,24 +4325,28 @@
                 <!-- Weapon -->
                 <div class="equipment-slot" id="equip-slot-main_hand" data-slot="main_hand" title="Arma Principal">
                   <div class="slot-refine-badge" id="refine-badge-main_hand">+0</div>
-                  <span class="slot-placeholder-icon">⚔️</span>
+                  <img class="slot-placeholder-icon" src="/assets/ui/slots/slot_weapon.png" alt="">
                   <span class="slot-label">Arma</span>
                 </div>
                 <!-- Shield / Offhand -->
                 <div class="equipment-slot" id="equip-slot-off_hand" data-slot="off_hand" title="Escudo / Secundária">
                   <div class="slot-refine-badge" id="refine-badge-off_hand">+0</div>
-                  <span class="slot-placeholder-icon">🛡️</span>
+                  <img class="slot-placeholder-icon" src="/assets/ui/slots/slot_shield.png" alt="">
                   <span class="slot-label">Escudo</span>
                 </div>
                 <!-- Relic -->
                 <div class="equipment-slot" id="equip-slot-relic" data-slot="relic" title="Relíquia / Anel">
                   <div class="slot-refine-badge" id="refine-badge-relic">+0</div>
-                  <span class="slot-placeholder-icon">💍</span>
+                  <img class="slot-placeholder-icon" src="/assets/ui/slots/slot_relic.png" alt="">
                   <span class="slot-label">Relíquia</span>
                 </div>
               </div>
             </div>
 
+            <div class="paperdoll-auto-equip">
+              <button type="button" class="btn-action-primary" id="btn-auto-equip">Equipar automaticamente</button>
+              <p id="auto-equip-status" role="status"></p>
+            </div>
             <!-- Left Pane Bottom: Atributos D&D e Estatísticas -->
             <div class="hero-stats-accordion">
               <div class="dnd-stats-mini-grid">
@@ -4721,27 +4725,22 @@
             <h2 id="forge-codex-title">Classes da Forja</h2>
             <p>Explore as sete classes e seus atributos iniciais.</p>
           </header>
-          <div class="class-stage-display" aria-live="polite">
-            <div class="forge-class-art">
-              <img id="cover-hero-sprite-img" src="/assets/portraits/GUERREIRO.jpg" alt="" width="320" height="400" fetchpriority="high">
-            </div>
+          <div class="class-stage-display">
+            <div class="forge-class-art" id="cover-class-art"></div>
             <div class="stage-info-card">
               <p id="cover-class-badge" class="forge-eyebrow">Corpo a corpo · Defesa</p>
               <h3 id="cover-class-title">Guerreiro</h3>
               <p id="cover-class-desc">Usa armadura pesada e contra-ataques para sustentar a linha de frente.</p>
-              <dl class="forge-class-attributes" aria-label="Atributos iniciais">
-                <div><dt><abbr title="Força">FOR</abbr></dt><dd data-attribute="forca">15</dd></div>
-                <div><dt><abbr title="Destreza">DES</abbr></dt><dd data-attribute="destreza">10</dd></div>
-                <div><dt><abbr title="Constituição">CON</abbr></dt><dd data-attribute="constituicao">14</dd></div>
-                <div><dt><abbr title="Inteligência">INT</abbr></dt><dd data-attribute="inteligencia">8</dd></div>
-                <div><dt><abbr title="Sabedoria">SAB</abbr></dt><dd data-attribute="sabedoria">10</dd></div>
-                <div><dt><abbr title="Carisma">CAR</abbr></dt><dd data-attribute="carisma">13</dd></div>
-              </dl>
+              <div id="cover-class-attributes"></div>
+              <section class="forge-showcase-skills" aria-labelledby="cover-skills-title">
+                <h4 id="cover-skills-title">Habilidades da classe</h4>
+                <div id="cover-class-skills"></div>
+              </section>
             </div>
           </div>
           <div class="classes-selector-rail" role="group" aria-label="Classe em destaque">
             <button type="button" class="class-rail-btn" data-class-id="GUERREIRO" aria-pressed="true">
-              <img src="/assets/portraits/GUERREIRO.jpg" alt="" width="80" height="80">
+              <span class="class-rail-art" aria-hidden="true"></span>
               <span>Guerreiro</span>
             </button>
             <button type="button" class="class-rail-btn" data-class-id="BARBARO" aria-pressed="false">

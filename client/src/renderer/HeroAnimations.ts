@@ -1,5 +1,5 @@
 export type HeroAction = 'idle' | 'walk' | 'attack' | 'hit' | 'death';
-export type HeroSheetSpec = { file: string; cols: number; rows: number; frames: number; fps: number };
+export type HeroSheetSpec = { file: string; cols: number; rows: number; frames: number; fps: number; directional?: boolean };
 export type HeroSheetSet = Record<HeroAction, HeroSheetSpec>;
 
 function sheets(className: string, cast = false, walkFrames = 6, walkFps = 9): HeroSheetSet {
@@ -14,8 +14,70 @@ function sheets(className: string, cast = false, walkFrames = 6, walkFps = 9): H
 }
 
 /** Same source of timing and slicing for gameplay and the offline review page. */
+const warriorV5 = '/assets/isometric/review/guerreiro_v5';
+const warriorDirectional = (action: HeroAction, fps: number): HeroSheetSpec => ({
+  file: `${warriorV5}/guerreiro_${action}_sheet.png`, cols: 4, rows: 8, frames: 4, fps, directional: true,
+});
+
+export const WARRIOR_DIRECTIONAL_SHEETS = {
+  idle: warriorDirectional('idle', 5),
+  walk: warriorDirectional('walk', 9),
+  attack: warriorDirectional('attack', 8),
+  hit: warriorDirectional('hit', 12),
+  death: warriorDirectional('death', 7),
+};
+
+/** Sprite rows run clockwise from south toward west. Positive yaw turns toward east. */
+export function warriorDirectionRow(yaw: number): number {
+  return ((Math.round(-yaw / 45) % 8) + 8) % 8;
+}
+
+export const WARRIOR_CAST_SHEETS = [1, 2, 3, 4].map(slot =>
+  `${warriorV5}/guerreiro_skills_slot_${slot}_sheet.png`);
+
+// Ground baselines in the authored 362px cells. Spell trails can extend below them.
+const warriorCastGround = [[303, 301, 304], [335, 324, 316], [294, 289, 294], [328, 341, 315]];
+
+export function warriorCastArt(skillId: string) {
+  const match = /^guerreiro_(truque|nv1|nv2|nv3)_([123])$/.exec(skillId);
+  if (!match) return;
+  const slot = ['truque', 'nv1', 'nv2', 'nv3'].indexOf(match[1]);
+  const row = Number(match[2]) - 1;
+  return { file: WARRIOR_CAST_SHEETS[slot], row, ground: warriorCastGround[slot][row] / 362 };
+}
+
+export class WarriorCastClock {
+  private readonly casts = new Map<string, NonNullable<ReturnType<typeof warriorCastArt>> & { startedAt: number }>();
+
+  trigger(id: string, skillId: string, now: number): boolean {
+    const art = warriorCastArt(skillId);
+    if (!art) return false;
+    this.casts.set(id, { ...art, startedAt: now });
+    return true;
+  }
+
+  sample(id: string, now: number) {
+    const cast = this.casts.get(id);
+    if (!cast) return;
+    const frame = Math.floor(Math.max(0, now - cast.startedAt) / 125);
+    if (frame >= 4) {
+      this.casts.delete(id);
+      return;
+    }
+    const { file, row, ground } = cast;
+    return { file, row, ground, frame };
+  }
+
+  clear(id: string): void { this.casts.delete(id); }
+  reset(): void { this.casts.clear(); }
+  retain(ids: ReadonlySet<string>): void {
+    for (const id of this.casts.keys()) if (!ids.has(id)) this.casts.delete(id);
+  }
+}
+
 export const HERO_SHEETS: Record<string, HeroSheetSet> = {
-  GUERREIRO: sheets('guerreiro'), CLERIGO: sheets('clerigo', true, 8, 12), BARBARO: sheets('barbaro'),
+  GUERREIRO: WARRIOR_DIRECTIONAL_SHEETS,
+  CLERIGO: sheets('clerigo', true, 8, 12), BARBARO: sheets('barbaro'),
   ARQUEIRO: sheets('arqueiro'),
 };
 

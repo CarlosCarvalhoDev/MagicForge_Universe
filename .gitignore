@@ -76,6 +76,7 @@ $RECYCLE.BIN/
 
 # Scripts locais de inicializacao
 *.bat
+!iniciar-localhost.bat
 
 # Scratch & Scraping Cache
 scratch/
