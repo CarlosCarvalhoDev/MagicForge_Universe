@@ -10,6 +10,8 @@ test('Sugestão só inspeciona; mudança de equipamento invalida resposta, ouro/
     click() { if (!this.disabled) this.listeners.click?.(); }
     append(...items: Element[]) { this.children.push(...items); }
     appendChild(item: Element) { this.children.push(item); }
+    prepend(...items: Element[]) { this.children.unshift(...items); }
+    setAttribute(_name: string, _value: string) {}
     replaceChildren() { this.children = []; }
   }
   const nodes = new Map<string, Element>();

@@ -13,7 +13,15 @@ export function finitePosition(position: FxPosition | undefined): position is Fx
   return !!position && Number.isFinite(position.x) && Number.isFinite(position.y) && Number.isFinite(position.z);
 }
 
-export function planMageCometPulseFx(event:{event:string;status:{type:string;areaCenter?:FxPosition;radius?:number}}):FxRequest[]{
+export function planMageCometPulseFx(event:{event:string;tickDamage?:number;tickHeal?:number;status:{type:string;areaCenter?:FxPosition;radius?:number;targetEntityId?:string}}):FxRequest[]{
+  if(event.event==='TICK'&&event.status.type==='HEX_REGEN'&&(event.tickHeal??0)>0&&finitePosition(event.status.areaCenter))return [{kind:'heal',position:event.status.areaCenter,followId:event.status.targetEntityId}];
+  if(event.event==='TICK'&&['HADAR_HUNGER','DEMON_PRESENCE'].includes(event.status.type)&&(event.tickDamage??0)>0&&finitePosition(event.status.areaCenter))return [{kind:'whirlwind',position:event.status.areaCenter,radius:event.status.radius}];
+  if(event.event==='TICK'&&event.status.type==='ZEN_DOME'&&finitePosition(event.status.areaCenter))return [
+    ...((event.tickDamage??0)>0?[{kind:'whirlwind' as const,position:event.status.areaCenter,radius:event.status.radius??6}]:[]),
+    ...((event.tickHeal??0)>0?[{kind:'heal' as const,position:event.status.areaCenter,followId:event.status.targetEntityId}]:[]),
+  ];
+  if(event.event==='TICK'&&['ARROW_VOLLEY','STORM_BARRAGE','POISON','CHI_PALMS','FLURRY','DARK_PLAGUE'].includes(event.status.type)&&finitePosition(event.status.areaCenter)&&(event.tickDamage??0)>0)return [{kind:'impact',position:event.status.areaCenter}];
+  if(event.event==='TICK'&&event.status.type==='ASTRAL_GUARDIAN'&&finitePosition(event.status.areaCenter)&&(event.tickDamage??0)>0)return [{kind:'whirlwind',position:event.status.areaCenter,radius:event.status.radius??6}];
   if(event.event!=='TICK'||event.status.type!=='COMET_RAIN'||!finitePosition(event.status.areaCenter))return [];
   return [{kind:'impact',position:event.status.areaCenter},{kind:'whirlwind',position:event.status.areaCenter,radius:event.status.radius??6.5}];
 }
@@ -45,6 +53,15 @@ export type WarriorCastFx = {
 export function planWarriorCastFx(event: WarriorCastFx, entities: readonly FxEntity[], radius?: number): FxRequest[] {
   if (!event.affectedEntityIds.length) return [];
   const caster = entities.find(e => e.id === event.casterId);
+  if(['bruxo_nv1_1','bruxo_nv2_1','bruxo_nv3_2'].includes(event.skillId))return [];
+  if(event.skillId==='bruxo_nv1_2')return caster?[{kind:'shield',position:caster.position,followId:caster.id}]:[];
+  if(event.skillId==='bruxo_nv2_2')return [
+    ...(event.targetResults??[]).filter(r=>r.effectiveDamage>0&&finitePosition(r.impactPosition)).map(r=>({kind:'impact' as const,position:r.impactPosition})),
+    ...(caster&&event.targetResults?.some(r=>r.effectiveHeal>0)?[{kind:'heal' as const,position:caster.position,followId:caster.id}]:[]),
+  ];
+  if(event.skillId==='bruxo_nv2_3'&&finitePosition(event.originPosition))return [{kind:'whirlwind',position:event.originPosition,radius:event.radius??3.5}];
+  if(['bruxo_nv3_1','bruxo_nv3_3'].includes(event.skillId)&&finitePosition(event.targetPosition))return [{kind:'judgment',position:event.targetPosition,radius:event.radius}];
+  if(event.skillId.startsWith('bruxo_'))return (event.targetResults??[]).filter(r=>r.effectiveDamage>0&&finitePosition(r.impactPosition)).map(r=>({kind:'impact' as const,position:r.impactPosition}));
   if(event.skillId==='barbaro_truque_3'){
     const effects:FxRequest[]=[];const hit=event.targetResults?.find(result=>result.effectiveDamage>0);
     if(hit)effects.push({kind:'slash',position:hit.impactPosition,yaw:event.headingYaw});
@@ -52,7 +69,15 @@ export function planWarriorCastFx(event: WarriorCastFx, entities: readonly FxEnt
     return effects;
   }
   if(event.skillId==='barbaro_nv2_2')return caster?[{kind:'shield',position:caster.position,followId:caster.id},...(event.targetResults?.some(result=>result.effectiveHeal>0)?[{kind:'heal' as const,position:caster.position,followId:caster.id}]:[])]:[];
-  if(event.skillId==='mago_nv3_2')return []; // Actual impacts arrive as authoritative status ticks.
+  if(['mago_nv3_2','arqueiro_nv1_1','arqueiro_nv1_2','arqueiro_nv2_3','arqueiro_nv3_2','arqueiro_nv3_3','monge_truque_1','monge_nv1_1','monge_nv1_2','monge_nv3_3'].includes(event.skillId))return []; // Periodic impacts arrive as authoritative status ticks; buffs have no damage impact.
+  if(event.skillId==='monge_nv1_3')return caster&&event.targetResults?.some(result=>result.effectiveHeal>0)?[{kind:'heal',position:caster.position,followId:caster.id}]:[];
+  if(event.skillId==='monge_nv2_2'&&finitePosition(event.originPosition))return [{kind:'cone',position:event.originPosition,yaw:event.headingYaw,coneRange:event.coneRange??5,coneAngleDeg:event.coneAngleDeg??60}];
+  if(event.skillId==='monge_nv3_2'&&finitePosition(event.targetPosition))return [{kind:'judgment',position:event.targetPosition,radius:event.radius??8}];
+  if(event.skillId.startsWith('monge_'))return (event.targetResults??[]).filter(result=>result.effectiveDamage>0&&finitePosition(result.impactPosition)).map(result=>({kind:'impact' as const,position:result.impactPosition}));
+  if(event.skillId==='arqueiro_nv2_2'&&finitePosition(event.originPosition))return [{kind:'line',position:event.originPosition,yaw:event.headingYaw,lineLength:event.lineLength,lineWidth:event.lineWidth}];
+  if(event.skillId==='arqueiro_nv3_1'&&finitePosition(event.targetPosition))return [{kind:'judgment',position:event.targetPosition,radius:event.radius??8}];
+  if(event.skillId==='arqueiro_nv2_1'&&finitePosition(event.targetPosition))return [{kind:'whirlwind',position:event.targetPosition,radius:event.radius??5.5}];
+  if(event.skillId.startsWith('arqueiro_'))return (event.targetResults??[]).filter(result=>result.effectiveDamage>0&&finitePosition(result.impactPosition)).map(result=>({kind:'impact' as const,position:result.impactPosition}));
   if(['mago_nv3_1','mago_nv3_3'].includes(event.skillId)&&finitePosition(event.targetPosition))return [{kind:'impact',position:event.targetPosition},{kind:'whirlwind',position:event.targetPosition,radius:event.radius}];
   if(event.skillId==='mago_nv2_3')return caster?[{kind:'avatar',position:caster.position,followId:caster.id}]:[];
   if(event.skillId==='mago_nv2_1'&&finitePosition(event.targetPosition))return [{kind:'whirlwind',position:event.targetPosition,radius:event.radius??5.5}];

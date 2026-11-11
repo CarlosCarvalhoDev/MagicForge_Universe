@@ -55,13 +55,13 @@ test('Fúria aplica dano +25%, resistência 15% e expira sem permanência ou emp
   assert.equal(f.player.BaseDamage,base);
 });
 
-test('Efeito pessoal não implementado não consome recurso nem cooldown',t=>{
+test('Agathys pessoal agora está disponível; guarda ainda bloqueia buffs desconhecidos',t=>{
   const f=setup(t,CharacterClass.BRUXO,25,1);f.player.setEquippedSkill(2,'bruxo_nv1_2');
-  assert.equal(isSkillEffectAvailable(SKILLS_DATABASE.bruxo_nv1_2),false);
+  assert.equal(isSkillEffectAvailable(SKILLS_DATABASE.bruxo_nv1_2),true);
+  assert.equal(isSkillEffectAvailable({...SKILLS_DATABASE.bruxo_nv1_2,skillId:'unimplemented_self_buff_fixture'}),false);
   const resource=f.player.currentResource;
-  assert.equal(f.world.castPlayerSkill(f.player,2),false);
-  assert.equal(f.player.currentResource,resource);assert.equal(f.player.getSkillCooldown(2),0);
-  assert.equal(f.errors().at(-1)!.data.reasonCode,'UNIMPLEMENTED_EFFECT');
+  assert.equal(f.world.castPlayerSkill(f.player,2),true);
+  assert.equal(f.player.currentResource,resource-22);assert.equal(f.player.getSkillCooldown(2),8.5);assert.equal(f.player.hasStatus('SHIELD'),true);
   f.packets.length=0;for(let n=0;n<20;n++)f.world.update(.05);assert.equal(f.errors().length,0);
 });
 

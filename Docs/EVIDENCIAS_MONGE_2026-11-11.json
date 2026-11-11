@@ -1,0 +1,88 @@
+{
+  "generatedAt": "2026-11-11T14:13:20.738Z",
+  "nodeVersion": "v24.15.0",
+  "branch": "master",
+  "scope": "Monk effects in authoritative server and Web presentation; no live database changes, images, layout replacement or Unity port.",
+  "benchmark": {
+    "scenarioCount": 474,
+    "assumptions": "474 solo in-memory fixed-level fixtures, two seeds: level 1/world 1, 10/worlds 1-2, 25/worlds 2-3, 50/worlds 3-4; all unlocked loadouts. Starter equipment, supplied gold/stocks, no purchases. Not farm-earned progression or final balance. Existing high-level DEX critical/dodge formulas remain; current monsters have basic attacks, not an NPC spellcasting system.",
+    "summary": [
+      {
+        "level": 1,
+        "scenarios": 6,
+        "victories": 2,
+        "deaths": 4,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 10,
+        "scenarios": 36,
+        "victories": 35,
+        "deaths": 1,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 25,
+        "scenarios": 108,
+        "victories": 108,
+        "deaths": 0,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 50,
+        "scenarios": 324,
+        "victories": 324,
+        "deaths": 0,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      }
+    ],
+    "sourceHashes": {
+      "src/game/World.ts": "8e6907624e63042de73c148a48e0c3bb7dd953c35df6a82611b52feb85291e71",
+      "src/entities/Entity.ts": "82f9eda2d950636b978785ddd6878cbcb3f733b3d7e20173b1f926d90f8275de",
+      "src/entities/Monster.ts": "6e86c2ec5ee3202d55b6d6b5134559fbc0569a33eb094aa3608d323a64fcac42",
+      "src/entities/Player.ts": "b29070499bdeefe4689b968baec0f24234b4a1c8af0a1510a14a99644f146511",
+      "tools/BossInvestmentSimulation.ts": "4cdf8cd8c88a91228616a692830add7c3cdd1ef985e08ab75ec0baf34dfe0e9c",
+      "tools/benchmark-monk.ts": "c147614f5516aa6955d4d724cc81e0dfbc08d8b34b6de9d206d30034b08c2bea",
+      "../shared/src/monk-effects.ts": "d0887bf1a977a12473bddc020802a295267aa37f287ed0494349d4b3cb0ba4ad",
+      "../shared/src/skills.ts": "6f3bf238588aea3bbe92ed796fdc7dc50bfbc9041e80282e954698aabf735a4d",
+      "../shared/src/skill-targeting.ts": "8d00de036d87180461aaf1423c155a6f712147a611f2d4d66d06090fa8442f7d"
+    },
+    "rawReport": "scratch/runtime/monk-loadouts-2026-11-11.json"
+  },
+  "additionalHashes": {
+    "server/tests/monk-effects.test.ts": "831555ede0b1a459b86ca8db427e9d89a1110012f52817d29db6f507da443828",
+    "client/tests/monk-effects-vfx.test.mjs": "e02842f353ca27e4d0ba46b4f93de29a3ef9f3886191a383484ec16ff120062a",
+    "client/src/renderer/PixelVfx.ts": "61ce3b32e9c259cf0e7e07fbe769c8690f0593a3fe78df7f9d31013d56196541",
+    "client/src/renderer/PixelVfxPlayer.ts": "ecba6c711bcd14be9e572b36420be49153bd9d6a377729c6271b0f9ca7c50260"
+  },
+  "checks": {
+    "fullServerTests": 263,
+    "monkServerTests": 28,
+    "monkPresentationTests": 6,
+    "archerServerRegression": 30,
+    "archerPresentationRegression": 5,
+    "mageTypeScriptRegression": 34,
+    "mageVfxRegression": 9,
+    "clientRegression": 36,
+    "clericMartialWarriorPresentationRegression": 14,
+    "serverAndClientBuild": "passed",
+    "whitespace": "passed"
+  },
+  "overlapNote": "Focused server tests are included in the full server total; do not sum suites as distinct checks.",
+  "limitations": [
+    "Dome silence blocks skill casting, not basic attacks or movement. Current monsters do not have their own spellcasting executor; that future executor must check Entity.canUseSkills().",
+    "Shadow Dance is three simultaneous hits per target, not summoned NPCs or pet AI.",
+    "Fixed Dome lasts six seconds, six pulses; regeneration is caster-only and requires the caster to be inside.",
+    "Step bonuses are additive percentage points; duration/regen parameters not specified in the original catalogue are initial authored values.",
+    "Existing high-level DEX critical/dodge scaling remains unchanged and is not final balance.",
+    "No real-player visual validation, deployment, commit or push in this block."
+  ]
+}

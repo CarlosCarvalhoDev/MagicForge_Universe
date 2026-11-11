@@ -1,4 +1,5 @@
 import { getEquipmentBonuses, ITEMS_DATABASE, ItemRarity, ItemType, type InventoryItemPayload, type ItemAttributesBonus } from '@magicforge/shared';
+import { createItemIcon } from './ItemIcon';
 
 export interface InventoryViewState { query: string; type: string; rarity: string; sort: 'slot' | 'name' | 'rarity'; }
 export const DEFAULT_INVENTORY_VIEW: InventoryViewState = { query: '', type: 'all', rarity: 'all', sort: 'slot' };
@@ -38,8 +39,10 @@ export function renderEquipmentComparison(root: HTMLElement, candidate: Inventor
   if (!comparison || !candidate) return;
   const title = document.createElement('h4');
   title.textContent = candidate.isEquipped ? 'Equipado no herói' : 'Comparar com o equipado';
+  title.prepend(createItemIcon(candidate.itemId));
   const context = document.createElement('p');
   context.textContent = comparison.equipped ? ITEMS_DATABASE[comparison.equipped.itemId].name : 'Este slot do herói está vazio.';
+  if (comparison.equipped) context.prepend(createItemIcon(comparison.equipped.itemId));
   root.append(title, context);
   if (candidate.isEquipped) return;
   const labels: Record<keyof ItemAttributesBonus, string> = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma', maxHp: 'Vida do item', maxResource: 'Recurso do item' };

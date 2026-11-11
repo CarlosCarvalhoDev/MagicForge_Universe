@@ -1,0 +1,3902 @@
+{
+  "auditedOn": "2026-11-11",
+  "branch": "master",
+  "scope": "Auditoria local; não inclui busca no remoto ou nova validação de combate.",
+  "counts": {
+    "canonicalSkills": 84,
+    "webPngFiles": 68,
+    "uniqueWebArtworks": 28,
+    "canonicalImagesPresent": 12,
+    "canonicalImagesMissing": 72,
+    "unityPngFiles": 56,
+    "unityUniqueHashes": 28
+  },
+  "sourceHashes": {
+    "shared/src/skills.ts": "9be9bffb5aa0f5afbf051fd19443f76182b9cb4ac681187f98b04840013898cc",
+    "shared/src/skill-targeting.ts": "4260c9d8e116f6a4a60269a683657e40409c1e2cc545a48a4b18830a81652bb2",
+    "server/src/game/World.ts": "8026ef7044b678d6d2abb9712a114a078465892e28b2b0eaafa9918692f599db",
+    "client/src/main.ts": "2babbdeed678e0b8c718f255c65c8c180577d7fa7b259f66a72115eac8e7f0ed"
+  },
+  "classSummary": [
+    {
+      "classType": "GUERREIRO",
+      "label": "Guerreiro",
+      "canonicalSkills": 12,
+      "mechanicsCompleteAccordingToCurrentCatalogue": true,
+      "canonicalImagesPresent": 0,
+      "canonicalImagesMissing": 12,
+      "distinctArtworks": 4,
+      "description": "Sangramento, ruptura de armadura, proteção/reflexão, empurrão, buffs e resistência.",
+      "evidence": "Docs/ENTREGA_GUERREIRO_BARBARO_2026-11-05.md",
+      "unavailableSkills": []
+    },
+    {
+      "classType": "BARBARO",
+      "label": "Bárbaro",
+      "canonicalSkills": 12,
+      "mechanicsCompleteAccordingToCurrentCatalogue": true,
+      "canonicalImagesPresent": 12,
+      "canonicalImagesMissing": 0,
+      "distinctArtworks": 4,
+      "description": "Lentidão, dreno, enfraquecimento, carga/salto, sangramento, proteção, execução e aura da Matilha.",
+      "evidence": "Docs/ENTREGA_GUERREIRO_BARBARO_2026-11-05.md",
+      "unavailableSkills": []
+    },
+    {
+      "classType": "CLERIGO",
+      "label": "Clérigo",
+      "canonicalSkills": 12,
+      "mechanicsCompleteAccordingToCurrentCatalogue": true,
+      "canonicalImagesPresent": 0,
+      "canonicalImagesMissing": 12,
+      "distinctArtworks": 4,
+      "description": "Dano sagrado, cura, bênção, marca, áreas periódicas, Arma Espiritual e proteção.",
+      "evidence": "Docs/ENTREGA_CLERIGO_NIVEL50_2026-11-05.md",
+      "unavailableSkills": []
+    },
+    {
+      "classType": "MAGO",
+      "label": "Mago",
+      "canonicalSkills": 12,
+      "mechanicsCompleteAccordingToCurrentCatalogue": true,
+      "canonicalImagesPresent": 0,
+      "canonicalImagesMissing": 12,
+      "distinctArtworks": 4,
+      "description": "Fogo/gelo/choque, escudo/reflexão, projéteis, áreas, cadeia, aceleração, cometas e congelamento.",
+      "evidence": "Docs/ENTREGA_MAGO_NIVEL50_2026-11-05.md",
+      "unavailableSkills": []
+    },
+    {
+      "classType": "ARQUEIRO",
+      "label": "Arqueiro",
+      "canonicalSkills": 12,
+      "mechanicsCompleteAccordingToCurrentCatalogue": false,
+      "canonicalImagesPresent": 0,
+      "canonicalImagesMissing": 12,
+      "distinctArtworks": 4,
+      "description": "Catálogo e execução básica existem; efeitos específicos ainda não tiveram o mesmo fechamento das quatro classes acima.",
+      "evidence": null,
+      "unavailableSkills": [
+        "arqueiro_nv2_3"
+      ]
+    },
+    {
+      "classType": "MONGE",
+      "label": "Monge",
+      "canonicalSkills": 12,
+      "mechanicsCompleteAccordingToCurrentCatalogue": false,
+      "canonicalImagesPresent": 0,
+      "canonicalImagesMissing": 12,
+      "distinctArtworks": 4,
+      "description": "Catálogo e execução básica existem; efeitos específicos e buffs ainda pendentes.",
+      "evidence": null,
+      "unavailableSkills": [
+        "monge_nv1_2"
+      ]
+    },
+    {
+      "classType": "BRUXO",
+      "label": "Bruxo",
+      "canonicalSkills": 12,
+      "mechanicsCompleteAccordingToCurrentCatalogue": false,
+      "canonicalImagesPresent": 0,
+      "canonicalImagesMissing": 12,
+      "distinctArtworks": 4,
+      "description": "Há execução básica e dreno híbrido em Toque Vampírico; a classe inteira ainda não está concluída.",
+      "evidence": null,
+      "unavailableSkills": [
+        "bruxo_nv1_2"
+      ]
+    }
+  ],
+  "artworks": [
+    {
+      "artworkId": "ARTE-01",
+      "representative": "client/public/assets/skills/01_guerreiro_ataque_poderoso.png",
+      "classType": "GUERREIRO",
+      "width": 512,
+      "height": 512,
+      "sha256": "ad851c370e97781c20cea3c5050840a6223ec1067bb4b16bd391e44be1e6cd5f",
+      "webFiles": [
+        "client/public/assets/skills/01_guerreiro_ataque_poderoso.png",
+        "client/public/assets/skills/guerreiro_1.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/01_guerreiro_ataque_poderoso.png",
+        "MagicForgeClient/Assets/Art/Skills/guerreiro_1.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-02",
+      "representative": "client/public/assets/skills/02_guerreiro_retomar_o_folego.png",
+      "classType": "GUERREIRO",
+      "width": 512,
+      "height": 512,
+      "sha256": "2918bedd298683beabd9ffa184c16e4aa86b5a172ef6eca7f3d77b1db53ea63f",
+      "webFiles": [
+        "client/public/assets/skills/02_guerreiro_retomar_o_folego.png",
+        "client/public/assets/skills/guerreiro_2.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/02_guerreiro_retomar_o_folego.png",
+        "MagicForgeClient/Assets/Art/Skills/guerreiro_2.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-03",
+      "representative": "client/public/assets/skills/03_guerreiro_golpe_amplo.png",
+      "classType": "GUERREIRO",
+      "width": 512,
+      "height": 512,
+      "sha256": "7ba82662a4ee928820eface637ec60169119ae1927c94a48c4d135e999724cb6",
+      "webFiles": [
+        "client/public/assets/skills/03_guerreiro_golpe_amplo.png",
+        "client/public/assets/skills/guerreiro_3.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/03_guerreiro_golpe_amplo.png",
+        "MagicForgeClient/Assets/Art/Skills/guerreiro_3.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-04",
+      "representative": "client/public/assets/skills/04_guerreiro_avatar_da_furia.png",
+      "classType": "GUERREIRO",
+      "width": 512,
+      "height": 512,
+      "sha256": "82dc480aa1205ef6011c6cbaaa8dde2d2a75ee266de4798a9fe764c01ac50ab6",
+      "webFiles": [
+        "client/public/assets/skills/04_guerreiro_avatar_da_furia.png",
+        "client/public/assets/skills/guerreiro_4.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/04_guerreiro_avatar_da_furia.png",
+        "MagicForgeClient/Assets/Art/Skills/guerreiro_4.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-05",
+      "representative": "client/public/assets/skills/05_clerigo_chama_sagrada.png",
+      "classType": "CLERIGO",
+      "width": 512,
+      "height": 512,
+      "sha256": "8f205ca98da361e6bed5feb7259145d1c3aa63c975cfd866a5e139df20ef0580",
+      "webFiles": [
+        "client/public/assets/skills/05_clerigo_chama_sagrada.png",
+        "client/public/assets/skills/clerigo_1.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/05_clerigo_chama_sagrada.png",
+        "MagicForgeClient/Assets/Art/Skills/clerigo_1.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-06",
+      "representative": "client/public/assets/skills/06_clerigo_arma_espiritual.png",
+      "classType": "CLERIGO",
+      "width": 512,
+      "height": 512,
+      "sha256": "826029fe91c89352e4d9e251101d389a91831f0e6391c036903535f3c9a97c01",
+      "webFiles": [
+        "client/public/assets/skills/06_clerigo_arma_espiritual.png",
+        "client/public/assets/skills/clerigo_2.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/06_clerigo_arma_espiritual.png",
+        "MagicForgeClient/Assets/Art/Skills/clerigo_2.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-07",
+      "representative": "client/public/assets/skills/07_clerigo_guardioes_espirituais.png",
+      "classType": "CLERIGO",
+      "width": 512,
+      "height": 512,
+      "sha256": "a27e12ef7486d20a5ba6ea40c7e24d6eabd9de461e9afa944bb21bf2589ceab0",
+      "webFiles": [
+        "client/public/assets/skills/07_clerigo_guardioes_espirituais.png",
+        "client/public/assets/skills/clerigo_3.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/07_clerigo_guardioes_espirituais.png",
+        "MagicForgeClient/Assets/Art/Skills/clerigo_3.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-08",
+      "representative": "client/public/assets/skills/08_clerigo_coluna_de_chamas_divinas.png",
+      "classType": "CLERIGO",
+      "width": 512,
+      "height": 512,
+      "sha256": "e0ab73814bbc11ec2b21c6aa19cf13d4a55dda375d0066f9eebddf5fa06d188d",
+      "webFiles": [
+        "client/public/assets/skills/08_clerigo_coluna_de_chamas_divinas.png",
+        "client/public/assets/skills/clerigo_4.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/08_clerigo_coluna_de_chamas_divinas.png",
+        "MagicForgeClient/Assets/Art/Skills/clerigo_4.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-09",
+      "representative": "client/public/assets/skills/09_mago_raio_de_fogo.png",
+      "classType": "MAGO",
+      "width": 512,
+      "height": 512,
+      "sha256": "916307393255142e179e78c59d460d0d2018249135669d4f1c11fbe31ab59221",
+      "webFiles": [
+        "client/public/assets/skills/09_mago_raio_de_fogo.png",
+        "client/public/assets/skills/mago_1.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/09_mago_raio_de_fogo.png",
+        "MagicForgeClient/Assets/Art/Skills/mago_1.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-10",
+      "representative": "client/public/assets/skills/10_mago_lamina_flamejante_arcana.png",
+      "classType": "MAGO",
+      "width": 512,
+      "height": 512,
+      "sha256": "f9feb311d6ddfcf073938c4e07a8c409b96313ac73bbb78cd51a85873ebfaca1",
+      "webFiles": [
+        "client/public/assets/skills/10_mago_lamina_flamejante_arcana.png",
+        "client/public/assets/skills/mago_2.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/10_mago_lamina_flamejante_arcana.png",
+        "MagicForgeClient/Assets/Art/Skills/mago_2.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-11",
+      "representative": "client/public/assets/skills/11_mago_bola_de_fogo.png",
+      "classType": "MAGO",
+      "width": 512,
+      "height": 512,
+      "sha256": "495ff234bf4d209805ac68ee7a13f75d1ac2b302db864d99824dde3265168489",
+      "webFiles": [
+        "client/public/assets/skills/11_mago_bola_de_fogo.png",
+        "client/public/assets/skills/mago_3.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/11_mago_bola_de_fogo.png",
+        "MagicForgeClient/Assets/Art/Skills/mago_3.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-12",
+      "representative": "client/public/assets/skills/12_mago_desintegracao_arcana.png",
+      "classType": "MAGO",
+      "width": 512,
+      "height": 512,
+      "sha256": "47a1dd082d0c6c6647921634763fda619705db1ff36c6659bc42637725c622c8",
+      "webFiles": [
+        "client/public/assets/skills/12_mago_desintegracao_arcana.png",
+        "client/public/assets/skills/mago_4.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/12_mago_desintegracao_arcana.png",
+        "MagicForgeClient/Assets/Art/Skills/mago_4.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-13",
+      "representative": "client/public/assets/skills/13_arqueiro_disparo_perfurante_com_marca.png",
+      "classType": "ARQUEIRO",
+      "width": 512,
+      "height": 512,
+      "sha256": "8eb2d69297957a8ef58af23a4793ca40b6fa3adc8518cf2711ed6e40396a331b",
+      "webFiles": [
+        "client/public/assets/skills/13_arqueiro_disparo_perfurante_com_marca.png",
+        "client/public/assets/skills/arqueiro_1.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/13_arqueiro_disparo_perfurante_com_marca.png",
+        "MagicForgeClient/Assets/Art/Skills/arqueiro_1.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-14",
+      "representative": "client/public/assets/skills/14_arqueiro_flecha_espinhosa_enredante.png",
+      "classType": "ARQUEIRO",
+      "width": 512,
+      "height": 512,
+      "sha256": "f76b8fe3e64027ed4e4a5154ba1b9a1579cba3a9bd9915ae50975e637965bf9e",
+      "webFiles": [
+        "client/public/assets/skills/14_arqueiro_flecha_espinhosa_enredante.png",
+        "client/public/assets/skills/arqueiro_2.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/14_arqueiro_flecha_espinhosa_enredante.png",
+        "MagicForgeClient/Assets/Art/Skills/arqueiro_2.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-15",
+      "representative": "client/public/assets/skills/15_arqueiro_saraivada_relampago.png",
+      "classType": "ARQUEIRO",
+      "width": 512,
+      "height": 512,
+      "sha256": "02aceab89219f3b59d4d1d88e7945129a69d896e57ef29b56700ffd5669c6d47",
+      "webFiles": [
+        "client/public/assets/skills/15_arqueiro_saraivada_relampago.png",
+        "client/public/assets/skills/arqueiro_3.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/15_arqueiro_saraivada_relampago.png",
+        "MagicForgeClient/Assets/Art/Skills/arqueiro_3.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-16",
+      "representative": "client/public/assets/skills/16_arqueiro_aljava_celere_tempestade_de_flechas.png",
+      "classType": "ARQUEIRO",
+      "width": 512,
+      "height": 512,
+      "sha256": "f1ff0a892a752fa8f330b931f2f74a1087a2618c919c499bddf4486a514df060",
+      "webFiles": [
+        "client/public/assets/skills/16_arqueiro_aljava_celere_tempestade_de_flechas.png",
+        "client/public/assets/skills/arqueiro_4.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/16_arqueiro_aljava_celere_tempestade_de_flechas.png",
+        "MagicForgeClient/Assets/Art/Skills/arqueiro_4.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-17",
+      "representative": "client/public/assets/skills/17_barbaro_ataque_descuidado.png",
+      "classType": "BARBARO",
+      "width": 512,
+      "height": 512,
+      "sha256": "28cd8c9da06dca43d70513c5cfae647c797d9aeb2d92aa5a0541cd9e368025cb",
+      "webFiles": [
+        "client/public/assets/skills/17_barbaro_ataque_descuidado.png",
+        "client/public/assets/skills/barbaro_1.png",
+        "client/public/assets/skills/barbaro_nv1_3.png",
+        "client/public/assets/skills/barbaro_truque_1.png",
+        "client/public/assets/skills/barbaro_truque_3.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/17_barbaro_ataque_descuidado.png",
+        "MagicForgeClient/Assets/Art/Skills/barbaro_1.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-18",
+      "representative": "client/public/assets/skills/18_barbaro_furia_totemica_do_urso.png",
+      "classType": "BARBARO",
+      "width": 512,
+      "height": 512,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f",
+      "webFiles": [
+        "client/public/assets/skills/18_barbaro_furia_totemica_do_urso.png",
+        "client/public/assets/skills/barbaro_2.png",
+        "client/public/assets/skills/barbaro_nv1_1.png",
+        "client/public/assets/skills/barbaro_nv1_2.png",
+        "client/public/assets/skills/barbaro_nv2_2.png",
+        "client/public/assets/skills/barbaro_nv3_3.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/18_barbaro_furia_totemica_do_urso.png",
+        "MagicForgeClient/Assets/Art/Skills/barbaro_2.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-19",
+      "representative": "client/public/assets/skills/19_barbaro_salto_sismico_brutal.png",
+      "classType": "BARBARO",
+      "width": 512,
+      "height": 512,
+      "sha256": "03ba2b048b6b74ca07663ea378d93afa8b55804e87e7a1f2b88c004765155255",
+      "webFiles": [
+        "client/public/assets/skills/19_barbaro_salto_sismico_brutal.png",
+        "client/public/assets/skills/barbaro_3.png",
+        "client/public/assets/skills/barbaro_nv2_3.png",
+        "client/public/assets/skills/barbaro_nv3_2.png",
+        "client/public/assets/skills/barbaro_truque_2.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/19_barbaro_salto_sismico_brutal.png",
+        "MagicForgeClient/Assets/Art/Skills/barbaro_3.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-20",
+      "representative": "client/public/assets/skills/20_barbaro_furia_imortal_do_berserker.png",
+      "classType": "BARBARO",
+      "width": 512,
+      "height": 512,
+      "sha256": "d25a61856bf705649deff9f0c254bbac86c3e5adcb08393f519d03fb00987d02",
+      "webFiles": [
+        "client/public/assets/skills/20_barbaro_furia_imortal_do_berserker.png",
+        "client/public/assets/skills/barbaro_4.png",
+        "client/public/assets/skills/barbaro_nv2_1.png",
+        "client/public/assets/skills/barbaro_nv3_1.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/20_barbaro_furia_imortal_do_berserker.png",
+        "MagicForgeClient/Assets/Art/Skills/barbaro_4.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-21",
+      "representative": "client/public/assets/skills/21_monge_rajada_de_golpes.png",
+      "classType": "MONGE",
+      "width": 512,
+      "height": 512,
+      "sha256": "8b6909b751db9afd845edd96f8506aa802c7999b805083d3bafee10fd9b7cf5f",
+      "webFiles": [
+        "client/public/assets/skills/21_monge_rajada_de_golpes.png",
+        "client/public/assets/skills/monge_1.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/21_monge_rajada_de_golpes.png",
+        "MagicForgeClient/Assets/Art/Skills/monge_1.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-22",
+      "representative": "client/public/assets/skills/22_monge_passo_do_vento_e_defesa_paciente.png",
+      "classType": "MONGE",
+      "width": 512,
+      "height": 512,
+      "sha256": "a6ea2e4940a6b45fde07025ada6f9486f20be557f65f9be6630e648f06fbcbad",
+      "webFiles": [
+        "client/public/assets/skills/22_monge_passo_do_vento_e_defesa_paciente.png",
+        "client/public/assets/skills/monge_2.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/22_monge_passo_do_vento_e_defesa_paciente.png",
+        "MagicForgeClient/Assets/Art/Skills/monge_2.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-23",
+      "representative": "client/public/assets/skills/23_monge_ataque_atordoante_do_dragao.png",
+      "classType": "MONGE",
+      "width": 512,
+      "height": 512,
+      "sha256": "6e586826c8feee4faa940e52af13301f0ea9d930f3c8a840c723404a8bed906b",
+      "webFiles": [
+        "client/public/assets/skills/23_monge_ataque_atordoante_do_dragao.png",
+        "client/public/assets/skills/monge_3.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/23_monge_ataque_atordoante_do_dragao.png",
+        "MagicForgeClient/Assets/Art/Skills/monge_3.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-24",
+      "representative": "client/public/assets/skills/24_monge_palma_vibratoria_dos_mil_sois.png",
+      "classType": "MONGE",
+      "width": 512,
+      "height": 512,
+      "sha256": "10efb8038bc8f97919c35415372892adba662e2a4f5275a432707beeb78436a9",
+      "webFiles": [
+        "client/public/assets/skills/24_monge_palma_vibratoria_dos_mil_sois.png",
+        "client/public/assets/skills/monge_4.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/24_monge_palma_vibratoria_dos_mil_sois.png",
+        "MagicForgeClient/Assets/Art/Skills/monge_4.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-25",
+      "representative": "client/public/assets/skills/25_bruxo_rajada_mistica_agonizante.png",
+      "classType": "BRUXO",
+      "width": 512,
+      "height": 512,
+      "sha256": "b68b9742891e5ffd153661e6b2547d8be00ef810e86a3d80b1e00b0c1aaf4253",
+      "webFiles": [
+        "client/public/assets/skills/25_bruxo_rajada_mistica_agonizante.png",
+        "client/public/assets/skills/bruxo_1.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/25_bruxo_rajada_mistica_agonizante.png",
+        "MagicForgeClient/Assets/Art/Skills/bruxo_1.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-26",
+      "representative": "client/public/assets/skills/26_bruxo_bruxaria_e_toque_vampirico.png",
+      "classType": "BRUXO",
+      "width": 512,
+      "height": 512,
+      "sha256": "08e03d203d38d5ce2152728e085a4c66b46c3d7a38206b5bc7ffd7729009fc49",
+      "webFiles": [
+        "client/public/assets/skills/26_bruxo_bruxaria_e_toque_vampirico.png",
+        "client/public/assets/skills/bruxo_2.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/26_bruxo_bruxaria_e_toque_vampirico.png",
+        "MagicForgeClient/Assets/Art/Skills/bruxo_2.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-27",
+      "representative": "client/public/assets/skills/27_bruxo_fome_de_hadar.png",
+      "classType": "BRUXO",
+      "width": 512,
+      "height": 512,
+      "sha256": "1ca414bc976c1565302093578197fb7ccf6559e202fa47606474af3047dd09ad",
+      "webFiles": [
+        "client/public/assets/skills/27_bruxo_fome_de_hadar.png",
+        "client/public/assets/skills/bruxo_3.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/27_bruxo_fome_de_hadar.png",
+        "MagicForgeClient/Assets/Art/Skills/bruxo_3.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    },
+    {
+      "artworkId": "ARTE-28",
+      "representative": "client/public/assets/skills/28_bruxo_chama_sinistra_do_patrono_abissal.png",
+      "classType": "BRUXO",
+      "width": 512,
+      "height": 512,
+      "sha256": "aa282076cba712b01acc3682173edc3fe64b449f0c6237f33b5a63f0c161daa4",
+      "webFiles": [
+        "client/public/assets/skills/28_bruxo_chama_sinistra_do_patrono_abissal.png",
+        "client/public/assets/skills/bruxo_4.png"
+      ],
+      "unityFilesWithSameHash": [
+        "MagicForgeClient/Assets/Art/Skills/28_bruxo_chama_sinistra_do_patrono_abissal.png",
+        "MagicForgeClient/Assets/Art/Skills/bruxo_4.png"
+      ],
+      "semanticStatus": "Arte existente; associação à habilidade atual precisa de revisão visual, não é validada pelo nome/slot legado."
+    }
+  ],
+  "skills": [
+    {
+      "skillId": "guerreiro_truque_1",
+      "slot": 1,
+      "choiceIndex": 1,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Golpe Firme",
+      "classType": "GUERREIRO",
+      "cost": 10,
+      "resourceType": "Energia",
+      "cooldownSec": 2.5,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Físico",
+      "description": "Golpe rápido e preciso com espada. Causa dano físico (1.35x STR) e restaura 5 de Energia.",
+      "iconEmoji": "⚔️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_truque_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_truque_2",
+      "slot": 1,
+      "choiceIndex": 2,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Golpe Dilacerante",
+      "classType": "GUERREIRO",
+      "cost": 12,
+      "resourceType": "Energia",
+      "cooldownSec": 3.2,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Físico (Sangramento)",
+      "description": "Corte profundo que causa dano imediato (1.1x STR) e sangramento contínuo por 3 segundos.",
+      "iconEmoji": "🩸",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_truque_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_truque_3",
+      "slot": 1,
+      "choiceIndex": 3,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Corte de Ruptura",
+      "classType": "GUERREIRO",
+      "cost": 15,
+      "resourceType": "Energia",
+      "cooldownSec": 3.8,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Físico (Perfurante)",
+      "description": "Golpe pesado que racha a defesa inimiga (1.25x STR), reduzindo a armadura do alvo em 15% por 5s.",
+      "iconEmoji": "🛡️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_truque_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv1_1",
+      "slot": 2,
+      "choiceIndex": 1,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Retomar o Fôlego",
+      "classType": "GUERREIRO",
+      "cost": 20,
+      "resourceType": "Energia",
+      "cooldownSec": 8,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": true,
+      "damageType": "Cura Marcial",
+      "description": "Second Wind de D&D 5e: Regenera vida instantaneamente com vigor de guerreiro (1.6x STR + 2x Nível).",
+      "iconEmoji": "💚",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv1_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv1_2",
+      "slot": 2,
+      "choiceIndex": 2,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Postura Ofensiva",
+      "classType": "GUERREIRO",
+      "cost": 22,
+      "resourceType": "Energia",
+      "cooldownSec": 7.5,
+      "range": 3.5,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Físico",
+      "description": "Investida rápida (1.6x STR) que aumenta a Velocidade de Ataque em 25% por 6 segundos.",
+      "iconEmoji": "⚡",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv1_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv1_3",
+      "slot": 2,
+      "choiceIndex": 3,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Escudo Desarmador",
+      "classType": "GUERREIRO",
+      "cost": 25,
+      "resourceType": "Energia",
+      "cooldownSec": 7,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Contundente",
+      "description": "Golpe com broquel de aço (1.4x STR + 0.5x CON) que atordoa o monstro por 1.5s.",
+      "iconEmoji": "💥",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv1_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv2_1",
+      "slot": 3,
+      "choiceIndex": 1,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Redemoinho de Aço",
+      "classType": "GUERREIRO",
+      "cost": 35,
+      "resourceType": "Energia",
+      "cooldownSec": 12,
+      "range": 4.5,
+      "isAoe": true,
+      "aoeRadius": 5,
+      "isHeal": false,
+      "damageType": "Físico (Área)",
+      "description": "Giro devastador de lâmina em 360° (2.3x STR) atingindo todos os inimigos em 5 metros.",
+      "iconEmoji": "🌪️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv2_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv2_2",
+      "slot": 3,
+      "choiceIndex": 2,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Baluarte Inquebrável",
+      "classType": "GUERREIRO",
+      "cost": 40,
+      "resourceType": "Energia",
+      "cooldownSec": 14,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Proteção",
+      "description": "Absorve dano equivalente a 30% do HP Máximo por 6s e devolve 20% do dano aos atacantes.",
+      "iconEmoji": "🏰",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv2_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv2_3",
+      "slot": 3,
+      "choiceIndex": 3,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Golpe Colossal",
+      "classType": "GUERREIRO",
+      "cost": 38,
+      "resourceType": "Energia",
+      "cooldownSec": 13,
+      "range": 4.5,
+      "isAoe": true,
+      "aoeRadius": 4,
+      "isHeal": false,
+      "damageType": "Físico (Sísmico)",
+      "description": "Espadada vertical de duas mãos que racha o solo em linha (2.6x STR) empurrando inimigos.",
+      "iconEmoji": "🗡️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv2_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv3_1",
+      "slot": 4,
+      "choiceIndex": 1,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Avatar da Guerra",
+      "classType": "GUERREIRO",
+      "cost": 65,
+      "resourceType": "Energia",
+      "cooldownSec": 40,
+      "range": 7,
+      "isAoe": true,
+      "aoeRadius": 7,
+      "isHeal": false,
+      "damageType": "Físico Supremo",
+      "description": "Manifesta a fúria dos deuses marciais (3.6x STR + 1.5x CON) em 7m e amplia dano em 30% por 10s.",
+      "iconEmoji": "👑",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv3_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv3_2",
+      "slot": 4,
+      "choiceIndex": 2,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Lâmina do Julgamento",
+      "classType": "GUERREIRO",
+      "cost": 70,
+      "resourceType": "Energia",
+      "cooldownSec": 44,
+      "range": 8,
+      "isAoe": true,
+      "aoeRadius": 5,
+      "isHeal": false,
+      "damageType": "Sagrado / Físico",
+      "description": "Invoca uma espada celestial titânica do céu que cai sobre o monstro e arredores (4.4x STR).",
+      "iconEmoji": "⚡",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv3_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "guerreiro_nv3_3",
+      "slot": 4,
+      "choiceIndex": 3,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Última Resistência Imortal",
+      "classType": "GUERREIRO",
+      "cost": 60,
+      "resourceType": "Energia",
+      "cooldownSec": 45,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": true,
+      "damageType": "Imortalidade",
+      "description": "Imunidade contra morte por 5s, regenera 40% do HP Máximo e emite ondas de fogo marcial.",
+      "iconEmoji": "🔥",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/guerreiro_nv3_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_truque_1",
+      "slot": 1,
+      "choiceIndex": 1,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Cutilada Selvagem",
+      "classType": "BARBARO",
+      "cost": 10,
+      "resourceType": "Energia",
+      "cooldownSec": 2.4,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Físico",
+      "description": "Cutilada de 1.4x FOR + 4x nível + 6.",
+      "iconEmoji": "🪓",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_truque_1.png",
+        "exists": true,
+        "artworkId": "ARTE-17"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_truque_2",
+      "slot": 1,
+      "choiceIndex": 2,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Pisotão Sísmico",
+      "classType": "BARBARO",
+      "cost": 12,
+      "resourceType": "Energia",
+      "cooldownSec": 3.4,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Físico (Lentidão)",
+      "description": "Pisotão de 1.2x FOR + 0.4x CON + 4x nível + 6, reduzindo movimento em 30% por 3s. Usa a maior lentidão ativa.",
+      "iconEmoji": "🦶",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_truque_2.png",
+        "exists": true,
+        "artworkId": "ARTE-19"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_truque_3",
+      "slot": 1,
+      "choiceIndex": 3,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Mordida Voraz",
+      "classType": "BARBARO",
+      "cost": 14,
+      "resourceType": "Energia",
+      "cooldownSec": 3,
+      "range": 2.5,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Físico (Dreno)",
+      "description": "Mordida de 1.3x FOR + 4x nível + 6. Cura 20% da vida realmente retirada, sem cura por dano excedente ou absorvido.",
+      "iconEmoji": "🐺",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_truque_3.png",
+        "exists": true,
+        "artworkId": "ARTE-17"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv1_1",
+      "slot": 2,
+      "choiceIndex": 1,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Fúria Primitiva",
+      "classType": "BARBARO",
+      "cost": 20,
+      "resourceType": "Energia",
+      "cooldownSec": 8.5,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Fúria Berserker",
+      "description": "Fúria clássica de D&D: +25% de Dano geral e -15% de Dano Sofrido por 6 segundos.",
+      "iconEmoji": "😡",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv1_1.png",
+        "exists": true,
+        "artworkId": "ARTE-18"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv1_2",
+      "slot": 2,
+      "choiceIndex": 2,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Rugido Desmoralizador",
+      "classType": "BARBARO",
+      "cost": 22,
+      "resourceType": "Energia",
+      "cooldownSec": 8,
+      "range": 5,
+      "isAoe": true,
+      "aoeRadius": 5,
+      "isHeal": false,
+      "damageType": "Sônico",
+      "description": "Rugido pessoal em 5m: reduz o dano de ataque dos inimigos em 20% por 6s, sem dano direto. Evolução aumenta a redução, sem somar instâncias.",
+      "iconEmoji": "📢",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv1_2.png",
+        "exists": true,
+        "artworkId": "ARTE-18"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv1_3",
+      "slot": 2,
+      "choiceIndex": 3,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Carga do Juggernaut",
+      "classType": "BARBARO",
+      "cost": 24,
+      "resourceType": "Energia",
+      "cooldownSec": 7.2,
+      "range": 5,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Físico",
+      "description": "Investida até o alvo, mantendo distância de 1.5m: dano de 1.75x FOR + 4x nível + 6 e atordoamento de 2s.",
+      "iconEmoji": "🦏",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv1_3.png",
+        "exists": true,
+        "artworkId": "ARTE-17"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv2_1",
+      "slot": 3,
+      "choiceIndex": 1,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Banho de Sangue",
+      "classType": "BARBARO",
+      "cost": 35,
+      "resourceType": "Energia",
+      "cooldownSec": 12,
+      "range": 5,
+      "isAoe": true,
+      "aoeRadius": 5,
+      "isHeal": false,
+      "damageType": "Físico (Área)",
+      "description": "Giro pessoal em 5m: 2.4x FOR + 4x nível + 6, aplicando três pulsos de sangramento de 0.35x FOR + nível.",
+      "iconEmoji": "🩸",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv2_1.png",
+        "exists": true,
+        "artworkId": "ARTE-20"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv2_2",
+      "slot": 3,
+      "choiceIndex": 2,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Pele Rochosa Ancestral",
+      "classType": "BARBARO",
+      "cost": 38,
+      "resourceType": "Energia",
+      "cooldownSec": 14.5,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": true,
+      "damageType": "Totêmico",
+      "description": "Cura 15% do HP máximo e reduz dano recebido em 20% por 6s. Evolução aumenta a cura; usa a maior proteção ativa, sem somar com Fúria.",
+      "iconEmoji": "🗿",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv2_2.png",
+        "exists": true,
+        "artworkId": "ARTE-18"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv2_3",
+      "slot": 3,
+      "choiceIndex": 3,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Salto dos Titãs",
+      "classType": "BARBARO",
+      "cost": 36,
+      "resourceType": "Energia",
+      "cooldownSec": 13,
+      "range": 6,
+      "isAoe": true,
+      "aoeRadius": 5,
+      "isHeal": false,
+      "damageType": "Impacto",
+      "description": "Salta para um ponto no chão até 6m, dentro do mapa. Impacto em raio de 5m de 2.6x FOR + 4x nível + 6.",
+      "iconEmoji": "☄️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv2_3.png",
+        "exists": true,
+        "artworkId": "ARTE-19"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv3_1",
+      "slot": 4,
+      "choiceIndex": 1,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Cólera do Vulcão",
+      "classType": "BARBARO",
+      "cost": 65,
+      "resourceType": "Energia",
+      "cooldownSec": 42,
+      "range": 7,
+      "isAoe": true,
+      "aoeRadius": 7,
+      "isHeal": false,
+      "damageType": "Fogo Primitivo",
+      "description": "Erupção pessoal em 7m: 3.9x FOR + 2x CON + 4x nível + 6. Após pagar a ativação, habilidades ficam sem custo de energia por 6s; cooldowns continuam valendo.",
+      "iconEmoji": "🌋",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv3_1.png",
+        "exists": true,
+        "artworkId": "ARTE-20"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv3_2",
+      "slot": 4,
+      "choiceIndex": 2,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Guilhotina do Cataclismo",
+      "classType": "BARBARO",
+      "cost": 70,
+      "resourceType": "Energia",
+      "cooldownSec": 45,
+      "range": 3.5,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Execução",
+      "description": "Execução de 5.2x FOR + 4x nível + 6 contra um alvo. Dano dobrado se a vida anterior ao impacto estiver estritamente abaixo de 30%.",
+      "iconEmoji": "⚔️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv3_2.png",
+        "exists": true,
+        "artworkId": "ARTE-19"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "barbaro_nv3_3",
+      "slot": 4,
+      "choiceIndex": 3,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Matilha Espectral Ancestral",
+      "classType": "BARBARO",
+      "cost": 60,
+      "resourceType": "Energia",
+      "cooldownSec": 40,
+      "range": 6,
+      "isAoe": true,
+      "aoeRadius": 6,
+      "isHeal": false,
+      "damageType": "Espiritual",
+      "description": "Matilha espiritual acompanha o herói em 6m por 10s. Potência total de 4.2x FOR + 4x nível + 6, dividida em dez pulsos de 1s sem crítico. Cancelada ao morrer ou sair do mundo.",
+      "iconEmoji": "🐺",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/barbaro_nv3_3.png",
+        "exists": true,
+        "artworkId": "ARTE-18"
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_truque_1",
+      "slot": 1,
+      "choiceIndex": 1,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Palma de Chi",
+      "classType": "MONGE",
+      "cost": 10,
+      "resourceType": "Energia",
+      "cooldownSec": 2.2,
+      "range": 2.5,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Chi Sagrado",
+      "description": "Sequência veloz de dois socos carregados de Chi (1.35x DEX).",
+      "iconEmoji": "✋",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_truque_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_truque_2",
+      "slot": 1,
+      "choiceIndex": 2,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Chute do Vendaval",
+      "classType": "MONGE",
+      "cost": 12,
+      "resourceType": "Energia",
+      "cooldownSec": 2.8,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Vento",
+      "description": "Chute giratório aerodinâmico (1.2x DEX + 0.3x WIS) atingindo até 2 alvos próximos.",
+      "iconEmoji": "🌪️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_truque_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_truque_3",
+      "slot": 1,
+      "choiceIndex": 3,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Golpe no Ponto Vital",
+      "classType": "MONGE",
+      "cost": 14,
+      "resourceType": "Energia",
+      "cooldownSec": 3,
+      "range": 2.5,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Pontos Vitais",
+      "description": "Atinge meridianos de energia (1.3x DEX), reduzindo a velocidade de ataque do alvo em 20%.",
+      "iconEmoji": "🎯",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_truque_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_nv1_1",
+      "slot": 2,
+      "choiceIndex": 1,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Rajada de Golpes",
+      "classType": "MONGE",
+      "cost": 20,
+      "resourceType": "Energia",
+      "cooldownSec": 6.5,
+      "range": 2.5,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Flurry of Blows",
+      "description": "Quatro socos velozes e fulminantes em 0.5s no alvo (1.85x DEX total).",
+      "iconEmoji": "👊",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv1_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_nv1_2",
+      "slot": 2,
+      "choiceIndex": 2,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Passo do Vento Evasivo",
+      "classType": "MONGE",
+      "cost": 22,
+      "resourceType": "Energia",
+      "cooldownSec": 7,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Mobilidade",
+      "description": "Step of the Wind D&D: +35% de Esquiva e +15% de Crítico por 5 segundos.",
+      "iconEmoji": "🍃",
+      "effectAvailableGuard": false,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv1_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Marcada como efeito ainda indisponível pela guarda do jogo."
+    },
+    {
+      "skillId": "monge_nv1_3",
+      "slot": 2,
+      "choiceIndex": 3,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Cura do Lótus Celestial",
+      "classType": "MONGE",
+      "cost": 25,
+      "resourceType": "Energia",
+      "cooldownSec": 8,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": true,
+      "damageType": "Chi Curativo",
+      "description": "Canaliza o fluxo interior para curar instantaneamente (1.6x WIS + 1.2x DEX).",
+      "iconEmoji": "🪷",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv1_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_nv2_1",
+      "slot": 3,
+      "choiceIndex": 1,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Golpe Atordoante Celestial",
+      "classType": "MONGE",
+      "cost": 35,
+      "resourceType": "Energia",
+      "cooldownSec": 11,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Stunning Strike",
+      "description": "Stunning Strike clássico de D&D: atordoa o sistema nervoso do alvo por 2.5s (2.3x DEX).",
+      "iconEmoji": "🔔",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv2_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_nv2_2",
+      "slot": 3,
+      "choiceIndex": 2,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Sopro do Dragão de Chi",
+      "classType": "MONGE",
+      "cost": 38,
+      "resourceType": "Energia",
+      "cooldownSec": 12,
+      "range": 5,
+      "isAoe": true,
+      "aoeRadius": 5,
+      "isHeal": false,
+      "damageType": "Chi Cósmico",
+      "description": "Projeta um sopro de chamas espirituais em cone de 5m (2.4x WIS + 1.0x DEX).",
+      "iconEmoji": "🐉",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv2_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_nv2_3",
+      "slot": 3,
+      "choiceIndex": 3,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Dança das Sombras Ilusórias",
+      "classType": "MONGE",
+      "cost": 36,
+      "resourceType": "Energia",
+      "cooldownSec": 13,
+      "range": 4.5,
+      "isAoe": true,
+      "aoeRadius": 4.5,
+      "isHeal": false,
+      "damageType": "Ilusão",
+      "description": "Três sombras marciais atacam simultaneamente em área (2.2x DEX).",
+      "iconEmoji": "👥",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv2_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_nv3_1",
+      "slot": 4,
+      "choiceIndex": 1,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Palma dos Cinco Pontos",
+      "classType": "MONGE",
+      "cost": 65,
+      "resourceType": "Energia",
+      "cooldownSec": 42,
+      "range": 3,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Vibração Letal",
+      "description": "Quivering Palm lendária de D&D: ondas de choque que explodem o núcleo do alvo (4.6x DEX + 2.0x WIS).",
+      "iconEmoji": "🖐️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv3_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_nv3_2",
+      "slot": 4,
+      "choiceIndex": 2,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Ascensão do Dragão Dourado",
+      "classType": "MONGE",
+      "cost": 70,
+      "resourceType": "Energia",
+      "cooldownSec": 45,
+      "range": 8,
+      "isAoe": true,
+      "aoeRadius": 8,
+      "isHeal": false,
+      "damageType": "Dragão Astral",
+      "description": "Um imenso dragão de Chi atinge o campo inteiro (3.8x DEX + 2.0x WIS) e dobra velocidade de corrida.",
+      "iconEmoji": "✨",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv3_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "monge_nv3_3",
+      "slot": 4,
+      "choiceIndex": 3,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Domo do Vazio Sereno",
+      "classType": "MONGE",
+      "cost": 60,
+      "resourceType": "Energia",
+      "cooldownSec": 40,
+      "range": 6,
+      "isAoe": true,
+      "aoeRadius": 6,
+      "isHeal": true,
+      "damageType": "Sanctuary Zen",
+      "description": "Domo zen de 6m que silencia inimigos, regenera o monge e causa dano contínuo (3.9x WIS).",
+      "iconEmoji": "☯️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/monge_nv3_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_truque_1",
+      "slot": 1,
+      "choiceIndex": 1,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Tiro Certeiro",
+      "classType": "ARQUEIRO",
+      "cost": 10,
+      "resourceType": "Energia",
+      "cooldownSec": 2.4,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Perfurante",
+      "description": "Disparo à distância milimetricamente calibrado (1.35x DEX).",
+      "iconEmoji": "🏹",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_truque_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_truque_2",
+      "slot": 1,
+      "choiceIndex": 2,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Flecha Venenosa",
+      "classType": "ARQUEIRO",
+      "cost": 12,
+      "resourceType": "Energia",
+      "cooldownSec": 3,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Veneno",
+      "description": "Ponta de flecha embebida em peçonha de serpente (1.1x DEX + veneno por 3s).",
+      "iconEmoji": "🧪",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_truque_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_truque_3",
+      "slot": 1,
+      "choiceIndex": 3,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Tiro Desacelerador",
+      "classType": "ARQUEIRO",
+      "cost": 14,
+      "resourceType": "Energia",
+      "cooldownSec": 3.5,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Contundente",
+      "description": "Atinge a perna do alvo (1.2x DEX), reduzindo a velocidade de movimento em 40% por 4s.",
+      "iconEmoji": "🎯",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_truque_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_nv1_1",
+      "slot": 2,
+      "choiceIndex": 1,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Marca do Caçador",
+      "classType": "ARQUEIRO",
+      "cost": 20,
+      "resourceType": "Energia",
+      "cooldownSec": 7.5,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Hunter's Mark",
+      "description": "Hunter's Mark clássico de D&D: marca a presa mágica, aumentando o dano sofrido por ela em 25% por 8s.",
+      "iconEmoji": "👁️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv1_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_nv1_2",
+      "slot": 2,
+      "choiceIndex": 2,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Rajada Tripla",
+      "classType": "ARQUEIRO",
+      "cost": 22,
+      "resourceType": "Energia",
+      "cooldownSec": 6.8,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Disparo Múltiplo",
+      "description": "Três flechas disparadas em rápida sucessão no alvo (1.85x DEX total).",
+      "iconEmoji": "🏹",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv1_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_nv1_3",
+      "slot": 2,
+      "choiceIndex": 3,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Armadilha de Espinhos",
+      "classType": "ARQUEIRO",
+      "cost": 24,
+      "resourceType": "Energia",
+      "cooldownSec": 8,
+      "range": 8,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Enraizamento",
+      "description": "Espinhos da floresta brotam do chão (1.4x DEX) imobilizando o alvo por 2 segundos.",
+      "iconEmoji": "🌿",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv1_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_nv2_1",
+      "slot": 3,
+      "choiceIndex": 1,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Chuva de Flechas",
+      "classType": "ARQUEIRO",
+      "cost": 35,
+      "resourceType": "Energia",
+      "cooldownSec": 12,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 5.5,
+      "isHeal": false,
+      "damageType": "Chuva Perfurante",
+      "description": "Tempestade de flechas em área de 5.5m (2.4x DEX) caindo do céu.",
+      "iconEmoji": "🌧️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv2_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_nv2_2",
+      "slot": 3,
+      "choiceIndex": 2,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Flecha Espectral Perfuradora",
+      "classType": "ARQUEIRO",
+      "cost": 38,
+      "resourceType": "Energia",
+      "cooldownSec": 13,
+      "range": 12,
+      "isAoe": true,
+      "aoeRadius": 3.5,
+      "isHeal": false,
+      "damageType": "Perfurante em Linha",
+      "description": "Flecha luminosa que atravessa todos os inimigos em linha reta até 12m (2.55x DEX).",
+      "iconEmoji": "💫",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv2_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_nv2_3",
+      "slot": 3,
+      "choiceIndex": 3,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Manto da Furtividade",
+      "classType": "ARQUEIRO",
+      "cost": 36,
+      "resourceType": "Energia",
+      "cooldownSec": 14,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Camuflagem",
+      "description": "Furtividade por 3s; o próximo ataque garante 100% de Acerto Crítico e esquiva garantida.",
+      "iconEmoji": "🍃",
+      "effectAvailableGuard": false,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv2_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Marcada como efeito ainda indisponível pela guarda do jogo."
+    },
+    {
+      "skillId": "arqueiro_nv3_1",
+      "slot": 4,
+      "choiceIndex": 1,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Flecha da Fênix Solar",
+      "classType": "ARQUEIRO",
+      "cost": 65,
+      "resourceType": "Energia",
+      "cooldownSec": 40,
+      "range": 12,
+      "isAoe": true,
+      "aoeRadius": 8,
+      "isHeal": false,
+      "damageType": "Fogo Solar",
+      "description": "Dispara um projétil na forma de uma fênix ardente que explode em 8m (4.2x DEX + 1.5x WIS).",
+      "iconEmoji": "🦅",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv3_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_nv3_2",
+      "slot": 4,
+      "choiceIndex": 2,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Bombardeio das Tempestades",
+      "classType": "ARQUEIRO",
+      "cost": 70,
+      "resourceType": "Energia",
+      "cooldownSec": 44,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Rajada Letal",
+      "description": "Dispara 10 flechas ultrassônicas consecutivas que despedaçam chefões (4.7x DEX total).",
+      "iconEmoji": "⚡",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv3_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "arqueiro_nv3_3",
+      "slot": 4,
+      "choiceIndex": 3,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Fera Guardiã Astral",
+      "classType": "ARQUEIRO",
+      "cost": 60,
+      "resourceType": "Energia",
+      "cooldownSec": 42,
+      "range": 8,
+      "isAoe": true,
+      "aoeRadius": 6,
+      "isHeal": false,
+      "damageType": "Invocação",
+      "description": "Invoca o espírito de um tigre dentes-de-sabre astral que rasga os monstros por 12s (4.2x DEX).",
+      "iconEmoji": "🐅",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/arqueiro_nv3_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_truque_1",
+      "slot": 1,
+      "choiceIndex": 1,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Dardo de Fogo",
+      "classType": "MAGO",
+      "cost": 10,
+      "resourceType": "Mana",
+      "cooldownSec": 2.4,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Fogo",
+      "description": "Fire Bolt clássico de D&D: esfera de fogo flamejante a longa distância (1.4x INT).",
+      "iconEmoji": "🔥",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_truque_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_truque_2",
+      "slot": 1,
+      "choiceIndex": 2,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Raio de Gelo",
+      "classType": "MAGO",
+      "cost": 12,
+      "resourceType": "Mana",
+      "cooldownSec": 3,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Gelo (Lentidão)",
+      "description": "Feixe de 1.25x INT que reduz o movimento do alvo em 35% por 3s. Usa a maior lentidão ativa, sem somar com Guardiões.",
+      "iconEmoji": "❄️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_truque_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_truque_3",
+      "slot": 1,
+      "choiceIndex": 3,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Toque Chocante",
+      "classType": "MAGO",
+      "cost": 14,
+      "resourceType": "Mana",
+      "cooldownSec": 2.8,
+      "range": 8,
+      "isAoe": true,
+      "aoeRadius": 3,
+      "isHeal": false,
+      "damageType": "Elétrico",
+      "description": "Arco de 1.3x INT por alvo: atinge até 2 inimigos no total, dentro de 3m do alvo ou ponto escolhido até 8m.",
+      "iconEmoji": "⚡",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_truque_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv1_1",
+      "slot": 2,
+      "choiceIndex": 1,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Mísseis Arcanos",
+      "classType": "MAGO",
+      "cost": 20,
+      "resourceType": "Mana",
+      "cooldownSec": 6.5,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Força Arcana",
+      "description": "Três dardos sem teste de esquiva contra um alvo até 10m. Potência total de 1.85x INT dividida entre os três impactos, em uma única cobrança.",
+      "iconEmoji": "✨",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv1_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv1_2",
+      "slot": 2,
+      "choiceIndex": 2,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Escudo Arcano Espelhado",
+      "classType": "MAGO",
+      "cost": 22,
+      "resourceType": "Mana",
+      "cooldownSec": 8,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Barreira Arcana",
+      "description": "Barreira por 5s: absorve 25% do HP máximo e reflete 20% do dano efetivamente absorvido ao atacante, sem reflexão em cadeia. Evolução aumenta a absorção.",
+      "iconEmoji": "🛡️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv1_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv1_3",
+      "slot": 2,
+      "choiceIndex": 3,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Orbe de Chamas Devoradoras",
+      "classType": "MAGO",
+      "cost": 25,
+      "resourceType": "Mana",
+      "cooldownSec": 7.5,
+      "range": 6,
+      "isAoe": true,
+      "aoeRadius": 4,
+      "isHeal": false,
+      "damageType": "Fogo em Cone",
+      "description": "Cone frontal de 6m e 60 graus: impacto de 1.65x INT e queima adicional de 0.8x INT no total, em quatro pulsos de 1s sem crítico. Queimas renovam sem empilhar.",
+      "iconEmoji": "🔥",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv1_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv2_1",
+      "slot": 3,
+      "choiceIndex": 1,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Nevasca Glacial",
+      "classType": "MAGO",
+      "cost": 35,
+      "resourceType": "Mana",
+      "cooldownSec": 12,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 5.5,
+      "isHeal": false,
+      "damageType": "Gelo em Área",
+      "description": "Chuva de gelo de 2.4x INT em raio de 5.5m no ponto escolhido até 10m. Congela os inimigos atingidos por 1.5s, impedindo movimento e ataques.",
+      "iconEmoji": "🌨️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv2_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv2_2",
+      "slot": 3,
+      "choiceIndex": 2,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Relâmpago em Cadeia",
+      "classType": "MAGO",
+      "cost": 38,
+      "resourceType": "Mana",
+      "cooldownSec": 11.5,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 5,
+      "isHeal": false,
+      "damageType": "Relâmpago",
+      "description": "Descarga de 2.35x INT por alvo: primeiro inimigo até 10m, seguido de até três saltos para o inimigo mais próximo em 5m do atingido. Não repete alvos.",
+      "iconEmoji": "⚡",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv2_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv2_3",
+      "slot": 3,
+      "choiceIndex": 3,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Mente Acelerada (Haste)",
+      "classType": "MAGO",
+      "cost": 36,
+      "resourceType": "Mana",
+      "cooldownSec": 14,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Tempo Arcano",
+      "description": "Por 7s, acelera em 35% as decisões de conjuração do automático e reduz pela metade os novos cooldowns do truque. Não altera cooldowns já iniciados, mana, ordem ou velocidade de ataque básico. Percentuais fixos, sem evolução de potência.",
+      "iconEmoji": "⏳",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv2_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv3_1",
+      "slot": 4,
+      "choiceIndex": 1,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Bola de Fogo Apocalíptica",
+      "classType": "MAGO",
+      "cost": 65,
+      "resourceType": "Mana",
+      "cooldownSec": 40,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 8,
+      "isHeal": false,
+      "damageType": "Fireball D&D",
+      "description": "Explosão de 4.3x INT em raio de 8m no ponto escolhido até 10m. Evolução e crítico aumentam o dano.",
+      "iconEmoji": "💥",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv3_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv3_2",
+      "slot": 4,
+      "choiceIndex": 2,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Chuva de Cometas Arcanos",
+      "classType": "MAGO",
+      "cost": 70,
+      "resourceType": "Mana",
+      "cooldownSec": 45,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 6.5,
+      "isHeal": false,
+      "damageType": "Meteoro Arcano",
+      "description": "Três cometas atingem uma área fixa de 6.5m, após 0.5s, 1s e 1.5s. Potência total de 4.7x INT, sem crítico; inimigos podem entrar ou sair entre impactos. Ponto escolhido até 10m.",
+      "iconEmoji": "☄️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv3_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "mago_nv3_3",
+      "slot": 4,
+      "choiceIndex": 3,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Estase do Zero Absoluto",
+      "classType": "MAGO",
+      "cost": 60,
+      "resourceType": "Mana",
+      "cooldownSec": 42,
+      "range": 8,
+      "isAoe": true,
+      "aoeRadius": 6,
+      "isHeal": false,
+      "damageType": "Paralisia Temporal",
+      "description": "Impacto de 3.9x INT em raio de 6m no ponto escolhido até 8m, congelando sobreviventes por 3s. Mantém um congelamento mais longo já ativo, sem somar durações.",
+      "iconEmoji": "🧊",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/mago_nv3_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_truque_1",
+      "slot": 1,
+      "choiceIndex": 1,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Rajada Mística",
+      "classType": "BRUXO",
+      "cost": 10,
+      "resourceType": "Mana",
+      "cooldownSec": 2.2,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Eldritch Blast",
+      "description": "Eldritch Blast icônico de D&D: feixe de energia espectral roxa causando 1.45x CAR.",
+      "iconEmoji": "🟣",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_truque_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_truque_2",
+      "slot": 1,
+      "choiceIndex": 2,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Toque Necrótico Drenante",
+      "classType": "BRUXO",
+      "cost": 12,
+      "resourceType": "Mana",
+      "cooldownSec": 3,
+      "range": 9,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Chill Touch",
+      "description": "Chill Touch de D&D: dreno sombrio (1.25x CAR) que corta a cura do alvo em 50%.",
+      "iconEmoji": "💀",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_truque_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_truque_3",
+      "slot": 1,
+      "choiceIndex": 3,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Orbe de Praga Sombria",
+      "classType": "BRUXO",
+      "cost": 14,
+      "resourceType": "Mana",
+      "cooldownSec": 2.8,
+      "range": 9,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Praga Abissal",
+      "description": "Orbe sombria que aplica maldição contínua no monstro (1.3x CAR).",
+      "iconEmoji": "👁️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_truque_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_nv1_1",
+      "slot": 2,
+      "choiceIndex": 1,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Maldição de Bruxaria",
+      "classType": "BRUXO",
+      "cost": 20,
+      "resourceType": "Mana",
+      "cooldownSec": 7.5,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Hex",
+      "description": "Hex de D&D: amplifica todo dano recebido pelo monstro em 25% e regenera vida do Bruxo.",
+      "iconEmoji": "🔮",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv1_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_nv1_2",
+      "slot": 2,
+      "choiceIndex": 2,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Armadura Gélida de Agathys",
+      "classType": "BRUXO",
+      "cost": 22,
+      "resourceType": "Mana",
+      "cooldownSec": 8.5,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Armor of Agathys",
+      "description": "Armor of Agathys de D&D: absorve dano e devolve gelo espectral (1.5x CAR) ao ser atacado.",
+      "iconEmoji": "❄️",
+      "effectAvailableGuard": false,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv1_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Marcada como efeito ainda indisponível pela guarda do jogo."
+    },
+    {
+      "skillId": "bruxo_nv1_3",
+      "slot": 2,
+      "choiceIndex": 3,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Tentáculos de Hadar",
+      "classType": "BRUXO",
+      "cost": 24,
+      "resourceType": "Mana",
+      "cooldownSec": 7,
+      "range": 4.5,
+      "isAoe": true,
+      "aoeRadius": 4.5,
+      "isHeal": false,
+      "damageType": "Arms of Hadar",
+      "description": "Tentáculos negros brotam do solo (1.7x CAR) impedindo inimigos de se moverem por 1.5s.",
+      "iconEmoji": "🐙",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv1_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_nv2_1",
+      "slot": 3,
+      "choiceIndex": 1,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Fome Voraz de Hadar",
+      "classType": "BRUXO",
+      "cost": 35,
+      "resourceType": "Mana",
+      "cooldownSec": 12,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 5.5,
+      "isHeal": false,
+      "damageType": "Hunger of Hadar",
+      "description": "Hunger of Hadar de D&D: vórtice cósmico em 5.5m que cega e causa dano contínuo (2.4x CAR).",
+      "iconEmoji": "🌌",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv2_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_nv2_2",
+      "slot": 3,
+      "choiceIndex": 2,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Toque Vampírico da Alma",
+      "classType": "BRUXO",
+      "cost": 38,
+      "resourceType": "Mana",
+      "cooldownSec": 13,
+      "range": 6,
+      "isAoe": false,
+      "isHeal": true,
+      "damageType": "Vampiric Touch",
+      "description": "Suga a força vital do monstro (2.5x CAR) convertendo 50% em Vida para o Bruxo.",
+      "iconEmoji": "🩸",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv2_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_nv2_3",
+      "slot": 3,
+      "choiceIndex": 3,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Salto das Brumas Etéreas",
+      "classType": "BRUXO",
+      "cost": 36,
+      "resourceType": "Mana",
+      "cooldownSec": 11,
+      "range": 6,
+      "isAoe": true,
+      "aoeRadius": 3.5,
+      "isHeal": false,
+      "damageType": "Misty Step",
+      "description": "Teleporta 6m adiante deixando uma névoa sombria explosiva para trás (2.2x CAR).",
+      "iconEmoji": "🌫️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv2_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_nv3_1",
+      "slot": 4,
+      "choiceIndex": 1,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Singularidade do Vazio",
+      "classType": "BRUXO",
+      "cost": 65,
+      "resourceType": "Mana",
+      "cooldownSec": 42,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 8,
+      "isHeal": false,
+      "damageType": "Buraco Negro",
+      "description": "Abre um buraco negro que suga todos os monstros para o centro e explode em 4.3x CAR.",
+      "iconEmoji": "🕳️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv3_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_nv3_2",
+      "slot": 4,
+      "choiceIndex": 2,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Lorde Demônio Maior",
+      "classType": "BRUXO",
+      "cost": 70,
+      "resourceType": "Mana",
+      "cooldownSec": 45,
+      "range": 8,
+      "isAoe": true,
+      "aoeRadius": 6,
+      "isHeal": false,
+      "damageType": "Demônio Abissal",
+      "description": "Invoca um demônio alado com espada de fogo que corta o campo por 10s (4.5x CAR).",
+      "iconEmoji": "😈",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv3_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "bruxo_nv3_3",
+      "slot": 4,
+      "choiceIndex": 3,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Palavra de Poder: Agonia",
+      "classType": "BRUXO",
+      "cost": 60,
+      "resourceType": "Mana",
+      "cooldownSec": 44,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 6,
+      "isHeal": false,
+      "damageType": "Execução de Almas",
+      "description": "Maldição terminal de D&D: explode a alma do alvo (4.9x CAR) e 2.5x CAR em área.",
+      "iconEmoji": "☠️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "classe parcialmente implementada; não considerar efeito específico concluído",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/bruxo_nv3_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_truque_1",
+      "slot": 1,
+      "choiceIndex": 1,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Chama Sagrada",
+      "classType": "CLERIGO",
+      "cost": 10,
+      "resourceType": "Mana",
+      "cooldownSec": 2.4,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Sacred Flame",
+      "description": "Sacred Flame de D&D: coluna de luz pura que cai dos céus causando 1.35x WIS.",
+      "iconEmoji": "🔥",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_truque_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_truque_2",
+      "slot": 1,
+      "choiceIndex": 2,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Tributo aos Mortos",
+      "classType": "CLERIGO",
+      "cost": 12,
+      "resourceType": "Mana",
+      "cooldownSec": 2.8,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Toll the Dead",
+      "description": "Som fúnebre sagrado: 1.45x SAB, com +25% de dano se o monstro já estiver ferido.",
+      "iconEmoji": "🔔",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_truque_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_truque_3",
+      "slot": 1,
+      "choiceIndex": 3,
+      "tier": 1,
+      "tierName": "Truque (Círculo 0)",
+      "unlockLevel": 1,
+      "name": "Golpe Orientador",
+      "classType": "CLERIGO",
+      "cost": 14,
+      "resourceType": "Mana",
+      "cooldownSec": 3.2,
+      "range": 8,
+      "isAoe": false,
+      "isHeal": true,
+      "damageType": "Guidance",
+      "description": "Golpe de luz (1.1x WIS) que regenera vida para o Clérigo (0.5x WIS).",
+      "iconEmoji": "✨",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_truque_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv1_1",
+      "slot": 2,
+      "choiceIndex": 1,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Palavra de Cura",
+      "classType": "CLERIGO",
+      "cost": 20,
+      "resourceType": "Mana",
+      "cooldownSec": 7,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": true,
+      "damageType": "Healing Word",
+      "description": "Healing Word de D&D: oração rápida que cura instantaneamente (2.0x WIS + Nível).",
+      "iconEmoji": "💖",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv1_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv1_2",
+      "slot": 2,
+      "choiceIndex": 2,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Bênção da Batalha (Bless)",
+      "classType": "CLERIGO",
+      "cost": 22,
+      "resourceType": "Mana",
+      "cooldownSec": 8.5,
+      "range": 0,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Bless",
+      "description": "Bênção pessoal por 8s: +20% de dano, redução de dano recebido de 20% e chance crítica multiplicada por 1.20 (20% vira 24%).",
+      "iconEmoji": "🙏",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv1_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv1_3",
+      "slot": 2,
+      "choiceIndex": 3,
+      "tier": 2,
+      "tierName": "1º Círculo",
+      "unlockLevel": 10,
+      "name": "Raio Guia Fulgurante",
+      "classType": "CLERIGO",
+      "cost": 25,
+      "resourceType": "Mana",
+      "cooldownSec": 7.5,
+      "range": 10,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Guiding Bolt",
+      "description": "Luz radiante (2.15x SAB) que marca por 6s. O próximo ataque básico ou habilidade de impacto direto em alvo único do conjurador consome a marca e é crítico.",
+      "iconEmoji": "⚡",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv1_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv2_1",
+      "slot": 3,
+      "choiceIndex": 1,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Espíritos Guardiões",
+      "classType": "CLERIGO",
+      "cost": 35,
+      "resourceType": "Mana",
+      "cooldownSec": 13,
+      "range": 0,
+      "isAoe": true,
+      "aoeRadius": 5,
+      "isHeal": false,
+      "damageType": "Spirit Guardians",
+      "description": "Aura de 5m acompanha o herói por 6s: 2.5x SAB no total, em 6 pulsos de 1s, e lentidão de movimento de 40% dentro da aura.",
+      "iconEmoji": "👼",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv2_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv2_2",
+      "slot": 3,
+      "choiceIndex": 2,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Arma Espiritual Flutuante",
+      "classType": "CLERIGO",
+      "cost": 38,
+      "resourceType": "Mana",
+      "cooldownSec": 14,
+      "range": 8,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Spiritual Weapon",
+      "description": "Arma espiritual por 8s: 2.4x SAB no total em 4 golpes de 2s, sem crítico. Mantém o alvo ou busca outro até 8m do herói.",
+      "iconEmoji": "🔨",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv2_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv2_3",
+      "slot": 3,
+      "choiceIndex": 3,
+      "tier": 3,
+      "tierName": "2º Círculo",
+      "unlockLevel": 25,
+      "name": "Santuário Consagrado",
+      "classType": "CLERIGO",
+      "cost": 36,
+      "resourceType": "Mana",
+      "cooldownSec": 15,
+      "range": 0,
+      "isAoe": true,
+      "aoeRadius": 6,
+      "isHeal": true,
+      "damageType": "Solo Sagrado",
+      "description": "Círculo fixo de 6m por 6s. Dentro dele, o conjurador cura 5% do HP máximo por segundo e recebe 25% menos dano. Usa a maior redução ativa, sem somar com Bênção.",
+      "iconEmoji": "☀️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv2_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv3_1",
+      "slot": 4,
+      "choiceIndex": 1,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Coluna do Fogo Sagrado",
+      "classType": "CLERIGO",
+      "cost": 65,
+      "resourceType": "Mana",
+      "cooldownSec": 40,
+      "range": 10,
+      "isAoe": true,
+      "aoeRadius": 7.5,
+      "isHeal": false,
+      "damageType": "Flame Strike",
+      "description": "Pilar de fogo radiante: 4.1x SAB + 1.5x CON em raio de 7.5m no ponto escolhido, até 10m do conjurador.",
+      "iconEmoji": "🔥",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv3_1.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv3_2",
+      "slot": 4,
+      "choiceIndex": 2,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Intervenção Divina: Graça",
+      "classType": "CLERIGO",
+      "cost": 70,
+      "resourceType": "Mana",
+      "cooldownSec": 45,
+      "range": 0,
+      "isAoe": true,
+      "aoeRadius": 8,
+      "isHeal": true,
+      "damageType": "Milagre Supremo",
+      "description": "Restaura a própria vida até 100% e causa 4.3x SAB aos inimigos em 8m ao redor do herói. Evolução aumenta o dano; a cura permanece limitada ao HP máximo. Pode atacar mesmo com vida cheia.",
+      "iconEmoji": "🌟",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv3_2.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    },
+    {
+      "skillId": "clerigo_nv3_3",
+      "slot": 4,
+      "choiceIndex": 3,
+      "tier": 4,
+      "tierName": "Ultimate (3º Círculo)",
+      "unlockLevel": 50,
+      "name": "Raio do Sol da Aurora",
+      "classType": "CLERIGO",
+      "cost": 60,
+      "resourceType": "Mana",
+      "cooldownSec": 42,
+      "range": 12,
+      "isAoe": false,
+      "isHeal": false,
+      "damageType": "Sunbeam",
+      "description": "Raio solar de 4.8x SAB contra um alvo até 12m. Pode consumir a marca do Raio Guia para garantir crítico.",
+      "iconEmoji": "☀️",
+      "effectAvailableGuard": true,
+      "mechanicsStatus": "efeitos implementados segundo catálogo atual; balanceamento pendente",
+      "canonicalImage": {
+        "expectedPath": "client/public/assets/skills/clerigo_nv3_3.png",
+        "exists": false,
+        "artworkId": null
+      },
+      "availabilityNote": "Guarda permite conjurar; isso por si só não prova efeito completo."
+    }
+  ],
+  "webFiles": [
+    {
+      "file": "01_guerreiro_ataque_poderoso.png",
+      "path": "client/public/assets/skills/01_guerreiro_ataque_poderoso.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 320048,
+      "sha256": "ad851c370e97781c20cea3c5050840a6223ec1067bb4b16bd391e44be1e6cd5f"
+    },
+    {
+      "file": "02_guerreiro_retomar_o_folego.png",
+      "path": "client/public/assets/skills/02_guerreiro_retomar_o_folego.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 302963,
+      "sha256": "2918bedd298683beabd9ffa184c16e4aa86b5a172ef6eca7f3d77b1db53ea63f"
+    },
+    {
+      "file": "03_guerreiro_golpe_amplo.png",
+      "path": "client/public/assets/skills/03_guerreiro_golpe_amplo.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 270223,
+      "sha256": "7ba82662a4ee928820eface637ec60169119ae1927c94a48c4d135e999724cb6"
+    },
+    {
+      "file": "04_guerreiro_avatar_da_furia.png",
+      "path": "client/public/assets/skills/04_guerreiro_avatar_da_furia.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 319340,
+      "sha256": "82dc480aa1205ef6011c6cbaaa8dde2d2a75ee266de4798a9fe764c01ac50ab6"
+    },
+    {
+      "file": "05_clerigo_chama_sagrada.png",
+      "path": "client/public/assets/skills/05_clerigo_chama_sagrada.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 252531,
+      "sha256": "8f205ca98da361e6bed5feb7259145d1c3aa63c975cfd866a5e139df20ef0580"
+    },
+    {
+      "file": "06_clerigo_arma_espiritual.png",
+      "path": "client/public/assets/skills/06_clerigo_arma_espiritual.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 308721,
+      "sha256": "826029fe91c89352e4d9e251101d389a91831f0e6391c036903535f3c9a97c01"
+    },
+    {
+      "file": "07_clerigo_guardioes_espirituais.png",
+      "path": "client/public/assets/skills/07_clerigo_guardioes_espirituais.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 272676,
+      "sha256": "a27e12ef7486d20a5ba6ea40c7e24d6eabd9de461e9afa944bb21bf2589ceab0"
+    },
+    {
+      "file": "08_clerigo_coluna_de_chamas_divinas.png",
+      "path": "client/public/assets/skills/08_clerigo_coluna_de_chamas_divinas.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 265115,
+      "sha256": "e0ab73814bbc11ec2b21c6aa19cf13d4a55dda375d0066f9eebddf5fa06d188d"
+    },
+    {
+      "file": "09_mago_raio_de_fogo.png",
+      "path": "client/public/assets/skills/09_mago_raio_de_fogo.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 253229,
+      "sha256": "916307393255142e179e78c59d460d0d2018249135669d4f1c11fbe31ab59221"
+    },
+    {
+      "file": "10_mago_lamina_flamejante_arcana.png",
+      "path": "client/public/assets/skills/10_mago_lamina_flamejante_arcana.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 240282,
+      "sha256": "f9feb311d6ddfcf073938c4e07a8c409b96313ac73bbb78cd51a85873ebfaca1"
+    },
+    {
+      "file": "11_mago_bola_de_fogo.png",
+      "path": "client/public/assets/skills/11_mago_bola_de_fogo.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254100,
+      "sha256": "495ff234bf4d209805ac68ee7a13f75d1ac2b302db864d99824dde3265168489"
+    },
+    {
+      "file": "12_mago_desintegracao_arcana.png",
+      "path": "client/public/assets/skills/12_mago_desintegracao_arcana.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 279961,
+      "sha256": "47a1dd082d0c6c6647921634763fda619705db1ff36c6659bc42637725c622c8"
+    },
+    {
+      "file": "13_arqueiro_disparo_perfurante_com_marca.png",
+      "path": "client/public/assets/skills/13_arqueiro_disparo_perfurante_com_marca.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 237351,
+      "sha256": "8eb2d69297957a8ef58af23a4793ca40b6fa3adc8518cf2711ed6e40396a331b"
+    },
+    {
+      "file": "14_arqueiro_flecha_espinhosa_enredante.png",
+      "path": "client/public/assets/skills/14_arqueiro_flecha_espinhosa_enredante.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 261879,
+      "sha256": "f76b8fe3e64027ed4e4a5154ba1b9a1579cba3a9bd9915ae50975e637965bf9e"
+    },
+    {
+      "file": "15_arqueiro_saraivada_relampago.png",
+      "path": "client/public/assets/skills/15_arqueiro_saraivada_relampago.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 288612,
+      "sha256": "02aceab89219f3b59d4d1d88e7945129a69d896e57ef29b56700ffd5669c6d47"
+    },
+    {
+      "file": "16_arqueiro_aljava_celere_tempestade_de_flechas.png",
+      "path": "client/public/assets/skills/16_arqueiro_aljava_celere_tempestade_de_flechas.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 266348,
+      "sha256": "f1ff0a892a752fa8f330b931f2f74a1087a2618c919c499bddf4486a514df060"
+    },
+    {
+      "file": "17_barbaro_ataque_descuidado.png",
+      "path": "client/public/assets/skills/17_barbaro_ataque_descuidado.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254517,
+      "sha256": "28cd8c9da06dca43d70513c5cfae647c797d9aeb2d92aa5a0541cd9e368025cb"
+    },
+    {
+      "file": "18_barbaro_furia_totemica_do_urso.png",
+      "path": "client/public/assets/skills/18_barbaro_furia_totemica_do_urso.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 276998,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f"
+    },
+    {
+      "file": "19_barbaro_salto_sismico_brutal.png",
+      "path": "client/public/assets/skills/19_barbaro_salto_sismico_brutal.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248602,
+      "sha256": "03ba2b048b6b74ca07663ea378d93afa8b55804e87e7a1f2b88c004765155255"
+    },
+    {
+      "file": "20_barbaro_furia_imortal_do_berserker.png",
+      "path": "client/public/assets/skills/20_barbaro_furia_imortal_do_berserker.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248031,
+      "sha256": "d25a61856bf705649deff9f0c254bbac86c3e5adcb08393f519d03fb00987d02"
+    },
+    {
+      "file": "21_monge_rajada_de_golpes.png",
+      "path": "client/public/assets/skills/21_monge_rajada_de_golpes.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274356,
+      "sha256": "8b6909b751db9afd845edd96f8506aa802c7999b805083d3bafee10fd9b7cf5f"
+    },
+    {
+      "file": "22_monge_passo_do_vento_e_defesa_paciente.png",
+      "path": "client/public/assets/skills/22_monge_passo_do_vento_e_defesa_paciente.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 281709,
+      "sha256": "a6ea2e4940a6b45fde07025ada6f9486f20be557f65f9be6630e648f06fbcbad"
+    },
+    {
+      "file": "23_monge_ataque_atordoante_do_dragao.png",
+      "path": "client/public/assets/skills/23_monge_ataque_atordoante_do_dragao.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274448,
+      "sha256": "6e586826c8feee4faa940e52af13301f0ea9d930f3c8a840c723404a8bed906b"
+    },
+    {
+      "file": "24_monge_palma_vibratoria_dos_mil_sois.png",
+      "path": "client/public/assets/skills/24_monge_palma_vibratoria_dos_mil_sois.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 242765,
+      "sha256": "10efb8038bc8f97919c35415372892adba662e2a4f5275a432707beeb78436a9"
+    },
+    {
+      "file": "25_bruxo_rajada_mistica_agonizante.png",
+      "path": "client/public/assets/skills/25_bruxo_rajada_mistica_agonizante.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 232788,
+      "sha256": "b68b9742891e5ffd153661e6b2547d8be00ef810e86a3d80b1e00b0c1aaf4253"
+    },
+    {
+      "file": "26_bruxo_bruxaria_e_toque_vampirico.png",
+      "path": "client/public/assets/skills/26_bruxo_bruxaria_e_toque_vampirico.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 228979,
+      "sha256": "08e03d203d38d5ce2152728e085a4c66b46c3d7a38206b5bc7ffd7729009fc49"
+    },
+    {
+      "file": "27_bruxo_fome_de_hadar.png",
+      "path": "client/public/assets/skills/27_bruxo_fome_de_hadar.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 228796,
+      "sha256": "1ca414bc976c1565302093578197fb7ccf6559e202fa47606474af3047dd09ad"
+    },
+    {
+      "file": "28_bruxo_chama_sinistra_do_patrono_abissal.png",
+      "path": "client/public/assets/skills/28_bruxo_chama_sinistra_do_patrono_abissal.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 234072,
+      "sha256": "aa282076cba712b01acc3682173edc3fe64b449f0c6237f33b5a63f0c161daa4"
+    },
+    {
+      "file": "arqueiro_1.png",
+      "path": "client/public/assets/skills/arqueiro_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 237351,
+      "sha256": "8eb2d69297957a8ef58af23a4793ca40b6fa3adc8518cf2711ed6e40396a331b"
+    },
+    {
+      "file": "arqueiro_2.png",
+      "path": "client/public/assets/skills/arqueiro_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 261879,
+      "sha256": "f76b8fe3e64027ed4e4a5154ba1b9a1579cba3a9bd9915ae50975e637965bf9e"
+    },
+    {
+      "file": "arqueiro_3.png",
+      "path": "client/public/assets/skills/arqueiro_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 288612,
+      "sha256": "02aceab89219f3b59d4d1d88e7945129a69d896e57ef29b56700ffd5669c6d47"
+    },
+    {
+      "file": "arqueiro_4.png",
+      "path": "client/public/assets/skills/arqueiro_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 266348,
+      "sha256": "f1ff0a892a752fa8f330b931f2f74a1087a2618c919c499bddf4486a514df060"
+    },
+    {
+      "file": "barbaro_1.png",
+      "path": "client/public/assets/skills/barbaro_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254517,
+      "sha256": "28cd8c9da06dca43d70513c5cfae647c797d9aeb2d92aa5a0541cd9e368025cb"
+    },
+    {
+      "file": "barbaro_2.png",
+      "path": "client/public/assets/skills/barbaro_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 276998,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f"
+    },
+    {
+      "file": "barbaro_3.png",
+      "path": "client/public/assets/skills/barbaro_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248602,
+      "sha256": "03ba2b048b6b74ca07663ea378d93afa8b55804e87e7a1f2b88c004765155255"
+    },
+    {
+      "file": "barbaro_4.png",
+      "path": "client/public/assets/skills/barbaro_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248031,
+      "sha256": "d25a61856bf705649deff9f0c254bbac86c3e5adcb08393f519d03fb00987d02"
+    },
+    {
+      "file": "barbaro_nv1_1.png",
+      "path": "client/public/assets/skills/barbaro_nv1_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 276998,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f"
+    },
+    {
+      "file": "barbaro_nv1_2.png",
+      "path": "client/public/assets/skills/barbaro_nv1_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 276998,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f"
+    },
+    {
+      "file": "barbaro_nv1_3.png",
+      "path": "client/public/assets/skills/barbaro_nv1_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254517,
+      "sha256": "28cd8c9da06dca43d70513c5cfae647c797d9aeb2d92aa5a0541cd9e368025cb"
+    },
+    {
+      "file": "barbaro_nv2_1.png",
+      "path": "client/public/assets/skills/barbaro_nv2_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248031,
+      "sha256": "d25a61856bf705649deff9f0c254bbac86c3e5adcb08393f519d03fb00987d02"
+    },
+    {
+      "file": "barbaro_nv2_2.png",
+      "path": "client/public/assets/skills/barbaro_nv2_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 276998,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f"
+    },
+    {
+      "file": "barbaro_nv2_3.png",
+      "path": "client/public/assets/skills/barbaro_nv2_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248602,
+      "sha256": "03ba2b048b6b74ca07663ea378d93afa8b55804e87e7a1f2b88c004765155255"
+    },
+    {
+      "file": "barbaro_nv3_1.png",
+      "path": "client/public/assets/skills/barbaro_nv3_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248031,
+      "sha256": "d25a61856bf705649deff9f0c254bbac86c3e5adcb08393f519d03fb00987d02"
+    },
+    {
+      "file": "barbaro_nv3_2.png",
+      "path": "client/public/assets/skills/barbaro_nv3_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248602,
+      "sha256": "03ba2b048b6b74ca07663ea378d93afa8b55804e87e7a1f2b88c004765155255"
+    },
+    {
+      "file": "barbaro_nv3_3.png",
+      "path": "client/public/assets/skills/barbaro_nv3_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 276998,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f"
+    },
+    {
+      "file": "barbaro_truque_1.png",
+      "path": "client/public/assets/skills/barbaro_truque_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254517,
+      "sha256": "28cd8c9da06dca43d70513c5cfae647c797d9aeb2d92aa5a0541cd9e368025cb"
+    },
+    {
+      "file": "barbaro_truque_2.png",
+      "path": "client/public/assets/skills/barbaro_truque_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248602,
+      "sha256": "03ba2b048b6b74ca07663ea378d93afa8b55804e87e7a1f2b88c004765155255"
+    },
+    {
+      "file": "barbaro_truque_3.png",
+      "path": "client/public/assets/skills/barbaro_truque_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254517,
+      "sha256": "28cd8c9da06dca43d70513c5cfae647c797d9aeb2d92aa5a0541cd9e368025cb"
+    },
+    {
+      "file": "bruxo_1.png",
+      "path": "client/public/assets/skills/bruxo_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 232788,
+      "sha256": "b68b9742891e5ffd153661e6b2547d8be00ef810e86a3d80b1e00b0c1aaf4253"
+    },
+    {
+      "file": "bruxo_2.png",
+      "path": "client/public/assets/skills/bruxo_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 228979,
+      "sha256": "08e03d203d38d5ce2152728e085a4c66b46c3d7a38206b5bc7ffd7729009fc49"
+    },
+    {
+      "file": "bruxo_3.png",
+      "path": "client/public/assets/skills/bruxo_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 228796,
+      "sha256": "1ca414bc976c1565302093578197fb7ccf6559e202fa47606474af3047dd09ad"
+    },
+    {
+      "file": "bruxo_4.png",
+      "path": "client/public/assets/skills/bruxo_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 234072,
+      "sha256": "aa282076cba712b01acc3682173edc3fe64b449f0c6237f33b5a63f0c161daa4"
+    },
+    {
+      "file": "clerigo_1.png",
+      "path": "client/public/assets/skills/clerigo_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 252531,
+      "sha256": "8f205ca98da361e6bed5feb7259145d1c3aa63c975cfd866a5e139df20ef0580"
+    },
+    {
+      "file": "clerigo_2.png",
+      "path": "client/public/assets/skills/clerigo_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 308721,
+      "sha256": "826029fe91c89352e4d9e251101d389a91831f0e6391c036903535f3c9a97c01"
+    },
+    {
+      "file": "clerigo_3.png",
+      "path": "client/public/assets/skills/clerigo_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 272676,
+      "sha256": "a27e12ef7486d20a5ba6ea40c7e24d6eabd9de461e9afa944bb21bf2589ceab0"
+    },
+    {
+      "file": "clerigo_4.png",
+      "path": "client/public/assets/skills/clerigo_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 265115,
+      "sha256": "e0ab73814bbc11ec2b21c6aa19cf13d4a55dda375d0066f9eebddf5fa06d188d"
+    },
+    {
+      "file": "guerreiro_1.png",
+      "path": "client/public/assets/skills/guerreiro_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 320048,
+      "sha256": "ad851c370e97781c20cea3c5050840a6223ec1067bb4b16bd391e44be1e6cd5f"
+    },
+    {
+      "file": "guerreiro_2.png",
+      "path": "client/public/assets/skills/guerreiro_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 302963,
+      "sha256": "2918bedd298683beabd9ffa184c16e4aa86b5a172ef6eca7f3d77b1db53ea63f"
+    },
+    {
+      "file": "guerreiro_3.png",
+      "path": "client/public/assets/skills/guerreiro_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 270223,
+      "sha256": "7ba82662a4ee928820eface637ec60169119ae1927c94a48c4d135e999724cb6"
+    },
+    {
+      "file": "guerreiro_4.png",
+      "path": "client/public/assets/skills/guerreiro_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 319340,
+      "sha256": "82dc480aa1205ef6011c6cbaaa8dde2d2a75ee266de4798a9fe764c01ac50ab6"
+    },
+    {
+      "file": "mago_1.png",
+      "path": "client/public/assets/skills/mago_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 253229,
+      "sha256": "916307393255142e179e78c59d460d0d2018249135669d4f1c11fbe31ab59221"
+    },
+    {
+      "file": "mago_2.png",
+      "path": "client/public/assets/skills/mago_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 240282,
+      "sha256": "f9feb311d6ddfcf073938c4e07a8c409b96313ac73bbb78cd51a85873ebfaca1"
+    },
+    {
+      "file": "mago_3.png",
+      "path": "client/public/assets/skills/mago_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254100,
+      "sha256": "495ff234bf4d209805ac68ee7a13f75d1ac2b302db864d99824dde3265168489"
+    },
+    {
+      "file": "mago_4.png",
+      "path": "client/public/assets/skills/mago_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 279961,
+      "sha256": "47a1dd082d0c6c6647921634763fda619705db1ff36c6659bc42637725c622c8"
+    },
+    {
+      "file": "monge_1.png",
+      "path": "client/public/assets/skills/monge_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274356,
+      "sha256": "8b6909b751db9afd845edd96f8506aa802c7999b805083d3bafee10fd9b7cf5f"
+    },
+    {
+      "file": "monge_2.png",
+      "path": "client/public/assets/skills/monge_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 281709,
+      "sha256": "a6ea2e4940a6b45fde07025ada6f9486f20be557f65f9be6630e648f06fbcbad"
+    },
+    {
+      "file": "monge_3.png",
+      "path": "client/public/assets/skills/monge_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274448,
+      "sha256": "6e586826c8feee4faa940e52af13301f0ea9d930f3c8a840c723404a8bed906b"
+    },
+    {
+      "file": "monge_4.png",
+      "path": "client/public/assets/skills/monge_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 242765,
+      "sha256": "10efb8038bc8f97919c35415372892adba662e2a4f5275a432707beeb78436a9"
+    }
+  ],
+  "unityFiles": [
+    {
+      "file": "01_guerreiro_ataque_poderoso.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/01_guerreiro_ataque_poderoso.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 320048,
+      "sha256": "ad851c370e97781c20cea3c5050840a6223ec1067bb4b16bd391e44be1e6cd5f"
+    },
+    {
+      "file": "02_guerreiro_retomar_o_folego.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/02_guerreiro_retomar_o_folego.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 302963,
+      "sha256": "2918bedd298683beabd9ffa184c16e4aa86b5a172ef6eca7f3d77b1db53ea63f"
+    },
+    {
+      "file": "03_guerreiro_golpe_amplo.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/03_guerreiro_golpe_amplo.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 270223,
+      "sha256": "7ba82662a4ee928820eface637ec60169119ae1927c94a48c4d135e999724cb6"
+    },
+    {
+      "file": "04_guerreiro_avatar_da_furia.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/04_guerreiro_avatar_da_furia.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 319340,
+      "sha256": "82dc480aa1205ef6011c6cbaaa8dde2d2a75ee266de4798a9fe764c01ac50ab6"
+    },
+    {
+      "file": "05_clerigo_chama_sagrada.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/05_clerigo_chama_sagrada.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 252531,
+      "sha256": "8f205ca98da361e6bed5feb7259145d1c3aa63c975cfd866a5e139df20ef0580"
+    },
+    {
+      "file": "06_clerigo_arma_espiritual.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/06_clerigo_arma_espiritual.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 308721,
+      "sha256": "826029fe91c89352e4d9e251101d389a91831f0e6391c036903535f3c9a97c01"
+    },
+    {
+      "file": "07_clerigo_guardioes_espirituais.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/07_clerigo_guardioes_espirituais.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 272676,
+      "sha256": "a27e12ef7486d20a5ba6ea40c7e24d6eabd9de461e9afa944bb21bf2589ceab0"
+    },
+    {
+      "file": "08_clerigo_coluna_de_chamas_divinas.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/08_clerigo_coluna_de_chamas_divinas.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 265115,
+      "sha256": "e0ab73814bbc11ec2b21c6aa19cf13d4a55dda375d0066f9eebddf5fa06d188d"
+    },
+    {
+      "file": "09_mago_raio_de_fogo.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/09_mago_raio_de_fogo.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 253229,
+      "sha256": "916307393255142e179e78c59d460d0d2018249135669d4f1c11fbe31ab59221"
+    },
+    {
+      "file": "10_mago_lamina_flamejante_arcana.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/10_mago_lamina_flamejante_arcana.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 240282,
+      "sha256": "f9feb311d6ddfcf073938c4e07a8c409b96313ac73bbb78cd51a85873ebfaca1"
+    },
+    {
+      "file": "11_mago_bola_de_fogo.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/11_mago_bola_de_fogo.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254100,
+      "sha256": "495ff234bf4d209805ac68ee7a13f75d1ac2b302db864d99824dde3265168489"
+    },
+    {
+      "file": "12_mago_desintegracao_arcana.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/12_mago_desintegracao_arcana.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 279961,
+      "sha256": "47a1dd082d0c6c6647921634763fda619705db1ff36c6659bc42637725c622c8"
+    },
+    {
+      "file": "13_arqueiro_disparo_perfurante_com_marca.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/13_arqueiro_disparo_perfurante_com_marca.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 237351,
+      "sha256": "8eb2d69297957a8ef58af23a4793ca40b6fa3adc8518cf2711ed6e40396a331b"
+    },
+    {
+      "file": "14_arqueiro_flecha_espinhosa_enredante.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/14_arqueiro_flecha_espinhosa_enredante.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 261879,
+      "sha256": "f76b8fe3e64027ed4e4a5154ba1b9a1579cba3a9bd9915ae50975e637965bf9e"
+    },
+    {
+      "file": "15_arqueiro_saraivada_relampago.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/15_arqueiro_saraivada_relampago.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 288612,
+      "sha256": "02aceab89219f3b59d4d1d88e7945129a69d896e57ef29b56700ffd5669c6d47"
+    },
+    {
+      "file": "16_arqueiro_aljava_celere_tempestade_de_flechas.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/16_arqueiro_aljava_celere_tempestade_de_flechas.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 266348,
+      "sha256": "f1ff0a892a752fa8f330b931f2f74a1087a2618c919c499bddf4486a514df060"
+    },
+    {
+      "file": "17_barbaro_ataque_descuidado.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/17_barbaro_ataque_descuidado.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254517,
+      "sha256": "28cd8c9da06dca43d70513c5cfae647c797d9aeb2d92aa5a0541cd9e368025cb"
+    },
+    {
+      "file": "18_barbaro_furia_totemica_do_urso.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/18_barbaro_furia_totemica_do_urso.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 276998,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f"
+    },
+    {
+      "file": "19_barbaro_salto_sismico_brutal.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/19_barbaro_salto_sismico_brutal.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248602,
+      "sha256": "03ba2b048b6b74ca07663ea378d93afa8b55804e87e7a1f2b88c004765155255"
+    },
+    {
+      "file": "20_barbaro_furia_imortal_do_berserker.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/20_barbaro_furia_imortal_do_berserker.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248031,
+      "sha256": "d25a61856bf705649deff9f0c254bbac86c3e5adcb08393f519d03fb00987d02"
+    },
+    {
+      "file": "21_monge_rajada_de_golpes.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/21_monge_rajada_de_golpes.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274356,
+      "sha256": "8b6909b751db9afd845edd96f8506aa802c7999b805083d3bafee10fd9b7cf5f"
+    },
+    {
+      "file": "22_monge_passo_do_vento_e_defesa_paciente.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/22_monge_passo_do_vento_e_defesa_paciente.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 281709,
+      "sha256": "a6ea2e4940a6b45fde07025ada6f9486f20be557f65f9be6630e648f06fbcbad"
+    },
+    {
+      "file": "23_monge_ataque_atordoante_do_dragao.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/23_monge_ataque_atordoante_do_dragao.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274448,
+      "sha256": "6e586826c8feee4faa940e52af13301f0ea9d930f3c8a840c723404a8bed906b"
+    },
+    {
+      "file": "24_monge_palma_vibratoria_dos_mil_sois.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/24_monge_palma_vibratoria_dos_mil_sois.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 242765,
+      "sha256": "10efb8038bc8f97919c35415372892adba662e2a4f5275a432707beeb78436a9"
+    },
+    {
+      "file": "25_bruxo_rajada_mistica_agonizante.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/25_bruxo_rajada_mistica_agonizante.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 232788,
+      "sha256": "b68b9742891e5ffd153661e6b2547d8be00ef810e86a3d80b1e00b0c1aaf4253"
+    },
+    {
+      "file": "26_bruxo_bruxaria_e_toque_vampirico.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/26_bruxo_bruxaria_e_toque_vampirico.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 228979,
+      "sha256": "08e03d203d38d5ce2152728e085a4c66b46c3d7a38206b5bc7ffd7729009fc49"
+    },
+    {
+      "file": "27_bruxo_fome_de_hadar.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/27_bruxo_fome_de_hadar.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 228796,
+      "sha256": "1ca414bc976c1565302093578197fb7ccf6559e202fa47606474af3047dd09ad"
+    },
+    {
+      "file": "28_bruxo_chama_sinistra_do_patrono_abissal.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/28_bruxo_chama_sinistra_do_patrono_abissal.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 234072,
+      "sha256": "aa282076cba712b01acc3682173edc3fe64b449f0c6237f33b5a63f0c161daa4"
+    },
+    {
+      "file": "arqueiro_1.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/arqueiro_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 237351,
+      "sha256": "8eb2d69297957a8ef58af23a4793ca40b6fa3adc8518cf2711ed6e40396a331b"
+    },
+    {
+      "file": "arqueiro_2.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/arqueiro_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 261879,
+      "sha256": "f76b8fe3e64027ed4e4a5154ba1b9a1579cba3a9bd9915ae50975e637965bf9e"
+    },
+    {
+      "file": "arqueiro_3.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/arqueiro_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 288612,
+      "sha256": "02aceab89219f3b59d4d1d88e7945129a69d896e57ef29b56700ffd5669c6d47"
+    },
+    {
+      "file": "arqueiro_4.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/arqueiro_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 266348,
+      "sha256": "f1ff0a892a752fa8f330b931f2f74a1087a2618c919c499bddf4486a514df060"
+    },
+    {
+      "file": "barbaro_1.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/barbaro_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254517,
+      "sha256": "28cd8c9da06dca43d70513c5cfae647c797d9aeb2d92aa5a0541cd9e368025cb"
+    },
+    {
+      "file": "barbaro_2.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/barbaro_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 276998,
+      "sha256": "e6bc179515eece915658610817384362f900b92cfab84c44cbbb030ccc5daf8f"
+    },
+    {
+      "file": "barbaro_3.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/barbaro_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248602,
+      "sha256": "03ba2b048b6b74ca07663ea378d93afa8b55804e87e7a1f2b88c004765155255"
+    },
+    {
+      "file": "barbaro_4.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/barbaro_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 248031,
+      "sha256": "d25a61856bf705649deff9f0c254bbac86c3e5adcb08393f519d03fb00987d02"
+    },
+    {
+      "file": "bruxo_1.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/bruxo_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 232788,
+      "sha256": "b68b9742891e5ffd153661e6b2547d8be00ef810e86a3d80b1e00b0c1aaf4253"
+    },
+    {
+      "file": "bruxo_2.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/bruxo_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 228979,
+      "sha256": "08e03d203d38d5ce2152728e085a4c66b46c3d7a38206b5bc7ffd7729009fc49"
+    },
+    {
+      "file": "bruxo_3.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/bruxo_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 228796,
+      "sha256": "1ca414bc976c1565302093578197fb7ccf6559e202fa47606474af3047dd09ad"
+    },
+    {
+      "file": "bruxo_4.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/bruxo_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 234072,
+      "sha256": "aa282076cba712b01acc3682173edc3fe64b449f0c6237f33b5a63f0c161daa4"
+    },
+    {
+      "file": "clerigo_1.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/clerigo_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 252531,
+      "sha256": "8f205ca98da361e6bed5feb7259145d1c3aa63c975cfd866a5e139df20ef0580"
+    },
+    {
+      "file": "clerigo_2.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/clerigo_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 308721,
+      "sha256": "826029fe91c89352e4d9e251101d389a91831f0e6391c036903535f3c9a97c01"
+    },
+    {
+      "file": "clerigo_3.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/clerigo_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 272676,
+      "sha256": "a27e12ef7486d20a5ba6ea40c7e24d6eabd9de461e9afa944bb21bf2589ceab0"
+    },
+    {
+      "file": "clerigo_4.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/clerigo_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 265115,
+      "sha256": "e0ab73814bbc11ec2b21c6aa19cf13d4a55dda375d0066f9eebddf5fa06d188d"
+    },
+    {
+      "file": "guerreiro_1.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/guerreiro_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 320048,
+      "sha256": "ad851c370e97781c20cea3c5050840a6223ec1067bb4b16bd391e44be1e6cd5f"
+    },
+    {
+      "file": "guerreiro_2.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/guerreiro_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 302963,
+      "sha256": "2918bedd298683beabd9ffa184c16e4aa86b5a172ef6eca7f3d77b1db53ea63f"
+    },
+    {
+      "file": "guerreiro_3.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/guerreiro_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 270223,
+      "sha256": "7ba82662a4ee928820eface637ec60169119ae1927c94a48c4d135e999724cb6"
+    },
+    {
+      "file": "guerreiro_4.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/guerreiro_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 319340,
+      "sha256": "82dc480aa1205ef6011c6cbaaa8dde2d2a75ee266de4798a9fe764c01ac50ab6"
+    },
+    {
+      "file": "mago_1.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/mago_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 253229,
+      "sha256": "916307393255142e179e78c59d460d0d2018249135669d4f1c11fbe31ab59221"
+    },
+    {
+      "file": "mago_2.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/mago_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 240282,
+      "sha256": "f9feb311d6ddfcf073938c4e07a8c409b96313ac73bbb78cd51a85873ebfaca1"
+    },
+    {
+      "file": "mago_3.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/mago_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 254100,
+      "sha256": "495ff234bf4d209805ac68ee7a13f75d1ac2b302db864d99824dde3265168489"
+    },
+    {
+      "file": "mago_4.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/mago_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 279961,
+      "sha256": "47a1dd082d0c6c6647921634763fda619705db1ff36c6659bc42637725c622c8"
+    },
+    {
+      "file": "monge_1.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/monge_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274356,
+      "sha256": "8b6909b751db9afd845edd96f8506aa802c7999b805083d3bafee10fd9b7cf5f"
+    },
+    {
+      "file": "monge_2.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/monge_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 281709,
+      "sha256": "a6ea2e4940a6b45fde07025ada6f9486f20be557f65f9be6630e648f06fbcbad"
+    },
+    {
+      "file": "monge_3.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/monge_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 274448,
+      "sha256": "6e586826c8feee4faa940e52af13301f0ea9d930f3c8a840c723404a8bed906b"
+    },
+    {
+      "file": "monge_4.png",
+      "path": "MagicForgeClient/Assets/Art/Skills/monge_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 242765,
+      "sha256": "10efb8038bc8f97919c35415372892adba662e2a4f5275a432707beeb78436a9"
+    }
+  ]
+}

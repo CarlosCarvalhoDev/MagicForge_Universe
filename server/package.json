@@ -4,6 +4,12 @@
   "description": "MagicForge: Universe - 20Hz Authoritative Game Server",
   "main": "dist/server/src/index.js",
   "scripts": {
+    "test:warlock": "tsx --test tests/warlock-effects.test.ts",
+    "benchmark:warlock": "tsx tools/benchmark-warlock.ts",
+    "test:monk": "tsx --test tests/monk-effects.test.ts",
+    "benchmark:monk": "tsx tools/benchmark-monk.ts",
+    "test:archer": "tsx --test tests/archer-effects.test.ts",
+    "benchmark:archer": "tsx tools/benchmark-archer.ts",
     "benchmark:earned": "tsx tools/benchmark-earned-progression.ts",
     "test:earned": "tsx --test tests/earned-progression.test.ts tests/economy-calibration.test.ts",
     "benchmark:martial": "tsx tools/benchmark-martial.ts",

@@ -11,6 +11,8 @@ test('Prévia congela identidades, exige confirmação e repete o mesmo pedido a
     addEventListener(name:string,callback:()=>void){this.listeners[name]=callback;}
     click(){if(!this.disabled)this.listeners.click?.();}
     append(...items:Element[]){this.children.push(...items);}
+    prepend(...items:Element[]){this.children.unshift(...items);}
+    setAttribute(_name:string,_value:string){}
     appendChild(item:Element){this.children.push(item);if(this.id==='fusion-recipe'&&!this.value)this.value=item.value;return item;}
     replaceChildren(){this.children=[];if(this.id==='fusion-recipe')this.value='';}
   }

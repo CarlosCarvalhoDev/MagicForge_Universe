@@ -110,6 +110,12 @@ flowchart TD
 ---
 
 ### 🚧 ETAPA 4: Proteção, sugestões de equipamento e fusão
+
+Fechamento posterior de 11/11/2026: efeitos das 12 habilidades do Bruxo implementados, incluindo cura reduzida, praga, Hex/regeneração, Agathys, raiz/cegueira, teleporte com dano na partida, puxão e áreas periódicas. As sete classes agora têm os 84 efeitos implementados conforme as descrições atuais; invocações em área não são pets com IA. Próximo foco: farm → melhoria → chefe, excedentes do inventário, rotas de equipamento e calibração. Arte, validação em sessão real, balanceamento final e Unity continuam pendentes. Ver [entrega do Bruxo](ENTREGA_BRUXO_2026-11-11.md).
+
+Atualização posterior de 11/11/2026: efeitos das 12 habilidades do Monge implementados, com socos periódicos, redução de frequência de ataque, bônus de esquiva/crítico, cura, stun, cone, sombras, corrida temporária e Domo com cura/dano e silêncio de habilidades. Medidas 474 fixtures sem rejeições/casts vazios. Monstros atuais só têm ataques básicos; silêncio não foi convertido em stun. Resta o Bruxo para fechar os efeitos das sete classes. Ver [entrega do Monge](ENTREGA_MONGE_2026-11-11.md).
+
+Atualização de 11/11/2026: concluídos os efeitos das 12 habilidades do Arqueiro, com veneno, marca, raiz, rajadas temporais, flecha em linha, furtividade/crítico/esquiva e área da Fera Guardiã. Medidas 474 fixtures de chefes sem rejeições/casts vazios. Restam Monge e Bruxo para o fechamento dos efeitos de todas as classes; balanceamento e progressão longa seguem pendentes. Ver [entrega do Arqueiro](ENTREGA_ARQUEIRO_2026-11-11.md).
 * **Objetivo**: Dar utilidade para dezenas de itens acumulados na bag e facilitar a troca de equipamentos no celular.
 * **Mecânica**:
   - **Proteção entregue**: trava por instância, persistida no SQLite, respeitada por venda, reciclagem, consumo de materiais/gemas/poções e venda em lote. Equipar e refinar o próprio equipamento continuam permitidos.

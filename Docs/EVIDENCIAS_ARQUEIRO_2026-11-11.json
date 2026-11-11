@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-11-11T13:40:33.378Z",
+  "branch": "master",
+  "scope": "Archer effects, authoritative server and Web presentation. No new images, Unity implementation, database migration or live-player validation.",
+  "benchmark": {
+    "scenarioCount": 474,
+    "assumptions": "474 solo fixtures in memory: 3 cantrips at level 1/world 1; 9 builds at 10/worlds 1-2; 27 at 25/worlds 2-3; 81 at 50/worlds 3-4; 2 seeds. Starter weapon, fixed level, supplied stocks/gold, no purchases. Production automation and real cooldowns; not farm-earned progression or final balance. High-level critical/dodge formulas are inherited, unchanged.",
+    "summary": [
+      {
+        "level": 1,
+        "scenarios": 6,
+        "victories": 3,
+        "deaths": 3,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 10,
+        "scenarios": 36,
+        "victories": 36,
+        "deaths": 0,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 25,
+        "scenarios": 108,
+        "victories": 108,
+        "deaths": 0,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 50,
+        "scenarios": 324,
+        "victories": 324,
+        "deaths": 0,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      }
+    ],
+    "sourceHashes": {
+      "src/game/World.ts": "5cc6b3a02d6203e37521bad3ad717e558c0bd546cdd87b3b6a74c502effa103a",
+      "src/entities/Entity.ts": "1266e4e25f9527eda04290fcde27278988d9240171dba778074b48b8ad843207",
+      "src/entities/Monster.ts": "6e86c2ec5ee3202d55b6d6b5134559fbc0569a33eb094aa3608d323a64fcac42",
+      "src/entities/Player.ts": "2dd9baa3501ec45e25a21f9104342136754efc2c7f483511e6a3c57c8240ba34",
+      "tools/BossInvestmentSimulation.ts": "4cdf8cd8c88a91228616a692830add7c3cdd1ef985e08ab75ec0baf34dfe0e9c",
+      "tools/benchmark-archer.ts": "61d03fb157868efe96243e019e6755f0922e5eed259e0b077cec022bb6680e60",
+      "../shared/src/archer-effects.ts": "02256976d19ff5be91801f3bdc3fdad87e88ee852442799c2ae91016bce6cb8f",
+      "../shared/src/skills.ts": "1529cd0ed3691deda300835398b5ee4d4d54476690364bd1b23fe232718d7dc8",
+      "../shared/src/skill-targeting.ts": "ffb5d035fb55eec7c1f972a8f49545ebfd41d7255a85d95937a53a370773c21c"
+    },
+    "rawReport": "scratch/runtime/archer-loadouts-2026-11-11.json"
+  },
+  "additionalHashes": {
+    "client/src/renderer/PixelVfx.ts": "e40e1b6f49e9623dc16ab254b552ee5dfa16e5c7d26acf25d7fec793fe590f8b",
+    "client/src/renderer/PixelVfxPlayer.ts": "52a8c4611a5062fd2e3a38145e130b72115fc51794fb6f84d814cdf4a87b315c",
+    "server/tests/archer-effects.test.ts": "d4366a2ea3d3748e6f732f349c67e7242157b1664bea9348311243e2b8aa574d",
+    "client/tests/archer-effects-vfx.test.mjs": "573abd666385155c3c6b967a0d37876459f500f6bf4684d0fd83566217b826d8"
+  },
+  "checks": {
+    "fullServerTests": 235,
+    "archerServerTests": 30,
+    "archerPresentationTests": 5,
+    "mageTypeScriptRegression": 34,
+    "mageVfxRegression": 9,
+    "martialServerRegression": 27,
+    "martialPresentationRegression": 23,
+    "clientRegression": 36,
+    "serverAndClientBuild": "passed",
+    "whitespace": "passed"
+  },
+  "overlapNote": "Focused server tests are included in the full server total; some presentation checks are also included in npm test. Do not sum as distinct tests.",
+  "limitations": [
+    "Guardian is a fixed spiritual area with twelve pulses, not an independent pet AI.",
+    "Stealth ends on the next offensive attack or after three seconds. One critical and one enemy-basic dodge are separate guarantees; no permanent invulnerability.",
+    "Damage, debuff strength and timing are initial authored values, not final economic or class balance.",
+    "Inherited high-level DEX critical/dodge formulas remain unchanged.",
+    "Original art and user changes were preserved; no commit/push in this block."
+  ]
+}

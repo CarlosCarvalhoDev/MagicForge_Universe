@@ -15,3 +15,6 @@ export * from './skill-targeting';
 export * from './cleric-effects';
 export * from './mage-effects';
 export * from './martial-effects';
+export * from './archer-effects';
+export * from './monk-effects';
+export * from './warlock-effects';

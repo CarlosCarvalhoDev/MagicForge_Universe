@@ -254,7 +254,7 @@ export class GameRenderer {
     if (!this.warriorPresentation.transition(event, performance.now())) return;
     for(const request of planMageCometPulseFx(event))this.vfx.queue.spawn(request,performance.now());
     const target = entities.find(e => e.id === event.status.targetEntityId);
-    if (target && event.event === 'BROKEN') this.floatingTexts.push({ id: `status-${event.status.statusId}`, text: event.status.type==='GUIDING_MARK'?'MARCA CONSUMIDA':'ESCUDO QUEBRADO', color: '#b9e9fa', x: target.position.x, y: target.position.z - 2, opacity: 1, createdAt: performance.now() });
+    if (target && event.event === 'BROKEN' && ['SHIELD','GUIDING_MARK'].includes(event.status.type)) this.floatingTexts.push({ id: `status-${event.status.statusId}`, text: event.status.type==='GUIDING_MARK'?'MARCA CONSUMIDA':'ESCUDO QUEBRADO', color: '#b9e9fa', x: target.position.x, y: target.position.z - 2, opacity: 1, createdAt: performance.now() });
     if(target && event.event==='TICK' && (event.tickHeal??0)>0)this.floatingTexts.push({id:`heal-${event.status.statusId}-${event.serverTick}`,text:`+${event.tickHeal}`,color:'#a2f4a0',x:target.position.x,y:target.position.z-2,opacity:1,createdAt:performance.now()});
     // BLEED damage is already broadcast via S2C_COMBAT_EVENT; do not duplicate numbers here.
   }

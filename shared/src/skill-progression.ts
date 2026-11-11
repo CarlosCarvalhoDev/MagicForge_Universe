@@ -16,7 +16,7 @@ export function getSkillUpgradeMultiplier(level: number): number {
 
 /** Self buffs without a power-bearing implementation cannot consume upgrade currency. */
 export function canUpgradeSkillPower(skill: SkillDefinition): boolean {
-  return skill.isHeal || skill.range > 0 || skill.isAoe || ['guerreiro_nv2_2','mago_nv1_2'].includes(skill.skillId);
+  return skill.isHeal || skill.range > 0 || skill.isAoe || ['guerreiro_nv2_2','mago_nv1_2','bruxo_nv1_2'].includes(skill.skillId);
 }
 
 /** Solo early-game tuning from the seeded economy audit; the server derives the actual price. */

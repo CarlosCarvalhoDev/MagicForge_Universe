@@ -1,5 +1,6 @@
 import { ITEMS_DATABASE, RARITY_COLORS, type InventoryItemPayload, type ItemAttributesBonus } from '@magicforge/shared';
 import { compareEquipment, itemBonuses } from './InventoryView';
+import { createItemIcon } from './ItemIcon';
 
 const labels: Record<keyof ItemAttributesBonus, string> = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma', maxHp: 'Vida do item', maxResource: 'Recurso do item' };
 
@@ -48,7 +49,8 @@ export function setupInventoryTooltip(grid: HTMLElement, getItems: () => readonl
       text('h4', caption, section);
       const itemDef = item && ITEMS_DATABASE[item.itemId];
       if (item && itemDef) {
-        const name = text('strong', `${item.isLocked ? '🔒 ' : ''}${itemDef.icon} ${itemDef.name}${item.refineLevel ? ` +${item.refineLevel}` : ''}`, section);
+        const name = text('strong', `${item.isLocked ? '🔒 ' : ''}${itemDef.name}${item.refineLevel ? ` +${item.refineLevel}` : ''}`, section);
+        name.prepend(createItemIcon(item.itemId));
         name.className = 'item-tooltip-name'; name.style.color = RARITY_COLORS[itemDef.rarity]?.text ?? '#fef08a';
         text('small', `${itemDef.rarity} · ${itemDef.equipmentSlot ?? itemDef.type}`, section);
         text('small', `Nível ${itemDef.minLevel ?? 1} · ${itemDef.allowedClasses?.join(', ') || 'Todas as classes'}`, section);

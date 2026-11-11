@@ -371,11 +371,12 @@ export class Player extends Entity {
       this.potionMpCooldownSec = Math.max(0, this.potionMpCooldownSec - deltaTimeSec);
     }
 
+    const movementSpeed = this.speed * this.getMovementMultiplier();
     // Authoritative Continuous Direction Movement (Mobile Virtual Joystick)
     if (this.isMoving && this.moveDirection) {
-      this.velocity.x = this.moveDirection.x * this.speed;
+      this.velocity.x = this.moveDirection.x * movementSpeed;
       this.velocity.y = 0;
-      this.velocity.z = this.moveDirection.z * this.speed;
+      this.velocity.z = this.moveDirection.z * movementSpeed;
 
       this.headingYaw = (Math.atan2(this.moveDirection.x, this.moveDirection.z) * 180) / Math.PI;
 
@@ -404,15 +405,15 @@ export class Player extends Entity {
         const dirZ = dz / dist;
 
         // Velocity vector
-        this.velocity.x = dirX * this.speed;
+        this.velocity.x = dirX * movementSpeed;
         this.velocity.y = 0;
-        this.velocity.z = dirZ * this.speed;
+        this.velocity.z = dirZ * movementSpeed;
 
         // Yaw angle (degrees)
         this.headingYaw = (Math.atan2(dirX, dirZ) * 180) / Math.PI;
 
         // Integrate position: s = v * dt
-        const moveStep = this.speed * deltaTimeSec;
+        const moveStep = movementSpeed * deltaTimeSec;
         if (moveStep >= dist) {
           this.position.x = this.targetDestination.x;
           this.position.z = this.targetDestination.z;

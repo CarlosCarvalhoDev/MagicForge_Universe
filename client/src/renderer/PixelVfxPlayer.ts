@@ -91,6 +91,8 @@ export class PixelVfxPlayer {
   }
   drawStatuses(ctx: CanvasRenderingContext2D, statuses: CombatStatusStatePayload[], entities: readonly FxEntity[], camera: { x: number; y: number }, zoom: number, now: number): void {
     const names = { BLEED: 'SANGRANDO', ARMOR_BREAK: 'DEFESA ↓', ATTACK_SPEED_BUFF: 'VELOCIDADE ↑', STUN: 'ATORDOADO', SHIELD: 'ESCUDO', DAMAGE_BUFF: 'PODER ↑', DAMAGE_REDUCTION: 'RESISTÊNCIA ↑', CRITICAL_BUFF: 'CRÍTICO ↑', GUIDING_MARK: 'MARCA GUIA', GUARDIANS_AURA:'GUARDIÕES', SPIRITUAL_WEAPON:'ARMA ESPIRITUAL', SANCTUARY:'SANTUÁRIO', SANCTUARY_WARD:'PROTEÇÃO SAGRADA', SLOW:'LENTIDÃO', FROST_SLOW:'GELO: LENTIDÃO', BURN:'QUEIMANDO', FROZEN:'CONGELADO', ARCANE_HASTE:'MENTE ACELERADA', COMET_RAIN:'COMETAS', CRIPPLED:'MOVIMENTO ↓', WEAKENED:'ATAQUE ↓', STONE_SKIN:'PELE ROCHOSA', UNBRIDLED_RAGE:'ENERGIA LIVRE', SPECTRAL_PACK:'MATILHA ESPIRITUAL', DEATH_IMMUNITY: 'PROTEÇÃO À MORTE' };
+    const labels: Record<string,string> = {...names,POISON:'ENVENENADO',HUNTERS_MARK:'MARCA DO CAÇADOR',ROOT:'ENRAIZADO',STEALTH:'FURTIVO',AMBUSH_CRITICAL:'EMBOSCADA',EVASION_READY:'ESQUIVA PRONTA',ARROW_VOLLEY:'RAJADA TRIPLA',STORM_BARRAGE:'BOMBARDEIO',ASTRAL_GUARDIAN:'FERA GUARDIÃ',CHI_PALMS:'PALMAS DE CHI',FLURRY:'RAJADA DE GOLPES',ATTACK_SLOW:'ATAQUES LENTOS',WIND_STEP:'PASSO DO VENTO',DRAGON_STRIDE:'CORRIDA DO DRAGÃO',ZEN_DOME:'DOMO SERENO',SILENCED:'SILENCIADO'};
+    Object.assign(labels,{HEAL_REDUCTION:'CURA REDUZIDA',DARK_PLAGUE:'PRAGA SOMBRIA',HEXED:'AMALDIÇOADO',HEX_REGEN:'VÍNCULO VITAL',HADAR_HUNGER:'FOME DE HADAR',BLINDED:'CEGO',DEMON_PRESENCE:'PRESENÇA DEMONÍACA'});
     const grouped = new Map<string, CombatStatusStatePayload[]>();
     for (const status of statuses) grouped.set(status.targetEntityId, [...(grouped.get(status.targetEntityId) ?? []), status]);
     ctx.save(); ctx.imageSmoothingEnabled = false;
@@ -99,8 +101,8 @@ export class PixelVfxPlayer {
       const x = Math.round(ctx.canvas.width / 2 + (entity.position.x - camera.x) * zoom), y = Math.round(ctx.canvas.height / 2 + (entity.position.z - camera.y) * zoom);
       if (x < -200 || y < -200 || x > ctx.canvas.width + 200 || y > ctx.canvas.height + 200) continue;
       active.forEach((status, index) => {
-        if((status.type==='GUARDIANS_AURA'||status.type==='SANCTUARY'||status.type==='COMET_RAIN'||status.type==='SPECTRAL_PACK')&&status.radius){
-          const center=['SANCTUARY','COMET_RAIN'].includes(status.type)?(status.areaCenter??entity.position):entity.position;
+        if((status.type==='GUARDIANS_AURA'||status.type==='SANCTUARY'||status.type==='COMET_RAIN'||status.type==='SPECTRAL_PACK'||status.type==='ASTRAL_GUARDIAN'||status.type==='ZEN_DOME'||status.type==='HADAR_HUNGER'||status.type==='DEMON_PRESENCE')&&status.radius){
+          const center=['SANCTUARY','COMET_RAIN','ASTRAL_GUARDIAN','ZEN_DOME','HADAR_HUNGER','DEMON_PRESENCE'].includes(status.type)?(status.areaCenter??entity.position):entity.position;
           const cx=ctx.canvas.width/2+(center.x-camera.x)*zoom,cy=ctx.canvas.height/2+(center.z-camera.y)*zoom;
           ctx.beginPath();ctx.arc(cx,cy,status.radius*zoom,0,Math.PI*2);
           ctx.fillStyle=status.type==='SANCTUARY'?'#b8e99b16':'#f8d78812';ctx.fill();ctx.strokeStyle=status.type==='SANCTUARY'?'#b8e99b88':'#f8d78888';ctx.lineWidth=1;ctx.stroke();
@@ -108,7 +110,7 @@ export class PixelVfxPlayer {
         const color = ['BLEED', 'ARMOR_BREAK', 'STUN'].includes(status.type) ? '#f3a18d' : '#ade4ee';
         ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center'; ctx.fillStyle = '#15291ee8';
         const absorption = status.type === 'SHIELD' && Number.isFinite(status.remainingAbsorption) ? Math.max(0, Math.ceil(status.remainingAbsorption!)) : undefined;
-        const label = names[status.type] + (absorption !== undefined ? ` ${absorption}` : '');
+        const label = labels[status.type] + (absorption !== undefined ? ` ${absorption}` : '');
         const w = ctx.measureText(label).width + 10; ctx.fillRect(x - w / 2, y - 120 - index * 15, w, 13); ctx.fillStyle = color; ctx.fillText(label, x, y - 110 - index * 15);
         if (status.type === 'SHIELD' || status.type === 'DEATH_IMMUNITY') {
           ctx.strokeStyle = status.type === 'SHIELD' ? '#83daf0' : '#f5cf85'; ctx.lineWidth = 2;

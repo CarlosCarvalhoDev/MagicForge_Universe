@@ -32,7 +32,7 @@ export function simulateBossInvestment(options: {
     player.currentWorld = player.unlockedWorld = options.world;
     player.currentStage = 9;
     player.recalculateStatsFromEquipment();
-    const combat = { basicAttacks:0, basicDamage:0, skillCasts:0, skillDamage:0, statusDamage:0, periodicHealing:0, effectiveHealing:0, ineffectiveCasts:0, rejections:0, outOfRange:0 };
+    const combat = { basicAttacks:0, basicDamage:0, skillCasts:0, skillDamage:0, statusDamage:0, periodicHealing:0, effectiveHealing:0, movementCasts:0, ineffectiveCasts:0, rejections:0, outOfRange:0 };
     const connection = { id: player.id, accountId: account.id, isAuthenticated: true, send(op: Opcode, data: any) {
       if(op===Opcode.S2C_COMBAT_EVENT&&data.attackerId===player.id&&data.damageSource==='BASIC_ATTACK'){combat.basicAttacks++;combat.basicDamage+=data.damage;}
       if(op===Opcode.S2C_COMBAT_EVENT&&data.attackerId===player.id&&data.damageSource==='STATUS_TICK')combat.statusDamage+=data.damage;
@@ -40,7 +40,9 @@ export function simulateBossInvestment(options: {
       if(op===Opcode.S2C_SKILL_CAST_EVENT&&data.casterId===player.id){
         combat.skillCasts++;combat.skillDamage+=(data.targetResults??[]).reduce((n:number,r:any)=>n+r.effectiveDamage,0);
         combat.effectiveHealing+=(data.targetResults??[]).reduce((n:number,r:any)=>n+r.effectiveHeal,0);
-        if(!data.damageOrHeal&&!data.appliedStatuses?.length)combat.ineffectiveCasts++;
+        const moved=data.skillId==='bruxo_nv2_3'&&data.originPosition&&data.targetPosition&&Math.hypot(data.originPosition.x-data.targetPosition.x,data.originPosition.z-data.targetPosition.z)>.1;
+        if(moved)combat.movementCasts++;
+        if(!data.damageOrHeal&&!data.appliedStatuses?.length&&!moved)combat.ineffectiveCasts++;
       }
       if(op===Opcode.S2C_SKILL_CAST_REJECTED){combat.rejections++;if(data.reasonCode==='OUT_OF_RANGE')combat.outOfRange++;}
     } } as unknown as Connection;

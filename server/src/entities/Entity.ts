@@ -4,6 +4,7 @@ import {
   createVector3,
   EntitySnapshotState,
   EntityType,
+  MONK_EFFECTS,
   CombatStatusType,
   CombatStatusStatePayload,
 } from '@magicforge/shared';
@@ -11,7 +12,7 @@ import {
 export interface ActiveCombatStatus {
   areaCenter?: Vector3;
   radius?: number;
-  periodic?: {elapsedSec:number; pulsesDone:number; totalPower:number; targetId?:string};
+  periodic?: {elapsedSec:number; pulsesDone:number; totalPower:number; targetId?:string; isCritical?:boolean; totalHealing?:number};
   statusId: string;
   type: CombatStatusType;
   skillId: string;
@@ -25,6 +26,7 @@ export interface ActiveCombatStatus {
   maxAbsorption?: number;
   reflectRatio?: number;
   reflectOnAbsorbed?: boolean;
+  reflectFlat?: number;
   nextTickSec?: number;
 }
 
@@ -104,6 +106,14 @@ export abstract class Entity {
     return this.hasStatus('DEATH_IMMUNITY');
   }
 
+  public isSilenced(): boolean {
+    return (this.getStatus('SILENCED')?.remainingSec ?? 0) > 0;
+  }
+
+  public canUseSkills(): boolean {
+    return !this.isDead && !this.isStunned() && !this.isSilenced();
+  }
+
   public getArmorMultiplier(): number {
     const armorBreak = this.getStatus('ARMOR_BREAK');
     return armorBreak ? 1.0 + armorBreak.magnitude : 1.0;
@@ -115,17 +125,23 @@ export abstract class Entity {
   }
 
   public getCriticalChance(baseChance: number): number {
-    return Math.max(0, Math.min(1, baseChance * (1 + (this.getStatus('CRITICAL_BUFF')?.magnitude ?? 0))));
+    return Math.max(0, Math.min(1, baseChance * (1 + (this.getStatus('CRITICAL_BUFF')?.magnitude ?? 0)) + (this.hasStatus('WIND_STEP') ? MONK_EFFECTS.criticalBonus : 0)));
+  }
+
+  public getDodgeChance(baseChance: number): number {
+    return Math.max(0, Math.min(1, baseChance + (this.hasStatus('WIND_STEP') ? MONK_EFFECTS.dodgeBonus : 0)));
   }
 
   public getMovementMultiplier(): number {
-    return 1-Math.max(0,Math.min(1,Math.max(this.getStatus('SLOW')?.magnitude??0,this.getStatus('FROST_SLOW')?.magnitude??0,this.getStatus('CRIPPLED')?.magnitude??0)));
+    if (this.hasStatus('ROOT')) return 0;
+    return (1-Math.max(0,Math.min(1,Math.max(this.getStatus('SLOW')?.magnitude??0,this.getStatus('FROST_SLOW')?.magnitude??0,this.getStatus('CRIPPLED')?.magnitude??0)))) * (1 + (this.getStatus('DRAGON_STRIDE')?.magnitude ?? 0));
   }
 
   public getAttackSpeedMultiplier(): number {
     const haste = this.getStatus('ATTACK_SPEED_BUFF');
     // +25% de velocidade de ataque reduz o intervalo de ataque em 20% (1 / 1.25 = 0.8)
-    return haste ? Math.max(0.4, 1.0 / (1.0 + haste.magnitude)) : 1.0;
+    const slow = Math.max(0,Math.min(.8,this.getStatus('ATTACK_SLOW')?.magnitude??0));
+    return (haste ? Math.max(0.4, 1.0 / (1.0 + haste.magnitude)) : 1.0) / (1 - slow);
   }
 
   public takeDamage(damage: number, source?: Entity, isReflected = false): TakeDamageResult {
@@ -134,7 +150,10 @@ export abstract class Entity {
     }
 
     const reduction = Math.max(0, Math.min(1, Math.max(this.getStatus('DAMAGE_REDUCTION')?.magnitude ?? 0, this.getStatus('SANCTUARY_WARD')?.magnitude ?? 0,this.getStatus('STONE_SKIN')?.magnitude??0)));
-    let modifiedDamage = Math.round(damage * this.getArmorMultiplier() * (1 - reduction));
+    const mark = this.getStatus('HUNTERS_MARK');
+    const markedMultiplier = mark && mark.remainingSec > 0 && source && !source.isDead && source.id === mark.sourceEntityId ? 1 + mark.magnitude : 1;
+    const hexMultiplier=1+Math.max(0,this.getStatus('HEXED')?.magnitude??0);
+    let modifiedDamage = Math.round(damage * this.getArmorMultiplier() * (1 - reduction) * markedMultiplier * hexMultiplier);
     let absorbed = 0;
     let reflected = 0;
     let brokenShieldStatus: ActiveCombatStatus | undefined;
@@ -162,8 +181,8 @@ export abstract class Entity {
       }
     }
 
-    if(shield?.reflectOnAbsorbed && absorbed>0 && shield.reflectRatio && source && !source.isDead && !isReflected){
-      reflected=Math.round(absorbed*shield.reflectRatio);
+    if(shield?.reflectOnAbsorbed && absorbed>0 && (shield.reflectRatio||shield.reflectFlat) && source && !source.isDead && !isReflected){
+      reflected=Math.round(shield.reflectFlat??absorbed*(shield.reflectRatio??0));
       if(reflected>0)source.takeDamage(reflected,this,true);
     }
 
@@ -203,7 +222,9 @@ export abstract class Entity {
   public heal(amount: number): number {
     if (this.isDead || amount <= 0) return 0;
     const prevHp = this.currentHp;
-    this.currentHp = Math.min(this.maxHp, this.currentHp + amount);
+    const reduction=Math.max(0,Math.min(1,this.getStatus('HEAL_REDUCTION')?.magnitude??0));
+    const incoming=reduction>0?Math.floor(amount*(1-reduction)):amount;
+    this.currentHp = Math.min(this.maxHp, this.currentHp + incoming);
     return this.currentHp - prevHp;
   }
 

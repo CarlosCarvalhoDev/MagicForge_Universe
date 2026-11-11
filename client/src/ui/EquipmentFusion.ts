@@ -1,5 +1,6 @@
 import { CharacterClass, FUSION_RECIPES, ITEMS_DATABASE, getFusionPreview, isFusionIngredient, type FusionRequest, type FusionResult, type InventoryItemPayload } from '@magicforge/shared';
 import { renderEquipmentComparison } from './InventoryView';
+import { createItemIcon } from './ItemIcon';
 
 export function setupEquipmentFusion(transport: { isReady(): boolean; send(request: FusionRequest): void; inspect(instanceId: string): void; openFarm(): void }) {
   const select = document.getElementById('fusion-recipe') as HTMLSelectElement;
@@ -28,12 +29,14 @@ export function setupEquipmentFusion(transport: { isReady(): boolean; send(reque
       operation = undefined; status.textContent = 'Os ingredientes ou requisitos mudaram. Revise a prévia novamente.';
     }
     const output = ITEMS_DATABASE[current.outputItemId];
-    document.getElementById('fusion-output')!.textContent = `${output.icon} ${output.name} · ${output.rarity} · nível ${output.minLevel}`;
+    const outputLabel = document.getElementById('fusion-output')!;
+    outputLabel.textContent = ` ${output.name} · ${output.rarity} · nível ${output.minLevel}`;
+    outputLabel.prepend(createItemIcon(output.itemId));
     document.getElementById('fusion-cost')!.textContent = `${current.goldCost.toLocaleString('pt-BR')} ouro · saldo ${context.gold.toLocaleString('pt-BR')} · ${preview.eligible.length}/${current.inputCount} cópias livres`;
     const ingredients = document.getElementById('fusion-ingredients')!; ingredients.replaceChildren();
     const selected = operation ? operation.inputInstanceIds.map(id => context.items.find(item => item.instanceId === id)).filter((item): item is InventoryItemPayload => !!item) : preview.selected;
-    for (const item of selected) text('li', `${ITEMS_DATABASE[item.itemId].name} · posição ${item.slotIndex + 1}`, ingredients);
-    for (const material of preview.materials) text('li', `${material.quantity}× ${ITEMS_DATABASE[material.itemId].name} · disponíveis ${material.available}`, ingredients);
+    for (const item of selected) text('li', ` ${ITEMS_DATABASE[item.itemId].name} · posição ${item.slotIndex + 1}`, ingredients).prepend(createItemIcon(item.itemId));
+    for (const material of preview.materials) text('li', ` ${material.quantity}× ${ITEMS_DATABASE[material.itemId].name} · disponíveis ${material.available}`, ingredients).prepend(createItemIcon(material.itemId));
     document.getElementById('fusion-requirements')!.textContent = pending ? 'Aguardando confirmação do servidor…' : uncertain ? 'Resposta não recebida. Verifique o mesmo pedido antes de preparar outra fusão.' : preview.reason || 'Receita disponível. Confira as cópias e os materiais.';
     renderEquipmentComparison(document.getElementById('fusion-comparison')!, { itemId:current.outputItemId, slotIndex:0, quantity:1, isEquipped:false, refineLevel:0 }, context.items);
     document.getElementById('fusion-confirmation-summary')!.textContent = `Criar ${output.name}: ${current.inputCount} cópias listadas + ${current.goldCost.toLocaleString('pt-BR')} ouro + ${current.materials.map(material => `${material.quantity}× ${ITEMS_DATABASE[material.itemId].name}`).join(' + ')}. Esses ingredientes serão consumidos.`;

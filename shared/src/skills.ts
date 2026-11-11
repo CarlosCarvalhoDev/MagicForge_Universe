@@ -529,7 +529,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Chi Sagrado',
-    description: 'Sequência veloz de dois socos carregados de Chi (1.35x DEX).',
+    description: 'Dois socos, a cada 0.1s, dividem 1.35x DEX + base de nível (6 + 4x nível). Uma cobrança; encerra se alvo sair do alcance ou o autor for atordoado, morrer ou sair do mundo.',
     iconEmoji: '✋',
   },
   'monge_truque_2': {
@@ -548,7 +548,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Vento',
-    description: 'Chute giratório aerodinâmico (1.2x DEX + 0.3x WIS) atingindo até 2 alvos próximos.',
+    description: '1.2x DEX + 0.3x SAB + base de nível por alvo. Atinge o alvo escolhido e até um segundo inimigo dentro de 3m do monge.',
     iconEmoji: '🌪️',
   },
   'monge_truque_3': {
@@ -567,7 +567,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Pontos Vitais',
-    description: 'Atinge meridianos de energia (1.3x DEX), reduzindo a velocidade de ataque do alvo em 20%.',
+    description: '1.3x DEX + base de nível; reduz a frequência de ataques do alvo em 20% por 4s, ampliando novos intervalos em 25%. Não altera um intervalo já iniciado.',
     iconEmoji: '🎯',
   },
 
@@ -587,7 +587,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Flurry of Blows',
-    description: 'Quatro socos velozes e fulminantes em 0.5s no alvo (1.85x DEX total).',
+    description: 'Quatro impactos ao longo de 0.5s dividem 1.85x DEX + base de nível. Sem trocar de alvo; encerra se ele sair do alcance ou o monge for atordoado, morrer ou sair do mundo.',
     iconEmoji: '👊',
   },
   'monge_nv1_2': {
@@ -606,7 +606,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Mobilidade',
-    description: 'Step of the Wind D&D: +35% de Esquiva e +15% de Crítico por 5 segundos.',
+    description: 'Por 5s, soma 35 pontos percentuais à esquiva e 15 ao crítico, limitados a 100%. Bônus fixos, sem evolução de potência; não desloca nem teleporta o monge.',
     iconEmoji: '🍃',
   },
   'monge_nv1_3': {
@@ -625,7 +625,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: true,
     damageType: 'Chi Curativo',
-    description: 'Canaliza o fluxo interior para curar instantaneamente (1.6x WIS + 1.2x DEX).',
+    description: 'Cura instantânea de 1.6x SAB + 1.2x DEX, limitada à vida faltante, sem crítico. Evolução aumenta a cura.',
     iconEmoji: '🪷',
   },
 
@@ -645,7 +645,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Stunning Strike',
-    description: 'Stunning Strike clássico de D&D: atordoa o sistema nervoso do alvo por 2.5s (2.3x DEX).',
+    description: '2.3x DEX + base de nível; atordoa por 2.5s, impedindo movimento e ataques. Não encurta um atordoamento mais longo.',
     iconEmoji: '🔔',
   },
   'monge_nv2_2': {
@@ -665,7 +665,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.0,
     isHeal: false,
     damageType: 'Chi Cósmico',
-    description: 'Projeta um sopro de chamas espirituais em cone de 5m (2.4x WIS + 1.0x DEX).',
+    description: 'Cone frontal de 5m e 60 graus: 2.4x SAB + 1.0x DEX + base de nível por alvo. Não atinge atrás do monge.',
     iconEmoji: '🐉',
   },
   'monge_nv2_3': {
@@ -685,7 +685,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 4.5,
     isHeal: false,
     damageType: 'Ilusão',
-    description: 'Três sombras marciais atacam simultaneamente em área (2.2x DEX).',
+    description: 'Três impactos simultâneos por alvo em área de 4.5m, dividindo 2.2x DEX + base de nível no total. Sombras são golpes, sem criaturas ou IA própria.',
     iconEmoji: '👥',
   },
 
@@ -705,7 +705,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Vibração Letal',
-    description: 'Quivering Palm lendária de D&D: ondas de choque que explodem o núcleo do alvo (4.6x DEX + 2.0x WIS).',
+    description: 'Impacto único de 4.6x DEX + 2.0x SAB + base de nível. Sem execução automática ou morte instantânea oculta.',
     iconEmoji: '🖐️',
   },
   'monge_nv3_2': {
@@ -725,7 +725,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 8.0,
     isHeal: false,
     damageType: 'Dragão Astral',
-    description: 'Um imenso dragão de Chi atinge o campo inteiro (3.8x DEX + 2.0x WIS) e dobra velocidade de corrida.',
+    description: 'Impacto de 3.8x DEX + 2.0x SAB + base de nível em raio de 8m no ponto escolhido. Dobra a velocidade de corrida por 6s, sem somar aplicações.',
     iconEmoji: '✨',
   },
   'monge_nv3_3': {
@@ -745,7 +745,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 6.0,
     isHeal: true,
     damageType: 'Sanctuary Zen',
-    description: 'Domo zen de 6m que silencia inimigos, regenera o monge e causa dano contínuo (3.9x WIS).',
+    description: 'Área fixa de 6m por 6s. Seis pulsos dividem 3.9x SAB + base de nível por inimigo e 30% da vida máxima em cura própria, somente dentro da área. Silêncio bloqueia habilidades, sem bloquear ataques básicos. Evolução aumenta dano/cura; sem crítico.',
     iconEmoji: '☯️',
   },
 
@@ -768,7 +768,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Perfurante',
-    description: 'Disparo à distância milimetricamente calibrado (1.35x DEX).',
+    description: 'Disparo à distância preciso: 1.35x DEX + base de nível (6 + 4x nível).',
     iconEmoji: '🏹',
   },
   'arqueiro_truque_2': {
@@ -787,7 +787,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Veneno',
-    description: 'Ponta de flecha embebida em peçonha de serpente (1.1x DEX + veneno por 3s).',
+    description: '1.1x DEX + base de nível. Veneno causa mais 0.6x DEX no total, em três pulsos de 1s. Renovar substitui o veneno anterior.',
     iconEmoji: '🧪',
   },
   'arqueiro_truque_3': {
@@ -806,7 +806,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Contundente',
-    description: 'Atinge a perna do alvo (1.2x DEX), reduzindo a velocidade de movimento em 40% por 4s.',
+    description: '1.2x DEX + base de nível; reduz movimento em 40% por 4s. Vale a maior lentidão ativa.',
     iconEmoji: '🎯',
   },
 
@@ -826,7 +826,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: "Hunter's Mark",
-    description: "Hunter's Mark clássico de D&D: marca a presa mágica, aumentando o dano sofrido por ela em 25% por 8s.",
+    description: 'Marca a presa por 8s, sem dano direto. Ela recebe 25% a mais de dano do próprio arqueiro. Evolução aumenta esse percentual, sem prolongar a marca.',
     iconEmoji: '👁️',
   },
   'arqueiro_nv1_2': {
@@ -845,7 +845,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Disparo Múltiplo',
-    description: 'Três flechas disparadas em rápida sucessão no alvo (1.85x DEX total).',
+    description: 'Três disparos, a cada 0.15s, dividem 1.85x DEX + base de nível. Interrompe se o alvo morrer/sair do alcance ou o arqueiro morrer/sair do mundo.',
     iconEmoji: '🏹',
   },
   'arqueiro_nv1_3': {
@@ -864,7 +864,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Enraizamento',
-    description: 'Espinhos da floresta brotam do chão (1.4x DEX) imobilizando o alvo por 2 segundos.',
+    description: '1.4x DEX + base de nível; enraíza por 2s. Impede movimento, mas o inimigo ainda pode atacar se estiver ao alcance.',
     iconEmoji: '🌿',
   },
 
@@ -885,7 +885,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.5,
     isHeal: false,
     damageType: 'Chuva Perfurante',
-    description: 'Tempestade de flechas em área de 5.5m (2.4x DEX) caindo do céu.',
+    description: 'Impacto em área de 5.5m: 2.4x DEX + base de nível por inimigo.',
     iconEmoji: '🌧️',
   },
   'arqueiro_nv2_2': {
@@ -905,7 +905,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 3.5,
     isHeal: false,
     damageType: 'Perfurante em Linha',
-    description: 'Flecha luminosa que atravessa todos os inimigos em linha reta até 12m (2.55x DEX).',
+    description: 'Atravessa inimigos em linha de 12m e largura de 3m: 2.55x DEX + base de nível por alvo.',
     iconEmoji: '💫',
   },
   'arqueiro_nv2_3': {
@@ -924,7 +924,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Camuflagem',
-    description: 'Furtividade por 3s; o próximo ataque garante 100% de Acerto Crítico e esquiva garantida.',
+    description: 'Fica oculto dos monstros por até 3s. O próximo ataque ofensivo nesse prazo rompe a furtividade e garante crítico. Também evita o próximo ataque básico inimigo dentro desses 3s. Marca e invocação não consomem o crítico.',
     iconEmoji: '🍃',
   },
 
@@ -945,7 +945,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 8.0,
     isHeal: false,
     damageType: 'Fogo Solar',
-    description: 'Dispara um projétil na forma de uma fênix ardente que explode em 8m (4.2x DEX + 1.5x WIS).',
+    description: 'Explosão solar em 8m: 4.2x DEX + 1.5x SAB + base de nível por alvo.',
     iconEmoji: '🦅',
   },
   'arqueiro_nv3_2': {
@@ -964,7 +964,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Rajada Letal',
-    description: 'Dispara 10 flechas ultrassônicas consecutivas que despedaçam chefões (4.7x DEX total).',
+    description: 'Dez disparos a cada 0.1s dividem 4.7x DEX + base de nível. Sem multiplicador oculto contra chefes. Interrompe se alvo morrer/sair do alcance ou arqueiro morrer/sair do mundo.',
     iconEmoji: '⚡',
   },
   'arqueiro_nv3_3': {
@@ -984,7 +984,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 6.0,
     isHeal: false,
     damageType: 'Invocação',
-    description: 'Invoca o espírito de um tigre dentes-de-sabre astral que rasga os monstros por 12s (4.2x DEX).',
+    description: 'Espírito guardião protege a área escolhida de 6m por 12s: 4.2x DEX + base de nível no total, em 12 pulsos. Área fixa, sem crítico ou pet com IA própria. Termina na morte/saída do arqueiro.',
     iconEmoji: '🐅',
   },
 
@@ -1249,7 +1249,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Eldritch Blast',
-    description: 'Eldritch Blast icônico de D&D: feixe de energia espectral roxa causando 1.45x CAR.',
+    description: 'Feixe espectral: 1.45x CAR + base de nível (6 + 4x nível) contra um alvo.',
     iconEmoji: '🟣',
   },
   'bruxo_truque_2': {
@@ -1268,7 +1268,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Chill Touch',
-    description: 'Chill Touch de D&D: dreno sombrio (1.25x CAR) que corta a cura do alvo em 50%.',
+    description: '1.25x CAR + base de nível; reduz a cura recebida pelo alvo em 50% por 4s. Não cura o Bruxo; evolução aumenta o dano, não esse percentual.',
     iconEmoji: '💀',
   },
   'bruxo_truque_3': {
@@ -1287,7 +1287,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Praga Abissal',
-    description: 'Orbe sombria que aplica maldição contínua no monstro (1.3x CAR).',
+    description: '1.3x CAR + base de nível no impacto e praga adicional de 0.6x CAR no total em quatro pulsos de 1s. Renovar substitui a praga anterior.',
     iconEmoji: '👁️',
   },
 
@@ -1307,7 +1307,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Hex',
-    description: 'Hex de D&D: amplifica todo dano recebido pelo monstro em 25% e regenera vida do Bruxo.',
+    description: 'Sem dano direto. Por 8s, amplifica todo dano recebido pelo alvo em 25% e regenera 8% do HP máximo do Bruxo no total, enquanto a maldição existir no alvo vivo. Uma presa por autor. Evolução aumenta bônus e cura.',
     iconEmoji: '🔮',
   },
   'bruxo_nv1_2': {
@@ -1326,7 +1326,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: false,
     damageType: 'Armor of Agathys',
-    description: 'Armor of Agathys de D&D: absorve dano e devolve gelo espectral (1.5x CAR) ao ser atacado.',
+    description: 'Escudo por 6s que absorve 20% do HP máximo. Cada ataque com absorção positiva retalia 1.5x CAR ao atacante, inclusive ao quebrar o escudo. Sem reflexão em cadeia; evolução aumenta absorção e retaliação.',
     iconEmoji: '❄️',
   },
   'bruxo_nv1_3': {
@@ -1346,7 +1346,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 4.5,
     isHeal: false,
     damageType: 'Arms of Hadar',
-    description: 'Tentáculos negros brotam do solo (1.7x CAR) impedindo inimigos de se moverem por 1.5s.',
+    description: '1.7x CAR + base de nível em área de 4.5m; enraíza sobreviventes por 1.5s. Impede movimento, sem bloquear ataques básicos ou encurtar uma raiz mais longa.',
     iconEmoji: '🐙',
   },
 
@@ -1367,7 +1367,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 5.5,
     isHeal: false,
     damageType: 'Hunger of Hadar',
-    description: 'Hunger of Hadar de D&D: vórtice cósmico em 5.5m que cega e causa dano contínuo (2.4x CAR).',
+    description: 'Área fixa de 5.5m por 6s. Seis pulsos dividem 2.4x CAR + base de nível, sem crítico. Dentro dela, inimigos têm 50% de chance adicional e independente de errar ataques básicos. Sair da área remove a cegueira.',
     iconEmoji: '🌌',
   },
   'bruxo_nv2_2': {
@@ -1386,7 +1386,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     isAoe: false,
     isHeal: true,
     damageType: 'Vampiric Touch',
-    description: 'Suga a força vital do monstro (2.5x CAR) convertendo 50% em Vida para o Bruxo.',
+    description: '2.5x CAR, preservando a fórmula existente, converte 50% do HP efetivamente retirado em cura própria. Sem cura por overkill ou dano absorvido. Evolução e bônus de dano aplicáveis.',
     iconEmoji: '🩸',
   },
   'bruxo_nv2_3': {
@@ -1406,7 +1406,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 3.5,
     isHeal: false,
     damageType: 'Misty Step',
-    description: 'Teleporta 6m adiante deixando uma névoa sombria explosiva para trás (2.2x CAR).',
+    description: 'Teleporta para um ponto no chão até 6m e explode na posição de partida em raio de 3.5m: 2.2x CAR + base de nível. Sem ponto escolhido, avança na direção atual; no AUTO, tenta afastar-se da presa.',
     iconEmoji: '🌫️',
   },
 
@@ -1427,7 +1427,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 8.0,
     isHeal: false,
     damageType: 'Buraco Negro',
-    description: 'Abre um buraco negro que suga todos os monstros para o centro e explode em 4.3x CAR.',
+    description: 'Puxa os inimigos vivos dentro de 8m do ponto escolhido para o centro e causa 4.3x CAR + base de nível. Posições são validadas no servidor; não afeta inimigos fora da área.',
     iconEmoji: '🕳️',
   },
   'bruxo_nv3_2': {
@@ -1447,7 +1447,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 6.0,
     isHeal: false,
     damageType: 'Demônio Abissal',
-    description: 'Invoca um demônio alado com espada de fogo que corta o campo por 10s (4.5x CAR).',
+    description: 'Presença demoníaca em área fixa de 6m por 10s. Dez pulsos dividem 4.5x CAR + base de nível, sem crítico. Termina na morte/saída do Bruxo. Sem demônio independente com IA própria.',
     iconEmoji: '😈',
   },
   'bruxo_nv3_3': {
@@ -1467,7 +1467,7 @@ export const SKILLS_DATABASE: Record<string, SkillDefinition> = {
     aoeRadius: 6.0,
     isHeal: false,
     damageType: 'Execução de Almas',
-    description: 'Maldição terminal de D&D: explode a alma do alvo (4.9x CAR) e 2.5x CAR em área.',
+    description: 'Alvo principal recebe 4.9x CAR + base de nível; os demais inimigos em 6m recebem 2.5x CAR + base de nível. No ponto escolhido, o principal é o mais próximo do centro. Sem morte instantânea oculta.',
     iconEmoji: '☠️',
   },
 
@@ -1821,6 +1821,39 @@ export function calculateSkillPower(
       case 'barbaro_nv3_3':return Math.round(base+stats.forca*4.2);
     }
   }
+  if (skill.classType === CharacterClass.ARQUEIRO) {
+    const base = 6 + level * 4;
+    switch (skill.skillId) {
+      case 'arqueiro_truque_1': return Math.round(base + stats.destreza * 1.35);
+      case 'arqueiro_truque_2': return Math.round(base + stats.destreza * 1.1);
+      case 'arqueiro_truque_3': return Math.round(base + stats.destreza * 1.2);
+      case 'arqueiro_nv1_1': case 'arqueiro_nv2_3': return 0;
+      case 'arqueiro_nv1_2': return Math.round(base + stats.destreza * 1.85);
+      case 'arqueiro_nv1_3': return Math.round(base + stats.destreza * 1.4);
+      case 'arqueiro_nv2_1': return Math.round(base + stats.destreza * 2.4);
+      case 'arqueiro_nv2_2': return Math.round(base + stats.destreza * 2.55);
+      case 'arqueiro_nv3_1': return Math.round(base + stats.destreza * 4.2 + stats.sabedoria * 1.5);
+      case 'arqueiro_nv3_2': return Math.round(base + stats.destreza * 4.7);
+      case 'arqueiro_nv3_3': return Math.round(base + stats.destreza * 4.2);
+    }
+  }
+  if (skill.classType === CharacterClass.MONGE) {
+    const base = 6 + level * 4;
+    switch (skill.skillId) {
+      case 'monge_truque_1': return Math.round(base + stats.destreza * 1.35);
+      case 'monge_truque_2': return Math.round(base + stats.destreza * 1.2 + stats.sabedoria * .3);
+      case 'monge_truque_3': return Math.round(base + stats.destreza * 1.3);
+      case 'monge_nv1_1': return Math.round(base + stats.destreza * 1.85);
+      case 'monge_nv1_2': return 0;
+      case 'monge_nv1_3': return Math.round(stats.sabedoria * 1.6 + stats.destreza * 1.2);
+      case 'monge_nv2_1': return Math.round(base + stats.destreza * 2.3);
+      case 'monge_nv2_2': return Math.round(base + stats.sabedoria * 2.4 + stats.destreza);
+      case 'monge_nv2_3': return Math.round(base + stats.destreza * 2.2);
+      case 'monge_nv3_1': return Math.round(base + stats.destreza * 4.6 + stats.sabedoria * 2);
+      case 'monge_nv3_2': return Math.round(base + stats.destreza * 3.8 + stats.sabedoria * 2);
+      case 'monge_nv3_3': return Math.round(base + stats.sabedoria * 3.9);
+    }
+  }
   if (skill.classType === CharacterClass.GUERREIRO) {
     switch (skill.skillId) {
       case 'guerreiro_truque_1':
@@ -1861,6 +1894,23 @@ export function calculateSkillPower(
     }
   }
 
+  if (skill.classType === CharacterClass.BRUXO) {
+    const base=6+level*4;
+    switch(skill.skillId) {
+      case 'bruxo_truque_1': return Math.round(base+stats.carisma*1.45);
+      case 'bruxo_truque_2': return Math.round(base+stats.carisma*1.25);
+      case 'bruxo_truque_3': return Math.round(base+stats.carisma*1.3);
+      case 'bruxo_nv1_1': return 0;
+      case 'bruxo_nv1_2': return Math.round((maxHp??0)*.2);
+      case 'bruxo_nv1_3': return Math.round(base+stats.carisma*1.7);
+      case 'bruxo_nv2_1': return Math.round(base+stats.carisma*2.4);
+      case 'bruxo_nv2_2': return Math.round(stats.carisma*2.5);
+      case 'bruxo_nv2_3': return Math.round(base+stats.carisma*2.2);
+      case 'bruxo_nv3_1': return Math.round(base+stats.carisma*4.3);
+      case 'bruxo_nv3_2': return Math.round(base+stats.carisma*4.5);
+      case 'bruxo_nv3_3': return Math.round(base+stats.carisma*4.9);
+    }
+  }
   let modifier = 0;
   switch (skill.classType) {
     case CharacterClass.GUERREIRO:

@@ -49,6 +49,7 @@ import { setupSkillRotation } from './ui/SkillRotation';
 import { setupSkillUpgrades } from './ui/SkillUpgrades';
 import { DEFAULT_INVENTORY_VIEW, selectBagView, itemBonuses, type InventoryViewState } from './ui/InventoryView';
 import './ui/inventory-view.css';
+import { createItemIcon, renderItemIcon } from './ui/ItemIcon';
 import { setupEquipmentFusion } from './ui/EquipmentFusion';
 import './ui/equipment-fusion.css';
 import { setupEquipmentAdvice } from './ui/EquipmentAdvice';
@@ -727,7 +728,7 @@ function updateRefinementView() {
     refinoItemName.textContent = `${def.name} (+${currentLevel})`;
     refinoItemName.style.color = rarityTheme.text;
   }
-  if (refinoItemIcon) refinoItemIcon.textContent = getItemEmoji(def.itemId, def.type);
+  if (refinoItemIcon) renderItemIcon(refinoItemIcon, def.itemId, getItemEmoji(def.itemId, def.type));
   if (refinoTierCurr) refinoTierCurr.textContent = `+${currentLevel}`;
   if (refinoTierNext) refinoTierNext.textContent = currentLevel >= 15 ? 'MAX' : `+${nextLevel}`;
 
@@ -769,7 +770,6 @@ function updateRefinementView() {
 
   const stoneDef = ITEMS_DATABASE[stoneId];
   const stoneName = stoneDef ? stoneDef.name : 'Pedra de Refinamento';
-  const stoneEmoji = stoneDef?.icon || '💎';
   const playerStones = playerInventory
     .filter((i) => !i.isLocked && i.itemId === stoneId)
     .reduce((sum, i) => sum + i.quantity, 0);
@@ -792,9 +792,10 @@ function updateRefinementView() {
       refinoCostBox.innerHTML = `<span class="cost-item" style="color: #fbbf24;">✨ Equipamento no Refinamento Máximo (+15)!</span>`;
     } else {
       refinoCostBox.innerHTML = `
-        <span class="cost-item" style="color: ${hasStone ? '#e2e8f0' : '#f87171'};">${stoneEmoji} ${stoneCount}x ${stoneName} (${playerStones}/${stoneCount})</span>
+        <span class="cost-item" style="color: ${hasStone ? '#e2e8f0' : '#f87171'};"> ${stoneCount}x ${stoneName} (${playerStones}/${stoneCount})</span>
         <span class="cost-item gold" style="color: ${hasGold ? '#fbbf24' : '#f87171'};">💰 ${goldCost.toLocaleString('pt-BR')} Ouro</span>
       `;
+      refinoCostBox.querySelector('.cost-item')?.prepend(createItemIcon(stoneId, '💎'));
     }
   }
 
@@ -844,19 +845,19 @@ function updatePedrasView() {
 
       if (sock) {
         const gemDef = ITEMS_DATABASE[sock.gemId];
-        const gemIcon = gemDef?.icon || '💎';
         const gemName = gemDef?.name || sock.gemId;
         let effect = '';
         if (gemDef?.statsBonus) {
           effect = Object.entries(gemDef.statsBonus).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(', ');
         }
         slotEl.innerHTML = `
-          <span class="gem-icon">${gemIcon}</span>
+          <span class="gem-icon"></span>
           <div class="gem-info">
             <span class="gem-name" style="color: #38bdf8;">${gemName} (Soquete ${s + 1})</span>
             <span class="gem-effect" style="color: #34d399;">${effect || 'Atributos Extras'}</span>
           </div>
         `;
+        renderItemIcon(slotEl.querySelector<HTMLElement>('.gem-icon')!, sock.gemId, '💎');
       } else {
         slotEl.innerHTML = `
           <span class="gem-icon">⚪</span>
@@ -895,7 +896,8 @@ function updatePedrasView() {
         if (gemDef.statsBonus) {
           bonusText = Object.entries(gemDef.statsBonus).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(', ');
         }
-        chip.textContent = `${gemDef.icon || '💎'} ${gemDef.name} (${g.quantity}x) [${bonusText}]`;
+        chip.textContent = ` ${gemDef.name} (${g.quantity}x) [${bonusText}]`;
+        chip.prepend(createItemIcon(g.itemId, gemDef.icon || '💎'));
         chip.onclick = () => {
           selectedGemItemId = g.itemId;
           updatePedrasView();
@@ -1245,7 +1247,7 @@ function renderInventorySlots() {
 
         const iconEl = document.createElement('span');
         iconEl.className = 'slot-icon-text';
-        iconEl.textContent = getItemEmoji(item.itemId, itemDef.type);
+        renderItemIcon(iconEl, item.itemId, getItemEmoji(item.itemId, itemDef.type));
         slotEl.appendChild(iconEl);
         const nameEl = document.createElement('span');
         nameEl.className = 'inventory-tile-name';
@@ -1342,7 +1344,7 @@ function selectInventorySlot(slotIndex: number) {
   const rarityTheme = RARITY_COLORS[itemDef.rarity] || { border: '#ffffff', glow: 'rgba(255,255,255,0.3)', text: '#ffffff', bg: 'rgba(30,41,59,0.6)' };
 
   if (inspectorIcon) {
-    inspectorIcon.textContent = getItemEmoji(item.itemId, itemDef.type);
+    renderItemIcon(inspectorIcon, item.itemId, getItemEmoji(item.itemId, itemDef.type));
     inspectorIcon.style.borderColor = rarityTheme.border;
   }
   if (inspectorName) {
@@ -1622,9 +1624,10 @@ function renderCharacterModal(): void {
       slotEl.style.borderColor = rarityTheme.border;
       slotEl.style.boxShadow = `0 0 12px ${rarityTheme.glow}`;
       slotEl.innerHTML = `
-        <span class="slot-placeholder-icon" style="font-size: 1.5rem;">${getItemEmoji(def.itemId, def.type)}</span>
+        <span class="slot-placeholder-icon" style="font-size: 1.5rem;"></span>
         <span class="slot-label" style="color: ${rarityTheme.text}; font-weight: 700;">${def.name}${refineStr}</span>
       `;
+      renderItemIcon(slotEl.querySelector<HTMLElement>('.slot-placeholder-icon')!, def.itemId, getItemEmoji(def.itemId, def.type));
       slotEl.title = `[Equipado] ${def.name}${refineStr} (${def.rarity})\nClique para inspecionar, refinar ou desequipar`;
       slotEl.onclick = () => {
         selectInventorySlot(equippedItem.slotIndex);
@@ -2234,7 +2237,7 @@ network.onCombatEvent = (event) => {
 network.onSkillCastEvent = (event: S2CSkillCastEventPayload) => {
   if (!renderer.acceptSkillCast(event)) return;
   renderer.triggerEntityAnimation(event.casterId, 'attack');
-  if (event.targetId && !event.isHeal && event.affectedEntityIds.includes(event.targetId)) {
+  if (event.targetId && event.targetId !== event.casterId && event.targetResults?.some(result=>result.targetId===event.targetId&&result.effectiveDamage>0)) {
     renderer.triggerEntityAnimation(event.targetId, 'hit');
   }
 

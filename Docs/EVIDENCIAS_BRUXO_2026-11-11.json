@@ -1,0 +1,112 @@
+{
+  "generatedAt": "2026-11-11T14:39:07.131Z",
+  "nodeVersion": "v24.15.0",
+  "branch": "master",
+  "scope": "Warlock authoritative effects and Web presentation; no art generation, layout replacement, live DB migration or Unity implementation.",
+  "benchmark": {
+    "scenarioCount": 474,
+    "assumptions": "474 solo in-memory fixed-level fixtures, two seeds: level 1/world 1, 10/worlds 1-2, 25/worlds 2-3, 50/worlds 3-4; all unlocked loadouts. Starter equipment, supplied gold/stocks, no purchases. Not farm-earned progression or final balance. Current production targeting, movement, buffs and periodic effects. Movement-only Misty Step casts are counted as useful when displacement is confirmed.",
+    "summary": [
+      {
+        "level": 1,
+        "scenarios": 6,
+        "victories": 0,
+        "deaths": 6,
+        "timeouts": 0,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 10,
+        "scenarios": 36,
+        "victories": 21,
+        "deaths": 6,
+        "timeouts": 9,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 25,
+        "scenarios": 108,
+        "victories": 65,
+        "deaths": 9,
+        "timeouts": 34,
+        "rejections": 0,
+        "emptyCasts": 0
+      },
+      {
+        "level": 50,
+        "scenarios": 324,
+        "victories": 318,
+        "deaths": 0,
+        "timeouts": 6,
+        "rejections": 0,
+        "emptyCasts": 0
+      }
+    ],
+    "sourceHashes": {
+      "src/game/World.ts": "6978f6fc0de75c46411f63398b637a978e4822c1587be6be279f1543bae6fb68",
+      "src/entities/Entity.ts": "2487fe0c5ee7def7d462eea2ceef2170b892b91b88561ca08fbb0e694b209096",
+      "src/entities/Monster.ts": "6e86c2ec5ee3202d55b6d6b5134559fbc0569a33eb094aa3608d323a64fcac42",
+      "src/entities/Player.ts": "b29070499bdeefe4689b968baec0f24234b4a1c8af0a1510a14a99644f146511",
+      "tools/BossInvestmentSimulation.ts": "838059189d988d32c0d207a8950cb9c14b3fa92c26d17f60b1db1cc5cd1054da",
+      "tools/benchmark-warlock.ts": "22e7dbfa67a756cb47a52e384a03b0b55352eda9ac08bddf1eb3da103a040d4e",
+      "../shared/src/warlock-effects.ts": "ced59ef7078f789680757613de17c87d9d5a8a1dac6f2f26b8289dbd7245b0ac",
+      "../shared/src/skills.ts": "2c316b0c121d28b7a2170ae43f84e114a52dafa7b6871c9375ea20281e2f3962",
+      "../shared/src/skill-targeting.ts": "1c4e92b71b47b2e2910a1bd5e492fa05b21f2da85a28bd54684eef4b5c451ea1"
+    },
+    "rawReport": "scratch/runtime/warlock-loadouts-2026-11-11.json",
+    "movementCasts": 633
+  },
+  "readiness": {
+    "total": 84,
+    "ready": 84,
+    "classes": {
+      "GUERREIRO": 12,
+      "BARBARO": 12,
+      "MONGE": 12,
+      "ARQUEIRO": 12,
+      "MAGO": 12,
+      "BRUXO": 12,
+      "CLERIGO": 12
+    },
+    "note": "Readiness guard permits casting; this flag alone is not proof of a complete effect. Implementation evidence is in the seven class deliveries and their tests."
+  },
+  "additionalHashes": {
+    "server/tests/warlock-effects.test.ts": "0df9c29177a26f1aff1265e6b094b461854893c26dcf22a11923bca930bd762d",
+    "server/tests/combat-loop.test.ts": "3401dde7b97792dccab86d35f288fd5f16372df81b9b109711fe7aba72e4980f",
+    "client/tests/warlock-effects-vfx.test.mjs": "00ecf55c251a653857f35a0dc824302839613d5ff04b279ea856362085747c61",
+    "client/src/main.ts": "c2831b6bfe3e3d316e2b6da29e46a42b6cc84f97cd4687317831bb7d89afe9e5",
+    "client/src/renderer/PixelVfx.ts": "87c40e18b52f4895039289b971be4965cf42fc29dda253722d84bc0e1f62e32d",
+    "client/src/renderer/PixelVfxPlayer.ts": "0c1f3c5e8ad7c0f9be71405ae6b6b7af667c48374d8390599f5a90eaf71df0ba",
+    "client/src/renderer/GameRenderer.ts": "8e3790300bef6b20d0febaf8199c25385451df8f86eebfbe82b8cd88f9a78416",
+    "shared/src/skill-progression.ts": "894d00263db35cc6cd6137dfa8e2262e3070764f7e544bfc4d13051eccdff6c5"
+  },
+  "checks": {
+    "fullServerTests": 292,
+    "warlockServerTests": 29,
+    "warlockPresentationTests": 6,
+    "archerServerRegression": 30,
+    "archerPresentationRegression": 5,
+    "monkServerRegression": 28,
+    "monkPresentationRegression": 6,
+    "mageTypeScriptRegression": 34,
+    "mageVfxRegression": 9,
+    "martialServerRegression": 27,
+    "martialPresentationRegression": 23,
+    "clericUltimateVfxRegression": 3,
+    "clientRegression": 36,
+    "serverAndClientBuild": "passed",
+    "whitespace": "passed"
+  },
+  "overlapNote": "Focused tests overlap the full server and client suites; do not sum as distinct tests.",
+  "limitations": [
+    "Demon is a fixed ten-second area, not a pet with autonomous AI.",
+    "Current NPCs do not have a general recurring heal routine; healing reduction is enforced through Entity.heal().",
+    "Hex boosts all incoming damage and has one active prey per caster, one curse instance per prey; no additive curse stacking.",
+    "Misty Step deals damage at departure, escapes away from the target in AUTO, and basic attacks revalidate range after movement.",
+    "Useful movement-only casts are recorded separately from empty casts in the benchmark.",
+    "Fixture levels/stocks are supplied, not farm-earned; balancing, live visual validation, final images and Unity parity remain pending.",
+    "No deployment, commit or push in this block."
+  ]
+}

@@ -1,4 +1,5 @@
 import { ITEMS_DATABASE, ItemType, type EquipmentAdvicePayload, type InventoryItemPayload } from '@magicforge/shared';
+import { createItemIcon } from './ItemIcon';
 
 export function setupEquipmentAdvice(transport: { isReady(): boolean; request(): void; inspect(slot: number): void }) {
   const root = document.getElementById('equipment-advice-list')!;
@@ -28,7 +29,9 @@ export function setupEquipmentAdvice(transport: { isReady(): boolean; request():
       for (const suggestion of payload.suggestions) {
         const row = document.createElement('article'); row.className = 'equipment-advice-row';
         const title = document.createElement('strong'); title.textContent = ITEMS_DATABASE[suggestion.candidate.itemId].name + (suggestion.candidate.refineLevel ? ` +${suggestion.candidate.refineLevel}` : '');
+        title.prepend(createItemIcon(suggestion.candidate.itemId));
         const previous = document.createElement('small'); previous.textContent = `Equipado: ${suggestion.equipped ? ITEMS_DATABASE[suggestion.equipped.itemId].name + (suggestion.equipped.refineLevel ? ` +${suggestion.equipped.refineLevel}` : '') : 'slot vazio'}`;
+        if (suggestion.equipped) previous.prepend(createItemIcon(suggestion.equipped.itemId));
         const gains = document.createElement('span'); gains.textContent = Object.entries(suggestion.delta).filter(([, value]) => value! > 0).map(([key, value]) => `+${value} ${labels[key]}`).join(' · ');
         const inspect = document.createElement('button'); inspect.type = 'button'; inspect.textContent = 'Inspecionar';
         inspect.addEventListener('click', () => transport.inspect(suggestion.candidate.slotIndex));

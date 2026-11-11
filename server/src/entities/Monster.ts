@@ -182,6 +182,11 @@ export class Monster extends Entity {
       this.attackCooldown -= deltaTimeSec;
     }
 
+    // A previously acquired hidden target cannot be tracked or attacked until revealed.
+    if (this.targetPlayer?.hasStatus('STEALTH')) {
+      this.velocity = createVector3(0, 0, 0); this.isMoving = false; return;
+    }
+
     // AI Logic
     switch (this.state) {
       case MonsterState.IDLE:
@@ -293,6 +298,7 @@ export class Monster extends Entity {
     const dirZ = dz / dist;
 
     const movementSpeed = this.speed * this.getMovementMultiplier();
+    if (movementSpeed <= 0) { this.velocity = createVector3(0, 0, 0); this.isMoving = false; return; }
     this.velocity.x = dirX * movementSpeed;
     this.velocity.y = 0;
     this.velocity.z = dirZ * movementSpeed;

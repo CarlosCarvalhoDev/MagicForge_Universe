@@ -8,6 +8,12 @@
     "shared"
   ],
   "scripts": {
+    "test:warlock": "npm run test:warlock --workspace=@magicforge/server && node --test client/tests/warlock-effects-vfx.test.mjs",
+    "benchmark:warlock": "npm run benchmark:warlock --workspace=@magicforge/server --",
+    "test:monk": "npm run test:monk --workspace=@magicforge/server && node --test client/tests/monk-effects-vfx.test.mjs",
+    "benchmark:monk": "npm run benchmark:monk --workspace=@magicforge/server --",
+    "test:archer": "npm run test:archer --workspace=@magicforge/server && node --test client/tests/archer-effects-vfx.test.mjs",
+    "benchmark:archer": "npm run benchmark:archer --workspace=@magicforge/server --",
     "benchmark:earned": "npm run benchmark:earned --workspace=@magicforge/server --",
     "test:earned": "npm run test:earned --workspace=@magicforge/server",
     "benchmark:martial": "npm run benchmark:martial --workspace=@magicforge/server --",
