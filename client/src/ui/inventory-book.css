@@ -1,0 +1,195 @@
+/* A fixed book spread with individually scrollable pages. */
+#inventory-modal {
+  --book-ink: #f0e1ca;
+  --book-muted: #bfb0a0;
+  --book-gold: #d3a669;
+  --book-line: #795b3d;
+  --book-leaf: #191415;
+}
+#inventory-modal .unified-hero-modal-content {
+  box-sizing: border-box;
+  width: min(820px, calc(100vw - 24px));
+  height: min(580px, calc(100dvh - 28px));
+  max-width: none;
+  max-height: none;
+  padding: 13px 15px 15px;
+  border: 1px solid var(--book-line) !important;
+  outline: 0;
+  background: linear-gradient(150deg, #2c1f1b, #151217 58%, #111015) !important;
+  box-shadow: 0 18px 60px #000b !important;
+  color: var(--book-ink);
+}
+#inventory-modal .unified-modal-header {
+  flex: none;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 0 0 8px !important;
+  border-bottom: 1px solid #795b3d80 !important;
+  background: none !important;
+}
+#inventory-modal .modal-title-group, #inventory-modal .modal-header-actions { gap: 7px; }
+#inventory-modal .modal-title-main { font-size: clamp(.74rem, 2vw, 1rem); }
+#inventory-modal .modal-title-icon { display: flex; filter: none; }
+#inventory-modal .modal-title-icon .inventory-art { width: 27px; height: 27px; }
+#inventory-modal .modal-currencies { gap: 4px; }
+#inventory-modal .currency-badge { font-size: .67rem; padding: 3px 6px; white-space: nowrap; }
+#inventory-modal .currency-badge .inventory-art { width: 13px; height: 13px; }
+#inventory-modal .unified-modal-body {
+  display: grid;
+  grid-template-columns: minmax(198px, .49fr) minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
+}
+#inventory-modal .unified-hero-left-pane,
+#inventory-modal .submenu-tab-panel {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #795b3d92 !important;
+  border-radius: 4px !important;
+  background: linear-gradient(150deg, #241b19, var(--book-leaf) 76%) !important;
+  box-shadow: none !important;
+  outline: 0;
+}
+#inventory-modal .unified-hero-left-pane { width: auto; padding: 9px; gap: 7px; overflow-y: auto; }
+#inventory-modal .hero-cp-banner,
+#inventory-modal .hero-stats-accordion {
+  padding: 6px;
+  background: #120f12 !important;
+  border: 1px solid #795b3d8c !important;
+  box-shadow: none !important;
+  outline: 0;
+}
+#inventory-modal .cp-label { font-size: .66rem; }
+#inventory-modal .cp-value-display { gap: 5px; }
+#inventory-modal .cp-number { font-size: 1.35rem; }
+#inventory-modal .hero-paperdoll-stage-box { gap: 3px; }
+#inventory-modal .paperdoll-slots-col { gap: 5px; }
+#inventory-modal .equipment-slot { width: 42px; height: 42px; }
+#inventory-modal .equipment-slot .slot-label { font-size: .51rem; }
+#inventory-modal .equipment-slot .slot-placeholder-icon { width: 24px; height: 24px; }
+#inventory-modal .hero-center-pedestal { min-width: 0; background: none !important; }
+#inventory-modal .hero-paperdoll-avatar { width: 84px; height: 108px; }
+#inventory-modal .paperdoll-auto-equip { margin: 0; }
+#inventory-modal #btn-auto-equip { min-height: 33px; font-size: .62rem; letter-spacing: .01em; }
+#inventory-modal .unified-submenus-right-pane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(74px, 92px);
+  gap: 0;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+}
+#inventory-modal .submenu-tab-panel { grid-area: 1 / 1; padding: 9px; }
+#inventory-modal .submenus-tab-nav {
+  grid-area: 1 / 2;
+  align-self: start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 5px;
+  padding: 10px 0;
+  border: 0;
+  overflow: visible;
+}
+#inventory-modal .submenu-tab-btn {
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 5px 5px 7px;
+  min-height: 36px;
+  gap: 4px;
+  border: 1px solid #795b3d9e !important;
+  border-left: 0 !important;
+  border-radius: 0 4px 4px 0 !important;
+  background: #29201d !important;
+  color: var(--book-muted) !important;
+  font: 700 .61rem system-ui, sans-serif !important;
+  letter-spacing: 0;
+  outline: 0;
+  box-shadow: none !important;
+}
+#inventory-modal .submenu-tab-btn .inventory-art { width: 16px; height: 16px; }
+#inventory-modal .submenu-tab-btn:hover { background: #3a2a21 !important; color: var(--book-ink) !important; }
+#inventory-modal .submenu-tab-btn[aria-selected="true"] {
+  border-color: var(--book-gold) !important;
+  background: linear-gradient(100deg, #62472d, #38271e) !important;
+  box-shadow: inset -2px 0 var(--book-gold) !important;
+  color: #ffebc4 !important;
+}
+#inventory-modal :is(.submenu-tab-btn, .inventory-items-scroll):focus-visible {
+  outline: 2px solid #efce9b;
+  outline-offset: -2px;
+}
+#inventory-modal .inventory-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #9c7547 transparent;
+}
+@media (hover: hover) {
+  #inventory-modal .inventory-scroll:not(:hover):not(:focus-within) { scrollbar-color: transparent transparent; }
+}
+#inventory-modal #tab-mochila { overflow: hidden; }
+#inventory-modal #tab-mochila .mochila-panel-layout { min-height: 0; gap: 6px; }
+#inventory-modal #tab-mochila .inventory-grid-wrap { min-height: 0; flex: 1; gap: 4px; }
+#inventory-modal .inventory-items-scroll { flex: 1; min-height: 0; padding: 2px 3px; }
+#inventory-modal #inventory-slots-grid { gap: 5px; }
+#inventory-modal #inventory-slots-grid .inventory-slot {
+  height: clamp(54px, 9.2dvh, 69px);
+  min-height: 0;
+  aspect-ratio: auto;
+  padding: 4px 2px 10px;
+  gap: 2px;
+  box-shadow: none;
+}
+#inventory-modal .inventory-tile-name { font-size: .61rem; }
+#inventory-modal .inventory-art { display: inline-block; width: 1.1em; height: 1.1em; object-fit: contain; flex: none; vertical-align: -.17em; color: var(--book-gold); }
+#inventory-modal :is(.slot-icon-text, .inspector-item-icon, .refino-item-preview, .m-card-pic, .card-symbol) .inventory-art { width: 27px; height: 27px; }
+#inventory-modal .inventory-lock-badge .inventory-art { width: 10px; height: 10px; }
+#inventory-modal #inventory-view-tools { margin: 1px 0; gap: 4px; }
+#inventory-modal #inventory-view-tools :is(input, select, button),
+#inventory-modal #tab-mochila #btn-expand-inventory { min-height: 30px; padding: 4px 6px; font-size: .64rem; background: #231b1b; }
+#inventory-modal #tab-mochila #btn-expand-inventory { min-width: 0; gap: 5px; }
+#inventory-modal #inventory-capacity-text { font-size: .65rem; letter-spacing: 0; }
+#inventory-modal #inventory-inspector,
+#inventory-modal :is(.fusion-forge-card,.refino-forge-card,.pedras-socket-card,.cartas-album-card) {
+  padding: 8px;
+  background: #201818 !important;
+  border: 1px solid #795b3d80 !important;
+  outline: 0;
+  box-shadow: none !important;
+  box-sizing: border-box;
+  min-width: 0;
+}
+#inventory-modal #inventory-inspector { gap: 4px 8px; }
+#inventory-modal #inventory-inspector .inspector-item-header { flex-basis: 130px; }
+#inventory-modal #inventory-inspector .inspector-item-icon { width: 34px; height: 34px; }
+#inventory-modal #inventory-inspector .inspector-stat-row { flex-basis: 130px; gap: 5px; }
+#inventory-modal #inventory-inspector button { min-height: 29px; padding: 4px 6px; font-size: .64rem; }
+#inventory-modal :is(.cost-item,.gem-chip,.card-slot-tag,.combat-substats-strip > span) .inventory-art { margin-right: 3px; }
+#inventory-modal .gem-chip { color: var(--book-ink); }
+#inventory-modal .gem-chip[aria-pressed="true"] { border-color: var(--book-gold); background: #443222; }
+#inventory-modal .monster-cards-grid { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 680px), (max-height: 510px) {
+  #inventory-modal .unified-hero-modal-content { width: calc(100vw - 12px); height: calc(100dvh - 16px); padding: 8px; }
+  #inventory-modal .unified-modal-body { display: block; overflow: auto; }
+  #inventory-modal .unified-hero-left-pane { width: auto !important; margin-bottom: 7px; overflow: visible; }
+  #inventory-modal .unified-submenus-right-pane { width: auto !important; grid-template-columns: minmax(0, 1fr) 70px; }
+  #inventory-modal .submenu-tab-panel { min-height: 235px; padding: 6px; }
+  #inventory-modal #tab-mochila .inventory-grid-wrap { flex: auto; }
+  #inventory-modal .inventory-items-scroll { max-height: 240px; flex: auto; }
+  #inventory-modal #inventory-slots-grid { grid-template-columns: repeat(auto-fill,minmax(46px,1fr)); }
+  #inventory-modal .submenu-tab-btn { flex-direction: column; justify-content: center; gap: 2px; padding: 3px; font-size: .56rem !important; min-height: 42px; }
+  #inventory-modal .submenu-tab-btn .inventory-art { width: 13px; height: 13px; }
+  #inventory-modal .currency-badge { font-size: .58rem; }
+  #inventory-modal .currency-badge.diamond { font-size: 0; }
+  #inventory-modal .currency-badge.diamond strong { font-size: .58rem; }
+}
+@media (max-width: 390px) {
+  #inventory-modal .modal-title-icon { display: none; }
+  #inventory-modal .submenu-tab-panel { padding: 4px; }
+}
+
+#inventory-modal #inventory-inspector:not([data-has-item]) .inspector-stat-row { display: none; }
