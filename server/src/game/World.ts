@@ -112,7 +112,9 @@ import { PartyManager } from './PartyManager';
 import { calculateOfflineReward, OFFLINE_REWARD_POLICY } from './OfflineRewards';
 
 export class World {
-  private devSettings = { pauseRespawns: false, disableDrops: false, doubleLegendary: false };
+  private devSettings = { disableDrops: false, doubleLegendary: false, freezeMonsters: false };
+  private pendingWorldSpawn = false;
+  private pendingBossSpawn = false;
   private devTargetSequence = 0;
   public automationEnabled = true;
   public automaticPortalHandler?: (player: Player) => void;
@@ -157,7 +159,7 @@ export class World {
     }
   }
 
-  constructor(customDb?: DatabaseManager, worldIndex: number = 1, channelId: number = 1, maxPlayers: number = 30) {
+  constructor(customDb?: DatabaseManager, worldIndex: number = 1, channelId: number = 1, maxPlayers: number = 30, private readonly devSpawn = { paused: false }) {
     this.db = customDb || new DatabaseManager();
     this.currentWorld = worldIndex;
     this.channelId = channelId;
@@ -167,7 +169,11 @@ export class World {
     this.spawnWorldMonsters(this.currentWorld);
   }
 
+  public get isAutomaticSpawnPaused(): boolean { return this.devSpawn.paused; }
+
   public spawnWorldMonsters(worldIndex: number): void {
+    this.pendingWorldSpawn = this.devSpawn.paused;
+    if (this.pendingWorldSpawn) return;
     const mobTemplates = [
       // Quadrante Noroeste (12m - 32m)
       { type: 'slime', pos: createVector3(-14, 0, 12), baseHp: 120, baseDmg: 8 },
@@ -914,7 +920,12 @@ export class World {
         }
       }
     } else { this.automaticPortalTimerSec = 0; }
-    if (this.automationEnabled && this.isBossAvailable && !this.isBossActive && !this.isPortalOpen) {
+    if (!this.devSpawn.paused && this.pendingWorldSpawn) this.spawnWorldMonsters(this.currentWorld);
+    if (!this.devSpawn.paused && this.pendingBossSpawn) {
+      this.pendingBossSpawn = false;
+      if (this.currentStage === 10 && !this.isPortalOpen) this.challengeStageBoss();
+    }
+    if (!this.devSpawn.paused && this.automationEnabled && this.isBossAvailable && !this.isBossActive && !this.isPortalOpen) {
       this.automaticBossRetrySec += deltaTimeSec;
       if (this.automaticBossRetrySec >= 60) {
         const player = this.entityManager.getAllPlayers().find(candidate => candidate.autoCastEnabled && !candidate.isDead && !this.dungeonManager.isPlayerInDungeon(candidate.id));
@@ -952,7 +963,12 @@ export class World {
         this.spatialGrid.updateEntity(monster);
         continue;
       }
-      if (monster.isDead && this.devSettings.pauseRespawns) continue;
+      if (monster.isDead && this.devSpawn.paused) continue;
+      if (!monster.isDead && this.devSettings.freezeMonsters) {
+        monster.isMoving = false;
+        monster.velocity = createVector3(0, 0, 0);
+        continue;
+      }
       // Monster Aggro targeting
       if (monster.state === MonsterState.IDLE && !monster.isDead) {
         const nearestPlayer = this.entityManager.findNearestPlayer(monster.position, monster.aggroRadius);
@@ -2680,10 +2696,11 @@ export class World {
               isBossStage: true,
               bossAvailable: false,
               portalOpen: false,
-              message: `⚠️ FASE 10/10 ATINGIDA! O CHEFÃO DO MUNDO DESPERTOU!`,
+              message: this.devSpawn.paused ? 'Fase 10 atingida. O surgimento do chefe está pausado.' : '⚠️ FASE 10/10 ATINGIDA! O CHEFÃO DO MUNDO DESPERTOU!',
             } as S2CStageUpdatePayload);
 
-            this.challengeStageBoss();
+            if (this.devSpawn.paused) this.pendingBossSpawn = true;
+            else this.challengeStageBoss();
           } else {
             // Advanced to next stage (2..9)
             this.broadcast(Opcode.S2C_STAGE_UPDATE, {
@@ -3408,6 +3425,7 @@ export class World {
     const player = this.entityManager.getPlayer(connection.playerId);
     if (!player || !command) return;
     let message: string | undefined;
+    let cooldownsReset: boolean | undefined;
     switch (command.action) {
       case 'state':
         break;
@@ -3436,6 +3454,11 @@ export class World {
         }
         message = player.isDead ? 'Aguarde o renascimento do herói.' : 'HP e recurso restaurados.';
         break;
+      case 'resetCooldowns':
+        player.skillCooldowns.clear();
+        cooldownsReset = true;
+        message = 'Recargas das habilidades zeradas.';
+        break;
       case 'clearDrops':
         for (const dropId of this.activeItemDrops.keys()) {
           this.broadcast(Opcode.S2C_ITEM_DROP_DESPAWN, { dropId, reason: 'EXPIRED' } satisfies S2CItemDropDespawnPayload);
@@ -3451,15 +3474,31 @@ export class World {
             player.currentHp = player.maxHp;
             player.currentResource = player.maxResource;
           }
+        } else if (command.key === 'pauseRespawns') {
+          this.devSpawn.paused = command.enabled;
+          message = command.enabled ? 'Surgimento automático pausado em todos os canais.' : 'Surgimento automático retomado.';
         } else if (Object.hasOwn(this.devSettings, command.key)) {
           this.devSettings[command.key] = command.enabled;
         } else return;
         break;
+      case 'teleport':
       case 'dummy': {
         const { minX, maxX, minZ, maxZ } = SERVER_CONFIG.MAP_BOUNDS;
         if (!Number.isFinite(command.x) || !Number.isFinite(command.z) ||
             command.x < minX || command.x > maxX || command.z < minZ || command.z > maxZ) {
           message = 'Informe coordenadas dentro do mapa.';
+          break;
+        }
+        if (command.action === 'teleport') {
+          if (player.isDead || this.dungeonManager.isPlayerInDungeon(player.id)) {
+            message = 'Teleporte disponível para heróis vivos fora de masmorras.';
+            break;
+          }
+          player.stopMoving();
+          player.targetId = null;
+          player.position = createVector3(command.x, 0, command.z);
+          this.spatialGrid.updateEntity(player);
+          message = 'Herói teleportado.';
           break;
         }
         if (this.entityManager.getAllMonsters().filter(monster => monster.trainingDummy).length >= 8) {
@@ -3479,7 +3518,8 @@ export class World {
         break;
       }
       case 'reset':
-        this.devSettings = { pauseRespawns: false, disableDrops: false, doubleLegendary: false };
+        this.devSpawn.paused = false;
+        this.devSettings = { disableDrops: false, doubleLegendary: false, freezeMonsters: false };
         player.devInfiniteVitals = false;
         // Reset also removes the test entities.
       case 'clearTargets':
@@ -3491,7 +3531,7 @@ export class World {
       default:
         return;
     }
-    connection.send(Opcode.S2C_DEV_STATE, { ...this.devSettings, infiniteVitals: player.devInfiniteVitals, message } satisfies DevState);
+    connection.send(Opcode.S2C_DEV_STATE, { ...this.devSettings, pauseRespawns: this.devSpawn.paused, infiniteVitals: player.devInfiniteVitals, message, cooldownsReset } satisfies DevState);
   }
 
   private addDevTarget(monster: Monster): void {
@@ -3507,6 +3547,9 @@ export class World {
   }
 
   public challengeStageBoss(player?: Player, devOnly = false): { success: boolean; reason?: string } {
+    if (!devOnly && this.devSpawn.paused) {
+      return { success: false, reason: 'O surgimento do chefe está pausado pelo painel Dev.' };
+    }
     if (this.isBossActive) {
       return { success: false, reason: 'Um Chefão já está em combate na arena!' };
     }

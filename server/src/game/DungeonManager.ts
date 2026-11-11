@@ -54,6 +54,10 @@ export class DungeonManager {
       return { success: false, message: 'Você já está em uma masmorra ativa!' };
     }
 
+    if (this.world.isAutomaticSpawnPaused) {
+      return { success: false, message: 'O surgimento de inimigos está pausado pelo painel Dev.' };
+    }
+
     // 1. Validação de Ingressos Diários no SQLite
     const charDbId = player.dbCharacterId || player.id;
     const hasTicket = this.world.db.consumeDailyDungeonTicket(charDbId);
@@ -389,6 +393,7 @@ export class DungeonManager {
 
       // Transição entre ondas
       if (session.status === 'WAVE_CLEAR') {
+        if (this.world.isAutomaticSpawnPaused) continue;
         session.waveTransitionTimerSec -= deltaTimeSec;
         if (session.waveTransitionTimerSec <= 0) {
           session.currentWave += 1;
