@@ -1,5 +1,3 @@
-#hud-header { display: contents; }
-
 .equipment-slot img.slot-placeholder-icon {
   width: min(70%, 38px);
   height: min(63%, 38px);
@@ -10,68 +8,190 @@
 #auto-equip-status { margin: 0; color: #e9d0a6; font-size: .75rem; }
 #auto-equip-status:empty { display: none; }
 
+#hud-header {
+  position: fixed;
+  inset: calc(10px + var(--safe-top, 0px)) calc(12px + var(--safe-right, 0px)) auto calc(12px + var(--safe-left, 0px));
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 345px) minmax(0, 520px);
+  justify-content: space-between;
+  align-items: start;
+  gap: 8px;
+  z-index: 60;
+  pointer-events: none;
+}
+.hud-profile-column, .hud-stage-column { min-width: 0; display: grid; gap: 6px; align-content: start; }
+.hud-profile-column { justify-items: start; }
+.hud-stage-column { justify-items: center; }
+#hud-header :is(#hero-status-card, #party-hud-card, #top-right-location-card, #top-center-wave-card, #center-notification-queue, .dev-shortcut) {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+#hud-header :is(#hero-status-card, #party-hud-card, #top-right-location-card, #top-center-wave-card, .dev-shortcut) { pointer-events: auto; }
+#hud-header #hero-status-card {
+  width: 100% !important;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 8px !important;
+  padding: 8px !important;
+  border: 1px solid #97754e !important;
+  outline: 0;
+  border-radius: 5px !important;
+  background: linear-gradient(150deg, #30221c, #171318 74%) !important;
+  box-shadow: 0 5px 14px #0008 !important;
+}
+#hud-header #hud-avatar-btn {
+  width: clamp(37px, 5vw, 57px) !important;
+  height: clamp(43px, 5.7vw, 65px) !important;
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 5px !important;
+  border: 1px solid #ad8557 !important;
+  outline: 0;
+  box-shadow: none !important;
+  background: #181318;
+}
+#hud-avatar-btn:focus-visible { outline: 2px solid #f4cc92 !important; outline-offset: 2px; }
+#hud-avatar-btn .hero-avatar-img { display: block; border-radius: 0; }
+#hud-header .hero-info-col { min-width: 0; width: 100%; gap: 4px; }
+#hud-header .hero-title-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; min-width: 0; }
+#hud-header .hero-name-label { color: #f6e3c2; font: 800 .93rem Cinzel, Georgia, serif; overflow-wrap: anywhere; }
+#hud-header .hero-level-pill-tag,
+#hud-header .hero-hud-tags > span {
+  max-width: 100%;
+  box-sizing: border-box;
+  font: 700 .62rem/1.2 system-ui, sans-serif !important;
+  letter-spacing: 0;
+  border: 1px solid #8e6c49 !important;
+  border-radius: 3px !important;
+  box-shadow: none !important;
+  background: #36291f !important;
+  color: #efd5ad !important;
+  padding: 2px 4px !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+#hud-header .hero-level-pill-tag { white-space: nowrap !important; }
+#hud-header .hero-hud-tags { display: flex; flex-wrap: wrap; gap: 3px; min-width: 0; }
+#hud-header .hero-hud-tags .hero-class-trait-pill { background: #231b1b !important; border-color: #77563b !important; }
+#hud-header .hero-cp-brand { gap: 4px; }
+#hud-header .hero-cp-tag { color: #d8b783; font: 700 .62rem Cinzel, serif; }
+#hud-header .hero-cp-number { color: #f3ca86; font-size: 1.13rem !important; text-shadow: none; }
+#hud-header .hero-vitals-bars { width: 100%; min-width: 0; gap: 3px !important; }
+#hud-header .mini-bar-track { box-sizing: border-box; height: 12px !important; border-color: #8c6e4f !important; background: #151113; }
+#hud-header .mini-bar-tag { left: 4px; }
+#hud-header .mini-bar-text { font-size: .61rem; white-space: nowrap; right: 4px; left: auto; transform: translateY(-50%); }
+#hud-header #party-hud-card:not(.collapsed) { width: 100% !important; max-height: min(175px, 24dvh); overflow-y: auto; }
+#hud-header .dev-shortcut { justify-self: start; }
+#hud-header #top-center-wave-card,
+#hud-header #center-notification-queue { width: 100% !important; }
+#hud-header #center-notification-queue { gap: 5px; }
+#hud-header #center-notification-queue :is(#boss-timer-banner, .boss-story-banner, #quick-use-toast, .party-toast, #levelup-banner) { max-width: 100% !important; }
+#hud-header #party-toast-container { min-width: 0; max-width: 100%; }
+#hud-header .stage-header-row { flex-wrap: wrap; }
+#hud-header :is(.stage-world-title, #target-name-label, .boss-timer-copy) { min-width: 0; overflow-wrap: anywhere; }
+#hud-header #target-name-label { overflow: hidden; text-overflow: ellipsis; }
+#hud-header #top-right-location-card { width: 100%; }
+#hud-header .top-right-header-row,
+#hud-header #top-right-location-card .top-status-lux-bar { display: flex !important; flex-wrap: wrap !important; max-width: 100%; min-width: 0; gap: 4px !important; justify-content: flex-end !important; }
+#hud-header .zone-info-pill { display: flex !important; box-sizing: border-box; min-width: 0; max-width: 100%; flex-wrap: wrap; }
+#hud-header .zone-title { white-space: normal !important; overflow-wrap: anywhere; }
+#hud-header :is(#btn-fullscreen-toggle, #btn-toggle-inspector, #btn-power-save, .lux-ping-pill) { display: inline-flex !important; }
+#hud-header .hud-session-label { display: inline !important; }
+#tactical-action-bar.runic-tactical-bar {
+  --tactical-anchor: max(calc(var(--hud-header-bottom, 170px) + 8px), 29dvh);
+  top: var(--tactical-anchor) !important;
+  transform: none !important;
+}
+#tactical-action-bar.runic-tactical-bar:is(.drawer-collapsed, [data-drawer-open="false"]) {
+  transform: translateX(calc(-100% - 8px)) !important;
+}
+#tactical-action-bar.runic-tactical-bar #tactical-drawer-items {
+  max-height: max(18px, calc(var(--hud-chat-top, 60dvh) - var(--tactical-anchor) - 22px));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #9c7547 transparent;
+}
+@media (max-width: 1040px) {
+  #hud-header { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  #hud-header .hud-profile-column { grid-area: 1 / 1 / 3 / 2; width: min(100%, 300px); }
+  #hud-header #top-right-location-card { grid-area: 1 / 2; }
+  #hud-header .hud-stage-column { grid-area: 2 / 2; width: min(100%, 345px); justify-self: end; }
+}
 @media (max-width: 760px) {
   #hud-header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: start;
-    gap: 4px;
-    position: fixed;
-    inset: calc(6px + var(--safe-top)) calc(6px + var(--safe-right)) auto calc(6px + var(--safe-left));
-    z-index: 60;
-    pointer-events: none;
-  }
-
-  #hud-header > :is(#hero-status-card, #party-hud-card, #top-right-location-card, #top-center-wave-card, #center-notification-queue) {
-    position: relative !important;
-    inset: auto !important;
-    transform: none !important;
-    margin: 0 !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-  #hud-header > :is(#hero-status-card, #party-hud-card, #top-right-location-card, #top-center-wave-card) { pointer-events: auto; }
-  #hero-status-card { grid-area: 1 / 1 / 3 / 2; }
-  #hud-header #top-right-location-card,
-  #hud-header .top-right-header-row { display: contents !important; }
-  #hud-header .hud-session-controls { grid-area: 1 / 2; justify-self: end; }
-  #hud-header .top-status-lux-bar { grid-area: 2 / 2; }
-  #hud-header .zone-info-pill { grid-area: 3 / 1 / 4 / -1; }
-  #top-center-wave-card { grid-area: 4 / 1 / 5 / -1; }
-  #party-hud-card { grid-area: 5 / 1 / 6 / -1; justify-self: start; }
-  #hud-header > #party-hud-card { width: min(100%, 260px) !important; }
-  #hud-header > #party-hud-card.collapsed { width: max-content !important; }
-  #center-notification-queue { grid-area: 6 / 1 / 7 / -1; }
-
-  #hud-header #top-right-location-card .top-status-lux-bar {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 3px !important;
-    justify-content: end !important;
-  }
-  #hud-header :is(.hud-session-controls, .top-status-lux-bar, .zone-info-pill) { pointer-events: auto; }
-  #hud-header .zone-info-pill { display: flex !important; min-width: 0; width: 100%; box-sizing: border-box; padding: 3px 5px; }
-  #hud-header .zone-title { white-space: normal !important; overflow-wrap: anywhere; }
-  #hud-header :is(#btn-fullscreen-toggle, #btn-toggle-inspector, #btn-power-save, .lux-ping-pill) { display: inline-flex !important; }
-  #hud-header .hud-session-label { display: inline !important; }
-  #hud-header #target-name-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-
-  #right-vertical-dock {
-    top: max(calc(var(--hud-header-bottom, 170px) + 6px), 28dvh) !important;
-    bottom: calc(80px + var(--safe-bottom)) !important;
-    transform: none !important;
+    inset: calc(6px + var(--safe-top, 0px)) calc(6px + var(--safe-right, 0px)) auto calc(6px + var(--safe-left, 0px));
+    max-height: 44dvh;
     overflow: auto;
     overscroll-behavior: contain;
-    justify-content: flex-start !important;
+    scrollbar-width: thin;
+    scrollbar-color: #9c7547 transparent;
+    gap: 5px;
   }
-  #right-vertical-dock .dock-btn { flex-shrink: 0; }
-  #tactical-action-bar.runic-tactical-bar {
-    top: max(calc(var(--hud-header-bottom, 170px) + 8px), 34dvh) !important;
-    transform: none !important;
-  }
+  #hud-header .hud-profile-column { grid-area: 1 / 1; width: 100%; }
+  #hud-header .hud-stage-column { grid-area: 2 / 1 / 3 / -1; width: 100%; justify-self: center; }
+  #hud-header #top-center-wave-card { max-width: 345px !important; }
+  #hud-header #center-notification-queue { max-width: 356px !important; }
+  #hud-header #top-right-location-card .zone-info-pill { width: 100%; padding: 3px 5px; }
+  #hud-header .hero-hud-tags > span { font-size: .55rem !important; }
+  #hud-header .hero-name-label { font-size: .78rem; }
+  #hud-header .hero-info-col { gap: 3px; }
+  #hud-header #hero-status-card { gap: 5px !important; padding: 5px !important; }
+  #hud-header .hero-vitals-bars { grid-column: 1 / -1; }
+  #hud-header .hero-info-col { display: contents; }
+  #hud-header :is(.hero-title-row, .hero-hud-tags, .hero-cp-brand) { grid-column: 2; }
+  #hud-header #hud-avatar-btn { grid-area: 1 / 1 / 4 / 2; }
+  #hud-header #top-right-location-card .zone-info-pill .zone-title { font-size: .67rem; }
   #game-chat-box:not(.collapsed) { max-width: calc(100vw - 76px) !important; }
   #game-chat-box #chat-input-field { width: 100% !important; box-sizing: border-box; }
   #mobile-combat-arc-container { max-width: calc(100vw - 12px - var(--safe-left) - var(--safe-right)); }
+}
+@media (max-height: 550px) {
+  #hud-header { max-height: 43dvh; overflow: auto; scrollbar-width: thin; }
+  #game-chat-box #chat-messages-container { height: clamp(32px, 10dvh, 57px) !important; }
+}
+#game-canvas { touch-action: none; }
+
+/* Keep long class labels and the vital values visible on the compact HUD. */
+#hud-header .hero-hud-tags > span { display: inline-flex !important; }
+#hud-header .mini-bar-text { inset: 0 4px 0 auto; display: flex; align-items: center; transform: none; }
+@media (max-width: 760px) {
+  #hud-header #top-right-location-card .top-right-header-row { width: 100%; }
+  #hud-header #top-right-location-card .zone-info-pill {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 3px;
+  }
+  #hud-header .zone-info-pill > div { min-width: 0; }
+  #hud-header .zone-info-pill .stage-badge { display: none; }
+  #hud-header .zone-info-pill #btn-channel-pill { grid-column: 1 / -1; margin: 0; }
+  #hud-header .zone-coords-sub { overflow-wrap: anywhere; }
+}
+
+@media (min-width: 540px) and (max-height: 550px) {
+  #hud-header { grid-template-columns: minmax(0, 1fr) minmax(0, .95fr) minmax(0, 1fr); }
+  #hud-header .hud-profile-column { grid-area: 1 / 1; }
+  #hud-header .hud-stage-column { grid-area: 1 / 2; }
+  #hud-header #top-right-location-card { grid-area: 1 / 3; }
+  #bottom-center-zone {
+    left: auto !important;
+    right: calc(62px + var(--safe-right, 0px)) !important;
+    bottom: calc(89px + var(--safe-bottom, 0px)) !important;
+    width: min(250px, 38vw) !important;
+  }
+  #bottom-center-zone #game-chat-box #chat-messages-container {
+    min-height: 0 !important;
+    max-height: clamp(16px, calc(17dvh - 43px), 50px) !important;
+  }
+  #tactical-action-bar.runic-tactical-bar #tactical-drawer-items {
+    max-height: max(28px, calc(100dvh - var(--tactical-anchor) - 93px));
+  }
 }

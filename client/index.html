@@ -3748,23 +3748,22 @@
   </head>
   <body>
     <div id="hud-header">
+    <div class="hud-profile-column">
     <!-- 1. Top-Left Hero Status Card (Estilo Mobile Ragnarok / Stickman Go) -->
     <div id="hero-status-card" class="glass-panel" data-hero-class="GUERREIRO">
-      <div class="hero-avatar-box" id="hud-avatar-btn" title="Abrir Ficha de Personagem & Equipamentos [C]">
+      <button type="button" class="hero-avatar-box" id="hud-avatar-btn" aria-label="Abrir resumo do herói" title="Abrir resumo do herói [C]">
         <img id="hud-hero-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Avatar" class="hero-avatar-img" />
-        <span id="hud-hero-level" class="hero-level-badge">Nv. 3</span>
-      </div>
+      </button>
       <div class="hero-info-col">
         <div class="hero-title-row">
-          <span id="hud-hero-level-pill" class="hero-level-pill-tag">Nv. 3</span>
           <span id="hud-hero-name" class="hero-name-label">LordAventureiro</span>
-          <span id="hud-hero-honor-tag" class="hero-honor-tag">Guerreiro • FOR/CAR</span>
+          <span id="hud-hero-level-pill" class="hero-level-pill-tag">Nv. 3</span>
         </div>
-        <div class="hero-cp-brand">
-          <span class="hero-cp-tag">PC</span>
-          <span id="hud-cp-big" class="hero-cp-number">1.425</span>
-          <span id="hud-class-trait-pill" class="hero-class-trait-pill">⚔️ Vanguarda • Energia</span>
+        <div class="hero-hud-tags">
+          <span id="hud-hero-honor-tag" class="hero-honor-tag">Guerreiro · FOR/CAR</span>
+          <span id="hud-class-trait-pill" class="hero-class-trait-pill">Vanguarda · Fervor</span>
         </div>
+        <div class="hero-cp-brand"><span class="hero-cp-tag" title="Poder de combate">PC</span><span id="hud-cp-big" class="hero-cp-number">1.425</span></div>
         <div class="hero-vitals-bars">
           <div class="mini-bar-track">
             <span class="mini-bar-tag">HP</span>
@@ -3780,6 +3779,8 @@
       </div>
     </div>
 
+    </div>
+    <div class="hud-stage-column">
     <!-- 2. Top-Center Stage Progression & Boss Card + Locked Monster Target Bar -->
     <div id="top-center-wave-card" class="glass-panel">
       <!-- Stage & World Header -->
@@ -3842,6 +3843,7 @@
       </div>
     </div>
 
+    </div>
     <!-- 3. Top-Right Location, Session Navigation & Luxury Runic Status Bar -->
     <div id="top-right-location-card">
       <div class="top-right-header-row">
@@ -3971,28 +3973,17 @@
     </aside>
 
 
-    <!-- Right Vertical Navigation Dock (Ragnarok Mobile Style) -->
-    <div id="right-vertical-dock">
-      <button class="dock-btn" id="btn-dock-character" title="Ficha do Personagem & Equipamentos [C]">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-hero-helm.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Herói</span>
+    <div id="hud-menu-dock">
+      <button type="button" class="hud-menu-trigger" data-hud-menu-trigger aria-label="Abrir menu do jogo" aria-expanded="false" aria-controls="hud-menu-options">
+        <img src="/assets/ui/icons/icon-hud-backpack.svg" alt="">
       </button>
-      <button class="dock-btn" id="btn-dock-inventory" title="Mochila de Itens [I]">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-mochila-satchel.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Mochila</span>
-      </button>
-      <button class="dock-btn" id="btn-dock-skillbook" title="Grimório de Habilidades [K]">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-grimorio-tome.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Grimório</span>
-      </button>
-      <button class="dock-btn" id="btn-dock-farm" title="Assistente de Farm Idle [F]">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-farm-anvil.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Farm</span>
-      </button>
-      <button class="dock-btn" id="btn-dock-ranking" title="Classificação e Rankings">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-rank-chalice.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Rank</span>
-      </button>
+      <nav class="hud-menu-panel" id="hud-menu-options" data-hud-menu-panel aria-label="Atalhos do jogo" hidden>
+        <button type="button" class="hud-menu-option" id="btn-dock-character" title="Herói [C]"><img src="/assets/ui/icons/icon-hero-bust.svg" alt=""><span>Herói</span></button>
+        <button type="button" class="hud-menu-option" id="btn-dock-inventory" title="Mochila [I]"><img src="/assets/ui/icons/icon-mochila-satchel.svg" alt=""><span>Mochila</span></button>
+        <button type="button" class="hud-menu-option" id="btn-dock-skillbook" title="Grimório [K]"><img src="/assets/ui/icons/icon-grimorio-tome.svg" alt=""><span>Grimório</span></button>
+        <button type="button" class="hud-menu-option" id="btn-dock-farm" title="Farm [F]"><img src="/assets/ui/icons/icon-farm-anvil.svg" alt=""><span>Farm</span></button>
+        <button type="button" class="hud-menu-option" id="btn-dock-ranking" title="Rank"><img src="/assets/ui/icons/icon-rank-chalice.svg" alt=""><span>Rank</span></button>
+      </nav>
     </div>
 
     <!-- Left Tactical Drawer -->
@@ -4265,7 +4256,7 @@
               <span class="currency-badge gold"><img class="inventory-art" src="/assets/ui/icons/icon-gold-coin.svg" alt=""> <strong id="inventory-gold-label">0 Ouro</strong></span>
               <span class="currency-badge diamond"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#gem"></use></svg> <strong>0</strong> Diamantes</span>
             </div>
-            <button id="btn-close-inventory" class="btn-close" title="Fechar (ESC ou I / C)">✕</button>
+            <button id="btn-close-inventory" class="btn-close" title="Fechar (Esc ou I)">✕</button>
           </div>
         </div>
 
@@ -4535,8 +4526,35 @@
       </div>
     </div>
 
-    <!-- Hidden alias anchor for legacy compatibility -->
-    <div id="character-modal" style="display: none;"></div>
+    <dialog id="character-modal" aria-labelledby="hero-summary-title">
+      <header class="hero-summary-header">
+        <h2 id="hero-summary-title"><img src="/assets/ui/icons/icon-hero-bust.svg" alt=""> Resumo do Herói</h2>
+        <button type="button" id="btn-close-character" class="btn-close" aria-label="Fechar resumo do herói">✕</button>
+      </header>
+      <div class="hero-profile-layout">
+        <section class="hero-profile-showcase" aria-label="Herói e equipamentos">
+          <div class="hero-profile-power"><span>Poder de combate</span><strong data-hero-summary="cp">—</strong></div>
+          <div class="hero-profile-paperdoll">
+            <div class="hero-profile-slot-rail">
+              <div class="hero-profile-slot" data-profile-slot="head"><div class="equipment-slot" role="img" aria-label="Elmo"></div><span data-equipped-name>—</span></div><div class="hero-profile-slot" data-profile-slot="chest"><div class="equipment-slot" role="img" aria-label="Armadura"></div><span data-equipped-name>—</span></div><div class="hero-profile-slot" data-profile-slot="legs"><div class="equipment-slot" role="img" aria-label="Botas"></div><span data-equipped-name>—</span></div>
+            </div>
+            <div id="hero-summary-portrait"></div>
+            <div class="hero-profile-slot-rail">
+              <div class="hero-profile-slot" data-profile-slot="main_hand"><div class="equipment-slot" role="img" aria-label="Arma"></div><span data-equipped-name>—</span></div><div class="hero-profile-slot" data-profile-slot="off_hand"><div class="equipment-slot" role="img" aria-label="Escudo"></div><span data-equipped-name>—</span></div><div class="hero-profile-slot" data-profile-slot="relic"><div class="equipment-slot" role="img" aria-label="Relíquia"></div><span data-equipped-name>—</span></div>
+            </div>
+          </div>
+          <div class="hero-summary-identity"><strong data-hero-summary="name"></strong><span data-hero-summary="class"></span></div>
+        </section>
+        <div class="hero-profile-details">
+          <section class="hero-profile-section"><h3>Estado e experiência</h3>
+            <div class="hero-profile-meter" data-profile-meter="hp"><div><label for="hero-profile-hp">Vida</label><span data-meter-value>—</span></div><progress id="hero-profile-hp" value="0" max="1"></progress></div><div class="hero-profile-meter" data-profile-meter="resource"><div><label for="hero-profile-resource">Recurso</label><span data-meter-value>—</span></div><progress id="hero-profile-resource" value="0" max="1"></progress></div><div class="hero-profile-meter" data-profile-meter="xp"><div><label for="hero-profile-xp">Experiência</label><span data-meter-value>—</span></div><progress id="hero-profile-xp" value="0" max="1"></progress></div>
+          </section>
+          <section class="hero-profile-section"><h3>Combate</h3><dl class="hero-summary-stats"><div><dt>Dano base</dt><dd data-hero-summary="damage">—</dd></div><div><dt>Chance de crítico</dt><dd data-hero-summary="critical">—</dd></div><div><dt>Alcance</dt><dd data-hero-summary="range">—</dd></div></dl></section>
+          <section class="hero-profile-section"><h3>Atributos</h3><dl class="hero-summary-stats"><div><dt>Força</dt><dd data-hero-summary="forca">—</dd></div><div><dt>Destreza</dt><dd data-hero-summary="destreza">—</dd></div><div><dt>Constituição</dt><dd data-hero-summary="constituicao">—</dd></div><div><dt>Inteligência</dt><dd data-hero-summary="inteligencia">—</dd></div><div><dt>Sabedoria</dt><dd data-hero-summary="sabedoria">—</dd></div><div><dt>Carisma</dt><dd data-hero-summary="carisma">—</dd></div></dl></section>
+          <section class="hero-profile-section"><h3>Progressão</h3><dl class="hero-summary-stats"><div><dt>Renascimentos</dt><dd data-hero-summary="reborn">—</dd></div><div><dt>Ouro</dt><dd data-hero-summary="gold">—</dd></div><div><dt>Peças equipadas</dt><dd data-hero-summary="equipped">—</dd></div></dl></section>
+        </div>
+      </div>
+    </dialog>
 
     <!-- Farm Helper Modal (Assistente de Farm Idle & Auto-Venda) -->
     <div id="farm-helper-modal" class="modal-backdrop" style="display: none;">

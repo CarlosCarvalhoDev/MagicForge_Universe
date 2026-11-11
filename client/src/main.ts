@@ -57,6 +57,9 @@ import './ui/hunt-report.css';
 import './ui/auth-selection.css';
 import './ui/progression.css';
 import './ui/inventory-book.css';
+import './ui/hud-menu.css';
+import { setupHudMenu } from './ui/HudMenu';
+import { setupHeroProfile } from './ui/HeroProfile';
 import { setupInventoryBook, type InventoryPage } from './ui/InventoryBook';
 import { inventoryImage, inventoryItemArt, inventorySymbol } from './ui/InventoryArt';
 import './ui/narrative.css';
@@ -134,7 +137,6 @@ const playerExpText = document.getElementById('player-exp-text') as HTMLSpanElem
 
 // Top-Left Hero Card DOM (Ragnarok Mobile / Stickman Go Style)
 const hudHeroPortrait = document.getElementById('hud-hero-portrait') as HTMLImageElement | null;
-const hudHeroLevel = document.getElementById('hud-hero-level') as HTMLSpanElement | null;
 const hudHeroLevelPill = document.getElementById('hud-hero-level-pill') as HTMLSpanElement | null;
 const hudHeroName = document.getElementById('hud-hero-name') as HTMLSpanElement | null;
 const hudCpBig = document.getElementById('hud-cp-big') as HTMLSpanElement | null;
@@ -142,7 +144,7 @@ const hudHeroHpBar = document.getElementById('hud-hero-hp-bar') as HTMLDivElemen
 const hudHeroHpText = document.getElementById('hud-hero-hp-text') as HTMLSpanElement | null;
 const hudHeroMpBar = document.getElementById('hud-hero-mp-bar') as HTMLDivElement | null;
 const hudHeroMpText = document.getElementById('hud-hero-mp-text') as HTMLSpanElement | null;
-const hudAvatarBtn = document.getElementById('hud-avatar-btn') as HTMLDivElement | null;
+const hudAvatarBtn = document.querySelector<HTMLButtonElement>('#hud-avatar-btn');
 
 // Mobile Bottom-Center & Ragnarok Combat Arc Controls
 const btnToggleAuto = document.getElementById('btn-toggle-auto') as HTMLButtonElement | null;
@@ -175,7 +177,8 @@ const btnDockFarm = document.getElementById('btn-dock-farm') as HTMLButtonElemen
 const btnDockRanking = document.getElementById('btn-dock-ranking') as HTMLButtonElement | null;
 
 // Character (Paperdoll) Modal Elements
-const characterModal = document.getElementById('character-modal') as HTMLDivElement | null;
+const characterModal = document.querySelector<HTMLDialogElement>('#character-modal');
+const heroProfile = setupHeroProfile(characterModal);
 const btnCloseCharacter = document.getElementById('btn-close-character') as HTMLButtonElement | null;
 const paperdollCpValue = document.getElementById('paperdoll-cp-value') as HTMLDivElement | null;
 const statForca = document.getElementById('stat-forca') as HTMLSpanElement | null;
@@ -218,44 +221,44 @@ const HERO_CLASS_HUD_META: Record<CharacterClass, {
   attackTrait: string;
 }> = {
   [CharacterClass.GUERREIRO]: {
-    honorTag: 'Guerreiro • FOR/CAR',
-    traitPill: '⚔️ Vanguarda • Fervor',
+    honorTag: 'Guerreiro · FOR/CAR',
+    traitPill: 'Vanguarda · Fervor',
     resourceShort: 'EN',
     attackTrait: 'Golpe Sagrado',
   },
   [CharacterClass.CLERIGO]: {
-    honorTag: 'Clérigo • SAB/CON',
-    traitPill: '✨ Luz Divina • Fé',
+    honorTag: 'Clérigo · SAB/CON',
+    traitPill: 'Luz Divina · Fé',
     resourceShort: 'MP',
     attackTrait: 'Centelha Radiante',
   },
   [CharacterClass.BARBARO]: {
-    honorTag: 'Bárbaro • FOR/CON',
-    traitPill: '🩸 Berserker • Fúria',
+    honorTag: 'Bárbaro · FOR/CON',
+    traitPill: 'Berserker · Fúria',
     resourceShort: 'FUR',
     attackTrait: 'Fúria Brutal',
   },
   [CharacterClass.ARQUEIRO]: {
-    honorTag: 'Arqueiro • DES',
-    traitPill: '🏹 Precisão • Foco',
+    honorTag: 'Arqueiro · DES',
+    traitPill: 'Precisão · Foco',
     resourceShort: 'FOC',
     attackTrait: 'Disparo Élfico',
   },
   [CharacterClass.MONGE]: {
-    honorTag: 'Monge • SAB/DES',
-    traitPill: '🥋 Asceta • Chi',
+    honorTag: 'Monge · SAB/DES',
+    traitPill: 'Asceta · Chi',
     resourceShort: 'CHI',
     attackTrait: 'Palma Rúnica',
   },
   [CharacterClass.BRUXO]: {
-    honorTag: 'Bruxo • CAR/SAB',
-    traitPill: '👁️ Ocultista • Mana',
+    honorTag: 'Bruxo · CAR/SAB',
+    traitPill: 'Ocultista · Mana',
     resourceShort: 'MP',
     attackTrait: 'Raio Sombrio',
   },
   [CharacterClass.MAGO]: {
-    honorTag: 'Mago • INT',
-    traitPill: '⚡ Arcanista • Mana',
+    honorTag: 'Mago · INT',
+    traitPill: 'Arcanista · Mana',
     resourceShort: 'MP',
     attackTrait: 'Orbe Arcano',
   },
@@ -984,9 +987,7 @@ function updateCartasView() {
 function openUnifiedHeroModal(defaultTab: InventoryPage = 'mochila') {
   if (!inventoryModal) return;
   inventoryModal.style.display = 'flex';
-  if (characterModal && characterModal !== inventoryModal) {
-    characterModal.style.display = 'none';
-  }
+  closeCharacterModal();
   if (selectedSlotIndex === null && playerInventory.length > 0) {
     selectedSlotIndex = (bagItems(playerInventory)[0] ?? playerInventory[0]).slotIndex;
   }
@@ -1001,7 +1002,6 @@ function openUnifiedHeroModal(defaultTab: InventoryPage = 'mochila') {
 function closeUnifiedHeroModal() {
   inventoryTooltip?.hide();
   if (inventoryModal) inventoryModal.style.display = 'none';
-  if (characterModal) characterModal.style.display = 'none';
 }
 
 function toggleUnifiedHeroModal(defaultTab: InventoryPage = 'mochila', force?: boolean) {
@@ -1028,15 +1028,20 @@ function toggleInventoryModal(force?: boolean) {
 }
 
 function openCharacterModal(): void {
-  openUnifiedHeroModal('mochila');
+  if (!characterModal || characterModal.open) return;
+  closeInventory();
+  characterModal.showModal();
+  renderCharacterModal();
+  heroProfile.updateVitals(snapshotBuffer.getInterpolatedEntities().find(entity => entity.id === network.myPlayerId));
 }
 
 function closeCharacterModal(): void {
-  closeUnifiedHeroModal();
+  if (characterModal?.open) characterModal.close();
 }
 
-function toggleCharacterModal(force?: boolean): void {
-  toggleUnifiedHeroModal('mochila', force);
+function toggleCharacterModal(): void {
+  if (characterModal?.open) closeCharacterModal();
+  else openCharacterModal();
 }
 
 if (btnOpenInventory) {
@@ -1474,10 +1479,18 @@ document.getElementById('btn-auto-equip')?.addEventListener('click', () => {
   network.sendAutoEquip();
 });
 const hudHeader = document.getElementById('hud-header');
-if (hudHeader) {
-  new ResizeObserver(() => {
+const hudChat = document.getElementById('game-chat-box');
+if (hudHeader && hudChat) {
+  const measureHud = () => {
     document.body.style.setProperty('--hud-header-bottom', `${hudHeader.getBoundingClientRect().bottom}px`);
-  }).observe(hudHeader);
+    const chat = hudChat.getBoundingClientRect();
+    document.body.style.setProperty('--hud-chat-top', `${chat.height > 0 ? chat.top : window.innerHeight - 70}px`);
+  };
+  const observer = new ResizeObserver(measureHud);
+  observer.observe(hudHeader);
+  observer.observe(hudChat);
+  window.addEventListener('resize', measureHud);
+  measureHud();
 }
 
 function renderCharacterModal(): void {
@@ -1546,15 +1559,36 @@ function renderCharacterModal(): void {
   if (paperdollHeroName) paperdollHeroName.textContent = charName;
   if (paperdollHeroClass) paperdollHeroClass.textContent = `${classDef.displayName} (Nv. ${playerLevel})`;
 
-  // Render 6 Equipment Slots
-  Object.entries(paperdollSlotElements).forEach(([slotKeyStr, slotEl]) => {
-    if (!slotEl) return;
-    const slotKey = slotKeyStr as PaperdollSlotKey;
+  const equippedBySlot = new Map<PaperdollSlotKey, InventoryItemPayload>();
+  for (const slotKey of Object.keys(paperdollSlotElements) as PaperdollSlotKey[]) {
     const equippedItem = playerInventory.find(item => item.isEquipped &&
       ITEMS_DATABASE[item.itemId]?.equipmentSlot === equipmentSlots[slotKey].slot);
+    if (equippedItem) equippedBySlot.set(slotKey, equippedItem);
+    const slotEl = paperdollSlotElements[slotKey];
+    if (!slotEl) continue;
     renderEquipmentSlot(slotEl, slotKey, equippedItem);
     slotEl.onclick = equippedItem ? () => selectInventorySlot(equippedItem.slotIndex) : openInventory;
-  });
+  }
+  if (characterModal?.open) {
+    heroProfile.render({
+      classType: chosenClass,
+      equipment: equippedBySlot,
+      xp: playerCurrentXp,
+      xpGoal: playerXpToNextLevel,
+      fields: {
+        ...currentAttrs,
+        name: charName,
+        class: `${classDef.displayName} · Nv. ${playerLevel}`,
+        cp: playerCombatPower,
+        damage: baseDmg,
+        critical: `${critPct.toLocaleString('pt-BR')}%`,
+        range: `${classDef.attackRange.toLocaleString('pt-BR')} m`,
+        reborn: playerRebornCount,
+        gold: playerGold,
+        equipped: `${equippedBySlot.size} / 6`,
+      },
+    });
+  }
 }
 
 // ==========================================
@@ -1598,6 +1632,8 @@ function triggerQuickUseToast(name: string, emoji: string, slotIndex: number): v
   }, 5000);
 }
 
+setupHudMenu(document.getElementById('hud-menu-dock'));
+
 // Bind Dock Navigation Buttons
 if (btnDockCharacter) btnDockCharacter.addEventListener('click', () => toggleCharacterModal());
 if (btnDockInventory) btnDockInventory.addEventListener('click', () => toggleInventoryModal());
@@ -1624,7 +1660,9 @@ if (btnCloseCharacter) {
 }
 if (characterModal) {
   characterModal.addEventListener('click', (e) => {
-    if (e.target === characterModal) closeCharacterModal();
+    if (e.target !== characterModal) return;
+    const bounds = characterModal.getBoundingClientRect();
+    if (e.clientX < bounds.left || e.clientX > bounds.right || e.clientY < bounds.top || e.clientY > bounds.bottom) closeCharacterModal();
   });
 }
 
@@ -1748,7 +1786,7 @@ const offlineRewardModal = new OfflineRewardModal({
 });
 const offlineChestButton = document.createElement('button');
 offlineChestButton.type = 'button';
-offlineChestButton.className = 'dock-btn';
+offlineChestButton.className = 'hud-menu-option';
 offlineChestButton.innerHTML = '<span class="dock-time-icon" aria-hidden="true">⌛</span><span>Baú do Tempo</span>';
 offlineChestButton.style.display = 'none';
 btnDockFarm?.insertAdjacentElement('afterend', offlineChestButton);
@@ -2379,7 +2417,6 @@ network.onLoginSuccess = (payload) => {
   if (hudHeroPortrait) hudHeroPortrait.src = `/assets/portraits/${chosenClass}.jpg`;
   applyHeroClassHudIdentity(chosenClass);
   if (hudHeroName) hudHeroName.textContent = payload.characterName || 'Jogador';
-  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
 
   updateSkillsForClass(chosenClass);
@@ -2423,7 +2460,6 @@ network.onPlayerExpUpdate = (payload) => {
 
   updateExpBarUI(playerLevel, playerCurrentXp, playerXpToNextLevel);
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
-  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
   if (playerLevel !== prevLevel) {
     equipmentAdvice.reset();
@@ -2480,7 +2516,6 @@ network.onPlayerLevelUp = (payload) => {
   playerLevel = payload.newLevel;
   refreshExpansionContext();
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
-  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
   if (hudCpVal) hudCpVal.textContent = `${payload.totalCombatPower}`;
   if (modalCpText) modalCpText.textContent = `${payload.totalCombatPower}`;
@@ -2509,7 +2544,6 @@ network.onRebornResult = (payload) => {
   playerRebornCount = payload.rebornCount;
   refreshExpansionContext();
   playerCombatPower = payload.totalCombatPower;
-  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
   if (hudCpVal) hudCpVal.textContent = `${playerCombatPower.toLocaleString('pt-BR')}`;
@@ -2847,6 +2881,7 @@ function gameLoop() {
 
   // 2. Update Player Vitals HUD (HP & Mana/Energy)
   const myPlayer = entities.find((e) => e.id === network.myPlayerId);
+  if (characterModal?.open) heroProfile.updateVitals(myPlayer);
   if (myPlayer) {
     const hpPct = Math.max(0, Math.min(100, (myPlayer.currentHp / myPlayer.maxHp) * 100));
     if (playerHpBar) playerHpBar.style.width = `${hpPct}%`;
@@ -2871,9 +2906,6 @@ function gameLoop() {
 
     if (myPlayer.level && playerLevelBadge) {
       playerLevelBadge.textContent = `Nv. ${myPlayer.level}`;
-    }
-    if (myPlayer.level && hudHeroLevel) {
-      hudHeroLevel.textContent = `Nv. ${myPlayer.level}`;
     }
     if (myPlayer.level && hudHeroLevelPill) {
       hudHeroLevelPill.textContent = `Nv. ${myPlayer.level}`;
