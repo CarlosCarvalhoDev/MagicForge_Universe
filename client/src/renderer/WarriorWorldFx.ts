@@ -50,7 +50,6 @@ export function planWarriorWorldFx(event: WarriorCastFx, entities: readonly FxEn
       break;
     case 'guerreiro_nv2_2':
       aura('#ffe19a');
-      effects.push({ kind: 'shield', position: origin, followId: caster?.id, delayMs: 130 });
       break;
     case 'guerreiro_nv2_1': {
       const radius = event.radius || 5;
@@ -61,9 +60,9 @@ export function planWarriorWorldFx(event: WarriorCastFx, entities: readonly FxEn
     case 'guerreiro_nv3_1': {
       const radius = event.radius || 7;
       effects.push({ kind: 'warriorSigil', position: origin, radius });
-      wave(origin, radius, '#ffd366', 185);
+      wave(origin, radius, '#ff8248', 185);
       effects.push({ kind: 'warriorAftermath', position: origin, followId: caster?.id, radius, delayMs: 330 });
-      contact('#ffd366', position => 185 + Math.min(1, distance(origin, position) / radius) * 410);
+      contact('#ffd366', position => 185 + Math.min(1, distance(origin, position) / radius) * FX_DURATION.warriorWave * .75);
       break;
     }
     case 'guerreiro_nv3_3': {
@@ -76,7 +75,7 @@ export function planWarriorWorldFx(event: WarriorCastFx, entities: readonly FxEn
       if (event.targetResults?.some(result => result.targetId === event.casterId && result.effectiveHeal > 0)) {
         effects.push({ kind: 'heal', position: origin, followId: caster?.id, delayMs: 110 });
       }
-      contact('#ff722d', position => 100 + Math.min(1, distance(origin, position) / radius) * 410);
+      contact('#ff722d', position => 100 + Math.min(1, distance(origin, position) / radius) * FX_DURATION.warriorWave * .75);
       break;
     }
     case 'guerreiro_nv2_3': {

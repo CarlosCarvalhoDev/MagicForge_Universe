@@ -43,7 +43,7 @@ export class PixelWorld {
     return this.warriorCasts.trigger(id, skillId, now);
   }
 
-  draw(ctx: CanvasRenderingContext2D, entities: InterpolatedEntity[], camera: { x: number; y: number }, zoom: number, myId: string | null, selected: string | null, now: number): void {
+  draw(ctx: CanvasRenderingContext2D, entities: InterpolatedEntity[], camera: { x: number; y: number }, zoom: number, myId: string | null, selected: string | null, now: number, drawGroundEffects?: () => void): void {
     const width = ctx.canvas.width, height = ctx.canvas.height;
     const screen = (x: number, z: number) => [Math.round(width / 2 + (x - camera.x) * zoom), Math.round(height / 2 + (z - camera.y) * zoom)];
     ctx.save(); ctx.imageSmoothingEnabled = false;
@@ -73,6 +73,7 @@ export class PixelWorld {
         for (let t = 0; t < 3; t++) { const px = sx + (n * (t + 1) % 13) / 16 * tileSize, py = sy + (n * (t + 3) % 13) / 16 * tileSize; ctx.fillRect(Math.round(px), Math.round(py), 3, 3); }
       }
     }
+    drawGroundEffects?.();
     const portal = this.presentation.portal;
     if (portal) {
       const [px, py] = screen(portal.x, portal.z), s = Math.max(1, Math.round(zoom / 8));

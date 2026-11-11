@@ -56,6 +56,9 @@ import { setupInventoryTooltip } from './ui/InventoryTooltip';
 import './ui/hunt-report.css';
 import './ui/auth-selection.css';
 import './ui/progression.css';
+import './ui/inventory-book.css';
+import { setupInventoryBook, type InventoryPage } from './ui/InventoryBook';
+import { inventoryImage, inventoryItemArt, inventorySymbol } from './ui/InventoryArt';
 import './ui/narrative.css';
 import './ui/party-hud.css';
 import './ui/automatic-play.css';
@@ -617,69 +620,15 @@ let playerGold: number = 0;
 let playerCombatPower: number = 1000;
 let selectedSlotIndex: number | null = null;
 
-function getItemEmoji(itemId: string, type: ItemType): string {
-  if (itemId.startsWith('wraps_')) return '🥊';
-  if (itemId.startsWith('focus_')) return '🔮';
-  if (itemId === 'gold') return '💰';
-  if (itemId.includes('stone_forge')) return '💎';
-  if (itemId.includes('gem_ruby')) return '🔴';
-  if (itemId.includes('gem_sapphire')) return '🔵';
-  if (itemId.includes('gem_emerald')) return '🟢';
-  if (itemId.includes('gem_topaz')) return '🟡';
-  if (itemId.includes('arcane_dust')) return '✨';
-  if (itemId.includes('hp')) return '🧪';
-  if (itemId.includes('mp')) return '💧';
-  if (itemId.includes('sword') || itemId.includes('dagger') || itemId.includes('greatsword')) return '⚔️';
-  if (itemId.includes('bow')) return '🏹';
-  if (itemId.includes('staff')) return '🪄';
-  if (itemId.includes('tome')) return '📜';
-  if (itemId.includes('armor')) return '🦺';
-  if (itemId.includes('shield')) return '🛡️';
-  if (itemId.includes('relic')) return '👑';
-  if (itemId.includes('essence') || itemId.includes('rune')) return '✨';
-  if (itemId.includes('ore')) return '💎';
-  if (itemId.includes('fang')) return '🐺';
-  if (type === ItemType.CONSUMIVEL) return '🧪';
-  if (type === ItemType.EQUIPAMENTO) return '⚔️';
-  return '📦';
-}
-
-let currentSubmenuTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila';
+let currentSubmenuTab: InventoryPage = 'mochila';
 let playerCards: CardAlbumEntryPayload[] = [];
 let selectedRefineSlot: number | null = null;
 let selectedGemItemId: string | null = null;
 
-function switchSubmenuTab(tabName: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas') {
+function switchSubmenuTab(tabName: InventoryPage) {
+  if (currentSubmenuTab !== tabName) inventoryTooltip?.hide();
   currentSubmenuTab = tabName;
-  const tabBtns: Record<string, string> = {
-    mochila: 'tab-btn-mochila',
-    fusao: 'tab-btn-fusao',
-    refino: 'tab-btn-refino',
-    pedras: 'tab-btn-pedras',
-    cartas: 'tab-btn-cartas',
-  };
-  const tabPanels: Record<string, string> = {
-    mochila: 'tab-mochila',
-    fusao: 'tab-fusao',
-    refino: 'tab-refino',
-    pedras: 'tab-pedras',
-    cartas: 'tab-cartas',
-  };
-
-  Object.entries(tabBtns).forEach(([k, btnId]) => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      if (k === tabName) btn.classList.add('active');
-      else btn.classList.remove('active');
-    }
-  });
-
-  Object.entries(tabPanels).forEach(([k, panelId]) => {
-    const panel = document.getElementById(panelId);
-    if (panel) {
-      panel.style.display = k === tabName ? 'flex' : 'none';
-    }
-  });
+  inventoryBook.show(tabName);
 
   if (tabName === 'fusao') {
     refreshExpansionContext();
@@ -712,7 +661,7 @@ function updateRefinementView() {
 
   if (!targetItem) {
     if (refinoItemName) refinoItemName.textContent = 'Nenhum equipamento selecionado';
-    if (refinoItemIcon) refinoItemIcon.textContent = '⚔️';
+    if (refinoItemIcon) refinoItemIcon.innerHTML = inventorySymbol('sword');
     if (refinoTierCurr) refinoTierCurr.textContent = '+0';
     if (refinoTierNext) refinoTierNext.textContent = '+1';
     if (btnDoRefine) {
@@ -732,7 +681,7 @@ function updateRefinementView() {
     refinoItemName.textContent = `${def.name} (+${currentLevel})`;
     refinoItemName.style.color = rarityTheme.text;
   }
-  if (refinoItemIcon) refinoItemIcon.textContent = getItemEmoji(def.itemId, def.type);
+  if (refinoItemIcon) refinoItemIcon.innerHTML = inventoryItemArt(def.itemId, def.type, def.equipmentSlot);
   if (refinoTierCurr) refinoTierCurr.textContent = `+${currentLevel}`;
   if (refinoTierNext) refinoTierNext.textContent = currentLevel >= 15 ? 'MAX' : `+${nextLevel}`;
 
@@ -774,7 +723,7 @@ function updateRefinementView() {
 
   const stoneDef = ITEMS_DATABASE[stoneId];
   const stoneName = stoneDef ? stoneDef.name : 'Pedra de Refinamento';
-  const stoneEmoji = stoneDef?.icon || '💎';
+  const stoneArt = inventoryItemArt(stoneId, ItemType.MATERIAL);
   const playerStones = playerInventory
     .filter((i) => !i.isLocked && i.itemId === stoneId)
     .reduce((sum, i) => sum + i.quantity, 0);
@@ -788,17 +737,17 @@ function updateRefinementView() {
     refinoStatsDiff.innerHTML = `
       <div class="stat-diff-row"><span>Bônus de Atributos:</span><strong style="color: #34d399;">+${currPct}% ➔ +${nextPct}% (+8%)</strong></div>
       <div class="stat-diff-row"><span>Taxa de Sucesso:</span><strong style="color: ${successRate >= 80 ? '#34d399' : successRate >= 50 ? '#fbbf24' : '#f87171'};">${currentLevel >= 15 ? 'MÁXIMO' : `${successRate}%`}</strong></div>
-      ${warnDrop ? `<div class="stat-diff-row" style="color: #f87171; font-size: 0.72rem;"><span>⚠️ Risco de Falha:</span><strong>Reduz -1 nível se falhar</strong></div>` : ''}
+      ${warnDrop ? `<div class="stat-diff-row" style="color: #f87171; font-size: 0.72rem;"><span>Risco de Falha:</span><strong>Reduz -1 nível se falhar</strong></div>` : ''}
     `;
   }
 
   if (refinoCostBox) {
     if (currentLevel >= 15) {
-      refinoCostBox.innerHTML = `<span class="cost-item" style="color: #fbbf24;">✨ Equipamento no Refinamento Máximo (+15)!</span>`;
+      refinoCostBox.innerHTML = `<span class="cost-item" style="color: #fbbf24;">Equipamento no Refinamento Máximo (+15)!</span>`;
     } else {
       refinoCostBox.innerHTML = `
-        <span class="cost-item" style="color: ${hasStone ? '#e2e8f0' : '#f87171'};">${stoneEmoji} ${stoneCount}x ${stoneName} (${playerStones}/${stoneCount})</span>
-        <span class="cost-item gold" style="color: ${hasGold ? '#fbbf24' : '#f87171'};">💰 ${goldCost.toLocaleString('pt-BR')} Ouro</span>
+        <span class="cost-item" style="color: ${hasStone ? '#e2e8f0' : '#f87171'};">${stoneArt} ${stoneCount}x ${stoneName} (${playerStones}/${stoneCount})</span>
+        <span class="cost-item gold" style="color: ${hasGold ? '#fbbf24' : '#f87171'};">${inventoryItemArt('gold', ItemType.MATERIAL)} ${goldCost.toLocaleString('pt-BR')} Ouro</span>
       `;
     }
   }
@@ -806,12 +755,12 @@ function updateRefinementView() {
   if (btnDoRefine) {
     if (currentLevel >= 15) {
       btnDoRefine.disabled = true;
-      btnDoRefine.textContent = '⭐ NÍVEL MÁXIMO (+15) ATINGIDO';
+      btnDoRefine.textContent = 'NÍVEL MÁXIMO (+15) ATINGIDO';
       btnDoRefine.style.opacity = '0.6';
     } else {
       btnDoRefine.disabled = !hasStone || !hasGold;
       btnDoRefine.style.opacity = (!hasStone || !hasGold) ? '0.6' : '1';
-      btnDoRefine.textContent = `🔨 APRIMORAR EQUIPAMENTO (+${nextLevel})`;
+      btnDoRefine.textContent = `APRIMORAR EQUIPAMENTO (+${nextLevel})`;
     }
   }
 }
@@ -849,7 +798,7 @@ function updatePedrasView() {
 
       if (sock) {
         const gemDef = ITEMS_DATABASE[sock.gemId];
-        const gemIcon = gemDef?.icon || '💎';
+        const gemIcon = inventoryItemArt(sock.gemId, ItemType.GEMA);
         const gemName = gemDef?.name || sock.gemId;
         let effect = '';
         if (gemDef?.statsBonus) {
@@ -864,7 +813,7 @@ function updatePedrasView() {
         `;
       } else {
         slotEl.innerHTML = `
-          <span class="gem-icon">⚪</span>
+          <span class="gem-icon">${inventorySymbol('socket')}</span>
           <div class="gem-info">
             <span class="gem-name">Soquete ${s + 1} Vazio</span>
             <span class="gem-effect" style="color: #94a3b8;">Selecione uma gema abaixo para engastar</span>
@@ -889,21 +838,21 @@ function updatePedrasView() {
       gemsInBag.forEach((g) => {
         const gemDef = ITEMS_DATABASE[g.itemId];
         if (!gemDef) return;
-        const chip = document.createElement('div');
+        const chip = document.createElement('button');
+        chip.type = 'button';
         chip.className = 'gem-chip';
-        if (selectedGemItemId === g.itemId) {
-          chip.style.borderColor = '#fbbf24';
-          chip.style.background = 'rgba(251, 191, 36, 0.2)';
-        }
+        chip.setAttribute('aria-pressed', String(selectedGemItemId === g.itemId));
         chip.setAttribute('data-gem', g.itemId);
         let bonusText = '';
         if (gemDef.statsBonus) {
           bonusText = Object.entries(gemDef.statsBonus).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(', ');
         }
-        chip.textContent = `${gemDef.icon || '💎'} ${gemDef.name} (${g.quantity}x) [${bonusText}]`;
+        chip.innerHTML = inventoryItemArt(g.itemId, ItemType.GEMA);
+        chip.append(` ${gemDef.name} (${g.quantity}×)${bonusText ? ` · ${bonusText}` : ''}`);
         chip.onclick = () => {
           selectedGemItemId = g.itemId;
           updatePedrasView();
+          Array.from(gemBagList.querySelectorAll('button')).find(button => button.dataset.gem === g.itemId)?.focus();
         };
         gemBagList.appendChild(chip);
       });
@@ -921,7 +870,7 @@ function updatePedrasView() {
       btnSocketGem.textContent = 'SELECIONE UMA GEMA ACIMA PARA ENGASTAR';
     } else {
       const gDef = ITEMS_DATABASE[selectedGemItemId];
-      btnSocketGem.textContent = `💎 ENGASTAR ${gDef?.name.toUpperCase() || 'GEMA'} NO SOQUETE #${nextFreeSocket + 1}`;
+      btnSocketGem.textContent = `ENGASTAR ${gDef?.name.toUpperCase() || 'GEMA'} NO SOQUETE #${nextFreeSocket + 1}`;
     }
   }
 }
@@ -937,9 +886,9 @@ function updateCartasView() {
   if (cardEquipPreview) {
     cardEquipPreview.innerHTML = `
       <div class="card-slot" style="margin-bottom: 8px;">
-        <span class="card-slot-tag" style="color: #fbbf24; font-weight: 700;">⚔️ Arma Principal • Carta Ativa (Bônus em Dobro 2x)</span>
+        <span class="card-slot-tag" style="color: #fbbf24; font-weight: 700;">${inventorySymbol('sword')} Arma Principal • Carta Ativa (Bônus em Dobro 2x)</span>
         <div class="card-equipped-box">
-          <span class="card-symbol" style="font-size: 1.8rem;">${weaponCardEntry ? (CARDS_DATABASE[weaponCardEntry.cardId]?.icon || '🃏') : '⚪'}</span>
+          <span class="card-symbol" style="font-size: 1.8rem;">${inventorySymbol(weaponCardEntry ? 'cards' : 'socket')}</span>
           <div class="card-details">
             <span class="card-name" style="color: #fbbf24; font-weight: bold;">
               ${weaponCardEntry ? (CARDS_DATABASE[weaponCardEntry.cardId]?.name || weaponCardEntry.cardId) : 'Nenhuma Carta Equipada na Arma'}
@@ -953,9 +902,9 @@ function updateCartasView() {
       </div>
 
       <div class="card-slot">
-        <span class="card-slot-tag" style="color: #60a5fa; font-weight: 700;">🛡️ Armadura Peitoral • Carta Ativa (Bônus em Dobro 2x)</span>
+        <span class="card-slot-tag" style="color: #60a5fa; font-weight: 700;">${inventoryImage('/assets/ui/slots/slot_armor.png')} Armadura Peitoral • Carta Ativa (Bônus em Dobro 2x)</span>
         <div class="card-equipped-box">
-          <span class="card-symbol" style="font-size: 1.8rem;">${armorCardEntry ? (CARDS_DATABASE[armorCardEntry.cardId]?.icon || '🃏') : '⚪'}</span>
+          <span class="card-symbol" style="font-size: 1.8rem;">${inventorySymbol(armorCardEntry ? 'cards' : 'socket')}</span>
           <div class="card-details">
             <span class="card-name" style="color: #60a5fa; font-weight: bold;">
               ${armorCardEntry ? (CARDS_DATABASE[armorCardEntry.cardId]?.name || armorCardEntry.cardId) : 'Nenhuma Carta Equipada na Armadura'}
@@ -986,10 +935,7 @@ function updateCartasView() {
         cardEl.style.borderColor = RARITY_COLORS[cardDef.rarity]?.border || '#fbbf24';
       }
 
-      let imgHtml = `<span class="m-card-pic">${cardDef.icon || '🃏'}</span>`;
-      if (cardDef.image) {
-        imgHtml = `<img src="/${cardDef.image}" alt="${cardDef.name}" class="m-card-pic" style="width: 44px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);" onerror="this.outerHTML='<span class=\\'m-card-pic\\'>${cardDef.icon || '🃏'}</span>'" />`;
-      }
+      const imgHtml = `<span class="m-card-pic">${cardDef.image ? inventoryImage(`/${cardDef.image}`) : inventorySymbol('cards')}</span>`;
 
       const rarityColor = RARITY_COLORS[cardDef.rarity]?.text || '#fbbf24';
 
@@ -998,7 +944,7 @@ function updateCartasView() {
         if (isEquipped) {
           equipButtonsHtml = `
             <div style="display: flex; gap: 4px; margin-top: 6px;">
-              <span style="color: #34d399; font-size: 0.72rem; font-weight: 700;">✅ Ativa [${owned.equippedSlot}]</span>
+              <span style="color: #34d399; font-size: 0.72rem; font-weight: 700;">Ativa [${owned.equippedSlot}]</span>
               <button class="btn-refine-action" style="padding: 2px 6px; font-size: 0.68rem; margin-left: auto;" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', '${owned.equippedSlot || 'ARMA'}', false)">Desequipar</button>
             </div>
           `;
@@ -1008,13 +954,13 @@ function updateCartasView() {
 
           equipButtonsHtml = `
             <div style="display: flex; gap: 6px; margin-top: 6px;">
-              ${allowArma ? `<button class="btn-action-primary" style="padding: 3px 6px; font-size: 0.68rem; flex: 1;" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', 'ARMA', true)">⚔️ Na Arma</button>` : ''}
-              ${allowArmadura ? `<button class="btn-action-primary" style="padding: 3px 6px; font-size: 0.68rem; flex: 1; background: linear-gradient(135deg, #2563eb, #1d4ed8);" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', 'ARMADURA', true)">🛡️ Na Armadura</button>` : ''}
+              ${allowArma ? `<button class="btn-action-primary" style="padding: 3px 6px; font-size: 0.68rem; flex: 1;" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', 'ARMA', true)">Na Arma</button>` : ''}
+              ${allowArmadura ? `<button class="btn-action-primary" style="padding: 3px 6px; font-size: 0.68rem; flex: 1; background: linear-gradient(135deg, #2563eb, #1d4ed8);" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', 'ARMADURA', true)">Na Armadura</button>` : ''}
             </div>
           `;
         }
       } else {
-        equipButtonsHtml = `<span style="color: #94a3b8; font-size: 0.68rem; margin-top: 4px;">🔒 Derrote este monstro para saquear</span>`;
+        equipButtonsHtml = `<span style="color: #94a3b8; font-size: 0.68rem; margin-top: 4px;">${inventorySymbol('lock')} Derrote este monstro para saquear</span>`;
       }
 
       cardEl.innerHTML = `
@@ -1026,12 +972,16 @@ function updateCartasView() {
           ${equipButtonsHtml}
         </div>
       `;
+      cardEl.querySelector<HTMLImageElement>('.m-card-pic img')?.addEventListener('error', event => {
+        const parent = (event.currentTarget as HTMLImageElement).parentElement;
+        if (parent) parent.innerHTML = inventorySymbol('cards');
+      }, { once: true });
       cardsGrid.appendChild(cardEl);
     });
   }
 }
 
-function openUnifiedHeroModal(defaultTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila') {
+function openUnifiedHeroModal(defaultTab: InventoryPage = 'mochila') {
   if (!inventoryModal) return;
   inventoryModal.style.display = 'flex';
   if (characterModal && characterModal !== inventoryModal) {
@@ -1054,7 +1004,7 @@ function closeUnifiedHeroModal() {
   if (characterModal) characterModal.style.display = 'none';
 }
 
-function toggleUnifiedHeroModal(defaultTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila', force?: boolean) {
+function toggleUnifiedHeroModal(defaultTab: InventoryPage = 'mochila', force?: boolean) {
   if (!inventoryModal) return;
   const isCurrentlyOpen = inventoryModal.style.display === 'flex';
   const shouldOpen = force !== undefined ? force : !isCurrentlyOpen;
@@ -1107,19 +1057,7 @@ if (inventoryModal) {
   });
 }
 
-// Submenus navigation tab listeners
-const tabBtnMochila = document.getElementById('tab-btn-mochila');
-if (tabBtnMochila) tabBtnMochila.addEventListener('click', () => switchSubmenuTab('mochila'));
-
-const tabBtnRefino = document.getElementById('tab-btn-refino');
-if (tabBtnRefino) tabBtnRefino.addEventListener('click', () => switchSubmenuTab('refino'));
-
-const tabBtnPedras = document.getElementById('tab-btn-pedras');
-if (tabBtnPedras) tabBtnPedras.addEventListener('click', () => switchSubmenuTab('pedras'));
-
-document.getElementById('tab-btn-fusao')?.addEventListener('click', () => switchSubmenuTab('fusao'));
-const tabBtnCartas = document.getElementById('tab-btn-cartas');
-if (tabBtnCartas) tabBtnCartas.addEventListener('click', () => switchSubmenuTab('cartas'));
+const inventoryBook = setupInventoryBook(inventoryModal, switchSubmenuTab);
 
 // Interactive Actions for Submenus
 const btnDoRefine = document.getElementById('btn-do-refine');
@@ -1250,14 +1188,14 @@ function renderInventorySlots() {
 
         const iconEl = document.createElement('span');
         iconEl.className = 'slot-icon-text';
-        iconEl.textContent = getItemEmoji(item.itemId, itemDef.type);
+        iconEl.innerHTML = inventoryItemArt(item.itemId, itemDef.type, itemDef.equipmentSlot);
         slotEl.appendChild(iconEl);
         const nameEl = document.createElement('span');
         nameEl.className = 'inventory-tile-name';
         nameEl.textContent = itemDef.name;
         slotEl.appendChild(nameEl);
         if (item.isLocked) {
-          const badge = document.createElement('span'); badge.className = 'inventory-lock-badge'; badge.textContent = '🔒';
+          const badge = document.createElement('span'); badge.className = 'inventory-lock-badge'; badge.innerHTML = inventorySymbol('lock');
           slotEl.appendChild(badge);
           slotEl.setAttribute('aria-label', slotEl.getAttribute('aria-label') + ' · protegido');
         }
@@ -1290,7 +1228,7 @@ function renderInventorySlots() {
       const lockIcon = document.createElement('span');
       lockIcon.style.fontSize = '1.1rem';
       lockIcon.style.opacity = '0.4';
-      lockIcon.textContent = '🔒';
+      lockIcon.innerHTML = inventorySymbol('lock');
       slotEl.appendChild(lockIcon);
 
       slotEl.addEventListener('click', () => {
@@ -1312,13 +1250,14 @@ function selectInventorySlot(slotIndex: number) {
   lockButton.hidden = !item;
   if (item) {
     lockButton.setAttribute('aria-pressed', String(!!item.isLocked));
-    lockButton.textContent = item.isLocked ? '🔓 Desproteger' : '🔒 Proteger';
+    lockButton.innerHTML = item.isLocked ? `${inventorySymbol('unlock')} Desproteger` : `${inventorySymbol('lock')} Proteger`;
     lockButton.title = 'Protege contra venda, reciclagem e consumo. Equipar e refinar continuam permitidos.';
     lockButton.onclick = () => network.sendSetItemLock(item.slotIndex, !item.isLocked);
   }
 
 
   const itemDef = item ? ITEMS_DATABASE[item.itemId] : null;
+  document.getElementById('inventory-inspector')?.toggleAttribute('data-has-item', !!itemDef);
 
   if (item && itemDef && itemDef.type === ItemType.EQUIPAMENTO) {
     selectedRefineSlot = slotIndex;
@@ -1327,7 +1266,10 @@ function selectInventorySlot(slotIndex: number) {
   }
 
   if (!item || !itemDef) {
-    if (inspectorIcon) inspectorIcon.textContent = '📦';
+    if (inspectorIcon) {
+      inspectorIcon.innerHTML = inventoryImage('/assets/ui/icons/icon-mochila-satchel.svg');
+      inspectorIcon.style.borderColor = '';
+    }
     if (inspectorName) {
       inspectorName.textContent = 'Slot Vazio';
       inspectorName.style.color = '#94a3b8';
@@ -1347,7 +1289,7 @@ function selectInventorySlot(slotIndex: number) {
   const rarityTheme = RARITY_COLORS[itemDef.rarity] || { border: '#ffffff', glow: 'rgba(255,255,255,0.3)', text: '#ffffff', bg: 'rgba(30,41,59,0.6)' };
 
   if (inspectorIcon) {
-    inspectorIcon.textContent = getItemEmoji(item.itemId, itemDef.type);
+    inspectorIcon.innerHTML = inventoryItemArt(item.itemId, itemDef.type, itemDef.equipmentSlot);
     inspectorIcon.style.borderColor = rarityTheme.border;
   }
   if (inspectorName) {

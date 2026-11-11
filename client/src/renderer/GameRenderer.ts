@@ -304,8 +304,10 @@ export class GameRenderer {
 
     // Pixel-art migration: presentation changes only; network snapshots remain authoritative.
     if (this.visualStyle === 'pixel') {
-      this.pixelWorld.draw(ctx, entities, this.cameraOffset, this.zoom, myPlayerId, this.selectedTargetId, now);
-      this.vfx.draw(ctx, entities, this.cameraOffset, this.zoom, now);
+      const effects = this.vfx.queue.sample(now, entities);
+      this.pixelWorld.draw(ctx, entities, this.cameraOffset, this.zoom, myPlayerId, this.selectedTargetId, now,
+        () => this.vfx.draw(ctx, effects, this.cameraOffset, this.zoom, now, 'ground'));
+      this.vfx.draw(ctx, effects, this.cameraOffset, this.zoom, now, 'air');
       this.vfx.drawStatuses(ctx, this.warriorPresentation.visible(now, entities), entities, this.cameraOffset, this.zoom, now);
       this.renderItemDrops(width / 2, height / 2);
       this.renderFloatingText(width / 2, height / 2);
