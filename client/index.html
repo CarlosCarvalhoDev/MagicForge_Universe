@@ -3748,23 +3748,22 @@
   </head>
   <body>
     <div id="hud-header">
+    <div class="hud-profile-column">
     <!-- 1. Top-Left Hero Status Card (Estilo Mobile Ragnarok / Stickman Go) -->
     <div id="hero-status-card" class="glass-panel" data-hero-class="GUERREIRO">
-      <div class="hero-avatar-box" id="hud-avatar-btn" title="Abrir Ficha de Personagem & Equipamentos [C]">
+      <button type="button" class="hero-avatar-box" id="hud-avatar-btn" aria-label="Abrir resumo do herói" title="Abrir resumo do herói [C]">
         <img id="hud-hero-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Avatar" class="hero-avatar-img" />
-        <span id="hud-hero-level" class="hero-level-badge">Nv. 3</span>
-      </div>
+      </button>
       <div class="hero-info-col">
         <div class="hero-title-row">
-          <span id="hud-hero-level-pill" class="hero-level-pill-tag">Nv. 3</span>
           <span id="hud-hero-name" class="hero-name-label">LordAventureiro</span>
-          <span id="hud-hero-honor-tag" class="hero-honor-tag">Guerreiro • FOR/CAR</span>
+          <span id="hud-hero-level-pill" class="hero-level-pill-tag">Nv. 3</span>
         </div>
-        <div class="hero-cp-brand">
-          <span class="hero-cp-tag">PC</span>
-          <span id="hud-cp-big" class="hero-cp-number">1.425</span>
-          <span id="hud-class-trait-pill" class="hero-class-trait-pill">⚔️ Vanguarda • Energia</span>
+        <div class="hero-hud-tags">
+          <span id="hud-hero-honor-tag" class="hero-honor-tag">Guerreiro · FOR/CAR</span>
+          <span id="hud-class-trait-pill" class="hero-class-trait-pill">Vanguarda · Fervor</span>
         </div>
+        <div class="hero-cp-brand"><span class="hero-cp-tag" title="Poder de combate">PC</span><span id="hud-cp-big" class="hero-cp-number">1.425</span></div>
         <div class="hero-vitals-bars">
           <div class="mini-bar-track">
             <span class="mini-bar-tag">HP</span>
@@ -3780,6 +3779,8 @@
       </div>
     </div>
 
+    </div>
+    <div class="hud-stage-column">
     <!-- 2. Top-Center Stage Progression & Boss Card + Locked Monster Target Bar -->
     <div id="top-center-wave-card" class="glass-panel">
       <!-- Stage & World Header -->
@@ -3842,6 +3843,7 @@
       </div>
     </div>
 
+    </div>
     <!-- 3. Top-Right Location, Session Navigation & Luxury Runic Status Bar -->
     <div id="top-right-location-card">
       <div class="top-right-header-row">
@@ -3971,28 +3973,17 @@
     </aside>
 
 
-    <!-- Right Vertical Navigation Dock (Ragnarok Mobile Style) -->
-    <div id="right-vertical-dock">
-      <button class="dock-btn" id="btn-dock-character" title="Ficha do Personagem & Equipamentos [C]">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-hero-helm.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Herói</span>
+    <div id="hud-menu-dock">
+      <button type="button" class="hud-menu-trigger" data-hud-menu-trigger aria-label="Abrir menu do jogo" aria-expanded="false" aria-controls="hud-menu-options">
+        <img src="/assets/ui/icons/icon-hud-backpack.svg" alt="">
       </button>
-      <button class="dock-btn" id="btn-dock-inventory" title="Mochila de Itens [I]">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-mochila-satchel.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Mochila</span>
-      </button>
-      <button class="dock-btn" id="btn-dock-skillbook" title="Grimório de Habilidades [K]">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-grimorio-tome.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Grimório</span>
-      </button>
-      <button class="dock-btn" id="btn-dock-farm" title="Assistente de Farm Idle [F]">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-farm-anvil.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Farm</span>
-      </button>
-      <button class="dock-btn" id="btn-dock-ranking" title="Classificação e Rankings">
-        <span class="dock-icon"><img src="/assets/ui/icons/icon-rank-chalice.svg" alt="" class="dock-svg-icon" /></span>
-        <span>Rank</span>
-      </button>
+      <nav class="hud-menu-panel" id="hud-menu-options" data-hud-menu-panel aria-label="Atalhos do jogo" hidden>
+        <button type="button" class="hud-menu-option" id="btn-dock-character" title="Herói [C]"><img src="/assets/ui/icons/icon-hero-bust.svg" alt=""><span>Herói</span></button>
+        <button type="button" class="hud-menu-option" id="btn-dock-inventory" title="Mochila [I]"><img src="/assets/ui/icons/icon-mochila-satchel.svg" alt=""><span>Mochila</span></button>
+        <button type="button" class="hud-menu-option" id="btn-dock-skillbook" title="Grimório [K]"><img src="/assets/ui/icons/icon-grimorio-tome.svg" alt=""><span>Grimório</span></button>
+        <button type="button" class="hud-menu-option" id="btn-dock-farm" title="Farm [F]"><img src="/assets/ui/icons/icon-farm-anvil.svg" alt=""><span>Farm</span></button>
+        <button type="button" class="hud-menu-option" id="btn-dock-ranking" title="Rank"><img src="/assets/ui/icons/icon-rank-chalice.svg" alt=""><span>Rank</span></button>
+      </nav>
     </div>
 
     <!-- Left Tactical Drawer -->
@@ -4251,34 +4242,33 @@
 
     <!-- Unified Hero & Inventory Modal (Ficha do Herói, Equipamentos, Mochila e Submenus: Refinamento, Pedras, Cartas) -->
     <div id="inventory-modal" class="modal-backdrop" style="display: none;">
-      <div class="glass-panel modal-content unified-hero-modal-content">
+      <div class="glass-panel modal-content unified-hero-modal-content" role="dialog" aria-modal="true" aria-labelledby="inventory-book-title">
         <!-- Top Modal Bar -->
         <div class="modal-header unified-modal-header">
           <div class="modal-title-group">
-            <span class="modal-title-icon">🎒</span>
+            <span class="modal-title-icon"><img class="inventory-art" src="/assets/ui/icons/icon-grimorio-tome.svg" alt=""></span>
             <div style="display: flex; flex-direction: column;">
-              <span class="modal-title-main">Ficha do Herói & Inventário</span>
-              <span class="modal-title-sub">Equipamentos • Mochila • Refinamento • Pedras • Cartas</span>
+              <span class="modal-title-main" id="inventory-book-title">Ficha do Herói &amp; Inventário</span>
             </div>
           </div>
           <div class="modal-header-actions">
             <div class="modal-currencies">
-              <span class="currency-badge gold"><span class="badge-icon">💰</span> <strong id="inventory-gold-label">0 Ouro</strong></span>
-              <span class="currency-badge diamond"><span class="badge-icon">💎</span> <strong>0</strong> Diamantes</span>
+              <span class="currency-badge gold"><img class="inventory-art" src="/assets/ui/icons/icon-gold-coin.svg" alt=""> <strong id="inventory-gold-label">0 Ouro</strong></span>
+              <span class="currency-badge diamond"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#gem"></use></svg> <strong>0</strong> Diamantes</span>
             </div>
-            <button id="btn-close-inventory" class="btn-close" title="Fechar (ESC ou I / C)">✕</button>
+            <button id="btn-close-inventory" class="btn-close" title="Fechar (Esc ou I)">✕</button>
           </div>
         </div>
 
         <!-- Main Body: Dual-Pane (Left: Hero & Equipment Stage, Right: Submenus & Views) -->
-        <div class="unified-modal-body">
+        <div class="unified-modal-body inventory-scroll">
           <!-- LEFT PANE: Character Paperdoll Showcase & Equipment -->
-          <div class="unified-hero-left-pane">
+          <div class="unified-hero-left-pane inventory-scroll">
             <!-- Combat Power Banner (Inspired by Laplace M / Tales of Wind "CB 4276") -->
             <div class="hero-cp-banner">
               <span class="cp-label">PODER DE COMBATE (CP)</span>
               <div class="cp-value-display">
-                <span class="cp-sword-icon">⚔️</span>
+                <svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#sword"></use></svg>
                 <span id="modal-cp-text" class="cp-number">1.864</span>
                 <span id="paperdoll-cp-value" style="display: none;">1.864</span>
               </div>
@@ -4358,10 +4348,10 @@
                 <div class="mini-stat"><span class="lbl cha">CAR</span><strong id="stat-carisma">14</strong></div>
               </div>
               <div class="combat-substats-strip">
-                <span title="Vida Máxima">❤️ <strong id="paperdoll-max-hp">1.130</strong></span>
-                <span title="Dano Base">⚔️ <strong id="paperdoll-base-damage">89</strong></span>
+                <span title="Vida Máxima"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#heart"></use></svg> <strong id="paperdoll-max-hp">1.130</strong></span>
+                <span title="Dano Base"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#sword"></use></svg> <strong id="paperdoll-base-damage">89</strong></span>
                 <span title="Alcance de Ataque" id="paperdoll-attack-range" style="display: none;">2.5m</span>
-                <span title="Chance de Crítico">🎯 <strong id="paperdoll-crit">18%</strong></span>
+                <span title="Chance de Crítico"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#target"></use></svg> <strong id="paperdoll-crit">18%</strong></span>
               </div>
             </div>
           </div>
@@ -4369,24 +4359,16 @@
           <!-- RIGHT PANE: Submenus (Mochila, Refinamento, Pedras, Cartas) -->
           <div class="unified-submenus-right-pane">
             <!-- Submenu Tab Bar -->
-            <div class="submenus-tab-nav">
-              <button class="submenu-tab-btn active" data-tab="tab-mochila" id="tab-btn-mochila">
-                <span class="tab-emoji">🎒</span> Mochila
-              </button>
-              <button class="submenu-tab-btn" data-tab="tab-fusao" id="tab-btn-fusao"><span class="tab-emoji">⚒️</span> Fusão</button>
-              <button class="submenu-tab-btn" data-tab="tab-refino" id="tab-btn-refino">
-                <span class="tab-emoji">🔨</span> Refinamento
-              </button>
-              <button class="submenu-tab-btn" data-tab="tab-pedras" id="tab-btn-pedras">
-                <span class="tab-emoji">💎</span> Pedras
-              </button>
-              <button class="submenu-tab-btn" data-tab="tab-cartas" id="tab-btn-cartas">
-                <span class="tab-emoji">🃏</span> Cartas
-              </button>
+            <div class="submenus-tab-nav" role="tablist" aria-label="Páginas do inventário" aria-orientation="vertical">
+              <button type="button" class="submenu-tab-btn active" role="tab" aria-selected="true" aria-controls="tab-mochila" tabindex="0" data-tab="tab-mochila" id="tab-btn-mochila"><img class="inventory-art" src="/assets/ui/icons/icon-mochila-satchel.svg" alt=""><span>Mochila</span></button>
+              <button type="button" class="submenu-tab-btn" role="tab" aria-selected="false" aria-controls="tab-fusao" tabindex="-1" data-tab="tab-fusao" id="tab-btn-fusao"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#fusion"></use></svg><span>Fusão</span></button>
+              <button type="button" class="submenu-tab-btn" role="tab" aria-selected="false" aria-controls="tab-refino" tabindex="-1" data-tab="tab-refino" id="tab-btn-refino"><img class="inventory-art" src="/assets/ui/icons/icon-farm-anvil.svg" alt=""><span>Refinamento</span></button>
+              <button type="button" class="submenu-tab-btn" role="tab" aria-selected="false" aria-controls="tab-pedras" tabindex="-1" data-tab="tab-pedras" id="tab-btn-pedras"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#gem"></use></svg><span>Pedras</span></button>
+              <button type="button" class="submenu-tab-btn" role="tab" aria-selected="false" aria-controls="tab-cartas" tabindex="-1" data-tab="tab-cartas" id="tab-btn-cartas"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#cards"></use></svg><span>Cartas</span></button>
             </div>
 
             <!-- SUBMENU VIEW 1: MOCHILA (Sacola) -->
-            <div class="submenu-tab-panel" id="tab-mochila">
+            <div class="submenu-tab-panel inventory-scroll" id="tab-mochila" role="tabpanel" aria-labelledby="tab-btn-mochila">
               <div class="mochila-panel-layout">
                 <!-- Dynamic Inventory Item Grid -->
                 <div class="inventory-grid-wrap">
@@ -4410,17 +4392,18 @@
                     <button type="button" id="btn-equipment-advice">Ver melhorias</button>
                   </div>
                   <p id="equipment-advice-status" role="status" aria-live="polite"></p>
-                  <div id="equipment-advice-list"></div>
                   <p id="inventory-view-summary" role="status" aria-live="polite"></p>
-                  <p class="inventory-equipment-note">Passe o mouse ou segure um item para comparar. Toque para selecionar.</p>
-                  <div class="inventory-slots-grid" id="inventory-slots-grid"></div>
+                  <div class="inventory-items-scroll inventory-scroll" role="region" aria-label="Itens da mochila" tabindex="0">
+                    <div id="equipment-advice-list"></div>
+                    <div class="inventory-slots-grid" id="inventory-slots-grid"></div>
+                  </div>
 
                 </div>
 
                 <!-- Inspector Card -->
                 <div class="inventory-inspector" id="inventory-inspector">
                   <div class="inspector-item-header">
-                    <div class="inspector-item-icon" id="inspector-icon">📦</div>
+                    <div class="inspector-item-icon" id="inspector-icon"><img class="inventory-art" src="/assets/ui/icons/icon-mochila-satchel.svg" alt=""></div>
                     <div class="inspector-item-title-box">
                       <span class="inspector-item-name" id="inspector-name">Selecione um Item</span>
                       <span class="inspector-item-tag" id="inspector-tag">Mochila</span>
@@ -4447,13 +4430,13 @@
                   <div class="inspector-actions" style="display: flex; gap: 8px; margin-top: auto;">
                     <button id="btn-inventory-action" class="btn-action-primary" style="display: none; flex: 1;">Equipar</button>
                     <button id="btn-inventory-lock" type="button" hidden>Proteger item</button>
-                    <button id="btn-inventory-discard" class="btn-action-discard" style="display: none; flex: 1;">♻️ Reciclar na Forja</button>
+                    <button id="btn-inventory-discard" class="btn-action-discard" style="display: none; flex: 1;"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#recycle"></use></svg> Reciclar na Forja</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="submenu-tab-panel" id="tab-fusao" style="display:none;">
+            <div class="submenu-tab-panel inventory-scroll" id="tab-fusao" role="tabpanel" aria-labelledby="tab-btn-fusao" style="display:none;">
               <section class="fusion-forge-card">
                 <h3>Reforja Rúnica</h3>
                 <p>Reúna duplicatas e desperte uma nova afinidade na bigorna ancestral.</p>
@@ -4474,14 +4457,14 @@
             </div>
 
             <!-- SUBMENU VIEW 2: REFINAMENTO (Forja de Equipamentos) -->
-            <div class="submenu-tab-panel" id="tab-refino" style="display: none;">
+            <div class="submenu-tab-panel inventory-scroll" id="tab-refino" role="tabpanel" aria-labelledby="tab-btn-refino" style="display: none;">
               <div class="refino-forge-card">
                 <div class="refino-forge-header">
-                  <span class="refino-title">⚒️ Forja de Refinamento Celestial</span>
+                  <span class="refino-title">Forja de Refinamento</span>
                   <span class="refino-sub">Eleve o poder do seu equipamento (+1, +2, +3...) com Pedras de Refinamento</span>
                 </div>
                 <div class="refino-target-box">
-                  <div class="refino-item-preview" id="refino-item-icon">⚔️</div>
+                  <div class="refino-item-preview" id="refino-item-icon"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#sword"></use></svg></div>
                   <div class="refino-item-details">
                     <span class="refino-item-name" id="refino-item-name">Arma Equipada</span>
                     <div class="refino-tiers-row">
@@ -4499,102 +4482,43 @@
                 <div class="refino-cost-box">
                   <span>Custo do Refinamento:</span>
                   <div class="cost-items">
-                    <span class="cost-item">💎 1x Pedra de Refinamento</span>
-                    <span class="cost-item gold">💰 250 Ouro</span>
+                    <span class="cost-item"><svg class="inventory-art" aria-hidden="true"><use href="/assets/ui/icons/inventory-book.svg#gem"></use></svg> 1x Pedra de Refinamento</span>
+                    <span class="cost-item gold"><img class="inventory-art" src="/assets/ui/icons/icon-gold-coin.svg" alt=""> 250 Ouro</span>
                   </div>
                 </div>
-                <button id="btn-do-refine" class="btn-refine-action">🔨 APRIMORAR EQUIPAMENTO (+1)</button>
+                <button id="btn-do-refine" class="btn-refine-action">Aprimorar equipamento (+1)</button>
               </div>
             </div>
 
             <!-- SUBMENU VIEW 3: PEDRAS (Engaste de Gemas) -->
-            <div class="submenu-tab-panel" id="tab-pedras" style="display: none;">
+            <div class="submenu-tab-panel inventory-scroll" id="tab-pedras" role="tabpanel" aria-labelledby="tab-btn-pedras" style="display: none;">
               <div class="pedras-socket-card">
                 <div class="pedras-header">
-                  <span class="pedras-title">💎 Engaste de Gemas & Pedras Rúnicas</span>
+                  <span class="pedras-title">Engaste de Gemas</span>
                   <span class="pedras-sub">Engaste joias nos soquetes do equipamento para destravar atributos extras</span>
                 </div>
-                <div class="pedras-sockets-grid">
-                  <div class="socket-slot" id="socket-slot-1">
-                    <span class="gem-icon">🔴</span>
-                    <div class="gem-info">
-                      <span class="gem-name">Rubi da Fúria (Nv. 1)</span>
-                      <span class="gem-effect">+15 Dano Físico e Mágico</span>
-                    </div>
-                  </div>
-                  <div class="socket-slot" id="socket-slot-2">
-                    <span class="gem-icon">🔵</span>
-                    <div class="gem-info">
-                      <span class="gem-name">Safira Mística (Nv. 1)</span>
-                      <span class="gem-effect">+40 Recurso / Mana Máxima</span>
-                    </div>
-                  </div>
-                  <div class="socket-slot" id="socket-slot-3">
-                    <span class="gem-icon">⚪</span>
-                    <div class="gem-info">
-                      <span class="gem-name">Soquete Vazio</span>
-                      <span class="gem-effect" style="color: #94a3b8;">Selecione uma gema abaixo para engastar</span>
-                    </div>
-                  </div>
-                </div>
+                <div class="pedras-sockets-grid"></div>
                 <div class="gem-bag-section">
                   <span class="gem-bag-title">Gemas na Sacola</span>
-                  <div class="gem-bag-list" id="gem-bag-list">
-                    <div class="gem-chip" data-gem="emerald">🟢 Esmeralda (+90 HP)</div>
-                    <div class="gem-chip" data-gem="topaz">🟡 Topázio (+3% Crítico)</div>
-                    <div class="gem-chip" data-gem="amethyst">🟣 Ametista (+12 Perfuração)</div>
-                  </div>
+                  <div class="gem-bag-list" id="gem-bag-list"></div>
                 </div>
-                <button id="btn-socket-gem" class="btn-refine-action">💎 ENGASTAR GEMA SELECIONADA</button>
+                <button id="btn-socket-gem" class="btn-refine-action">Engastar gema selecionada</button>
               </div>
             </div>
 
             <!-- SUBMENU VIEW 4: CARTAS (Monstros do Universo) -->
-            <div class="submenu-tab-panel" id="tab-cartas" style="display: none;">
+            <div class="submenu-tab-panel inventory-scroll" id="tab-cartas" role="tabpanel" aria-labelledby="tab-btn-cartas" style="display: none;">
               <div class="cartas-album-card">
                 <div class="cartas-header">
-                  <span class="cartas-title">🃏 Cartas de Monstros & Encantamentos</span>
-                  <span class="cartas-sub">Estilo Laplace M & Ragnarok Mobile: Cartas saqueadas dos monstros com bônus únicos</span>
+                  <span class="cartas-title">Álbum de Monstros</span>
+                  <span class="cartas-sub">Equipe cartas para ativar seus bônus.</span>
                 </div>
-                <div class="card-equip-preview">
-                  <div class="card-slot">
-                    <span class="card-slot-tag">Arma Principal • Carta Ativa</span>
-                    <div class="card-equipped-box">
-                      <span class="card-symbol">🃏</span>
-                      <div class="card-details">
-                        <span class="card-name" style="color: #fbbf24;">Carta Orc Guerreiro (Rara)</span>
-                        <span class="card-perk">+10% Dano Corpo-a-Corpo em Chefões</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <div class="card-equip-preview"></div>
                 <div class="card-deck-section">
                   <span class="deck-title">Cartas Disponíveis para Equipar</span>
-                  <div class="monster-cards-grid" id="monster-cards-grid">
-                    <div class="monster-card-item">
-                      <span class="m-card-pic">🕷️</span>
-                      <div class="m-card-body">
-                        <span class="m-card-title">Carta Aranha Venenosa</span>
-                        <span class="m-card-effect">+5% Chance de Envenenar ao golpear</span>
-                      </div>
-                    </div>
-                    <div class="monster-card-item">
-                      <span class="m-card-pic">💀</span>
-                      <div class="m-card-body">
-                        <span class="m-card-title">Carta Esqueleto Arqueiro</span>
-                        <span class="m-card-effect">+12% Dano Crítico à Distância</span>
-                      </div>
-                    </div>
-                    <div class="monster-card-item">
-                      <span class="m-card-pic">🗿</span>
-                      <div class="m-card-body">
-                        <span class="m-card-title">Carta Golem de Rocha</span>
-                        <span class="m-card-effect">+30 Armadura Física & 150 Vida</span>
-                      </div>
-                    </div>
-                  </div>
+                  <div class="monster-cards-grid" id="monster-cards-grid"></div>
                 </div>
-                <button id="btn-socket-card" class="btn-refine-action">🃏 ENCAIXAR CARTA NO EQUIPAMENTO</button>
+                <button id="btn-socket-card" class="btn-refine-action">Encaixar carta no equipamento</button>
               </div>
             </div>
           </div>
@@ -4602,8 +4526,35 @@
       </div>
     </div>
 
-    <!-- Hidden alias anchor for legacy compatibility -->
-    <div id="character-modal" style="display: none;"></div>
+    <dialog id="character-modal" aria-labelledby="hero-summary-title">
+      <header class="hero-summary-header">
+        <h2 id="hero-summary-title"><img src="/assets/ui/icons/icon-hero-bust.svg" alt=""> Resumo do Herói</h2>
+        <button type="button" id="btn-close-character" class="btn-close" aria-label="Fechar resumo do herói">✕</button>
+      </header>
+      <div class="hero-profile-layout">
+        <section class="hero-profile-showcase" aria-label="Herói e equipamentos">
+          <div class="hero-profile-power"><span>Poder de combate</span><strong data-hero-summary="cp">—</strong></div>
+          <div class="hero-profile-paperdoll">
+            <div class="hero-profile-slot-rail">
+              <div class="hero-profile-slot" data-profile-slot="head"><div class="equipment-slot" role="img" aria-label="Elmo"></div><span data-equipped-name>—</span></div><div class="hero-profile-slot" data-profile-slot="chest"><div class="equipment-slot" role="img" aria-label="Armadura"></div><span data-equipped-name>—</span></div><div class="hero-profile-slot" data-profile-slot="legs"><div class="equipment-slot" role="img" aria-label="Botas"></div><span data-equipped-name>—</span></div>
+            </div>
+            <div id="hero-summary-portrait"></div>
+            <div class="hero-profile-slot-rail">
+              <div class="hero-profile-slot" data-profile-slot="main_hand"><div class="equipment-slot" role="img" aria-label="Arma"></div><span data-equipped-name>—</span></div><div class="hero-profile-slot" data-profile-slot="off_hand"><div class="equipment-slot" role="img" aria-label="Escudo"></div><span data-equipped-name>—</span></div><div class="hero-profile-slot" data-profile-slot="relic"><div class="equipment-slot" role="img" aria-label="Relíquia"></div><span data-equipped-name>—</span></div>
+            </div>
+          </div>
+          <div class="hero-summary-identity"><strong data-hero-summary="name"></strong><span data-hero-summary="class"></span></div>
+        </section>
+        <div class="hero-profile-details">
+          <section class="hero-profile-section"><h3>Estado e experiência</h3>
+            <div class="hero-profile-meter" data-profile-meter="hp"><div><label for="hero-profile-hp">Vida</label><span data-meter-value>—</span></div><progress id="hero-profile-hp" value="0" max="1"></progress></div><div class="hero-profile-meter" data-profile-meter="resource"><div><label for="hero-profile-resource">Recurso</label><span data-meter-value>—</span></div><progress id="hero-profile-resource" value="0" max="1"></progress></div><div class="hero-profile-meter" data-profile-meter="xp"><div><label for="hero-profile-xp">Experiência</label><span data-meter-value>—</span></div><progress id="hero-profile-xp" value="0" max="1"></progress></div>
+          </section>
+          <section class="hero-profile-section"><h3>Combate</h3><dl class="hero-summary-stats"><div><dt>Dano base</dt><dd data-hero-summary="damage">—</dd></div><div><dt>Chance de crítico</dt><dd data-hero-summary="critical">—</dd></div><div><dt>Alcance</dt><dd data-hero-summary="range">—</dd></div></dl></section>
+          <section class="hero-profile-section"><h3>Atributos</h3><dl class="hero-summary-stats"><div><dt>Força</dt><dd data-hero-summary="forca">—</dd></div><div><dt>Destreza</dt><dd data-hero-summary="destreza">—</dd></div><div><dt>Constituição</dt><dd data-hero-summary="constituicao">—</dd></div><div><dt>Inteligência</dt><dd data-hero-summary="inteligencia">—</dd></div><div><dt>Sabedoria</dt><dd data-hero-summary="sabedoria">—</dd></div><div><dt>Carisma</dt><dd data-hero-summary="carisma">—</dd></div></dl></section>
+          <section class="hero-profile-section"><h3>Progressão</h3><dl class="hero-summary-stats"><div><dt>Renascimentos</dt><dd data-hero-summary="reborn">—</dd></div><div><dt>Ouro</dt><dd data-hero-summary="gold">—</dd></div><div><dt>Peças equipadas</dt><dd data-hero-summary="equipped">—</dd></div></dl></section>
+        </div>
+      </div>
+    </dialog>
 
     <!-- Farm Helper Modal (Assistente de Farm Idle & Auto-Venda) -->
     <div id="farm-helper-modal" class="modal-backdrop" style="display: none;">

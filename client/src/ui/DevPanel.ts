@@ -9,14 +9,7 @@ export function setupDevPanel(send: (command: DevCommand) => void, visibleMonste
   shortcut.style.display = 'none';
   shortcut.setAttribute('aria-controls', 'dev-panel');
   shortcut.setAttribute('aria-expanded', 'false');
-  document.getElementById('hud-header')?.append(shortcut);
-  const party = document.getElementById('party-hud-card');
-  if (party) {
-    const align = () => shortcut.style.setProperty('--dev-party-bottom', `${party.getBoundingClientRect().bottom}px`);
-    new ResizeObserver(align).observe(party);
-    window.addEventListener('resize', align);
-    align();
-  }
+  document.querySelector('.hud-profile-column')?.append(shortcut);
   const dialog = document.createElement('dialog');
   dialog.id = 'dev-panel';
   dialog.className = 'dev-panel';

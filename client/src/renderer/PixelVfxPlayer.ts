@@ -1,8 +1,8 @@
 import { FX_SHEETS, PixelVfxQueue } from './PixelVfx';
-import type { FxEntity } from './PixelVfx';
+import type { FxEntity, FxInstance } from './PixelVfx';
 import type { CombatStatusStatePayload } from '@magicforge/shared';
 import { warriorCastArt } from './HeroAnimations';
-import { drawWarriorUltimate, drawWarriorWorldFx, WARRIOR_ULTIMATE_ATLAS, WARRIOR_WORLD_ATLAS } from './WarriorWorldFxDraw';
+import { drawWarriorWorldFx, WARRIOR_ULTIMATE_ATLAS, WARRIOR_WORLD_ATLAS } from './WarriorWorldFxDraw';
 
 /** Native sheets + code-authored pixel primitives. Never edits vendor pixels. */
 export class PixelVfxPlayer {
@@ -20,19 +20,20 @@ export class PixelVfxPlayer {
       image.onerror = () => reject(new Error(`Falha no VFX: ${spec.file}`)); image.src = spec.file;
     }))).then(() => undefined);
   }
-  draw(ctx: CanvasRenderingContext2D, entities: readonly FxEntity[], camera: { x: number; y: number }, zoom: number, now: number): number {
-    const effects = this.queue.sample(now, entities);
+  draw(ctx: CanvasRenderingContext2D, effects: readonly FxInstance[], camera: { x: number; y: number }, zoom: number, now: number, layer: 'ground' | 'air'): void {
+    const warriorImages = { world: this.warriorAtlas, ultimate: this.ultimateAtlas, impact: this.images.get(FX_SHEETS.impact.file) };
     ctx.save(); ctx.imageSmoothingEnabled = false;
     const scale = Math.max(1, Math.round(zoom / 8));
     for (const fx of effects) {
+      if (layer === 'ground' && fx.artwork === undefined) continue;
       const x = Math.round(ctx.canvas.width / 2 + (fx.position.x - camera.x) * zoom), y = Math.round(ctx.canvas.height / 2 + (fx.position.z - camera.y) * zoom);
-      if (x < -300 || y < -300 || x > ctx.canvas.width + 300 || y > ctx.canvas.height + 300) continue;
+      const reach = Math.max(16, fx.radius ?? 0, fx.lineLength ?? 0,
+        fx.destination ? Math.hypot(fx.destination.x - fx.position.x, fx.destination.z - fx.position.z) + 3 : 0) * zoom;
+      if (x < -reach || y < -reach || x > ctx.canvas.width + reach || y > ctx.canvas.height + reach) continue;
       const progress = Math.min(1, (now - fx.startedAt) / fx.duration);
       ctx.globalAlpha = Math.min(1, (1 - progress) * 3);
       if (fx.artwork !== undefined) {
-        if (!drawWarriorUltimate(ctx, this.ultimateAtlas, fx, x, y, zoom, progress)) {
-          drawWarriorWorldFx(ctx, this.warriorAtlas, fx, x, y, zoom, progress);
-        }
+        drawWarriorWorldFx(ctx, warriorImages, fx, x, y, zoom, progress, layer);
         continue;
       }
       const dot = (dx: number, dy: number, size = 2) => ctx.fillRect(x + Math.round(dx) * scale, y + Math.round(dy) * scale, size * scale, size * scale);
@@ -100,7 +101,7 @@ export class PixelVfxPlayer {
         for (let i = 0; i < 10; i++) dot(Math.sin(i * 1.9) * (10 + progress * 10), -progress * 55 - (i % 4) * 5, 2);
       }
     }
-    ctx.restore(); return effects.length;
+    ctx.restore();
   }
   drawStatuses(ctx: CanvasRenderingContext2D, statuses: CombatStatusStatePayload[], entities: readonly FxEntity[], camera: { x: number; y: number }, zoom: number, now: number): void {
     const names = { BLEED: 'SANGRANDO', ARMOR_BREAK: 'DEFESA ↓', ATTACK_SPEED_BUFF: 'VELOCIDADE ↑', STUN: 'ATORDOADO', SHIELD: 'ESCUDO', DAMAGE_BUFF: 'PODER ↑', DAMAGE_REDUCTION: 'RESISTÊNCIA ↑', CRITICAL_BUFF: 'CRÍTICO ↑', GUIDING_MARK: 'MARCA GUIA', GUARDIANS_AURA:'GUARDIÕES', SPIRITUAL_WEAPON:'ARMA ESPIRITUAL', SANCTUARY:'SANTUÁRIO', SANCTUARY_WARD:'PROTEÇÃO SAGRADA', SLOW:'LENTIDÃO', FROST_SLOW:'GELO: LENTIDÃO', BURN:'QUEIMANDO', FROZEN:'CONGELADO', ARCANE_HASTE:'MENTE ACELERADA', COMET_RAIN:'COMETAS', CRIPPLED:'MOVIMENTO ↓', WEAKENED:'ATAQUE ↓', STONE_SKIN:'PELE ROCHOSA', UNBRIDLED_RAGE:'ENERGIA LIVRE', SPECTRAL_PACK:'MATILHA ESPIRITUAL', DEATH_IMMUNITY: 'PROTEÇÃO À MORTE' };
