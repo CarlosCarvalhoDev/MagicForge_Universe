@@ -16,13 +16,16 @@ test('Dev commands require server-side admin permission and spawn a stationary, 
   world.entityManager.addPlayer(hero);
   const packets: Array<{ op: Opcode; data: unknown }> = [];
   const conn = {
-    isAuthenticated: true, playerId: hero.id, accountId: account.id,
+    id: hero.id, isAuthenticated: true, playerId: hero.id, accountId: account.id,
     send(op: Opcode, data: unknown) { packets.push({ op, data }); },
   } as unknown as Connection;
+  world.registerConnection(conn);
   const handler = new PacketHandler(world);
   const send = (data: unknown) => handler.handlePacket(conn, JSON.stringify({ op: Opcode.C2S_DEV_CONTROL, data }));
   const command = { action: 'dummy', x: 3, z: -2 };
   send(command);
+  send({ action: 'maxLevel' });
+  assert.equal(hero.level, 1);
   assert.equal(db.isAdminAccount(account.id), false);
   assert.equal(world.entityManager.getAllMonsters().some(monster => monster.trainingDummy), false);
   assert.equal(packets.length, 0);
@@ -53,6 +56,19 @@ test('Dev commands require server-side admin permission and spawn a stationary, 
   send({ action: 'resetCooldowns' });
   assert.equal(hero.skillCooldowns.size, 0);
   assert.equal((packets.at(-1)?.data as { cooldownsReset?: boolean }).cooldownsReset, true);
+  send({ action: 'maxLevel' });
+  assert.equal(hero.level, 50);
+  assert.equal(db.getCharacterById(hero.dbCharacterId)?.level, 50);
+  const experience = packets.findLast(packet => packet.op === Opcode.S2C_PLAYER_EXP_UPDATE);
+  assert.deepEqual(experience?.data, {
+    playerId: hero.id, level: 50, currentXp: hero.currentXp, xpToNextLevel: hero.xpToNextLevel,
+    expGained: 0, source: 'Painel Dev',
+  });
+  assert.ok(packets.some(packet => packet.op === Opcode.S2C_INVENTORY_UPDATE));
+  const packetCount = packets.length;
+  send({ action: 'maxLevel' });
+  assert.equal(hero.currentXp, hero.xpToNextLevel);
+  assert.ok(packets.slice(packetCount).some(packet => packet.op === Opcode.S2C_PLAYER_EXP_UPDATE));
   send({ action: 'teleport', x: 3, z: 4 });
   assert.deepEqual(hero.position, { x: 3, y: 0, z: 4 });
   send({ action: 'teleport', x: 1_000_000, z: 4 });

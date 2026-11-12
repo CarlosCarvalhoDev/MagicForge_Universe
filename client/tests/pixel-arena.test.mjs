@@ -25,8 +25,8 @@ test('warrior has eight movement directions and twelve distinct authored casts',
 
 test('cardinal heading selects actual directional rows without mirroring', () => {
   assert.deepEqual([0, 90, 180, 270, -90, 360].map(facingFromYaw), ['south', 'east', 'north', 'west', 'west', 'south']);
-  assert.equal(directionRow('hero', 'north'), 3); assert.equal(directionRow('orc', 'north'), 1);
-  assert.equal(directionRow('hero', 'east'), 2); assert.equal(directionRow('slime', 'east'), 3);
+  assert.equal(directionRow('hero', 'north'), 4); assert.equal(directionRow('orc', 'north'), 1);
+  assert.equal(directionRow('hero', 'east'), 6); assert.equal(directionRow('slime', 'east'), 3);
   assert.equal(pixelFamily('PLAYER', 'MAGO'), null);
 });
 test('every shipped sheet has the declared native cell grid and every prop exists', () => {

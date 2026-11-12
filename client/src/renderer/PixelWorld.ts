@@ -1,7 +1,7 @@
 import { WarehouseMap } from './WarehouseMap';
 import type { WarehouseRoom } from '@magicforge/shared';
 import type { InterpolatedEntity } from '../interpolation/SnapshotBuffer';
-import { HeroAnimationClock, WARRIOR_CAST_SHEETS, WarriorCastClock, warriorCastArt, warriorDirectionRow } from './HeroAnimations';
+import { BARBARIAN_CAST_SHEETS, BARBARIAN_GROUND, HeroAnimationClock, WARLOCK_GROUND, WARRIOR_CAST_SHEETS, WarriorCastClock, heroCastArt, warlockSkillArt, warriorDirectionRow } from './HeroAnimations';
 import { PIXEL_PROPS, PIXEL_SHEETS, directionRow, facingFromYaw, pixelFamily } from './PixelAssets';
 import { WorldPresentation } from './WorldPresentation';
 
@@ -9,7 +9,9 @@ type Prop = { x: number; z: number; kind: 'tree' | 'mossTree' | 'rock' | 'smallR
 
 // Baselines measured in source pixels. The warrior's walking rows have different padding.
 const warriorWalkGround = [215, 211, 212, 205, 204, 197, 190, 213];
-const groundByFamily = { orc: 42, slime: 40, barbarian: 45 };
+const groundByFamily = { orc: 42, slime: 40 };
+// Match the directional staff release to frame four of the spell clock.
+const warlockCastFrames = [0, 0, 1, 1, 2, 3];
 
 /** Presentation only: consumes snapshots, never decides gameplay, loot or collision. */
 export class PixelWorld {
@@ -28,7 +30,7 @@ export class PixelWorld {
   private props: Prop[] = [];
   readonly ready: Promise<void>;
   constructor() {
-    const files = [...Object.values(PIXEL_SHEETS).flatMap(set => Object.values(set).map(spec => spec.file)), ...Object.values(PIXEL_PROPS), ...WARRIOR_CAST_SHEETS];
+    const files = [...Object.values(PIXEL_SHEETS).flatMap(set => Object.values(set).map(spec => spec.file)), ...Object.values(PIXEL_PROPS), ...WARRIOR_CAST_SHEETS, ...BARBARIAN_CAST_SHEETS];
     this.ready = Promise.all(files.map(file => new Promise<void>((resolve, reject) => {
       const image = new Image(); this.images.set(file, image);
       image.onload = () => resolve(); image.onerror = () => reject(new Error(`Não foi possível carregar ${file}`)); image.src = file;
@@ -45,10 +47,12 @@ export class PixelWorld {
   private image(file: string): HTMLImageElement | undefined {
     const image = this.images.get(file); return image?.complete && image.naturalWidth > 0 ? image : undefined;
   }
+
   playWarriorCast(id: string, skillId: string, now: number): boolean {
-    const art = warriorCastArt(skillId);
+    if (warlockSkillArt(skillId)) return this.warriorCasts.trigger(id, skillId, now);
+    const art = heroCastArt(skillId);
     const image = art && this.image(art.file);
-    if (!image || image.naturalWidth % 4 !== 0 || image.naturalHeight % 3 !== 0) return false;
+    if (!image || image.naturalWidth % (art?.cols ?? 4) !== 0 || image.naturalHeight % 3 !== 0) return false;
     return this.warriorCasts.trigger(id, skillId, now);
   }
 
@@ -127,8 +131,9 @@ export class PixelWorld {
       const entity = layer.entity!; const [x, y] = screen(entity.position.x, entity.position.z);
       if (x < -200 || x > width + 200 || y < -200 || y > height + 200) continue;
       const family = pixelFamily(entity.type, entity.classType, entity.name);
+      const isHero = family === 'hero' || family === 'barbarian' || family === 'warlock';
       const scale = Math.max(0.75, 3 * zoom / 16) * (this.inWarehouse ? .7 : 1);
-      const shadowWidth = family === 'hero' ? 9 : 8;
+      const shadowWidth = isHero ? 9 : 8;
       ctx.beginPath();
       ctx.ellipse(x, y, shadowWidth * scale, 2.6 * scale, 0, 0, Math.PI * 2);
       ctx.fillStyle = '#14241f80';
@@ -150,28 +155,31 @@ export class PixelWorld {
         ctx.fillRect(x - 8 * scale, y - 15 * scale, 16 * scale, 2 * scale);
       } else if (family) {
         const playback = this.clock.sample(entity.id, entity.isMoving, entity.currentHp, PIXEL_SHEETS[family], now);
-        const spec = PIXEL_SHEETS[family][playback.action], image = this.image(spec.file);
-        const cast = family === 'hero' && playback.action !== 'death' ? this.warriorCasts.sample(entity.id, now) : undefined;
-        const castImage = cast ? this.image(cast.file) : undefined;
+        const cast = isHero && playback.action !== 'death' ? this.warriorCasts.sample(entity.id, now) : undefined;
+        const warlockFrame = family === 'warlock' && cast && playback.action !== 'hit' ? warlockCastFrames[cast.frame] : undefined;
+        const spec = PIXEL_SHEETS[family][warlockFrame === undefined ? playback.action : 'attack'];
+        const image = this.image(spec.file);
+        const castImage = cast && family !== 'warlock' ? this.image(cast.file) : undefined;
         if (cast && castImage) {
-          const w = castImage.naturalWidth / 4, h = castImage.naturalHeight / 3;
-          const size = Math.round(55 * scale);
+          const w = castImage.naturalWidth / (cast.cols ?? 4), h = castImage.naturalHeight / 3;
+          const size = Math.round((family === 'hero' ? 55 : 43) * scale);
           ctx.drawImage(castImage, cast.frame * w, cast.row * h, w, h, Math.round(x - size / 2), Math.round(y - cast.ground * size), size, size);
         } else if (image && image.naturalWidth % spec.cols === 0 && image.naturalHeight % spec.rows === 0) {
           const cellWidth = image.naturalWidth / spec.cols;
           const cellHeight = image.naturalHeight / spec.rows;
           const row = spec.directional ? warriorDirectionRow(entity.headingYaw) : directionRow(family, facingFromYaw(entity.headingYaw));
-          const size = Math.round((family === 'hero' ? 40 : 64) * scale);
+          const size = Math.round((isHero ? 40 : 64) * scale);
           const ground = family === 'hero'
             ? playback.action === 'walk' ? warriorWalkGround[row] : 208
-            : groundByFamily[family];
+            : family === 'barbarian' ? BARBARIAN_GROUND * cellHeight
+            : family === 'warlock' ? WARLOCK_GROUND * cellHeight : groundByFamily[family];
           const recoil = playback.action === 'hit' && entity.type === 'MONSTER' ? Math.max(0, 1 - playback.frame / 3) : 0;
           const spriteHeight = size * (1 - recoil * .08);
           const spriteWidth = size * (1 + recoil * .06);
           const heading = entity.headingYaw * Math.PI / 180;
           const offset = recoil * 3 * scale;
           if (recoil > .6) ctx.filter = 'brightness(1.45) saturate(.8)';
-          ctx.drawImage(image, playback.frame * cellWidth, row * cellHeight, cellWidth, cellHeight,
+          ctx.drawImage(image, (warlockFrame ?? playback.frame) * cellWidth, row * cellHeight, cellWidth, cellHeight,
             Math.round(x - spriteWidth / 2 - Math.sin(heading) * offset),
             Math.round(y - ground / cellHeight * spriteHeight - Math.cos(heading) * offset), spriteWidth, spriteHeight);
           if (recoil > .6) ctx.filter = 'none';
@@ -183,7 +191,7 @@ export class PixelWorld {
       if (entity.currentHp > 0) {
         ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
         ctx.lineWidth = 3; ctx.strokeStyle = '#14241e'; ctx.fillStyle = entity.id === myId ? '#fff1ca' : '#f0f2d8';
-        const labelY = Math.round(y - (family === 'hero' ? 40 : family === 'slime' ? 27 : 32) * scale - 6);
+        const labelY = Math.round(y - (isHero ? 40 : family === 'slime' ? 27 : 32) * scale - 6);
         ctx.strokeText(entity.name, x, labelY); ctx.fillText(entity.name, x, labelY);
         ctx.fillStyle = '#172b24'; ctx.fillRect(x - 25, labelY + 5, 50, 5);
         ctx.fillStyle = entity.type === 'MONSTER' ? '#d57967' : '#9ac778'; ctx.fillRect(x - 24, labelY + 6, 48 * Math.max(0, Math.min(1, entity.currentHp / entity.maxHp)), 3);

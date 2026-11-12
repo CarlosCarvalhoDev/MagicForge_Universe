@@ -27,7 +27,10 @@ function enableDragging(dialog: HTMLDialogElement) {
   window.addEventListener('resize', fit);
 }
 
-export function setupDevPanel(send: (command: DevCommand) => void, visibleMonsters: () => string[]) {
+export function setupDevPanel(
+  send: (command: DevCommand) => void,
+  visibleMonsters: () => string[],
+) {
   const shortcut = document.createElement('button');
   shortcut.type = 'button';
   shortcut.className = 'dev-shortcut';
@@ -59,6 +62,8 @@ export function setupDevPanel(send: (command: DevCommand) => void, visibleMonste
       <button type="button" data-action="boss">Invocar chefe</button>
       <button type="button" data-action="refillVitals">Restaurar HP e recurso</button>
       <button type="button" data-action="resetCooldowns">Zerar recargas</button>
+      <button type="button" data-action="maxLevel">Nível máximo</button>
+      <button type="button" data-clear-inventory>Limpar inventário</button>
       <button type="button" data-action="clearDrops">Limpar drops</button>
       <button type="button" data-action="clearTargets">Remover alvos de teste</button>
       <button type="button" data-action="reset">Restaurar configuração</button>
@@ -78,8 +83,13 @@ export function setupDevPanel(send: (command: DevCommand) => void, visibleMonste
     send({ action: 'toggle', key: input.dataset.key as DevToggle, enabled: input.checked });
   }));
   dialog.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(button => button.onclick = () => {
-    send({ action: button.dataset.action as 'boss' | 'clearTargets' | 'reset' | 'refillVitals' | 'clearDrops' | 'resetCooldowns' });
+    send({ action: button.dataset.action as 'boss' | 'clearTargets' | 'reset' | 'refillVitals' | 'clearDrops' | 'resetCooldowns' | 'maxLevel' });
   });
+  dialog.querySelector<HTMLButtonElement>('[data-clear-inventory]')!.onclick = () => {
+    if (window.confirm('Remover os itens desprotegidos da mochila deste herói? Equipamentos vestidos e itens protegidos serão preservados.')) {
+      send({ action: 'clearInventory', confirmed: true });
+    }
+  };
   dialog.querySelector<HTMLButtonElement>('[data-kill]')!.onclick = () => {
     send({ action: 'killVisible', monsterIds: visibleMonsters().slice(0, 256) });
   };

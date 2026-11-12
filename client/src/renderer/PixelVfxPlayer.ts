@@ -1,7 +1,7 @@
 import { FX_SHEETS, PixelVfxQueue } from './PixelVfx';
 import type { FxEntity, FxInstance } from './PixelVfx';
 import type { CombatStatusStatePayload } from '@magicforge/shared';
-import { warriorCastArt } from './HeroAnimations';
+import { WARLOCK_FX_SHEETS, warriorCastArt } from './HeroAnimations';
 import { drawWarriorWorldFx, WARRIOR_ULTIMATE_ATLAS, WARRIOR_WORLD_ATLAS } from './WarriorWorldFxDraw';
 
 /** Native sheets + code-authored pixel primitives. Never edits vendor pixels. */
@@ -11,9 +11,16 @@ export class PixelVfxPlayer {
   private images = new Map<string, HTMLImageElement>();
   private readonly warriorAtlas = new Image();
   private readonly ultimateAtlas = new Image();
+  private readonly barbarianAtlas = new Image();
+  private readonly warlockAtlases = WARLOCK_FX_SHEETS.map(file => {
+    const image = new Image();
+    image.src = file;
+    return image;
+  });
   constructor() {
     this.warriorAtlas.src = WARRIOR_WORLD_ATLAS;
     this.ultimateAtlas.src = WARRIOR_ULTIMATE_ATLAS;
+    this.barbarianAtlas.src = '/assets/isometric/review/barbaro/barbaro_world_fx.png';
     this.ready = Promise.all(Object.values(FX_SHEETS).map(spec => new Promise<void>((resolve, reject) => {
       const image = new Image(); this.images.set(spec.file, image);
       image.onload = () => image.naturalWidth === spec.cell * spec.frames && image.naturalHeight === spec.cell ? resolve() : reject(new Error(`Grade VFX inválida: ${spec.file}`));
@@ -25,15 +32,35 @@ export class PixelVfxPlayer {
     ctx.save(); ctx.imageSmoothingEnabled = false;
     const scale = Math.max(1, Math.round(zoom / 8));
     for (const fx of effects) {
-      if (layer === 'ground' && fx.artwork === undefined) continue;
+      const onGround = fx.kind === 'warlockImpact' && [5, 6, 8, 9].includes(fx.spellIndex ?? -1);
+      if ((layer === 'ground' && fx.artwork === undefined && !onGround) || (layer === 'air' && onGround)) continue;
       const x = Math.round(ctx.canvas.width / 2 + (fx.position.x - camera.x) * zoom), y = Math.round(ctx.canvas.height / 2 + (fx.position.z - camera.y) * zoom);
       const reach = Math.max(16, fx.radius ?? 0, fx.lineLength ?? 0,
         fx.destination ? Math.hypot(fx.destination.x - fx.position.x, fx.destination.z - fx.position.z) + 3 : 0) * zoom;
       if (x < -reach || y < -reach || x > ctx.canvas.width + reach || y > ctx.canvas.height + reach) continue;
       const progress = Math.min(1, (now - fx.startedAt) / fx.duration);
       ctx.globalAlpha = Math.min(1, (1 - progress) * 3);
+      if (fx.kind === 'warlockFlight' || fx.kind === 'warlockImpact' || fx.kind === 'warlockContact') {
+        this.drawWarlockFx(ctx, fx, x, y, zoom, progress);
+        continue;
+      }
       if (fx.artwork !== undefined) {
         drawWarriorWorldFx(ctx, warriorImages, fx, x, y, zoom, progress, layer);
+        continue;
+      }
+      if (fx.kind === 'barbarianBurst') {
+        const atlas = this.barbarianAtlas;
+        if (!atlas.complete || !atlas.naturalWidth || fx.barbarianRow === undefined) continue;
+        const cellWidth = atlas.naturalWidth / 4;
+        const cellHeight = atlas.naturalHeight / 12;
+        const frame = Math.min(3, Math.floor(progress * 4));
+        const width = Math.max(4, (fx.radius ?? 2.5) * 2) * zoom;
+        const height = width * cellHeight / cellWidth;
+        const travel = Math.min(1, progress * 1.6);
+        const drawX = x + (fx.destination ? (fx.destination.x - fx.position.x) * zoom * travel : 0);
+        const drawY = y + (fx.destination ? (fx.destination.z - fx.position.z) * zoom * travel : 0);
+        ctx.drawImage(atlas, frame * cellWidth, fx.barbarianRow * cellHeight, cellWidth, cellHeight,
+          drawX - width / 2, drawY - height * .75, width, height);
         continue;
       }
       const dot = (dx: number, dy: number, size = 2) => ctx.fillRect(x + Math.round(dx) * scale, y + Math.round(dy) * scale, size * scale, size * scale);
@@ -100,6 +127,40 @@ export class PixelVfxPlayer {
         ring(12 + progress * 22, '#f9df9b'); ctx.fillStyle = '#fff1b6';
         for (let i = 0; i < 10; i++) dot(Math.sin(i * 1.9) * (10 + progress * 10), -progress * 55 - (i % 4) * 5, 2);
       }
+    }
+    ctx.restore();
+  }
+
+  private drawWarlockFx(ctx: CanvasRenderingContext2D, fx: FxInstance, x: number, y: number, zoom: number, progress: number): void {
+    const index = fx.spellIndex ?? 0;
+    const atlas = this.warlockAtlases[Math.floor(index / 3)];
+    const flight = fx.kind === 'warlockFlight' && fx.destination;
+    const dx = flight ? (flight.x - fx.position.x) * zoom : 0;
+    const dy = flight ? (flight.z - fx.position.z) * zoom : 0;
+    const lift = flight ? (1 - progress) * zoom * 1.7 + Math.sin(progress * Math.PI) * zoom * .55 : 0;
+    const cx = x + dx * progress;
+    const cy = y + dy * progress - lift;
+    const size = (flight ? (fx.radius ?? 1.4) * 2 : (fx.radius ?? 1) * 2) * zoom;
+    ctx.save();
+    ctx.translate(cx, cy);
+    if (flight) {
+      ctx.rotate(Math.atan2(dy, dx));
+      ctx.globalAlpha = 1;
+    }
+    if (atlas?.complete && atlas.naturalWidth && fx.kind !== 'warlockContact') {
+      const w = atlas.naturalWidth / 6, h = atlas.naturalHeight / 3;
+      const frame = (flight ? 0 : 3) + Math.min(2, Math.floor(progress * 3));
+      ctx.drawImage(atlas, frame * w, (index % 3) * h, w, h, -size / 2, -size * (flight ? .5 : .72), size, size);
+    }
+    ctx.fillStyle = fx.tone ?? '#b780ff';
+    const count = flight ? 6 : index >= 9 ? 22 : 10;
+    for (let i = 0; i < count; i++) {
+      const angle = i * 2.39996 + index;
+      const spread = size * progress * (.18 + (i % 4) * .055);
+      const px = flight ? -i * zoom * .21 : Math.cos(angle) * spread;
+      const py = flight ? Math.sin(angle + progress * 8) * zoom * .22 : Math.sin(angle) * spread * .58 - zoom * progress * .65;
+      const pixel = Math.max(1, Math.round(zoom * (.08 + (i % 3) * .035)));
+      ctx.fillRect(Math.round(px), Math.round(py), pixel, pixel);
     }
     ctx.restore();
   }

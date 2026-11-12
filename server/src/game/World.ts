@@ -2,6 +2,7 @@ import { WarehouseSession } from './WarehouseSession';
 import type { C2SMoveInputPayload, WarehouseStatePayload } from '@magicforge/shared';
 import {
   CharacterClass,
+  CREATABLE_CHARACTER_CLASSES,
   createVector3,
   distance,
   distanceSquared,
@@ -641,16 +642,10 @@ export class World {
       return;
     }
 
-    const unlockedInitialClasses = [
-      CharacterClass.GUERREIRO,
-      CharacterClass.CLERIGO,
-      CharacterClass.BARBARO,
-      CharacterClass.ARQUEIRO,
-    ];
-    if (!unlockedInitialClasses.includes(classType)) {
+    if (!CREATABLE_CHARACTER_CLASSES.includes(classType)) {
       connection.send(Opcode.S2C_ERROR, {
-        errorCode: 'INVALID_SLOT',
-        errorMessage: 'Esta classe ainda não está liberada. Escolha Guerreiro, Clérigo, Bárbaro ou Arqueiro.',
+        errorCode: 'CLASS_UNAVAILABLE',
+        errorMessage: 'Esta classe ainda não está liberada. Escolha uma classe disponível na Forja.',
         slotIndex,
       } as S2CCharacterActionErrorPayload);
       return;
@@ -3826,6 +3821,25 @@ export class World {
         cooldownsReset = true;
         message = 'Recargas das habilidades zeradas.';
         break;
+      case 'maxLevel':
+        if (player.isDead) {
+          message = 'Aguarde o renascimento do herói.';
+          break;
+        }
+        player.reachMaxLevel();
+        this.db.savePlayer(player);
+        this.sendExpUpdate(player, 0, 'Painel Dev');
+        this.sendInventoryUpdate(player);
+        message = `${player.name} está no nível máximo (${player.level}).`;
+        break;
+      case 'clearInventory': {
+        if (command.confirmed !== true || !player.dbCharacterId) return;
+        const removed = this.db.clearUnlockedBackpack(player.dbCharacterId);
+        player.inventory = this.db.getInventory(player.dbCharacterId);
+        this.sendInventoryUpdate(player);
+        message = `${removed} espaço(s) da mochila esvaziado(s).`;
+        break;
+      }
       case 'clearDrops':
         for (const dropId of this.activeItemDrops.keys()) {
           this.broadcast(Opcode.S2C_ITEM_DROP_DESPAWN, { dropId, reason: 'EXPIRED' } satisfies S2CItemDropDespawnPayload);

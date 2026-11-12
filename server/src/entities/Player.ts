@@ -25,6 +25,8 @@ import { Entity, TakeDamageResult } from './Entity';
 import { HuntSession } from '../game/HuntSession';
 import { SERVER_CONFIG } from '../config';
 
+const MAX_CHARACTER_LEVEL = 50;
+
 export class Player extends Entity {
   public readonly classType: CharacterClass;
   public baseAttributes: CharacterAttributes;
@@ -461,11 +463,17 @@ export class Player extends Entity {
     return result;
   }
 
+  public reachMaxLevel(): void {
+    let remainingXp = -this.currentXp;
+    for (let level = this.level; level < MAX_CHARACTER_LEVEL; level++) remainingXp += getXpForNextLevel(level);
+    this.addExperience(remainingXp + getXpForNextLevel(MAX_CHARACTER_LEVEL));
+  }
+
   public addExperience(amount: number): { leveledUp: boolean; newLevel: number; levelsGained: number } {
     this.currentXp += amount;
     let levelsGained = 0;
 
-    while (this.currentXp >= this.xpToNextLevel && this.level < 50) {
+    while (this.currentXp >= this.xpToNextLevel && this.level < MAX_CHARACTER_LEVEL) {
       this.currentXp -= this.xpToNextLevel;
       this.level += 1;
       levelsGained += 1;
@@ -487,7 +495,7 @@ export class Player extends Entity {
       console.log(`[Player] "${this.name}" subiu para o NÍVEL ${this.level}! CP: ${this.CombatPower}`);
     }
 
-    if (this.level >= 50 && this.currentXp > this.xpToNextLevel) {
+    if (this.level >= MAX_CHARACTER_LEVEL && this.currentXp > this.xpToNextLevel) {
       this.currentXp = this.xpToNextLevel;
     }
 

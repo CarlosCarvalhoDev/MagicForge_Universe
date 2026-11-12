@@ -1,12 +1,12 @@
 export type WarriorWorldFxKind = 'warriorTrail' | 'warriorWave' | 'warriorBlade' | 'warriorContact' | 'warriorAura' | 'warriorSigil' | 'warriorAftermath';
-export type FxKind = 'slash' | 'heal' | 'whirlwind' | 'avatar' | 'impact' | 'shield' | 'levelUp' | 'line' | 'judgment' | 'cone' | WarriorWorldFxKind;
+export type FxKind = 'slash' | 'heal' | 'whirlwind' | 'avatar' | 'impact' | 'shield' | 'levelUp' | 'line' | 'judgment' | 'cone' | 'barbarianBurst' | 'warlockFlight' | 'warlockImpact' | 'warlockContact' | WarriorWorldFxKind;
 export type FxPosition = { x: number; y: number; z: number };
 export type FxEntity = { id: string; position: FxPosition; headingYaw: number; currentHp: number };
 export type SlashVariant = 'bleed' | 'rupture' | 'haste' | 'stun';
-export type FxRequest = { kind: FxKind; position: FxPosition; yaw?: number; followId?: string; radius?: number; lineLength?: number; lineWidth?: number; coneRange?:number;coneAngleDeg?:number;delayMs?:number;variant?: SlashVariant; destination?: FxPosition; tone?: string; artwork?: number; targetId?: string };
+export type FxRequest = { kind: FxKind; position: FxPosition; yaw?: number; followId?: string; radius?: number; lineLength?: number; lineWidth?: number; coneRange?:number;coneAngleDeg?:number;delayMs?:number;variant?: SlashVariant; destination?: FxPosition; tone?: string; artwork?: number; barbarianRow?: number; spellIndex?: number; durationMs?: number; targetId?: string };
 export type FxInstance = FxRequest & { startedAt: number; duration: number };
 export const FX_DURATION: Record<FxKind, number> = { slash: 330, heal: 800, whirlwind: 650, avatar: 1000, impact: 400, shield: 900, levelUp: 1100, line: 650, judgment: 850, cone:600,
-  warriorTrail: 400, warriorWave: 560, warriorBlade: 680, warriorContact: 350, warriorAura: 760, warriorSigil: 430, warriorAftermath: 900 };
+  warriorTrail: 400, warriorWave: 560, warriorBlade: 680, warriorContact: 350, warriorAura: 760, warriorSigil: 430, warriorAftermath: 900, barbarianBurst: 600, warlockFlight: 300, warlockImpact: 700, warlockContact: 300 };
 export const FX_SHEETS = {
   heal: { file: '/assets/pixel/craftpix/vfx/heal.png', cell: 72, frames: 8, fps: 10 },
   impact: { file: '/assets/pixel/craftpix/vfx/impact.png', cell: 72, frames: 4, fps: 10 },
@@ -27,13 +27,23 @@ export function planMageCometPulseFx(event:{event:string;tickDamage?:number;tick
   if(event.event!=='TICK'||event.status.type!=='COMET_RAIN'||!finitePosition(event.status.areaCenter))return [];
   return [{kind:'impact',position:event.status.areaCenter},{kind:'whirlwind',position:event.status.areaCenter,radius:event.status.radius??6.5}];
 }
+
+export function planBarbarianPackPulseFx(
+  event: { event: string; status: { type: string; targetEntityId: string; radius?: number } },
+  entities: readonly FxEntity[],
+): FxRequest[] {
+  if (event.event !== 'TICK' || event.status.type !== 'SPECTRAL_PACK') return [];
+  const caster = entities.find(entity => entity.id === event.status.targetEntityId);
+  if (!caster || caster.currentHp <= 0) return [];
+  return [{ kind: 'barbarianBurst', barbarianRow: 11, position: caster.position, radius: event.status.radius }];
+}
 /** Bounded, disposable presentation state. No damage, healing or persistent statuses. */
 export class PixelVfxQueue {
   private effects: FxInstance[] = [];
   spawn(request: FxRequest, now: number): void {
     if (!finitePosition(request.position) || !Number.isFinite(now) || !Object.hasOwn(FX_DURATION, request.kind)) return;
     const delay=Number.isFinite(request.delayMs)?Math.max(0,Math.min(600,request.delayMs!)):0;
-    this.effects.push({ ...request, position: { ...request.position }, yaw: Number.isFinite(request.yaw) ? request.yaw : 0, radius: Number.isFinite(request.radius) ? Math.max(1, Math.min(30, request.radius!)) : undefined, startedAt: now+delay, duration: FX_DURATION[request.kind] });
+    this.effects.push({ ...request, position: { ...request.position }, yaw: Number.isFinite(request.yaw) ? request.yaw : 0, radius: Number.isFinite(request.radius) ? Math.max(1, Math.min(30, request.radius!)) : undefined, startedAt: now+delay, duration: request.durationMs ?? FX_DURATION[request.kind] });
     if (this.effects.length > 64) this.effects.splice(0, this.effects.length - 64);
   }
   clear(): void { this.effects = []; }
@@ -51,6 +61,33 @@ export type WarriorCastFx = {
   lineLength?: number; lineWidth?: number;
   targetResults?: Array<{ targetId: string; impactPosition: FxPosition; effectiveDamage: number; effectiveHeal: number }>;
 };
+export function planBarbarianCastFx(event: WarriorCastFx, entities: readonly FxEntity[]): FxRequest[] {
+  const match = /^barbaro_(truque|nv1|nv2|nv3)_([123])$/.exec(event.skillId);
+  if (!match) return [];
+  const row = ['truque', 'nv1', 'nv2', 'nv3'].indexOf(match[1]) * 3 + Number(match[2]) - 1;
+  const caster = entities.find(entity => entity.id === event.casterId);
+  const origin = event.originPosition ?? caster?.position;
+  const hit = event.targetResults?.find(result => result.effectiveDamage > 0 && finitePosition(result.impactPosition));
+  const target = hit?.impactPosition ?? event.targetPosition;
+  const position = [1, 3, 4, 5, 6, 7, 9, 11].includes(row) ? origin : target ?? origin;
+  if (!finitePosition(position)) return [];
+  const effects: FxRequest[] = [{
+    kind: 'barbarianBurst', barbarianRow: row, position, radius: event.radius,
+    followId: caster && [3, 7, 11].includes(row) ? caster.id : undefined,
+    delayMs: row === 10 ? 180 : 80,
+    destination: row === 5 && finitePosition(target) ? target : undefined,
+  }];
+  for (const result of event.targetResults ?? []) {
+    if (result.effectiveDamage > 0 && finitePosition(result.impactPosition)) {
+      effects.push({ kind: 'impact', position: result.impactPosition, targetId: result.targetId, delayMs: row === 10 ? 320 : 200 });
+    }
+  }
+  if (caster && event.targetResults?.some(result => result.targetId === caster.id && result.effectiveHeal > 0)) {
+    effects.push({ kind: 'heal', position: caster.position, followId: caster.id });
+  }
+  return effects;
+}
+
 /** Short cast/impact visuals only; persistent statuses use their own authoritative lifecycle. */
 export function planWarriorCastFx(event: WarriorCastFx, entities: readonly FxEntity[], radius?: number): FxRequest[] {
   if (!event.affectedEntityIds.length) return [];

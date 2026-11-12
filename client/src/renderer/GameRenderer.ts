@@ -1,11 +1,12 @@
 import { ItemRarity, RARITY_COLORS, S2CItemDropSpawnPayload, S2CSkillCastEventPayload, CombatStatusTransitionPayload, SKILLS_DATABASE, Vector3, distance } from '@magicforge/shared';
 import { InterpolatedEntity } from '../interpolation/SnapshotBuffer';
-import { HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground, warriorDirectionRow } from './HeroAnimations';
+import { BARBARIAN_GROUND, HERO_SHEETS, HeroAnimationClock, HeroSheetSpec, keyDarkBackground, warriorDirectionRow } from './HeroAnimations';
 import { FloatingDialogue } from '../ui/FloatingDialogue';
 import { PixelWorld } from './PixelWorld';
 import { PixelVfxPlayer } from './PixelVfxPlayer';
-import { planWarriorCastFx, planMageCometPulseFx } from './PixelVfx';
+import { planBarbarianCastFx, planBarbarianPackPulseFx, planWarriorCastFx, planMageCometPulseFx } from './PixelVfx';
 import { planWarriorWorldFx } from './WarriorWorldFx';
+import { planWarlockAreaPulse, planWarlockBasicAttack, planWarlockCast } from './WarlockEffects';
 import { warriorCastArt } from './HeroAnimations';
 import { WarriorPresentation } from './WarriorPresentation';
 import type { VisualStage } from './WorldPresentation';
@@ -202,13 +203,23 @@ export class GameRenderer {
     this.pixelWorld.clock.trigger(entityId, action, performance.now());
   }
 
+  public playWarlockBasicAttack(caster: InterpolatedEntity, target: InterpolatedEntity, hit: boolean): number {
+    if (this.visualStyle !== 'pixel' || caster.classType !== 'BRUXO') return 0;
+    const now = performance.now();
+    const effects = planWarlockBasicAttack(caster.position, target.position, hit);
+    for (const effect of effects) this.vfx.queue.spawn(effect, now);
+    const delay = hit ? effects.at(-1)?.delayMs ?? 0 : 0;
+    if (delay) this.pixelWorld.pendingHits.set(target.id, now + delay);
+    return delay;
+  }
+
   public resize(width: number, height: number): void {
     this.canvas.width = width;
     this.canvas.height = height;
   }
 
-  public addDamageText(worldPos: Vector3, damage: number, isCritical: boolean, isDodged: boolean): void {
-    if (!isDodged && damage > 0) this.vfx.queue.spawn({ kind: 'impact', position: worldPos }, performance.now());
+  public addDamageText(worldPos: Vector3, damage: number, isCritical: boolean, isDodged: boolean, delay = 0): void {
+    if (!delay && !isDodged && damage > 0) this.vfx.queue.spawn({ kind: 'impact', position: worldPos }, performance.now());
     let text = `-${damage}`;
     let color = '#ff4d4f'; // red
 
@@ -227,7 +238,7 @@ export class GameRenderer {
       x: worldPos.x + (Math.random() - 0.5) * 1.5,
       y: worldPos.z - 1.2,
       opacity: 1.0,
-      createdAt: performance.now(),
+      createdAt: performance.now() + delay,
     });
   }
 
@@ -279,7 +290,13 @@ export class GameRenderer {
 
   public applyCombatStatus(event: CombatStatusTransitionPayload, entities: InterpolatedEntity[]): void {
     if (!this.warriorPresentation.transition(event, performance.now())) return;
-    for(const request of planMageCometPulseFx(event))this.vfx.queue.spawn(request,performance.now());
+    const now = performance.now();
+    const warlockPulse = this.visualStyle === 'pixel' ? planWarlockAreaPulse(event, entities) : [];
+    const pulseEffects = warlockPulse.length ? warlockPulse : planMageCometPulseFx(event);
+    for (const request of pulseEffects) this.vfx.queue.spawn(request, now);
+    if (this.visualStyle === 'pixel') {
+      for (const request of planBarbarianPackPulseFx(event, entities)) this.vfx.queue.spawn(request, now);
+    }
     const target = entities.find(e => e.id === event.status.targetEntityId);
     if (target && event.event === 'BROKEN' && ['SHIELD','GUIDING_MARK'].includes(event.status.type)) this.floatingTexts.push({ id: `status-${event.status.statusId}`, text: event.status.type==='GUIDING_MARK'?'MARCA CONSUMIDA':'ESCUDO QUEBRADO', color: '#b9e9fa', x: target.position.x, y: target.position.z - 2, opacity: 1, createdAt: performance.now() });
     if(target && event.event==='TICK' && (event.tickHeal??0)>0)this.floatingTexts.push({id:`heal-${event.status.statusId}-${event.serverTick}`,text:`+${event.tickHeal}`,color:'#a2f4a0',x:target.position.x,y:target.position.z-2,opacity:1,createdAt:performance.now()});
@@ -296,10 +313,16 @@ export class GameRenderer {
     const now = performance.now();
     const skillId = skill?.skillId ?? event.skillId;
     const warrior = this.visualStyle === 'pixel' && warriorCastArt(skillId);
-    if (warrior && caster?.classType === 'GUERREIRO') this.pixelWorld.playWarriorCast(caster.id, skillId, now);
+    if (this.visualStyle === 'pixel' && caster && (caster.classType === 'GUERREIRO' || caster.classType === 'BARBARO' || caster.classType === 'BRUXO')) {
+      this.pixelWorld.playWarriorCast(caster.id, skillId, now);
+    }
     const effects = warrior
       ? planWarriorWorldFx({ ...event, skillId }, entities)
-      : planWarriorCastFx(event, entities, event.radius ?? skill?.aoeRadius);
+      : this.visualStyle === 'pixel' && skillId.startsWith('barbaro_')
+        ? planBarbarianCastFx({ ...event, skillId }, entities)
+        : this.visualStyle === 'pixel' && skillId.startsWith('bruxo_')
+          ? planWarlockCast({ ...event, skillId }, entities)
+          : planWarriorCastFx(event, entities, event.radius ?? skill?.aoeRadius);
     const delayedHits = new Set<string>();
     for (const request of effects) {
       this.vfx.queue.spawn(request, now);
@@ -449,7 +472,9 @@ export class GameRenderer {
             if (facingLeft && !sheetSpec.directional) {
               ctx.scale(-1, 1);
             }
-            const anchor = sheetSpec.directional ? drawSize * (29 / 31) : drawSize - 36;
+            const anchor = sheetSpec.directional
+              ? drawSize * (heroClass === 'BARBARO' ? BARBARIAN_GROUND : 29 / 31)
+              : drawSize - 36;
             ctx.drawImage(cleanSheet, sx, sy, cellW, cellH, -drawSize / 2, -anchor, drawSize, drawSize);
             ctx.restore();
             drewSheet = true;
@@ -724,6 +749,7 @@ export class GameRenderer {
 
     this.floatingTexts = this.floatingTexts.filter((item) => {
       const elapsed = now - item.createdAt;
+      if (elapsed < 0) return true;
       if (elapsed > duration) return false;
 
       const progress = elapsed / duration;

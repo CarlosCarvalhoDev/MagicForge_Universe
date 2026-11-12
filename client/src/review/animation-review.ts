@@ -5,6 +5,7 @@ const walkVersion = document.getElementById('walk-version') as HTMLSelectElement
 const warriorVersion = document.getElementById('warrior-version') as HTMLSelectElement;
 const view = document.getElementById('view') as HTMLSelectElement;
 const barbarianVersion = document.getElementById('barbarian-version') as HTMLSelectElement;
+const spriteDirection = document.getElementById('sprite-direction') as HTMLSelectElement;
 const walkVersions: Record<string, HeroSheetSpec> = {
   candidate: { file: '/assets/isometric/review/clerigo_walk_v4_1_sheet.png', cols: 4, rows: 2, frames: 8, fps: 12 },
   frontal: { file: '/assets/isometric/review/clerigo_walk_v3_sheet.png', cols: 4, rows: 2, frames: 8, fps: 12 },
@@ -37,7 +38,7 @@ const alpha = document.getElementById('alpha') as HTMLSelectElement;
 const guides = document.getElementById('guides') as HTMLInputElement;
 const status = document.getElementById('review-status')!;
 const images = new Map<string, { raw: HTMLCanvasElement; keyed: HTMLCanvasElement }>();
-const labels: Record<string, string> = { GUERREIRO: 'Guerreiro', CLERIGO: 'Clérigo', BARBARO: 'Bárbaro', ARQUEIRO: 'Arqueiro' };
+const labels: Record<string, string> = { GUERREIRO: 'Guerreiro', CLERIGO: 'Clérigo', BARBARO: 'Bárbaro', ARQUEIRO: 'Arqueiro', BRUXO: 'Bruxo' };
 let running = false;
 let elapsed = 0;
 let last = performance.now();
@@ -49,6 +50,7 @@ const panels = [
   { className: 'GUERREIRO', fixedVersion: '' },
   { className: 'CLERIGO', fixedVersion: '' },
   { className: 'BARBARO', fixedVersion: '' },
+  { className: 'BRUXO', fixedVersion: '' },
   { className: 'CLERIGO', fixedVersion: 'rejected' },
   { className: 'GUERREIRO', fixedVersion: 'warriorBaseline' },
   { className: 'BARBARO', fixedVersion: 'barbarianBaseline' },
@@ -80,7 +82,8 @@ function updateView() {
   document.getElementById('warrior-version-control')!.hidden = !['warrior', 'classes'].includes(view.value);
   document.getElementById('barbarian-version-control')!.hidden = !['barbarian', 'classes'].includes(view.value);
   for (const panel of panels) {
-    panel.article.hidden = archerOnly ? panel.className !== 'ARQUEIRO' : comparison ? panel.className !== focusClass : Boolean(panel.fixedVersion);
+    panel.article.hidden = view.value === 'warlock' ? panel.className !== 'BRUXO'
+      : archerOnly ? panel.className !== 'ARQUEIRO' : comparison ? panel.className !== focusClass : Boolean(panel.fixedVersion);
     panel.title.textContent = panel.fixedVersion === 'barbarianBaseline' ? 'Bárbaro · versão anterior arquivada' : panel.fixedVersion === 'warriorBaseline' ? (['candidate', 'runtime'].includes(warriorVersion.value) ? 'Guerreiro · V2 · passada com chute' : 'Guerreiro · baseline arquivado') : panel.fixedVersion ? 'Clérigo · V2 reprovada'
       : panel.className === 'ARQUEIRO' ? 'Arqueiro · V1 aprovada · folhas em uso'
       : panel.className === 'BARBARO' && action.value === 'walk' ? `Bárbaro · ${barbarianVersion.selectedOptions[0].textContent}`
@@ -96,7 +99,7 @@ function updateStatus() { status.textContent = `${loaded} de ${allSheets.length}
 for (const spec of allSheets) {
   const img = new Image();
   img.onload = () => {
-    if (img.naturalWidth !== spec.cols * 512 || img.naturalHeight !== spec.rows * 512) { failures++; updateStatus(); return; }
+    if (img.naturalWidth % spec.cols || img.naturalHeight % spec.rows) { failures++; updateStatus(); return; }
     const raw = document.createElement('canvas'); raw.width = img.naturalWidth; raw.height = img.naturalHeight;
     raw.getContext('2d')!.drawImage(img, 0, 0);
     const keyed = document.createElement('canvas'); keyed.width = raw.width; keyed.height = raw.height;
@@ -113,7 +116,13 @@ function draw(canvas: HTMLCanvasElement, className: string, frame: number, showG
   const image = images.get(spec.file)?.[alpha.value === 'raw' ? 'raw' : 'keyed'];
   const ctx = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (image) ctx.drawImage(image, frame % spec.cols * 512, Math.floor(frame / spec.cols) * 512, 512, 512, 0, 0, canvas.width, canvas.height);
+  if (image) {
+    const cellWidth = image.width / spec.cols;
+    const cellHeight = image.height / spec.rows;
+    const row = spec.directional ? Number(spriteDirection.value) : Math.floor(frame / spec.cols);
+    ctx.drawImage(image, frame % spec.cols * cellWidth, row * cellHeight, cellWidth, cellHeight,
+      0, 0, canvas.width, canvas.height);
+  }
   if (showGuides) {
     ctx.strokeStyle = '#67e8f9'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
     ctx.beginPath(); ctx.moveTo(canvas.width * .5, 0); ctx.lineTo(canvas.width * .5, canvas.height);
@@ -155,6 +164,7 @@ walkVersion.onchange = () => { elapsed = 0; fixedFrame = null; rebuildFrames(); 
 warriorVersion.onchange = () => { elapsed = 0; fixedFrame = null; rebuildFrames(); updateView(); };
 barbarianVersion.onchange = () => { elapsed = 0; fixedFrame = null; rebuildFrames(); updateView(); };
 alpha.onchange = rebuildFrames;
+spriteDirection.onchange = rebuildFrames;
 function applyBackground() {
   for (const stage of document.querySelectorAll<HTMLElement>('.stage')) {
     stage.style.backgroundColor = background.value === 'black' ? '#000' : background.value === 'light' ? '#f1f5f9' : '#182337';

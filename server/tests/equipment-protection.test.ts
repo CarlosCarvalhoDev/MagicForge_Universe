@@ -19,6 +19,19 @@ function setup(t: TestContext) {
   return { db, player, world, conn, packets, inventory, weapon };
 }
 
+test('Dev inventory cleanup preserves equipped and protected entries', t => {
+  const f = setup(t);
+  const weapon = f.weapon();
+  assert.equal(f.db.toggleEquipItem(f.player.dbCharacterId, weapon.slotIndex, f.player.classType, 30, f.player.attributes).success, true);
+  const potion = f.inventory().find(item => item.itemId === 'potion_hp_minor')!;
+  assert.equal(f.db.setItemLocked(f.player.dbCharacterId, potion.instanceId!, true), true);
+  assert.ok(f.db.addItemToInventory(f.player.dbCharacterId, 'arcane_dust', 3));
+  const preserved = f.inventory().filter(item => item.isEquipped || item.isLocked);
+  assert.ok(f.db.clearUnlockedBackpack(f.player.dbCharacterId) > 0);
+  assert.deepEqual(f.inventory(), preserved);
+  assert.equal(f.db.clearUnlockedBackpack(f.player.dbCharacterId), 0);
+});
+
 test('Proteger preserva instância ao equipar/trocar/recarregar e bloqueia venda/reciclagem na persistência', t => {
   const f = setup(t), weapon = f.weapon();
   assert.equal(f.db.setItemLocked(f.player.dbCharacterId, weapon.instanceId!, true), true);

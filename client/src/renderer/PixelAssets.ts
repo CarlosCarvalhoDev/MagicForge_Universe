@@ -1,7 +1,7 @@
 import type { HeroAction, HeroSheetSet } from './HeroAnimations.ts';
-import { WARRIOR_DIRECTIONAL_SHEETS } from './HeroAnimations.ts';
+import { BARBARIAN_DIRECTIONAL_SHEETS, WARLOCK_DIRECTIONAL_SHEETS, WARRIOR_DIRECTIONAL_SHEETS, warriorDirectionRow } from './HeroAnimations.ts';
 
-export type PixelFamily = 'hero' | 'barbarian' | 'slime' | 'orc';
+export type PixelFamily = 'hero' | 'barbarian' | 'warlock' | 'slime' | 'orc';
 export type Facing = 'south' | 'west' | 'east' | 'north';
 const base = '/assets/pixel/craftpix';
 // Native 64px cells, one direction per row. Counts measured from vendor PNGs.
@@ -13,7 +13,8 @@ function family(folder: PixelFamily, prefix: string, names: string[], counts: nu
 }
 export const PIXEL_SHEETS: Record<PixelFamily, HeroSheetSet> = {
   hero: WARRIOR_DIRECTIONAL_SHEETS,
-  barbarian: family('barbarian', 'Barbarian', ['Idle', 'Walk', 'attack', 'Hurt', 'Death'], [4, 8, 6, 4, 6]),
+  barbarian: BARBARIAN_DIRECTIONAL_SHEETS,
+  warlock: WARLOCK_DIRECTIONAL_SHEETS,
   slime: family('slime', 'Slime1', ['Idle', 'Walk', 'Attack', 'Hurt', 'Death'], [6, 8, 10, 5, 10]),
   orc: family('orc', 'orc1', ['idle', 'walk', 'attack', 'hurt', 'death'], [4, 6, 8, 6, 8]),
 };
@@ -30,14 +31,16 @@ export function facingFromYaw(yaw: number): Facing {
   return (['south', 'east', 'north', 'west'] as Facing[])[quadrant];
 }
 export function directionRow(familyName: PixelFamily, facing: Facing): number {
-  const rows: Facing[] = (familyName === 'hero' || familyName === 'barbarian')
-    ? ['south', 'west', 'east', 'north']
-    : ['south', 'north', 'west', 'east'];
+  if (PIXEL_SHEETS[familyName].idle.directional) {
+    return warriorDirectionRow({ south: 0, west: -90, east: 90, north: 180 }[facing]);
+  }
+  const rows: Facing[] = ['south', 'north', 'west', 'east'];
   return rows.indexOf(facing);
 }
 export function pixelFamily(type: string, classType?: string, name = ''): PixelFamily | null {
   if (type !== 'MONSTER') {
     if (classType === 'BARBARO') return 'barbarian';
+    if (classType === 'BRUXO') return 'warlock';
     if (classType === 'GUERREIRO' || !classType) return 'hero';
     return null;
   }

@@ -1,4 +1,4 @@
-import { CLASS_DEFINITIONS, CharacterClass, type CharacterSlotSummary, type S2CCharacterListPayload, type S2CCharacterActionErrorPayload } from '@magicforge/shared';
+import { CLASS_DEFINITIONS, CREATABLE_CHARACTER_CLASSES, CharacterClass, type CharacterSlotSummary, type S2CCharacterListPayload, type S2CCharacterActionErrorPayload } from '@magicforge/shared';
 import { renderHeroPreview } from './HeroPreview';
 import { renderClassArtwork } from './WarriorStage';
 import { renderHeroStats } from './HeroStats';
@@ -496,8 +496,7 @@ export function setupAuthSelection(
       nameInput.reportValidity();
       return;
     }
-    const allowedClasses = [CharacterClass.GUERREIRO, CharacterClass.CLERIGO, CharacterClass.BARBARO, CharacterClass.ARQUEIRO];
-    if (!allowedClasses.includes(classSelect.value as CharacterClass)) {
+    if (!CREATABLE_CHARACTER_CLASSES.includes(classSelect.value as CharacterClass)) {
       setStatus('Esta classe ainda está bloqueada. Escolha uma classe disponível na Forja.', true);
       return;
     }

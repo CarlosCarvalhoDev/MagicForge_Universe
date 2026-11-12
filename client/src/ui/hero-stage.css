@@ -1,4 +1,7 @@
 .class-artwork-stage {
+  --idle-width: 84%;
+  --idle-floor: 86%;
+  --idle-ground: 94%;
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -18,19 +21,19 @@
 
 .class-artwork-idle {
   position: absolute;
-  top: 86%;
-  width: 84%;
+  top: var(--idle-floor);
+  width: var(--idle-width);
   aspect-ratio: 1;
   left: 46%;
-  transform: translate(-50%, -94%);
+  transform: translate(-50%, calc(-1 * var(--idle-ground)));
   background-repeat: no-repeat;
   image-rendering: pixelated;
   animation: class-artwork-idle steps(var(--idle-steps), end) infinite;
 }
 
-.class-artwork-stage[data-variant='compact'] .class-artwork-idle {
-  width: 94%;
-  top: 93%;
+.class-artwork-stage[data-variant='compact'] {
+  --idle-width: 94%;
+  --idle-floor: 93%;
 }
 
 @keyframes class-artwork-idle {
@@ -113,6 +116,25 @@
   background-repeat: no-repeat;
   background-size: 400% 300%;
   image-rendering: pixelated;
+}
+
+.class-artwork-stage[data-class='BRUXO'] {
+  --idle-ground: 93%;
+}
+.class-artwork-stage[data-class='BRUXO'] .class-skill-sheet {
+  top: var(--idle-floor);
+  width: var(--idle-width);
+}
+.class-warlock-spell {
+  position: absolute;
+  top: 61%;
+  left: 28%;
+  width: 45%;
+  aspect-ratio: 1;
+  background-size: 600% 300%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 
 .class-skill-illustration {

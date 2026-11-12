@@ -1,5 +1,5 @@
 import { CLASS_DEFINITIONS, getManaAttribute, getSkillsForClass, isSkillEffectAvailable, type CharacterClass } from '@magicforge/shared';
-import { warriorCastArt } from '../renderer/HeroAnimations';
+import { heroCastArt } from '../renderer/HeroAnimations';
 import { skillArtUrl } from './SkillArt';
 import { playClassSkillArtwork } from './WarriorStage';
 
@@ -51,7 +51,7 @@ export function renderClassSkillShowcase(host: HTMLElement, artwork: HTMLElement
       active = button;
       button.setAttribute('aria-pressed', 'true');
       name.textContent = skill.name;
-      meta.textContent = `Nv. ${skill.unlockLevel} · ${skill.cost} ${skill.resourceType}${warriorCastArt(skill.skillId) ? '' : ' · Prévia ilustrada'}`;
+      meta.textContent = `Nv. ${skill.unlockLevel} · ${skill.cost} ${skill.resourceType}${heroCastArt(skill.skillId) ? '' : ' · Prévia ilustrada'}`;
       const reach = skill.range > 0 ? `${skill.range.toLocaleString('pt-BR')} m` : 'Pessoal';
       const area = skill.aoeRadius ? ` · Área: ${skill.aoeRadius.toLocaleString('pt-BR')} m` : '';
       mechanics.textContent = `Recarga: ${skill.cooldownSec.toLocaleString('pt-BR')} s · Alcance: ${reach}${area}${isSkillEffectAvailable(skill) ? '' : ' · Efeito em preparação'}`;
