@@ -52,6 +52,15 @@ import { World } from '../game/World';
 import { WorldManager } from '../game/WorldManager';
 import { SERVER_CONFIG } from '../config';
 
+const warehouseActions = new Set<Opcode>([
+  Opcode.C2S_PING, Opcode.C2S_REQUEST_CHARACTER_LIST,
+  Opcode.C2S_USE_ITEM, Opcode.C2S_SELL_ITEM, Opcode.C2S_DISCARD_ITEM, Opcode.C2S_EXPAND_INVENTORY,
+  Opcode.C2S_REFINE_EQUIPMENT, Opcode.C2S_SOCKET_GEM, Opcode.C2S_SET_ITEM_LOCK,
+  Opcode.C2S_REQUEST_EQUIPMENT_ADVICE, Opcode.C2S_FUSE_EQUIPMENT, Opcode.C2S_AUTO_EQUIP,
+  Opcode.C2S_REQUEST_CARD_ALBUM, Opcode.C2S_EQUIP_CARD,
+  Opcode.C2S_REQUEST_LEADERBOARD, Opcode.C2S_EQUIP_SKILL, Opcode.C2S_UPGRADE_SKILL,
+]);
+
 export class PacketHandler {
   private worldManager: WorldManager | World;
 
@@ -80,6 +89,27 @@ export class PacketHandler {
 
     if (!message || typeof message.op !== 'number') {
       return;
+    }
+
+    if (message.op === Opcode.C2S_WAREHOUSE_TRAVEL) {
+      if (connection.isAuthenticated && connection.playerId) this.getActiveWorld(connection).travelWarehouse(connection, message.data);
+      return;
+    }
+    if (connection.isAuthenticated && connection.playerId) {
+      const world = this.getActiveWorld(connection);
+      if (world.getWarehouse(connection.playerId)) {
+        if (message.op === Opcode.C2S_MOVE_INPUT) {
+          world.moveInWarehouse(connection.playerId, message.data as C2SMoveInputPayload);
+          return;
+        }
+        if (!warehouseActions.has(message.op)) return;
+        if (message.op === Opcode.C2S_REQUEST_CHARACTER_LIST) {
+          world.removePlayerFromWorld(connection, true, true);
+          connection.currentWorldInstance = null;
+          connection.playerId = null;
+          connection.send(Opcode.S2C_WAREHOUSE_STATE, { area: 'battle' });
+        }
+      }
     }
 
     switch (message.op) {
@@ -187,7 +217,7 @@ export class PacketHandler {
 
       case Opcode.C2S_FUSE_EQUIPMENT: {
         if (!connection.isAuthenticated || !connection.playerId) return;
-        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        const world = this.getActiveWorld(connection), player = world.getSessionPlayer(connection.playerId);
         if (player) world.fusePlayerEquipment(player, message.data as FusionRequest);
         break;
       }
@@ -195,20 +225,20 @@ export class PacketHandler {
         const payload = message.data as C2SSetItemLockPayload;
         if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.isLocked !== 'boolean') return;
         if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
-        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        const world = this.getActiveWorld(connection), player = world.getSessionPlayer(connection.playerId);
         if (player) this.runInventoryAction(connection, () => world.setPlayerItemLocked(player, payload.expectedInstanceId, payload.isLocked));
         break;
       }
       case Opcode.C2S_REQUEST_EQUIPMENT_ADVICE: {
         if (!connection.isAuthenticated || !connection.playerId) return;
-        const world = this.getActiveWorld(connection), player = world.entityManager.getPlayer(connection.playerId);
+        const world = this.getActiveWorld(connection), player = world.getSessionPlayer(connection.playerId);
         if (player) this.runInventoryAction(connection, () => world.sendEquipmentAdvice(player));
         break;
       }
       case Opcode.C2S_AUTO_EQUIP: {
         if (!connection.isAuthenticated || !connection.playerId) return;
         const world = this.getActiveWorld(connection);
-        const player = world.entityManager.getPlayer(connection.playerId);
+        const player = world.getSessionPlayer(connection.playerId);
         if (player) this.runInventoryAction(connection, () => world.autoEquipPlayer(player));
         break;
       }
@@ -460,7 +490,7 @@ export class PacketHandler {
     if (!connection.isAuthenticated || !connection.playerId) return;
 
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
 
     player.targetId = payload.targetEntityId || null;
@@ -470,7 +500,7 @@ export class PacketHandler {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slot !== 'number') return;
 
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
 
     world.castPlayerSkill(player, payload.slot, payload.targetEntityId, payload.targetPosition);
@@ -480,7 +510,7 @@ export class PacketHandler {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slot !== 'number' || !payload.skillId) return;
 
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
 
     world.equipPlayerSkill(player, payload.slot, payload.skillId);
@@ -504,7 +534,7 @@ export class PacketHandler {
   private handleLootItem(connection: Connection, payload: C2SLootItemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || !payload.dropId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     this.runInventoryAction(connection, () => world.lootItem(player, payload.dropId));
   }
@@ -512,7 +542,7 @@ export class PacketHandler {
   private runInventoryAction(connection: Connection, action: () => unknown): void {
     try { action(); } catch {
       const world = this.getActiveWorld(connection);
-      const player = connection.playerId ? world.entityManager.getPlayer(connection.playerId) : undefined;
+      const player = connection.playerId ? world.getSessionPlayer(connection.playerId) : undefined;
       if (player) {
         try {
           player.inventory = world.db.getInventory(player.dbCharacterId);
@@ -528,7 +558,7 @@ export class PacketHandler {
 
   private validateInventoryTarget(connection: Connection, slotIndex: number, expectedInstanceId?: string): boolean {
     const world = this.getActiveWorld(connection);
-    const player = connection.playerId ? world.entityManager.getPlayer(connection.playerId) : undefined;
+    const player = connection.playerId ? world.getSessionPlayer(connection.playerId) : undefined;
     if (!player) return false;
     const item = player.inventory.find(entry => entry.slotIndex === slotIndex);
     if (Number.isInteger(slotIndex) && typeof expectedInstanceId === 'string' && item?.instanceId === expectedInstanceId) return true;
@@ -541,7 +571,7 @@ export class PacketHandler {
   private handleUseItem(connection: Connection, payload: C2SUseItemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
     this.runInventoryAction(connection, () => world.usePlayerItem(player, payload.slotIndex));
@@ -550,7 +580,7 @@ export class PacketHandler {
   private handleSellItem(connection: Connection, payload: C2SSellItemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
     this.runInventoryAction(connection, () => world.sellPlayerItem(player, payload.slotIndex));
@@ -559,7 +589,7 @@ export class PacketHandler {
   private handleChallengeBoss(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     world.challengeStageBoss(player);
   }
@@ -567,7 +597,7 @@ export class PacketHandler {
   private handleEnterPortal(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     if (this.worldManager instanceof WorldManager) this.worldManager.advancePlayerAutomatically(player, world);
     else world.enterPortal(player);
@@ -576,7 +606,7 @@ export class PacketHandler {
   private handleExpandInventory(connection: Connection, payload?: C2SExpandInventoryPayload): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     world.expandPlayerInventory(player, payload?.expectedMaxSlots ?? NaN, payload?.payment ?? 'gold',
       payload?.payment === 'cash' ? payload.quotedCost ?? NaN : payload?.quotedCost);
@@ -585,7 +615,7 @@ export class PacketHandler {
   private handleDiscardItem(connection: Connection, payload: C2SDiscardItemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
     this.runInventoryAction(connection, () => world.discardOrRecyclePlayerItem(player, payload.slotIndex));
@@ -594,7 +624,7 @@ export class PacketHandler {
   private handlePerformReborn(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     world.performPlayerReborn(player);
   }
@@ -602,7 +632,7 @@ export class PacketHandler {
   private handleRefineEquipment(connection: Connection, payload: C2SRefineEquipmentPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.slotIndex !== 'number') return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     if (!this.validateInventoryTarget(connection, payload.slotIndex, payload.expectedInstanceId)) return;
     if ((player.inventory.find(item => item.slotIndex === payload.slotIndex)?.refineLevel ?? 0) !== payload.expectedRefineLevel) { world.sendInventoryUpdate(player); return; }
@@ -612,7 +642,7 @@ export class PacketHandler {
   private handleSocketGem(connection: Connection, payload: C2SSocketGemPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || typeof payload.equipmentSlotIndex !== 'number' || typeof payload.socketIndex !== 'number' || !payload.gemItemId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     if (!this.validateInventoryTarget(connection, payload.equipmentSlotIndex, payload.expectedInstanceId)) return;
     this.runInventoryAction(connection, () => world.socketPlayerGem(player, payload.equipmentSlotIndex, payload.socketIndex, payload.gemItemId));
@@ -621,7 +651,7 @@ export class PacketHandler {
   private handleEquipCard(connection: Connection, payload: C2SEquipCardPayload): void {
     if (!connection.isAuthenticated || !connection.playerId || !payload || !payload.cardId || !payload.targetSlot) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     world.equipPlayerCard(player, payload.cardId, payload.targetSlot, payload.isEquip);
   }
@@ -629,7 +659,7 @@ export class PacketHandler {
   private handleRequestCardAlbum(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     world.sendPlayerCardAlbum(player);
   }
@@ -637,7 +667,7 @@ export class PacketHandler {
   private handleRequestDungeonInfo(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player) return;
     world.handleRequestDungeonInfo(player);
   }
@@ -645,7 +675,7 @@ export class PacketHandler {
   private handleEnterDungeon(connection: Connection, payload: C2SEnterDungeonPayload): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     world.handleEnterDungeon(player, payload);
   }
@@ -653,7 +683,7 @@ export class PacketHandler {
   private handleBuyDungeonTicket(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player || player.isDead) return;
     world.handleBuyDungeonTicket(player);
   }
@@ -661,7 +691,7 @@ export class PacketHandler {
   private handleLeaveDungeon(connection: Connection): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player) return;
     world.handleLeaveDungeon(player);
   }
@@ -669,7 +699,7 @@ export class PacketHandler {
   private handleClaimOfflineRewards(connection: Connection, payload?: C2SClaimOfflineRewardsPayload): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
-    const player = world.entityManager.getPlayer(connection.playerId);
+    const player = world.getSessionPlayer(connection.playerId);
     if (!player) return;
     world.claimOfflineRewards(player, payload?.multiplier);
   }

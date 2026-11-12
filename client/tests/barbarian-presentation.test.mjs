@@ -202,10 +202,10 @@ test('All 12 Barbarian skill icon assets exist on disk for HUD action bar and Gr
     'barbaro_nv2_1', 'barbaro_nv2_2', 'barbaro_nv2_3',
     'barbaro_nv3_1', 'barbaro_nv3_2', 'barbaro_nv3_3',
   ];
-  const skillsDir = path.join('client', 'public', 'assets', 'skills');
+  const skillsDir = path.join('client', 'public', 'assets', 'skills', 'illustrated');
   for (const id of skillIds) {
     const file = path.join(skillsDir, `${id}.png`);
-    assert.ok(fs.existsSync(file), `Skill icon ${id}.png must exist in client/public/assets/skills/`);
+    assert.ok(fs.existsSync(file), `Skill icon ${id}.png must exist in the canonical illustrated directory`);
     const stat = fs.statSync(file);
     assert.ok(stat.size > 1000, `Skill icon ${id}.png must have valid non-empty image content`);
   }

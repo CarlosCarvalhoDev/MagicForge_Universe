@@ -2,6 +2,7 @@ import { setupInventoryExpansion } from '../src/ui/InventoryExpansion';
 import { getInventoryExpansion } from '@magicforge/shared';
 import '../src/ui/progression.css';
 import '../src/ui/inventory-view.css';
+import '../src/ui/inventory-book.css';
 
 // Uses the production DOM and styles, with simulated transport and no account access.
 const source = new DOMParser().parseFromString(await (await fetch('/index.html')).text(), 'text/html');

@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { drawWarriorWorldFx } from '../src/renderer/WarriorWorldFxDraw.ts';
 import { planWarriorWorldFx } from '../src/renderer/WarriorWorldFx.ts';
 
 const position = (x, z) => ({ x, y: 0, z });
@@ -35,4 +36,41 @@ test('Immortal Resistance emits three waves and delays each impact by distance',
   assert.ok(waves[0].delayMs < waves[1].delayMs && waves[1].delayMs < waves[2].delayMs);
   assert.ok(contacts[0].delayMs < contacts[1].delayMs);
   assert.equal(cast('nv3_3', { targetResults: [] }).filter(fx => fx.kind === 'warriorWave').length, 3);
+});
+
+test('world rendering uses dedicated sprites and never stamps crest, shield or barrier artwork', () => {
+  const sprites = [];
+  let particles = 0;
+  const images = {
+    world: { naturalWidth: 1086, naturalHeight: 1448 },
+    ultimate: { naturalWidth: 1448, naturalHeight: 1086 },
+    impact: { naturalWidth: 288, naturalHeight: 72 },
+  };
+  const ctx = {
+    globalAlpha: 1, save() {}, restore() {}, translate() {}, rotate() {},
+    beginPath() {}, ellipse() {}, stroke() {}, moveTo() {}, lineTo() {},
+    fillRect() { particles++; },
+    drawImage(image, sx, sy) {
+      const atlas = Object.keys(images).find(key => images[key] === image);
+      const cellSize = atlas === 'impact' ? 72 : 362;
+      const columns = atlas === 'world' ? 3 : 4;
+      sprites.push([atlas, sx / cellSize + columns * sy / cellSize]);
+    },
+  };
+  for (const group of ['truque', 'nv1', 'nv2', 'nv3']) {
+    for (const choice of [1, 2, 3]) {
+      for (const fx of cast(`${group}_${choice}`)) {
+        ctx.globalAlpha = 1;
+        drawWarriorWorldFx(ctx, images, fx, 200, 200, 24, .35, 'ground');
+        drawWarriorWorldFx(ctx, images, fx, 200, 200, 24, .35, 'air');
+      }
+    }
+  }
+  assert.ok(particles > 0);
+  assert.ok(sprites.some(([atlas]) => atlas === 'impact'));
+  assert.ok(sprites.some(([atlas, cell]) => atlas === 'ultimate' && cell === 5));
+  assert.ok(sprites.some(([atlas, cell]) => atlas === 'ultimate' && cell === 9));
+  assert.ok(sprites.every(([atlas, cell]) => ({
+    world: [0, 1, 2, 3, 4, 6, 8], ultimate: [5, 6, 9, 10, 11], impact: [0, 1, 2, 3],
+  })[atlas].includes(cell)));
 });

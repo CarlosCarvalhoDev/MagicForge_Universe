@@ -12,13 +12,14 @@ test('Reordenar o ciclo preserva os quatro slots e suporta ida e volta', () => {
   assert.deepEqual(moveRotationSlot(initial, 0, -1), initial);
 });
 
-test('HUD preserva quatro habilidades sem enviar movimento por clique', () => {
+test('HUD preserva quatro habilidades e limita movimento por clique ao armazém', () => {
   const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const main = fs.readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
   const css = fs.readFileSync(new URL('../src/ui/progression.css', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /id="virtual-joystick-zone"/);
   assert.doesNotMatch(main, /sendMoveDirection\(/);
-  assert.doesNotMatch(main, /network\.sendMoveInput\(/);
+  assert.match(main, /if \(player && player\.currentHp > 0 && inWarehouse\)\s*\{\s*network\.sendMoveInput\(/);
+  assert.doesNotMatch(main, /inWarehouse \|\| skillRotationUI\?\.canCastManually/);
   assert.doesNotMatch(main, /for \(let slot = 4; slot >= 1; slot--\)/);
   assert.match(html, /id="grimorio-tab-rotation"/);
   assert.match(html, /id="skill-rotation-panel"/);

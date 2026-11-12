@@ -21,6 +21,8 @@ export enum Opcode {
   S2C_POSITION_CORRECTION = 0x22,
   C2S_ENTER_PORTAL = 0x23,
   S2C_STAGE_UPDATE = 0x24,
+  C2S_WAREHOUSE_TRAVEL = 0x25,
+  S2C_WAREHOUSE_STATE = 0x26,
 
   // --- Combat & Actions (0x30 - 0x3F) ---
   C2S_ATTACK_TARGET = 0x30,

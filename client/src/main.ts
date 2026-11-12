@@ -27,6 +27,7 @@ import {
   bagItems,
   getSkillTargeting,
   isSkillEffectAvailable,
+  WAREHOUSE_ROOMS, type WarehouseRoom,
 } from '@magicforge/shared';
 import { ClientNetwork } from './network/ClientNetwork';
 import { SnapshotBuffer, InterpolatedEntity } from './interpolation/SnapshotBuffer';
@@ -49,7 +50,6 @@ import { setupSkillRotation } from './ui/SkillRotation';
 import { setupSkillUpgrades } from './ui/SkillUpgrades';
 import { DEFAULT_INVENTORY_VIEW, selectBagView, itemBonuses, type InventoryViewState } from './ui/InventoryView';
 import './ui/inventory-view.css';
-import { createItemIcon, renderItemIcon } from './ui/ItemIcon';
 import { setupEquipmentFusion } from './ui/EquipmentFusion';
 import './ui/equipment-fusion.css';
 import { setupEquipmentAdvice } from './ui/EquipmentAdvice';
@@ -57,6 +57,12 @@ import { setupInventoryTooltip } from './ui/InventoryTooltip';
 import './ui/hunt-report.css';
 import './ui/auth-selection.css';
 import './ui/progression.css';
+import './ui/inventory-book.css';
+import './ui/hud-menu.css';
+import { setupHudMenu } from './ui/HudMenu';
+import { setupHeroProfile } from './ui/HeroProfile';
+import { setupInventoryBook, type InventoryPage } from './ui/InventoryBook';
+import { inventoryImage, inventoryItemArt, inventorySymbol } from './ui/InventoryArt';
 import './ui/narrative.css';
 import './ui/party-hud.css';
 import './ui/automatic-play.css';
@@ -132,7 +138,6 @@ const playerExpText = document.getElementById('player-exp-text') as HTMLSpanElem
 
 // Top-Left Hero Card DOM (Ragnarok Mobile / Stickman Go Style)
 const hudHeroPortrait = document.getElementById('hud-hero-portrait') as HTMLImageElement | null;
-const hudHeroLevel = document.getElementById('hud-hero-level') as HTMLSpanElement | null;
 const hudHeroLevelPill = document.getElementById('hud-hero-level-pill') as HTMLSpanElement | null;
 const hudHeroName = document.getElementById('hud-hero-name') as HTMLSpanElement | null;
 const hudCpBig = document.getElementById('hud-cp-big') as HTMLSpanElement | null;
@@ -140,7 +145,7 @@ const hudHeroHpBar = document.getElementById('hud-hero-hp-bar') as HTMLDivElemen
 const hudHeroHpText = document.getElementById('hud-hero-hp-text') as HTMLSpanElement | null;
 const hudHeroMpBar = document.getElementById('hud-hero-mp-bar') as HTMLDivElement | null;
 const hudHeroMpText = document.getElementById('hud-hero-mp-text') as HTMLSpanElement | null;
-const hudAvatarBtn = document.getElementById('hud-avatar-btn') as HTMLDivElement | null;
+const hudAvatarBtn = document.querySelector<HTMLButtonElement>('#hud-avatar-btn');
 
 // Mobile Bottom-Center & Ragnarok Combat Arc Controls
 const btnToggleAuto = document.getElementById('btn-toggle-auto') as HTMLButtonElement | null;
@@ -160,9 +165,6 @@ const stagePhaseBadge = document.getElementById('stage-phase-badge') as HTMLSpan
 const stageProgressFill = document.getElementById('stage-progress-fill') as HTMLDivElement | null;
 const stageProgressCounter = document.getElementById('stage-progress-counter') as HTMLSpanElement | null;
 const btnBossChallenge = document.getElementById('btn-boss-challenge') as HTMLButtonElement | null;
-const currentStageBadge = document.getElementById('current-stage-badge') as HTMLSpanElement | null;
-const zoneLocationTitle = document.getElementById('zone-location-title') as HTMLSpanElement | null;
-const btnPowerSave = document.getElementById('btn-power-save') as HTMLButtonElement | null;
 const inspectorRecyclePreview = document.getElementById('inspector-recycle-preview') as HTMLElement | null;
 
 // Mobile Dock Navigation Buttons
@@ -173,7 +175,8 @@ const btnDockFarm = document.getElementById('btn-dock-farm') as HTMLButtonElemen
 const btnDockRanking = document.getElementById('btn-dock-ranking') as HTMLButtonElement | null;
 
 // Character (Paperdoll) Modal Elements
-const characterModal = document.getElementById('character-modal') as HTMLDivElement | null;
+const characterModal = document.querySelector<HTMLDialogElement>('#character-modal');
+const heroProfile = setupHeroProfile(characterModal);
 const btnCloseCharacter = document.getElementById('btn-close-character') as HTMLButtonElement | null;
 const paperdollCpValue = document.getElementById('paperdoll-cp-value') as HTMLDivElement | null;
 const statForca = document.getElementById('stat-forca') as HTMLSpanElement | null;
@@ -217,44 +220,44 @@ const HERO_CLASS_HUD_META: Record<CharacterClass, {
   attackTrait: string;
 }> = {
   [CharacterClass.GUERREIRO]: {
-    honorTag: 'Guerreiro • FOR/CAR',
-    traitPill: '⚔️ Vanguarda • Fervor',
+    honorTag: 'Guerreiro · FOR/CAR',
+    traitPill: 'Vanguarda · Fervor',
     resourceShort: 'EN',
     attackTrait: 'Golpe Sagrado',
   },
   [CharacterClass.CLERIGO]: {
-    honorTag: 'Clérigo • SAB/CON',
-    traitPill: '✨ Luz Divina • Fé',
+    honorTag: 'Clérigo · SAB/CON',
+    traitPill: 'Luz Divina · Fé',
     resourceShort: 'MP',
     attackTrait: 'Centelha Radiante',
   },
   [CharacterClass.BARBARO]: {
-    honorTag: 'Bárbaro • FOR/CON',
-    traitPill: '🩸 Berserker • Fúria',
+    honorTag: 'Bárbaro · FOR/CON',
+    traitPill: 'Berserker · Fúria',
     resourceShort: 'FUR',
     attackTrait: 'Fúria Brutal',
   },
   [CharacterClass.ARQUEIRO]: {
-    honorTag: 'Arqueiro • DES',
-    traitPill: '🏹 Precisão • Foco',
+    honorTag: 'Arqueiro · DES',
+    traitPill: 'Precisão · Foco',
     resourceShort: 'FOC',
     attackTrait: 'Disparo Élfico',
   },
   [CharacterClass.MONGE]: {
-    honorTag: 'Monge • SAB/DES',
-    traitPill: '🥋 Asceta • Chi',
+    honorTag: 'Monge · SAB/DES',
+    traitPill: 'Asceta · Chi',
     resourceShort: 'CHI',
     attackTrait: 'Palma Rúnica',
   },
   [CharacterClass.BRUXO]: {
-    honorTag: 'Bruxo • CAR/SAB',
-    traitPill: '👁️ Ocultista • Mana',
+    honorTag: 'Bruxo · CAR/SAB',
+    traitPill: 'Ocultista · Mana',
     resourceShort: 'MP',
     attackTrait: 'Raio Sombrio',
   },
   [CharacterClass.MAGO]: {
-    honorTag: 'Mago • INT',
-    traitPill: '⚡ Arcanista • Mana',
+    honorTag: 'Mago · INT',
+    traitPill: 'Arcanista · Mana',
     resourceShort: 'MP',
     attackTrait: 'Orbe Arcano',
   },
@@ -620,69 +623,15 @@ let playerCashBalance = 0;
 let playerCombatPower: number = 1000;
 let selectedSlotIndex: number | null = null;
 
-function getItemEmoji(itemId: string, type: ItemType): string {
-  if (itemId.startsWith('wraps_')) return '🥊';
-  if (itemId.startsWith('focus_')) return '🔮';
-  if (itemId === 'gold') return '💰';
-  if (itemId.includes('stone_forge')) return '💎';
-  if (itemId.includes('gem_ruby')) return '🔴';
-  if (itemId.includes('gem_sapphire')) return '🔵';
-  if (itemId.includes('gem_emerald')) return '🟢';
-  if (itemId.includes('gem_topaz')) return '🟡';
-  if (itemId.includes('arcane_dust')) return '✨';
-  if (itemId.includes('hp')) return '🧪';
-  if (itemId.includes('mp')) return '💧';
-  if (itemId.includes('sword') || itemId.includes('dagger') || itemId.includes('greatsword')) return '⚔️';
-  if (itemId.includes('bow')) return '🏹';
-  if (itemId.includes('staff')) return '🪄';
-  if (itemId.includes('tome')) return '📜';
-  if (itemId.includes('armor')) return '🦺';
-  if (itemId.includes('shield')) return '🛡️';
-  if (itemId.includes('relic')) return '👑';
-  if (itemId.includes('essence') || itemId.includes('rune')) return '✨';
-  if (itemId.includes('ore')) return '💎';
-  if (itemId.includes('fang')) return '🐺';
-  if (type === ItemType.CONSUMIVEL) return '🧪';
-  if (type === ItemType.EQUIPAMENTO) return '⚔️';
-  return '📦';
-}
-
-let currentSubmenuTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila';
+let currentSubmenuTab: InventoryPage = 'mochila';
 let playerCards: CardAlbumEntryPayload[] = [];
 let selectedRefineSlot: number | null = null;
 let selectedGemItemId: string | null = null;
 
-function switchSubmenuTab(tabName: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas') {
+function switchSubmenuTab(tabName: InventoryPage) {
+  if (currentSubmenuTab !== tabName) inventoryTooltip?.hide();
   currentSubmenuTab = tabName;
-  const tabBtns: Record<string, string> = {
-    mochila: 'tab-btn-mochila',
-    fusao: 'tab-btn-fusao',
-    refino: 'tab-btn-refino',
-    pedras: 'tab-btn-pedras',
-    cartas: 'tab-btn-cartas',
-  };
-  const tabPanels: Record<string, string> = {
-    mochila: 'tab-mochila',
-    fusao: 'tab-fusao',
-    refino: 'tab-refino',
-    pedras: 'tab-pedras',
-    cartas: 'tab-cartas',
-  };
-
-  Object.entries(tabBtns).forEach(([k, btnId]) => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      if (k === tabName) btn.classList.add('active');
-      else btn.classList.remove('active');
-    }
-  });
-
-  Object.entries(tabPanels).forEach(([k, panelId]) => {
-    const panel = document.getElementById(panelId);
-    if (panel) {
-      panel.style.display = k === tabName ? 'flex' : 'none';
-    }
-  });
+  inventoryBook.show(tabName);
 
   if (tabName === 'fusao') {
     refreshExpansionContext();
@@ -715,7 +664,7 @@ function updateRefinementView() {
 
   if (!targetItem) {
     if (refinoItemName) refinoItemName.textContent = 'Nenhum equipamento selecionado';
-    if (refinoItemIcon) refinoItemIcon.textContent = '⚔️';
+    if (refinoItemIcon) refinoItemIcon.innerHTML = inventorySymbol('sword');
     if (refinoTierCurr) refinoTierCurr.textContent = '+0';
     if (refinoTierNext) refinoTierNext.textContent = '+1';
     if (btnDoRefine) {
@@ -735,7 +684,7 @@ function updateRefinementView() {
     refinoItemName.textContent = `${def.name} (+${currentLevel})`;
     refinoItemName.style.color = rarityTheme.text;
   }
-  if (refinoItemIcon) renderItemIcon(refinoItemIcon, def.itemId, getItemEmoji(def.itemId, def.type));
+  if (refinoItemIcon) refinoItemIcon.innerHTML = inventoryItemArt(def.itemId, def.type, def.equipmentSlot);
   if (refinoTierCurr) refinoTierCurr.textContent = `+${currentLevel}`;
   if (refinoTierNext) refinoTierNext.textContent = currentLevel >= 15 ? 'MAX' : `+${nextLevel}`;
 
@@ -777,6 +726,7 @@ function updateRefinementView() {
 
   const stoneDef = ITEMS_DATABASE[stoneId];
   const stoneName = stoneDef ? stoneDef.name : 'Pedra de Refinamento';
+  const stoneArt = inventoryItemArt(stoneId, ItemType.MATERIAL);
   const playerStones = playerInventory
     .filter((i) => !i.isLocked && i.itemId === stoneId)
     .reduce((sum, i) => sum + i.quantity, 0);
@@ -790,31 +740,30 @@ function updateRefinementView() {
     refinoStatsDiff.innerHTML = `
       <div class="stat-diff-row"><span>Bônus de Atributos:</span><strong style="color: #34d399;">+${currPct}% ➔ +${nextPct}% (+8%)</strong></div>
       <div class="stat-diff-row"><span>Taxa de Sucesso:</span><strong style="color: ${successRate >= 80 ? '#34d399' : successRate >= 50 ? '#fbbf24' : '#f87171'};">${currentLevel >= 15 ? 'MÁXIMO' : `${successRate}%`}</strong></div>
-      ${warnDrop ? `<div class="stat-diff-row" style="color: #f87171; font-size: 0.72rem;"><span>⚠️ Risco de Falha:</span><strong>Reduz -1 nível se falhar</strong></div>` : ''}
+      ${warnDrop ? `<div class="stat-diff-row" style="color: #f87171; font-size: 0.72rem;"><span>Risco de Falha:</span><strong>Reduz -1 nível se falhar</strong></div>` : ''}
     `;
   }
 
   if (refinoCostBox) {
     if (currentLevel >= 15) {
-      refinoCostBox.innerHTML = `<span class="cost-item" style="color: #fbbf24;">✨ Equipamento no Refinamento Máximo (+15)!</span>`;
+      refinoCostBox.innerHTML = `<span class="cost-item" style="color: #fbbf24;">Equipamento no Refinamento Máximo (+15)!</span>`;
     } else {
       refinoCostBox.innerHTML = `
-        <span class="cost-item" style="color: ${hasStone ? '#e2e8f0' : '#f87171'};"> ${stoneCount}x ${stoneName} (${playerStones}/${stoneCount})</span>
-        <span class="cost-item gold" style="color: ${hasGold ? '#fbbf24' : '#f87171'};">💰 ${goldCost.toLocaleString('pt-BR')} Ouro</span>
+        <span class="cost-item" style="color: ${hasStone ? '#e2e8f0' : '#f87171'};">${stoneArt} ${stoneCount}x ${stoneName} (${playerStones}/${stoneCount})</span>
+        <span class="cost-item gold" style="color: ${hasGold ? '#fbbf24' : '#f87171'};">${inventoryItemArt('gold', ItemType.MATERIAL)} ${goldCost.toLocaleString('pt-BR')} Ouro</span>
       `;
-      refinoCostBox.querySelector('.cost-item')?.prepend(createItemIcon(stoneId, '💎'));
     }
   }
 
   if (btnDoRefine) {
     if (currentLevel >= 15) {
       btnDoRefine.disabled = true;
-      btnDoRefine.textContent = '⭐ NÍVEL MÁXIMO (+15) ATINGIDO';
+      btnDoRefine.textContent = 'NÍVEL MÁXIMO (+15) ATINGIDO';
       btnDoRefine.style.opacity = '0.6';
     } else {
       btnDoRefine.disabled = !hasStone || !hasGold;
       btnDoRefine.style.opacity = (!hasStone || !hasGold) ? '0.6' : '1';
-      btnDoRefine.textContent = `🔨 APRIMORAR EQUIPAMENTO (+${nextLevel})`;
+      btnDoRefine.textContent = `APRIMORAR EQUIPAMENTO (+${nextLevel})`;
     }
   }
 }
@@ -852,22 +801,22 @@ function updatePedrasView() {
 
       if (sock) {
         const gemDef = ITEMS_DATABASE[sock.gemId];
+        const gemIcon = inventoryItemArt(sock.gemId, ItemType.GEMA);
         const gemName = gemDef?.name || sock.gemId;
         let effect = '';
         if (gemDef?.statsBonus) {
           effect = Object.entries(gemDef.statsBonus).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(', ');
         }
         slotEl.innerHTML = `
-          <span class="gem-icon"></span>
+          <span class="gem-icon">${gemIcon}</span>
           <div class="gem-info">
             <span class="gem-name" style="color: #38bdf8;">${gemName} (Soquete ${s + 1})</span>
             <span class="gem-effect" style="color: #34d399;">${effect || 'Atributos Extras'}</span>
           </div>
         `;
-        renderItemIcon(slotEl.querySelector<HTMLElement>('.gem-icon')!, sock.gemId, '💎');
       } else {
         slotEl.innerHTML = `
-          <span class="gem-icon">⚪</span>
+          <span class="gem-icon">${inventorySymbol('socket')}</span>
           <div class="gem-info">
             <span class="gem-name">Soquete ${s + 1} Vazio</span>
             <span class="gem-effect" style="color: #94a3b8;">Selecione uma gema abaixo para engastar</span>
@@ -892,22 +841,21 @@ function updatePedrasView() {
       gemsInBag.forEach((g) => {
         const gemDef = ITEMS_DATABASE[g.itemId];
         if (!gemDef) return;
-        const chip = document.createElement('div');
+        const chip = document.createElement('button');
+        chip.type = 'button';
         chip.className = 'gem-chip';
-        if (selectedGemItemId === g.itemId) {
-          chip.style.borderColor = '#fbbf24';
-          chip.style.background = 'rgba(251, 191, 36, 0.2)';
-        }
+        chip.setAttribute('aria-pressed', String(selectedGemItemId === g.itemId));
         chip.setAttribute('data-gem', g.itemId);
         let bonusText = '';
         if (gemDef.statsBonus) {
           bonusText = Object.entries(gemDef.statsBonus).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(', ');
         }
-        chip.textContent = ` ${gemDef.name} (${g.quantity}x) [${bonusText}]`;
-        chip.prepend(createItemIcon(g.itemId, gemDef.icon || '💎'));
+        chip.innerHTML = inventoryItemArt(g.itemId, ItemType.GEMA);
+        chip.append(` ${gemDef.name} (${g.quantity}×)${bonusText ? ` · ${bonusText}` : ''}`);
         chip.onclick = () => {
           selectedGemItemId = g.itemId;
           updatePedrasView();
+          Array.from(gemBagList.querySelectorAll('button')).find(button => button.dataset.gem === g.itemId)?.focus();
         };
         gemBagList.appendChild(chip);
       });
@@ -925,7 +873,7 @@ function updatePedrasView() {
       btnSocketGem.textContent = 'SELECIONE UMA GEMA ACIMA PARA ENGASTAR';
     } else {
       const gDef = ITEMS_DATABASE[selectedGemItemId];
-      btnSocketGem.textContent = `💎 ENGASTAR ${gDef?.name.toUpperCase() || 'GEMA'} NO SOQUETE #${nextFreeSocket + 1}`;
+      btnSocketGem.textContent = `ENGASTAR ${gDef?.name.toUpperCase() || 'GEMA'} NO SOQUETE #${nextFreeSocket + 1}`;
     }
   }
 }
@@ -941,9 +889,9 @@ function updateCartasView() {
   if (cardEquipPreview) {
     cardEquipPreview.innerHTML = `
       <div class="card-slot" style="margin-bottom: 8px;">
-        <span class="card-slot-tag" style="color: #fbbf24; font-weight: 700;">⚔️ Arma Principal • Carta Ativa (Bônus em Dobro 2x)</span>
+        <span class="card-slot-tag" style="color: #fbbf24; font-weight: 700;">${inventorySymbol('sword')} Arma Principal • Carta Ativa (Bônus em Dobro 2x)</span>
         <div class="card-equipped-box">
-          <span class="card-symbol" style="font-size: 1.8rem;">${weaponCardEntry ? (CARDS_DATABASE[weaponCardEntry.cardId]?.icon || '🃏') : '⚪'}</span>
+          <span class="card-symbol" style="font-size: 1.8rem;">${inventorySymbol(weaponCardEntry ? 'cards' : 'socket')}</span>
           <div class="card-details">
             <span class="card-name" style="color: #fbbf24; font-weight: bold;">
               ${weaponCardEntry ? (CARDS_DATABASE[weaponCardEntry.cardId]?.name || weaponCardEntry.cardId) : 'Nenhuma Carta Equipada na Arma'}
@@ -957,9 +905,9 @@ function updateCartasView() {
       </div>
 
       <div class="card-slot">
-        <span class="card-slot-tag" style="color: #60a5fa; font-weight: 700;">🛡️ Armadura Peitoral • Carta Ativa (Bônus em Dobro 2x)</span>
+        <span class="card-slot-tag" style="color: #60a5fa; font-weight: 700;">${inventoryImage('/assets/ui/slots/slot_armor.png')} Armadura Peitoral • Carta Ativa (Bônus em Dobro 2x)</span>
         <div class="card-equipped-box">
-          <span class="card-symbol" style="font-size: 1.8rem;">${armorCardEntry ? (CARDS_DATABASE[armorCardEntry.cardId]?.icon || '🃏') : '⚪'}</span>
+          <span class="card-symbol" style="font-size: 1.8rem;">${inventorySymbol(armorCardEntry ? 'cards' : 'socket')}</span>
           <div class="card-details">
             <span class="card-name" style="color: #60a5fa; font-weight: bold;">
               ${armorCardEntry ? (CARDS_DATABASE[armorCardEntry.cardId]?.name || armorCardEntry.cardId) : 'Nenhuma Carta Equipada na Armadura'}
@@ -990,10 +938,7 @@ function updateCartasView() {
         cardEl.style.borderColor = RARITY_COLORS[cardDef.rarity]?.border || '#fbbf24';
       }
 
-      let imgHtml = `<span class="m-card-pic">${cardDef.icon || '🃏'}</span>`;
-      if (cardDef.image) {
-        imgHtml = `<img src="/${cardDef.image}" alt="${cardDef.name}" class="m-card-pic" style="width: 44px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);" onerror="this.outerHTML='<span class=\\'m-card-pic\\'>${cardDef.icon || '🃏'}</span>'" />`;
-      }
+      const imgHtml = `<span class="m-card-pic">${cardDef.image ? inventoryImage(`/${cardDef.image}`) : inventorySymbol('cards')}</span>`;
 
       const rarityColor = RARITY_COLORS[cardDef.rarity]?.text || '#fbbf24';
 
@@ -1002,7 +947,7 @@ function updateCartasView() {
         if (isEquipped) {
           equipButtonsHtml = `
             <div style="display: flex; gap: 4px; margin-top: 6px;">
-              <span style="color: #34d399; font-size: 0.72rem; font-weight: 700;">✅ Ativa [${owned.equippedSlot}]</span>
+              <span style="color: #34d399; font-size: 0.72rem; font-weight: 700;">Ativa [${owned.equippedSlot}]</span>
               <button class="btn-refine-action" style="padding: 2px 6px; font-size: 0.68rem; margin-left: auto;" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', '${owned.equippedSlot || 'ARMA'}', false)">Desequipar</button>
             </div>
           `;
@@ -1012,13 +957,13 @@ function updateCartasView() {
 
           equipButtonsHtml = `
             <div style="display: flex; gap: 6px; margin-top: 6px;">
-              ${allowArma ? `<button class="btn-action-primary" style="padding: 3px 6px; font-size: 0.68rem; flex: 1;" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', 'ARMA', true)">⚔️ Na Arma</button>` : ''}
-              ${allowArmadura ? `<button class="btn-action-primary" style="padding: 3px 6px; font-size: 0.68rem; flex: 1; background: linear-gradient(135deg, #2563eb, #1d4ed8);" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', 'ARMADURA', true)">🛡️ Na Armadura</button>` : ''}
+              ${allowArma ? `<button class="btn-action-primary" style="padding: 3px 6px; font-size: 0.68rem; flex: 1;" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', 'ARMA', true)">Na Arma</button>` : ''}
+              ${allowArmadura ? `<button class="btn-action-primary" style="padding: 3px 6px; font-size: 0.68rem; flex: 1; background: linear-gradient(135deg, #2563eb, #1d4ed8);" onclick="window.magicForgeNetwork?.sendEquipCard('${cardDef.cardId}', 'ARMADURA', true)">Na Armadura</button>` : ''}
             </div>
           `;
         }
       } else {
-        equipButtonsHtml = `<span style="color: #94a3b8; font-size: 0.68rem; margin-top: 4px;">🔒 Derrote este monstro para saquear</span>`;
+        equipButtonsHtml = `<span style="color: #94a3b8; font-size: 0.68rem; margin-top: 4px;">${inventorySymbol('lock')} Derrote este monstro para saquear</span>`;
       }
 
       cardEl.innerHTML = `
@@ -1030,17 +975,19 @@ function updateCartasView() {
           ${equipButtonsHtml}
         </div>
       `;
+      cardEl.querySelector<HTMLImageElement>('.m-card-pic img')?.addEventListener('error', event => {
+        const parent = (event.currentTarget as HTMLImageElement).parentElement;
+        if (parent) parent.innerHTML = inventorySymbol('cards');
+      }, { once: true });
       cardsGrid.appendChild(cardEl);
     });
   }
 }
 
-function openUnifiedHeroModal(defaultTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila') {
+function openUnifiedHeroModal(defaultTab: InventoryPage = 'mochila') {
   if (!inventoryModal) return;
   inventoryModal.style.display = 'flex';
-  if (characterModal && characterModal !== inventoryModal) {
-    characterModal.style.display = 'none';
-  }
+  closeCharacterModal();
   if (selectedSlotIndex === null && playerInventory.length > 0) {
     selectedSlotIndex = (bagItems(playerInventory)[0] ?? playerInventory[0]).slotIndex;
   }
@@ -1055,10 +1002,9 @@ function openUnifiedHeroModal(defaultTab: 'mochila' | 'fusao' | 'refino' | 'pedr
 function closeUnifiedHeroModal() {
   inventoryTooltip?.hide();
   if (inventoryModal) inventoryModal.style.display = 'none';
-  if (characterModal) characterModal.style.display = 'none';
 }
 
-function toggleUnifiedHeroModal(defaultTab: 'mochila' | 'fusao' | 'refino' | 'pedras' | 'cartas' = 'mochila', force?: boolean) {
+function toggleUnifiedHeroModal(defaultTab: InventoryPage = 'mochila', force?: boolean) {
   if (!inventoryModal) return;
   const isCurrentlyOpen = inventoryModal.style.display === 'flex';
   const shouldOpen = force !== undefined ? force : !isCurrentlyOpen;
@@ -1082,15 +1028,20 @@ function toggleInventoryModal(force?: boolean) {
 }
 
 function openCharacterModal(): void {
-  openUnifiedHeroModal('mochila');
+  if (!characterModal || characterModal.open) return;
+  closeInventory();
+  characterModal.showModal();
+  renderCharacterModal();
+  heroProfile.updateVitals(snapshotBuffer.getInterpolatedEntities().find(entity => entity.id === network.myPlayerId));
 }
 
 function closeCharacterModal(): void {
-  closeUnifiedHeroModal();
+  if (characterModal?.open) characterModal.close();
 }
 
-function toggleCharacterModal(force?: boolean): void {
-  toggleUnifiedHeroModal('mochila', force);
+function toggleCharacterModal(): void {
+  if (characterModal?.open) closeCharacterModal();
+  else openCharacterModal();
 }
 
 if (btnOpenInventory) {
@@ -1111,19 +1062,7 @@ if (inventoryModal) {
   });
 }
 
-// Submenus navigation tab listeners
-const tabBtnMochila = document.getElementById('tab-btn-mochila');
-if (tabBtnMochila) tabBtnMochila.addEventListener('click', () => switchSubmenuTab('mochila'));
-
-const tabBtnRefino = document.getElementById('tab-btn-refino');
-if (tabBtnRefino) tabBtnRefino.addEventListener('click', () => switchSubmenuTab('refino'));
-
-const tabBtnPedras = document.getElementById('tab-btn-pedras');
-if (tabBtnPedras) tabBtnPedras.addEventListener('click', () => switchSubmenuTab('pedras'));
-
-document.getElementById('tab-btn-fusao')?.addEventListener('click', () => switchSubmenuTab('fusao'));
-const tabBtnCartas = document.getElementById('tab-btn-cartas');
-if (tabBtnCartas) tabBtnCartas.addEventListener('click', () => switchSubmenuTab('cartas'));
+const inventoryBook = setupInventoryBook(inventoryModal, switchSubmenuTab);
 
 // Interactive Actions for Submenus
 const btnDoRefine = document.getElementById('btn-do-refine');
@@ -1254,14 +1193,14 @@ function renderInventorySlots() {
 
         const iconEl = document.createElement('span');
         iconEl.className = 'slot-icon-text';
-        renderItemIcon(iconEl, item.itemId, getItemEmoji(item.itemId, itemDef.type));
+        iconEl.innerHTML = inventoryItemArt(item.itemId, itemDef.type, itemDef.equipmentSlot);
         slotEl.appendChild(iconEl);
         const nameEl = document.createElement('span');
         nameEl.className = 'inventory-tile-name';
         nameEl.textContent = itemDef.name;
         slotEl.appendChild(nameEl);
         if (item.isLocked) {
-          const badge = document.createElement('span'); badge.className = 'inventory-lock-badge'; badge.textContent = '🔒';
+          const badge = document.createElement('span'); badge.className = 'inventory-lock-badge'; badge.innerHTML = inventorySymbol('lock');
           slotEl.appendChild(badge);
           slotEl.setAttribute('aria-label', slotEl.getAttribute('aria-label') + ' · protegido');
         }
@@ -1294,7 +1233,7 @@ function renderInventorySlots() {
       const lockIcon = document.createElement('span');
       lockIcon.style.fontSize = '1.1rem';
       lockIcon.style.opacity = '0.4';
-      lockIcon.textContent = '🔒';
+      lockIcon.innerHTML = inventorySymbol('lock');
       slotEl.appendChild(lockIcon);
 
       slotEl.addEventListener('click', () => {
@@ -1316,13 +1255,14 @@ function selectInventorySlot(slotIndex: number) {
   lockButton.hidden = !item;
   if (item) {
     lockButton.setAttribute('aria-pressed', String(!!item.isLocked));
-    lockButton.textContent = item.isLocked ? '🔓 Desproteger' : '🔒 Proteger';
+    lockButton.innerHTML = item.isLocked ? `${inventorySymbol('unlock')} Desproteger` : `${inventorySymbol('lock')} Proteger`;
     lockButton.title = 'Protege contra venda, reciclagem e consumo. Equipar e refinar continuam permitidos.';
     lockButton.onclick = () => network.sendSetItemLock(item.slotIndex, !item.isLocked);
   }
 
 
   const itemDef = item ? ITEMS_DATABASE[item.itemId] : null;
+  document.getElementById('inventory-inspector')?.toggleAttribute('data-has-item', !!itemDef);
 
   if (item && itemDef && itemDef.type === ItemType.EQUIPAMENTO) {
     selectedRefineSlot = slotIndex;
@@ -1331,7 +1271,10 @@ function selectInventorySlot(slotIndex: number) {
   }
 
   if (!item || !itemDef) {
-    if (inspectorIcon) inspectorIcon.textContent = '📦';
+    if (inspectorIcon) {
+      inspectorIcon.innerHTML = inventoryImage('/assets/ui/icons/icon-mochila-satchel.svg');
+      inspectorIcon.style.borderColor = '';
+    }
     if (inspectorName) {
       inspectorName.textContent = 'Slot Vazio';
       inspectorName.style.color = '#94a3b8';
@@ -1351,7 +1294,7 @@ function selectInventorySlot(slotIndex: number) {
   const rarityTheme = RARITY_COLORS[itemDef.rarity] || { border: '#ffffff', glow: 'rgba(255,255,255,0.3)', text: '#ffffff', bg: 'rgba(30,41,59,0.6)' };
 
   if (inspectorIcon) {
-    renderItemIcon(inspectorIcon, item.itemId, getItemEmoji(item.itemId, itemDef.type));
+    inspectorIcon.innerHTML = inventoryItemArt(item.itemId, itemDef.type, itemDef.equipmentSlot);
     inspectorIcon.style.borderColor = rarityTheme.border;
   }
   if (inspectorName) {
@@ -1536,10 +1479,18 @@ document.getElementById('btn-auto-equip')?.addEventListener('click', () => {
   network.sendAutoEquip();
 });
 const hudHeader = document.getElementById('hud-header');
-if (hudHeader) {
-  new ResizeObserver(() => {
+const hudChat = document.getElementById('game-chat-box');
+if (hudHeader && hudChat) {
+  const measureHud = () => {
     document.body.style.setProperty('--hud-header-bottom', `${hudHeader.getBoundingClientRect().bottom}px`);
-  }).observe(hudHeader);
+    const chat = hudChat.getBoundingClientRect();
+    document.body.style.setProperty('--hud-chat-top', `${chat.height > 0 ? chat.top : window.innerHeight - 70}px`);
+  };
+  const observer = new ResizeObserver(measureHud);
+  observer.observe(hudHeader);
+  observer.observe(hudChat);
+  window.addEventListener('resize', measureHud);
+  measureHud();
 }
 
 function renderCharacterModal(): void {
@@ -1608,15 +1559,36 @@ function renderCharacterModal(): void {
   if (paperdollHeroName) paperdollHeroName.textContent = charName;
   if (paperdollHeroClass) paperdollHeroClass.textContent = `${classDef.displayName} (Nv. ${playerLevel})`;
 
-  // Render 6 Equipment Slots
-  Object.entries(paperdollSlotElements).forEach(([slotKeyStr, slotEl]) => {
-    if (!slotEl) return;
-    const slotKey = slotKeyStr as PaperdollSlotKey;
+  const equippedBySlot = new Map<PaperdollSlotKey, InventoryItemPayload>();
+  for (const slotKey of Object.keys(paperdollSlotElements) as PaperdollSlotKey[]) {
     const equippedItem = playerInventory.find(item => item.isEquipped &&
       ITEMS_DATABASE[item.itemId]?.equipmentSlot === equipmentSlots[slotKey].slot);
+    if (equippedItem) equippedBySlot.set(slotKey, equippedItem);
+    const slotEl = paperdollSlotElements[slotKey];
+    if (!slotEl) continue;
     renderEquipmentSlot(slotEl, slotKey, equippedItem);
     slotEl.onclick = equippedItem ? () => selectInventorySlot(equippedItem.slotIndex) : openInventory;
-  });
+  }
+  if (characterModal?.open) {
+    heroProfile.render({
+      classType: chosenClass,
+      equipment: equippedBySlot,
+      xp: playerCurrentXp,
+      xpGoal: playerXpToNextLevel,
+      fields: {
+        ...currentAttrs,
+        name: charName,
+        class: `${classDef.displayName} · Nv. ${playerLevel}`,
+        cp: playerCombatPower,
+        damage: baseDmg,
+        critical: `${critPct.toLocaleString('pt-BR')}%`,
+        range: `${classDef.attackRange.toLocaleString('pt-BR')} m`,
+        reborn: playerRebornCount,
+        gold: playerGold,
+        equipped: `${equippedBySlot.size} / 6`,
+      },
+    });
+  }
 }
 
 // ==========================================
@@ -1660,6 +1632,8 @@ function triggerQuickUseToast(name: string, emoji: string, slotIndex: number): v
   }, 5000);
 }
 
+setupHudMenu(document.getElementById('hud-menu-dock'));
+
 // Bind Dock Navigation Buttons
 if (btnDockCharacter) btnDockCharacter.addEventListener('click', () => toggleCharacterModal());
 if (btnDockInventory) btnDockInventory.addEventListener('click', () => toggleInventoryModal());
@@ -1686,7 +1660,9 @@ if (btnCloseCharacter) {
 }
 if (characterModal) {
   characterModal.addEventListener('click', (e) => {
-    if (e.target === characterModal) closeCharacterModal();
+    if (e.target !== characterModal) return;
+    const bounds = characterModal.getBoundingClientRect();
+    if (e.clientX < bounds.left || e.clientX > bounds.right || e.clientY < bounds.top || e.clientY > bounds.bottom) closeCharacterModal();
   });
 }
 
@@ -1703,18 +1679,90 @@ if (farmHelperModal) {
 }
 
 
-// Battery Power Save mode toggle
-let isPowerSave = false;
-if (btnPowerSave) {
-  btnPowerSave.addEventListener('click', () => {
-    isPowerSave = !isPowerSave;
-    btnPowerSave.style.background = isPowerSave ? 'rgba(56, 189, 248, 0.35)' : 'rgba(15, 23, 42, 0.75)';
-    btnPowerSave.textContent = isPowerSave ? '🌙 Economia ON' : '🌙 Economia';
-  });
-}
-
 // Core Game Client Systems
 const network = new ClientNetwork();
+let inWarehouse = false;
+let warehouseRoom: WarehouseRoom | null = null;
+let warehouseTravelTimer: number | undefined;
+let warehouseCountdownTimer: number | undefined;
+let warehouseTravelAttempt = 0;
+const warehouseTravel = document.querySelector<HTMLButtonElement>('#btn-warehouse-travel');
+const warehouseIcon = warehouseTravel?.querySelector<HTMLImageElement>('img');
+const warehouseCountdown = document.querySelector<HTMLElement>('#warehouse-countdown');
+
+function resetWarehouseTravel(): void {
+  warehouseTravelAttempt++;
+  window.clearTimeout(warehouseTravelTimer);
+  window.clearInterval(warehouseCountdownTimer);
+  if (warehouseTravel) warehouseTravel.disabled = false;
+  if (warehouseCountdown) warehouseCountdown.hidden = true;
+}
+
+function showWarehouse(room: WarehouseRoom | null): void {
+  resetWarehouseTravel();
+  if (warehouseRoom === room) return;
+  warehouseRoom = room;
+  const active = room !== null;
+  inWarehouse = active;
+  document.body.classList.toggle('in-warehouse', active);
+  renderer.setWarehouse(room);
+  const location = document.querySelector('#warehouse-room-name');
+  if (location && room) location.textContent = WAREHOUSE_ROOMS[room].label;
+  snapshotBuffer.clear();
+  bossNarrative.reset();
+  if (warehouseTravel) {
+    const label = active ? 'Voltar para a batalha' : 'Ir ao armazém';
+    warehouseTravel.title = label;
+    warehouseTravel.setAttribute('aria-label', label);
+  }
+  if (warehouseIcon) warehouseIcon.src = active
+    ? '/assets/ui/icons/icon-warehouse-battle.svg'
+    : '/assets/ui/icons/icon-warehouse-home.svg';
+}
+
+warehouseTravel?.addEventListener('click', async () => {
+  if (!network.isConnected || !network.myPlayerId || warehouseTravel.disabled) return;
+  warehouseTravel.disabled = true;
+  const attempt = ++warehouseTravelAttempt;
+  const destination = inWarehouse ? 'battle' : 'warehouse';
+  const playerId = network.myPlayerId;
+  const deadline = performance.now() + 3000;
+  const updateCountdown = () => {
+    if (!warehouseCountdown) return;
+    const seconds = Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
+    const label = destination === 'warehouse' ? 'Pátio do armazém' : 'Campo de batalha';
+    const message = seconds ? `${label} em ${seconds}s` : `Teleportando para ${label.toLowerCase()}…`;
+    if (warehouseCountdown.textContent !== message) warehouseCountdown.textContent = message;
+    warehouseCountdown.hidden = false;
+  };
+  updateCountdown();
+  warehouseCountdownTimer = window.setInterval(updateCountdown, 100);
+  try {
+    await Promise.all([
+      new Promise<void>(resolve => window.setTimeout(resolve, 3000)),
+      destination === 'warehouse' ? renderer.prepareWarehouse() : Promise.resolve(),
+    ]);
+    if (attempt !== warehouseTravelAttempt) return;
+    if (!network.isConnected || network.myPlayerId !== playerId) { resetWarehouseTravel(); return; }
+    window.clearInterval(warehouseCountdownTimer);
+    updateCountdown();
+    network.sendWarehouseTravel(destination);
+    warehouseTravelTimer = window.setTimeout(() => {
+      resetWarehouseTravel();
+      addChatMessage('Sistema', 'O servidor não confirmou a viagem.', 'sys');
+    }, 4000);
+  } catch {
+    if (attempt !== warehouseTravelAttempt) return;
+    resetWarehouseTravel();
+    addChatMessage('Sistema', 'Não foi possível carregar o mapa do armazém.', 'sys');
+  }
+});
+
+network.onWarehouseState = ({ area, reason, room }) => {
+  showWarehouse(area === 'warehouse' ? room ?? 'exterior' : null);
+  if (reason) addChatMessage('Sistema', reason, 'sys');
+};
+
 skillRotationUI = setupSkillRotation({
   isReady: () => network.isConnected && network.isAuthenticated && Boolean(network.myPlayerId),
   save: (order, autoCastEnabled) => network.sendSkillRotation(order, autoCastEnabled),
@@ -1802,7 +1850,10 @@ const devPanel = setupDevPanel(
   command => network.sendDevControl(command),
   () => renderer.visibleMonsterIds(snapshotBuffer.getInterpolatedEntities()),
 );
-network.onDevState = state => devPanel.update(state);
+network.onDevState = state => {
+  if (state.cooldownsReset) cooldownMap.clear();
+  devPanel.update(state);
+};
 const channelSelector = new ChannelSelector(network);
 const offlineRewardModal = new OfflineRewardModal({
   isReady: () => network.isConnected && network.isAuthenticated,
@@ -1811,7 +1862,7 @@ const offlineRewardModal = new OfflineRewardModal({
 });
 const offlineChestButton = document.createElement('button');
 offlineChestButton.type = 'button';
-offlineChestButton.className = 'dock-btn';
+offlineChestButton.className = 'hud-menu-option';
 offlineChestButton.innerHTML = '<span class="dock-time-icon" aria-hidden="true">⌛</span><span>Baú do Tempo</span>';
 offlineChestButton.style.display = 'none';
 btnDockFarm?.insertAdjacentElement('afterend', offlineChestButton);
@@ -1847,33 +1898,6 @@ handleResize();
 // ----------------------------------------------------
 // Interactive Camera Zoom Controls (HUD Buttons, Wheel & Pinch)
 // ----------------------------------------------------
-const btnZoomIn = document.getElementById('btn-zoom-in') as HTMLButtonElement | null;
-const btnZoomOut = document.getElementById('btn-zoom-out') as HTMLButtonElement | null;
-const hudZoomLabel = document.getElementById('hud-zoom-label') as HTMLSpanElement | null;
-
-function updateZoomDisplay() {
-  if (hudZoomLabel) {
-    hudZoomLabel.textContent = `${Math.round(renderer.zoom)}x`;
-  }
-}
-updateZoomDisplay();
-
-if (btnZoomIn) {
-  btnZoomIn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    renderer.setZoom(renderer.zoom + 1.2);
-    updateZoomDisplay();
-  });
-}
-
-if (btnZoomOut) {
-  btnZoomOut.addEventListener('click', (e) => {
-    e.stopPropagation();
-    renderer.setZoom(renderer.zoom - 1.2);
-    updateZoomDisplay();
-  });
-}
-
 // Canvas Wheel for Zoom In / Zoom Out
 canvas.addEventListener(
   'wheel',
@@ -1881,7 +1905,6 @@ canvas.addEventListener(
     e.preventDefault();
     const delta = e.deltaY < 0 ? 0.9 : -0.9;
     renderer.setZoom(renderer.zoom + delta);
-    updateZoomDisplay();
   },
   { passive: false }
 );
@@ -1912,7 +1935,6 @@ canvas.addEventListener(
       const currentDistance = Math.hypot(dx, dy);
       const factor = currentDistance / initialPinchDistance;
       renderer.setZoom(initialPinchZoom * factor);
-      updateZoomDisplay();
     }
   },
   { passive: true }
@@ -2151,6 +2173,7 @@ network.onConnectionStateChange = (connected) => {
     else authSelection.onConnected();
     addChatMessage('Sistema', 'Conectado ao servidor autoritativo MagicForge (20Hz)!', 'sys');
   } else {
+    showWarehouse(null);
     authSelection.onDisconnected();
     farmPlayerReady = false;
     pendingFarmSettings = null;
@@ -2328,19 +2351,11 @@ network.onBossEvent = (payload) => {
 let lastPortalOpenState = false;
 network.onStageUpdate = (payload) => {
   renderer.setStagePresentation(payload);
-  const biomeIcon = document.getElementById('zone-biome-icon');
-  if (biomeIcon) biomeIcon.textContent = worldAppearance(payload.world).icon;
-  if (currentStageBadge) {
-    currentStageBadge.textContent = `Fase ${payload.stage}/10`;
-  }
   if (stageWorldTitle) {
     stageWorldTitle.textContent = `${worldAppearance(payload.world).icon} ${payload.worldName}`;
   }
   if (stagePhaseBadge) {
     stagePhaseBadge.textContent = payload.isBossStage ? `Fase 10/10 [CHEFÃO]` : `Fase ${payload.stage}/10`;
-  }
-  if (zoneLocationTitle) {
-    zoneLocationTitle.textContent = `${payload.worldName} (Fase ${payload.stage})`;
   }
 
   const kills = Math.min(payload.killsRequired, payload.stageKills);
@@ -2422,6 +2437,7 @@ network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
 };
 
 network.onLoginSuccess = (payload) => {
+  showWarehouse(null);
   devPanel.setAdmin(payload.isAdmin === true);
   farmPlayerReady = true;
   farmHelperUI.onCharacterLogin();
@@ -2444,7 +2460,6 @@ network.onLoginSuccess = (payload) => {
   if (hudHeroPortrait) hudHeroPortrait.src = `/assets/portraits/${chosenClass}.jpg`;
   applyHeroClassHudIdentity(chosenClass);
   if (hudHeroName) hudHeroName.textContent = payload.characterName || 'Jogador';
-  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
 
   updateSkillsForClass(chosenClass);
@@ -2488,7 +2503,6 @@ network.onPlayerExpUpdate = (payload) => {
 
   updateExpBarUI(playerLevel, playerCurrentXp, playerXpToNextLevel);
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
-  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
   if (playerLevel !== prevLevel) {
     equipmentAdvice.reset();
@@ -2545,7 +2559,6 @@ network.onPlayerLevelUp = (payload) => {
   playerLevel = payload.newLevel;
   refreshExpansionContext();
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
-  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
   if (hudCpVal) hudCpVal.textContent = `${payload.totalCombatPower}`;
   if (modalCpText) modalCpText.textContent = `${payload.totalCombatPower}`;
@@ -2574,7 +2587,6 @@ network.onRebornResult = (payload) => {
   playerRebornCount = payload.rebornCount;
   refreshExpansionContext();
   playerCombatPower = payload.totalCombatPower;
-  if (hudHeroLevel) hudHeroLevel.textContent = `Nv. ${playerLevel}`;
   if (hudHeroLevelPill) hudHeroLevelPill.textContent = `Nv. ${playerLevel}`;
   if (playerLevelBadge) playerLevelBadge.textContent = `Nv. ${playerLevel}`;
   if (hudCpVal) hudCpVal.textContent = `${playerCombatPower.toLocaleString('pt-BR')}`;
@@ -2687,6 +2699,7 @@ window.addEventListener('keydown', (e) => {
     }
   }
 
+  if (inWarehouse && /^[1-4af]$/i.test(e.key)) return;
   if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
     castSkill(parseInt(e.key, 10));
   } else if (e.key === 'a' || e.key === 'A') {
@@ -2860,6 +2873,10 @@ canvas.addEventListener('pointerdown', (event) => {
   const entities = snapshotBuffer.getInterpolatedEntities();
   const target = entities.find(entity => entity.type === 'MONSTER' && entity.currentHp > 0 && distance(position, entity.position) < 2.8);
   renderer.selectedTargetId = target?.id ?? null;
+  const player = entities.find(entity => entity.id === network.myPlayerId);
+  if (player && player.currentHp > 0 && inWarehouse) {
+    network.sendMoveInput(position, player.position);
+  }
 });
 
 btnPrimaryAttack?.addEventListener('click', () => {
@@ -2908,6 +2925,7 @@ function gameLoop() {
 
   // 2. Update Player Vitals HUD (HP & Mana/Energy)
   const myPlayer = entities.find((e) => e.id === network.myPlayerId);
+  if (characterModal?.open) heroProfile.updateVitals(myPlayer);
   if (myPlayer) {
     const hpPct = Math.max(0, Math.min(100, (myPlayer.currentHp / myPlayer.maxHp) * 100));
     if (playerHpBar) playerHpBar.style.width = `${hpPct}%`;
@@ -2932,9 +2950,6 @@ function gameLoop() {
 
     if (myPlayer.level && playerLevelBadge) {
       playerLevelBadge.textContent = `Nv. ${myPlayer.level}`;
-    }
-    if (myPlayer.level && hudHeroLevel) {
-      hudHeroLevel.textContent = `Nv. ${myPlayer.level}`;
     }
     if (myPlayer.level && hudHeroLevelPill) {
       hudHeroLevelPill.textContent = `Nv. ${myPlayer.level}`;

@@ -1,3 +1,5 @@
+import { WarehouseSession } from './WarehouseSession';
+import type { C2SMoveInputPayload, WarehouseStatePayload } from '@magicforge/shared';
 import {
   CharacterClass,
   createVector3,
@@ -120,7 +122,9 @@ import { PartyManager } from './PartyManager';
 import { calculateOfflineReward, OFFLINE_REWARD_POLICY } from './OfflineRewards';
 
 export class World {
-  private devSettings = { pauseRespawns: false, disableDrops: false, doubleLegendary: false };
+  private devSettings = { disableDrops: false, doubleLegendary: false, freezeMonsters: false };
+  private pendingWorldSpawn = false;
+  private pendingBossSpawn = false;
   private devTargetSequence = 0;
   public automationEnabled = true;
   public automaticPortalHandler?: (player: Player) => void;
@@ -165,7 +169,7 @@ export class World {
     }
   }
 
-  constructor(customDb?: DatabaseManager, worldIndex: number = 1, channelId: number = 1, maxPlayers: number = 30) {
+  constructor(customDb?: DatabaseManager, worldIndex: number = 1, channelId: number = 1, maxPlayers: number = 30, private readonly devSpawn = { paused: false }) {
     this.db = customDb || new DatabaseManager();
     this.currentWorld = worldIndex;
     this.channelId = channelId;
@@ -175,7 +179,11 @@ export class World {
     this.spawnWorldMonsters(this.currentWorld);
   }
 
+  public get isAutomaticSpawnPaused(): boolean { return this.devSpawn.paused; }
+
   public spawnWorldMonsters(worldIndex: number): void {
+    this.pendingWorldSpawn = this.devSpawn.paused;
+    if (this.pendingWorldSpawn) return;
     const mobTemplates = [
       // Quadrante Noroeste (12m - 32m)
       { type: 'slime', pos: createVector3(-14, 0, 12), baseHp: 120, baseDmg: 8 },
@@ -270,6 +278,96 @@ export class World {
     this.connections.set(connection.id, connection);
   }
 
+  private readonly warehouse = new Map<string, WarehouseSession>();
+
+  public getOccupancy(): number {
+    return this.entityManager.getAllPlayers().length + this.warehouse.size;
+  }
+
+  public getWarehouse(playerId: string) { return this.warehouse.get(playerId); }
+
+  public getSessionPlayer(playerId: string): Player | undefined {
+    return this.entityManager.getPlayer(playerId) ?? this.warehouse.get(playerId)?.player;
+  }
+
+  public moveInWarehouse(playerId: string, input?: C2SMoveInputPayload): void {
+    this.warehouse.get(playerId)?.move(input);
+  }
+
+  public travelWarehouse(connection: Connection, destination: unknown): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const id = connection.playerId;
+    const parked = this.warehouse.get(id);
+    const sendArea = (area: WarehouseStatePayload['area'], reason?: string, room?: WarehouseStatePayload['room']) =>
+      connection.send(Opcode.S2C_WAREHOUSE_STATE, { area, reason, room } satisfies WarehouseStatePayload);
+
+    if (destination === 'warehouse') {
+      if (parked) { sendArea('warehouse', undefined, parked.room); return; }
+      const player = this.entityManager.getPlayer(id);
+      if (!player) return;
+      if (player.isDead || this.dungeonManager.isPlayerInDungeon(id)) {
+        sendArea('battle', 'O armazém está disponível para heróis vivos fora de masmorras.');
+        return;
+      }
+      player.stopMoving();
+      player.targetId = null;
+      player.currentStage = this.currentStage;
+      player.clearAllStatuses();
+      this.clearCombatEffectsFromSource(id);
+      this.entityManager.removePlayer(id);
+      this.spatialGrid.removeEntity(id);
+      for (const monster of this.entityManager.getAllMonsters()) {
+        if (monster.targetPlayer?.id !== id) continue;
+        monster.targetPlayer = null;
+        monster.targetId = null;
+        monster.state = MonsterState.IDLE;
+      }
+      this.warehouse.set(id, new WarehouseSession(player));
+      this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: id, reason: 'DISCONNECTED' });
+      sendArea('warehouse', undefined, 'exterior');
+      return;
+    }
+
+    if (destination !== 'battle') return;
+    if (!parked) { sendArea('battle'); return; }
+    const player = parked.player;
+    this.warehouse.delete(id);
+    player.currentStage = this.currentStage;
+    this.entityManager.addPlayer(player);
+    this.spatialGrid.updateEntity(player);
+    sendArea('battle');
+    connection.send(Opcode.S2C_STAGE_UPDATE, {
+      world: this.currentWorld, stage: this.currentStage, worldName: this.getWorldName(this.currentWorld),
+      stageKills: this.stageKills, killsRequired: this.currentStage === 10 ? 1 : this.killsPerStage,
+      isBossStage: this.currentStage === 10, bossAvailable: this.isBossAvailable,
+      portalOpen: this.isPortalOpen, portalPosition: this.portalPosition,
+    } satisfies S2CStageUpdatePayload);
+    const boss = this.activeBossId ? this.entityManager.getMonster(this.activeBossId) : undefined;
+    if (boss && this.isBossActive) {
+      connection.send(Opcode.S2C_BOSS_EVENT, {
+        eventType: 'SPAWN', bossId: boss.id, bossName: boss.name, currentHp: boss.currentHp, maxHp: boss.maxHp,
+        timeLimitSec: 60, remainingTimeSec: this.bossTimerSec, message: `Combate contra ${boss.name} em andamento.`,
+      } satisfies S2CBossEventPayload);
+    }
+    this.sendActiveDrops(connection);
+  }
+
+  private sendActiveDrops(connection: Connection): void {
+    const now = Date.now();
+    for (const drop of this.activeItemDrops.values()) {
+      const remainingSec = Math.max(0, Math.round(drop.despawnSec - (now - drop.spawnTime) / 1000));
+      connection.send(Opcode.S2C_ITEM_DROP_SPAWN, {
+        dropId: drop.dropId,
+        itemId: drop.itemId,
+        name: drop.name,
+        rarity: drop.rarity,
+        quantity: drop.quantity,
+        position: drop.position,
+        despawnTimeSec: remainingSec,
+      } as S2CItemDropSpawnPayload);
+    }
+  }
+
   public unregisterConnection(connection: Connection): void {
     this.removePlayerFromWorld(connection, true);
   }
@@ -282,7 +380,9 @@ export class World {
     this.connections.delete(connection.id);
     if (!connection.playerId) return null;
     const playerId = connection.playerId;
-    const player = this.entityManager.removePlayer(playerId);
+    const parked = this.warehouse.get(playerId);
+    this.warehouse.delete(playerId);
+    const player = this.entityManager.removePlayer(playerId) ?? parked?.player;
     this.spatialGrid.removeEntity(playerId);
     if (player) {
       const clearedStatuses = player.clearAllStatuses();
@@ -297,7 +397,7 @@ export class World {
         });
       }
       if (saveToDb) {
-        if (markLogout) player.lastLogoutTime = Date.now();
+        if (markLogout || parked) player.lastLogoutTime = Date.now();
         this.db.savePlayer(player);
         console.log(`[World] Player "${player.name}" salvo no SQLite ao sair da instância ${this.instanceId}.`);
       }
@@ -674,19 +774,7 @@ export class World {
     }
 
     // 3. Envia drops de itens ativos no chão
-    const now = Date.now();
-    for (const drop of this.activeItemDrops.values()) {
-      const remainingSec = Math.max(0, Math.round(drop.despawnSec - (now - drop.spawnTime) / 1000));
-      connection.send(Opcode.S2C_ITEM_DROP_SPAWN, {
-        dropId: drop.dropId,
-        itemId: drop.itemId,
-        name: drop.name,
-        rarity: drop.rarity,
-        quantity: drop.quantity,
-        position: drop.position,
-        despawnTimeSec: remainingSec,
-      } as S2CItemDropSpawnPayload);
-    }
+    this.sendActiveDrops(connection);
 
     // 4. Envia inventário, moedas e CP
     connection.send(Opcode.S2C_INVENTORY_UPDATE, {
@@ -783,7 +871,7 @@ export class World {
   }
 
   public saveAllPlayers(): void {
-    const players = this.entityManager.getAllPlayers();
+    const players = [...this.entityManager.getAllPlayers(), ...Array.from(this.warehouse.values(), session => session.player)];
     for (const p of players) {
       this.db.savePlayer(p);
     }
@@ -857,7 +945,7 @@ export class World {
 
   public handleUpgradeSkill(connection: Connection, payload?: C2SUpgradeSkillPayload): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.entityManager.getPlayer(connection.playerId);
+    const player = this.getSessionPlayer(connection.playerId);
     if (!player) return;
     let success = false;
     let message = 'Não foi possível melhorar a habilidade. Tente novamente.';
@@ -922,7 +1010,12 @@ export class World {
         }
       }
     } else { this.automaticPortalTimerSec = 0; }
-    if (this.automationEnabled && this.isBossAvailable && !this.isBossActive && !this.isPortalOpen) {
+    if (!this.devSpawn.paused && this.pendingWorldSpawn) this.spawnWorldMonsters(this.currentWorld);
+    if (!this.devSpawn.paused && this.pendingBossSpawn) {
+      this.pendingBossSpawn = false;
+      if (this.currentStage === 10 && !this.isPortalOpen) this.challengeStageBoss();
+    }
+    if (!this.devSpawn.paused && this.automationEnabled && this.isBossAvailable && !this.isBossActive && !this.isPortalOpen) {
       this.automaticBossRetrySec += deltaTimeSec;
       if (this.automaticBossRetrySec >= 60) {
         const player = this.entityManager.getAllPlayers().find(candidate => !candidate.isDead && !this.dungeonManager.isPlayerInDungeon(candidate.id));
@@ -960,7 +1053,12 @@ export class World {
         this.spatialGrid.updateEntity(monster);
         continue;
       }
-      if (monster.isDead && this.devSettings.pauseRespawns) continue;
+      if (monster.isDead && this.devSpawn.paused) continue;
+      if (!monster.isDead && this.devSettings.freezeMonsters) {
+        monster.isMoving = false;
+        monster.velocity = createVector3(0, 0, 0);
+        continue;
+      }
       // Monster Aggro targeting
       if (monster.state === MonsterState.IDLE && !monster.isDead) {
         const nearestPlayer = players.filter(p => !p.isDead && !p.hasStatus('STEALTH') && distanceSquared(p.position,monster.position)<=monster.aggroRadius**2)
@@ -1038,6 +1136,15 @@ export class World {
     }
 
     // 4. Build & Broadcast World Snapshot (Partitioned by Area of Interest)
+    for (const [id, session] of this.warehouse) {
+      const previousRoom = session.room;
+      session.update(deltaTimeSec);
+      if (session.room !== previousRoom) {
+        this.connections.get(id)?.send(Opcode.S2C_WAREHOUSE_STATE, {
+          area: 'warehouse', room: session.room,
+        } satisfies WarehouseStatePayload);
+      }
+    }
     this.broadcastSnapshot();
   }
 
@@ -2799,6 +2906,11 @@ export class World {
     for (const [_, conn] of this.connections) {
       if (!conn.isAuthenticated) continue;
 
+      const session = conn.playerId ? this.warehouse.get(conn.playerId) : undefined;
+      if (session) {
+        conn.send(Opcode.S2C_WORLD_SNAPSHOT, { serverTick: this.currentTick, serverTimestamp: now, entities: [session.snapshot()] });
+        continue;
+      }
       let entitiesToSend: Entity[];
 
       if (conn.playerId) {
@@ -2831,7 +2943,7 @@ export class World {
 
   public broadcast<T>(op: Opcode, data: T, excludeConnectionId?: string): void {
     for (const [id, conn] of this.connections) {
-      if (id !== excludeConnectionId && conn.isAuthenticated) {
+      if (id !== excludeConnectionId && conn.isAuthenticated && (!conn.playerId || !this.warehouse.has(conn.playerId))) {
         conn.send(op, data);
       }
     }
@@ -2951,10 +3063,11 @@ export class World {
               isBossStage: true,
               bossAvailable: false,
               portalOpen: false,
-              message: `⚠️ FASE 10/10 ATINGIDA! O CHEFÃO DO MUNDO DESPERTOU!`,
+              message: this.devSpawn.paused ? 'Fase 10 atingida. O surgimento do chefe está pausado.' : '⚠️ FASE 10/10 ATINGIDA! O CHEFÃO DO MUNDO DESPERTOU!',
             } as S2CStageUpdatePayload);
 
-            this.challengeStageBoss();
+            if (this.devSpawn.paused) this.pendingBossSpawn = true;
+            else this.challengeStageBoss();
           } else {
             // Advanced to next stage (2..9)
             this.broadcast(Opcode.S2C_STAGE_UPDATE, {
@@ -3679,6 +3792,7 @@ export class World {
     const player = this.entityManager.getPlayer(connection.playerId);
     if (!player || !command) return;
     let message: string | undefined;
+    let cooldownsReset: boolean | undefined;
     switch (command.action) {
       case 'state':
         break;
@@ -3707,6 +3821,11 @@ export class World {
         }
         message = player.isDead ? 'Aguarde o renascimento do herói.' : 'HP e recurso restaurados.';
         break;
+      case 'resetCooldowns':
+        player.skillCooldowns.clear();
+        cooldownsReset = true;
+        message = 'Recargas das habilidades zeradas.';
+        break;
       case 'clearDrops':
         for (const dropId of this.activeItemDrops.keys()) {
           this.broadcast(Opcode.S2C_ITEM_DROP_DESPAWN, { dropId, reason: 'EXPIRED' } satisfies S2CItemDropDespawnPayload);
@@ -3722,15 +3841,31 @@ export class World {
             player.currentHp = player.maxHp;
             player.currentResource = player.maxResource;
           }
+        } else if (command.key === 'pauseRespawns') {
+          this.devSpawn.paused = command.enabled;
+          message = command.enabled ? 'Surgimento automático pausado em todos os canais.' : 'Surgimento automático retomado.';
         } else if (Object.hasOwn(this.devSettings, command.key)) {
           this.devSettings[command.key] = command.enabled;
         } else return;
         break;
+      case 'teleport':
       case 'dummy': {
         const { minX, maxX, minZ, maxZ } = SERVER_CONFIG.MAP_BOUNDS;
         if (!Number.isFinite(command.x) || !Number.isFinite(command.z) ||
             command.x < minX || command.x > maxX || command.z < minZ || command.z > maxZ) {
           message = 'Informe coordenadas dentro do mapa.';
+          break;
+        }
+        if (command.action === 'teleport') {
+          if (player.isDead || this.dungeonManager.isPlayerInDungeon(player.id)) {
+            message = 'Teleporte disponível para heróis vivos fora de masmorras.';
+            break;
+          }
+          player.stopMoving();
+          player.targetId = null;
+          player.position = createVector3(command.x, 0, command.z);
+          this.spatialGrid.updateEntity(player);
+          message = 'Herói teleportado.';
           break;
         }
         if (this.entityManager.getAllMonsters().filter(monster => monster.trainingDummy).length >= 8) {
@@ -3750,7 +3885,8 @@ export class World {
         break;
       }
       case 'reset':
-        this.devSettings = { pauseRespawns: false, disableDrops: false, doubleLegendary: false };
+        this.devSpawn.paused = false;
+        this.devSettings = { disableDrops: false, doubleLegendary: false, freezeMonsters: false };
         player.devInfiniteVitals = false;
         // Reset also removes the test entities.
       case 'clearTargets':
@@ -3762,7 +3898,7 @@ export class World {
       default:
         return;
     }
-    connection.send(Opcode.S2C_DEV_STATE, { ...this.devSettings, infiniteVitals: player.devInfiniteVitals, message } satisfies DevState);
+    connection.send(Opcode.S2C_DEV_STATE, { ...this.devSettings, pauseRespawns: this.devSpawn.paused, infiniteVitals: player.devInfiniteVitals, message, cooldownsReset } satisfies DevState);
   }
 
   private addDevTarget(monster: Monster): void {
@@ -3778,6 +3914,9 @@ export class World {
   }
 
   public challengeStageBoss(player?: Player, devOnly = false): { success: boolean; reason?: string } {
+    if (!devOnly && this.devSpawn.paused) {
+      return { success: false, reason: 'O surgimento do chefe está pausado pelo painel Dev.' };
+    }
     if (this.isBossActive) {
       return { success: false, reason: 'Um Chefão já está em combate na arena!' };
     }

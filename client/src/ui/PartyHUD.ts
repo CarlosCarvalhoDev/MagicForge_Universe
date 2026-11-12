@@ -34,16 +34,9 @@ export class PartyHUD {
     this.rootCard = document.createElement('div');
     this.rootCard.id = 'party-hud-card';
     this.rootCard.className = 'glass-panel collapsed';
-    const profile = document.getElementById('hero-status-card');
+    const profile = document.querySelector('.hud-hero-and-gold') ?? document.getElementById('hero-status-card');
     if (profile) profile.after(this.rootCard);
     else document.body.appendChild(this.rootCard);
-    if (profile) {
-      const align = () => this.rootCard?.style.setProperty('--party-profile-bottom', profile.getBoundingClientRect().bottom + 'px');
-      new ResizeObserver(align).observe(profile);
-      window.addEventListener('resize', align);
-      align();
-    }
-
     // Toast Container
     this.toastContainer = document.getElementById('party-toast-container');
     if (!this.toastContainer) {

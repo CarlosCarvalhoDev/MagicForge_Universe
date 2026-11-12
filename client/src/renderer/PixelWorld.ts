@@ -1,3 +1,5 @@
+import { WarehouseMap } from './WarehouseMap';
+import type { WarehouseRoom } from '@magicforge/shared';
 import type { InterpolatedEntity } from '../interpolation/SnapshotBuffer';
 import { HeroAnimationClock, WARRIOR_CAST_SHEETS, WarriorCastClock, warriorCastArt, warriorDirectionRow } from './HeroAnimations';
 import { PIXEL_PROPS, PIXEL_SHEETS, directionRow, facingFromYaw, pixelFamily } from './PixelAssets';
@@ -11,6 +13,13 @@ const groundByFamily = { orc: 42, slime: 40, barbarian: 45 };
 
 /** Presentation only: consumes snapshots, never decides gameplay, loot or collision. */
 export class PixelWorld {
+  readonly warehouseMaps = {
+    exterior: new WarehouseMap('exterior'),
+    interior: new WarehouseMap('interior'),
+    upper: new WarehouseMap('upper'),
+  };
+  warehouseRoom: WarehouseRoom | null = null;
+  get inWarehouse(): boolean { return this.warehouseRoom !== null; }
   readonly presentation = new WorldPresentation();
   readonly clock = new HeroAnimationClock();
   readonly warriorCasts = new WarriorCastClock();
@@ -43,52 +52,57 @@ export class PixelWorld {
     return this.warriorCasts.trigger(id, skillId, now);
   }
 
-  draw(ctx: CanvasRenderingContext2D, entities: InterpolatedEntity[], camera: { x: number; y: number }, zoom: number, myId: string | null, selected: string | null, now: number): void {
+  draw(ctx: CanvasRenderingContext2D, entities: InterpolatedEntity[], camera: { x: number; y: number }, zoom: number, myId: string | null, selected: string | null, now: number, drawGroundEffects?: () => void): void {
     const width = ctx.canvas.width, height = ctx.canvas.height;
     const screen = (x: number, z: number) => [Math.round(width / 2 + (x - camera.x) * zoom), Math.round(height / 2 + (z - camera.y) * zoom)];
     ctx.save(); ctx.imageSmoothingEnabled = false;
     const frozen = this.presentation.appearance.theme === 'frost';
-    ctx.fillStyle = frozen ? '#344c67' : '#253c31'; ctx.fillRect(0, 0, width, height);
-    const grass = this.image(PIXEL_PROPS.grass), road = this.image(PIXEL_PROPS.road);
-    const tileWorld = 3, tileSize = tileWorld * zoom;
-    const minX = Math.max(-20, Math.floor((camera.x - width / 2 / zoom) / tileWorld));
-    const maxX = Math.min(19, Math.ceil((camera.x + width / 2 / zoom) / tileWorld));
-    const minZ = Math.max(-20, Math.floor((camera.y - height / 2 / zoom) / tileWorld));
-    const maxZ = Math.min(19, Math.ceil((camera.y + height / 2 / zoom) / tileWorld));
-    for (let z = minZ; z <= maxZ; z++) for (let x = minX; x <= maxX; x++) {
-      const [sx, sy] = screen(x * tileWorld, z * tileWorld);
-      const n = Math.abs((x * 73856093) ^ (z * 19349663));
-      if (frozen) { ctx.fillStyle = ['#d8e8eb', '#dcebef', '#d3e4e9'][n % 3]; ctx.fillRect(sx, sy, Math.ceil(tileSize), Math.ceil(tileSize)); }
-      else if (grass) ctx.drawImage(grass, 48, 320, 16, 16, sx, sy, Math.ceil(tileSize), Math.ceil(tileSize));
-      else { ctx.fillStyle = '#489461'; ctx.fillRect(sx, sy, Math.ceil(tileSize), Math.ceil(tileSize)); }
-      const path = x === -1 || x === 0 || z === -1 || z === 0 || (Math.abs(x) <= 2 && Math.abs(z) <= 2);
-      if (path && frozen) {
-        ctx.fillStyle = n % 2 ? '#8fb7c9' : '#9bc2d1'; ctx.fillRect(sx, sy, Math.ceil(tileSize), Math.ceil(tileSize));
-        const unit = tileSize / 16;
-        if (n % 4 === 0) { ctx.fillStyle = '#bfdde5'; ctx.fillRect(sx + 2 * unit, sy + 3 * unit, 7 * unit, unit); ctx.fillRect(sx + 8 * unit, sy + 4 * unit, unit, 5 * unit); }
-        if (n % 5 === 0) { ctx.fillStyle = '#7398ae'; ctx.fillRect(sx + 11 * unit, sy + 11 * unit, 4 * unit, unit); ctx.fillRect(sx + 10 * unit, sy + 12 * unit, unit, 3 * unit); }
-      } else if (path && road) ctx.drawImage(road, 32, 32, 16, 16, sx, sy, Math.ceil(tileSize), Math.ceil(tileSize));
-      if (!path) {
-        ctx.fillStyle = frozen ? (n % 3 ? '#c0d8e2' : '#eff8f7') : n % 3 ? '#397c55' : '#63a16b';
-        for (let t = 0; t < 3; t++) { const px = sx + (n * (t + 1) % 13) / 16 * tileSize, py = sy + (n * (t + 3) % 13) / 16 * tileSize; ctx.fillRect(Math.round(px), Math.round(py), 3, 3); }
+    if (this.warehouseRoom) {
+      this.warehouseMaps[this.warehouseRoom].draw(ctx, camera, zoom, now);
+    } else {
+      ctx.fillStyle = frozen ? '#344c67' : '#253c31'; ctx.fillRect(0, 0, width, height);
+      const grass = this.image(PIXEL_PROPS.grass), road = this.image(PIXEL_PROPS.road);
+      const tileWorld = 3, tileSize = tileWorld * zoom;
+      const minX = Math.max(-20, Math.floor((camera.x - width / 2 / zoom) / tileWorld));
+      const maxX = Math.min(19, Math.ceil((camera.x + width / 2 / zoom) / tileWorld));
+      const minZ = Math.max(-20, Math.floor((camera.y - height / 2 / zoom) / tileWorld));
+      const maxZ = Math.min(19, Math.ceil((camera.y + height / 2 / zoom) / tileWorld));
+      for (let z = minZ; z <= maxZ; z++) for (let x = minX; x <= maxX; x++) {
+        const [sx, sy] = screen(x * tileWorld, z * tileWorld);
+        const n = Math.abs((x * 73856093) ^ (z * 19349663));
+        if (frozen) { ctx.fillStyle = ['#d8e8eb', '#dcebef', '#d3e4e9'][n % 3]; ctx.fillRect(sx, sy, Math.ceil(tileSize), Math.ceil(tileSize)); }
+        else if (grass) ctx.drawImage(grass, 48, 320, 16, 16, sx, sy, Math.ceil(tileSize), Math.ceil(tileSize));
+        else { ctx.fillStyle = '#489461'; ctx.fillRect(sx, sy, Math.ceil(tileSize), Math.ceil(tileSize)); }
+        const path = x === -1 || x === 0 || z === -1 || z === 0 || (Math.abs(x) <= 2 && Math.abs(z) <= 2);
+        if (path && frozen) {
+          ctx.fillStyle = n % 2 ? '#8fb7c9' : '#9bc2d1'; ctx.fillRect(sx, sy, Math.ceil(tileSize), Math.ceil(tileSize));
+          const unit = tileSize / 16;
+          if (n % 4 === 0) { ctx.fillStyle = '#bfdde5'; ctx.fillRect(sx + 2 * unit, sy + 3 * unit, 7 * unit, unit); ctx.fillRect(sx + 8 * unit, sy + 4 * unit, unit, 5 * unit); }
+          if (n % 5 === 0) { ctx.fillStyle = '#7398ae'; ctx.fillRect(sx + 11 * unit, sy + 11 * unit, 4 * unit, unit); ctx.fillRect(sx + 10 * unit, sy + 12 * unit, unit, 3 * unit); }
+        } else if (path && road) ctx.drawImage(road, 32, 32, 16, 16, sx, sy, Math.ceil(tileSize), Math.ceil(tileSize));
+        if (!path) {
+          ctx.fillStyle = frozen ? (n % 3 ? '#c0d8e2' : '#eff8f7') : n % 3 ? '#397c55' : '#63a16b';
+          for (let t = 0; t < 3; t++) { const px = sx + (n * (t + 1) % 13) / 16 * tileSize, py = sy + (n * (t + 3) % 13) / 16 * tileSize; ctx.fillRect(Math.round(px), Math.round(py), 3, 3); }
+        }
       }
-    }
-    const portal = this.presentation.portal;
-    if (portal) {
-      const [px, py] = screen(portal.x, portal.z), s = Math.max(1, Math.round(zoom / 8));
-      ctx.fillStyle = '#526982'; ctx.fillRect(px - 22 * s, py - 4 * s, 44 * s, 8 * s);
-      ctx.beginPath();
-      [[-17,-3],[-17,-32],[-13,-32],[-13,-40],[-7,-40],[-7,-45],[7,-45],[7,-40],[13,-40],[13,-32],[17,-32],[17,-3]].forEach(([x,y],i)=>{ if(i) ctx.lineTo(px+x*s,py+y*s); else ctx.moveTo(px+x*s,py+y*s); });
-      ctx.closePath(); ctx.fillStyle = '#6d4ba6'; ctx.fill(); ctx.strokeStyle = '#f1c968'; ctx.lineWidth = 3 * s; ctx.stroke();
-      ctx.fillStyle = '#9675cf';
-      for (let i = 0; i < 30; i++) {
-        const a = i / 30 * Math.PI * 2 + now / 1300;
-        ctx.fillRect(px + Math.round(Math.sin(a) * 9) * s, py - 23 * s + Math.round(Math.cos(a) * 15) * s, 2 * s, 2 * s);
+      drawGroundEffects?.();
+      const portal = this.presentation.portal;
+      if (portal) {
+        const [px, py] = screen(portal.x, portal.z), s = Math.max(1, Math.round(zoom / 8));
+        ctx.fillStyle = '#526982'; ctx.fillRect(px - 22 * s, py - 4 * s, 44 * s, 8 * s);
+        ctx.beginPath();
+        [[-17,-3],[-17,-32],[-13,-32],[-13,-40],[-7,-40],[-7,-45],[7,-45],[7,-40],[13,-40],[13,-32],[17,-32],[17,-3]].forEach(([x,y],i)=>{ if(i) ctx.lineTo(px+x*s,py+y*s); else ctx.moveTo(px+x*s,py+y*s); });
+        ctx.closePath(); ctx.fillStyle = '#6d4ba6'; ctx.fill(); ctx.strokeStyle = '#f1c968'; ctx.lineWidth = 3 * s; ctx.stroke();
+        ctx.fillStyle = '#9675cf';
+        for (let i = 0; i < 30; i++) {
+          const a = i / 30 * Math.PI * 2 + now / 1300;
+          ctx.fillRect(px + Math.round(Math.sin(a) * 9) * s, py - 23 * s + Math.round(Math.cos(a) * 15) * s, 2 * s, 2 * s);
+        }
+        ctx.fillStyle = '#fff0b0';
+        for (let i = 0; i < 5; i++) { const offset = (Math.floor(now / 160) + i * 7) % 36; ctx.fillRect(px + (i % 2 ? 10 : -10) * s, py - offset * s - 8 * s, 2 * s, 2 * s); }
+        ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center'; ctx.fillStyle = '#fff2c3'; ctx.strokeStyle = '#293648'; ctx.lineWidth = 3;
+        ctx.strokeText('PORTAL RÚNICO', px, py - 50 * s); ctx.fillText('PORTAL RÚNICO', px, py - 50 * s);
       }
-      ctx.fillStyle = '#fff0b0';
-      for (let i = 0; i < 5; i++) { const offset = (Math.floor(now / 160) + i * 7) % 36; ctx.fillRect(px + (i % 2 ? 10 : -10) * s, py - offset * s - 8 * s, 2 * s, 2 * s); }
-      ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center'; ctx.fillStyle = '#fff2c3'; ctx.strokeStyle = '#293648'; ctx.lineWidth = 3;
-      ctx.strokeText('PORTAL RÚNICO', px, py - 50 * s); ctx.fillText('PORTAL RÚNICO', px, py - 50 * s);
     }
     const visibleIds = new Set(entities.map(entity => entity.id));
     this.clock.retain(visibleIds);
@@ -99,7 +113,7 @@ export class PixelWorld {
         this.pendingHits.delete(id);
       }
     }
-    const layers = [...this.props.map(prop => ({ z: prop.z, prop, entity: null as InterpolatedEntity | null })), ...entities.map(entity => ({ z: entity.position.z, prop: null as Prop | null, entity }))].sort((a, b) => a.z - b.z);
+    const layers = [...(this.inWarehouse ? [] : this.props).map(prop => ({ z: prop.z, prop, entity: null as InterpolatedEntity | null })), ...entities.map(entity => ({ z: entity.position.z, prop: null as Prop | null, entity }))].sort((a, b) => a.z - b.z);
     for (const layer of layers) {
       if (layer.prop) {
         const p = layer.prop;
@@ -113,7 +127,7 @@ export class PixelWorld {
       const entity = layer.entity!; const [x, y] = screen(entity.position.x, entity.position.z);
       if (x < -200 || x > width + 200 || y < -200 || y > height + 200) continue;
       const family = pixelFamily(entity.type, entity.classType, entity.name);
-      const scale = Math.max(0.75, 3 * zoom / 16);
+      const scale = Math.max(0.75, 3 * zoom / 16) * (this.inWarehouse ? .7 : 1);
       const shadowWidth = family === 'hero' ? 9 : 8;
       ctx.beginPath();
       ctx.ellipse(x, y, shadowWidth * scale, 2.6 * scale, 0, 0, Math.PI * 2);

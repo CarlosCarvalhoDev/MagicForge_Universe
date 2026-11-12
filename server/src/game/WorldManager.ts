@@ -31,6 +31,7 @@ import { PartyManager } from './PartyManager';
 export class WorldManager {
   public readonly db: DatabaseManager;
   public readonly partyManager: PartyManager;
+  private readonly devSpawn = { paused: false };
   private channels = new Map<string, World>();
   private connections = new Map<string, Connection>();
 
@@ -56,7 +57,7 @@ export class WorldManager {
     const key = this.getChannelKey(worldIndex, channelId);
     let world = this.channels.get(key);
     if (!world) {
-      world = new World(this.db, worldIndex, channelId);
+      world = new World(this.db, worldIndex, channelId, undefined, this.devSpawn);
       world.partyManager = this.partyManager;
       world.automaticPortalHandler = player => this.advancePlayerAutomatically(player, world!);
       this.channels.set(key, world);
@@ -106,7 +107,7 @@ export class WorldManager {
     for (const world of this.channels.values()) {
       if (world.currentWorld !== worldIndex) continue;
 
-      const activePlayers = world.entityManager.getAllPlayers().length;
+      const activePlayers = world.getOccupancy();
       const maxPlayers = world.maxPlayers || 30;
       const ratio = activePlayers / maxPlayers;
 
@@ -141,7 +142,7 @@ export class WorldManager {
     // Se preferência informada e canal tem vaga
     if (preferredChannelId !== undefined && preferredChannelId > 0) {
       const preferredWorld = this.getOrCreateChannel(worldIndex, preferredChannelId);
-      if (preferredWorld.entityManager.getAllPlayers().length < preferredWorld.maxPlayers) {
+      if (preferredWorld.getOccupancy() < preferredWorld.maxPlayers) {
         preferredWorld.enterWorld(connection, player);
         return preferredWorld;
       }
@@ -149,11 +150,11 @@ export class WorldManager {
 
     // Balanceador automático: escolhe o canal do mesmo mundo com menor população
     const worldChannels = Array.from(this.channels.values()).filter((w) => w.currentWorld === worldIndex);
-    worldChannels.sort((a, b) => a.entityManager.getAllPlayers().length - b.entityManager.getAllPlayers().length);
+    worldChannels.sort((a, b) => a.getOccupancy() - b.getOccupancy());
 
     let chosenWorld = worldChannels[0] ?? this.getOrCreateChannel(worldIndex, 1);
     // Se o canal mais vazio estiver cheio, cria dinamicamente o próximo canal
-    if (chosenWorld.entityManager.getAllPlayers().length >= chosenWorld.maxPlayers) {
+    if (chosenWorld.getOccupancy() >= chosenWorld.maxPlayers) {
       const nextChannelId = worldChannels.length + 1;
       chosenWorld = this.getOrCreateChannel(worldIndex, nextChannelId);
     }
@@ -183,7 +184,7 @@ export class WorldManager {
     }
 
     const targetWorld = this.getOrCreateChannel(currentWorld.currentWorld, targetChannelId);
-    const activeInTarget = targetWorld.entityManager.getAllPlayers().length;
+    const activeInTarget = targetWorld.getOccupancy();
     if (activeInTarget >= targetWorld.maxPlayers) {
       return {
         success: false,

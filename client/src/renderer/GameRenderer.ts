@@ -31,7 +31,21 @@ export interface ActiveItemDrop {
   spawnTimestamp: number;
 }
 
+const WAREHOUSE_EXTERIOR_ZOOM = 22;
+const WAREHOUSE_INTERIOR_ZOOM_SCALE = WAREHOUSE_EXTERIOR_ZOOM / 17;
+
 export class GameRenderer {
+  public async prepareWarehouse(): Promise<void> {
+    await Promise.all(Object.values(this.pixelWorld.warehouseMaps).map(map => map.load()));
+  }
+  public setWarehouse(room: import('@magicforge/shared').WarehouseRoom | null): void {
+    this.pixelWorld.warehouseRoom = room;
+    this.selectedTargetId = null;
+    this.floatingTexts = [];
+    this.clearDrops();
+    this.resetNarrative();
+  }
+
   public setStagePresentation(stage: VisualStage): void { this.pixelWorld.presentation.setStage(stage); }
   public readonly pixelWorld = new PixelWorld();
   public readonly vfx = new PixelVfxPlayer();
@@ -44,15 +58,25 @@ export class GameRenderer {
   public activeDrops = new Map<string, ActiveItemDrop>();
 
   // World to screen mapping (Scaled up for bold hero & monster presence)
-  public zoom: number = 16.0; // pixels per world unit
-  public minZoom: number = 8.0;
-  public maxZoom: number = 26.0;
+  private preferredZoom = 15.0;
+  public get zoom(): number {
+    if (this.pixelWorld.warehouseRoom === 'exterior') return WAREHOUSE_EXTERIOR_ZOOM;
+    return this.preferredZoom * this.interiorZoomScale;
+  }
+
+  private get interiorZoomScale(): number {
+    return this.pixelWorld.inWarehouse ? WAREHOUSE_INTERIOR_ZOOM_SCALE : 1;
+  }
+  public minZoom: number = 10.0;
+  public maxZoom: number = 17.0;
   public cameraOffset = { x: 0, y: 0 };
   public showRawGhost: boolean = true;
   public selectedTargetId: string | null = null;
 
   public setZoom(targetZoom: number): void {
-    this.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, Math.round(targetZoom * 10) / 10));
+    if (this.pixelWorld.warehouseRoom === 'exterior') return;
+    const preferredZoom = Math.round(targetZoom / this.interiorZoomScale * 10) / 10;
+    this.preferredZoom = Math.max(this.minZoom, Math.min(this.maxZoom, preferredZoom));
   }
 
   // Sprite animation assets & Chroma-Key cache
@@ -303,9 +327,15 @@ export class GameRenderer {
     }
 
     // Pixel-art migration: presentation changes only; network snapshots remain authoritative.
+    if (this.pixelWorld.inWarehouse) {
+      this.pixelWorld.draw(ctx, entities, this.cameraOffset, this.zoom, myPlayerId, null, now);
+      return;
+    }
     if (this.visualStyle === 'pixel') {
-      this.pixelWorld.draw(ctx, entities, this.cameraOffset, this.zoom, myPlayerId, this.selectedTargetId, now);
-      this.vfx.draw(ctx, entities, this.cameraOffset, this.zoom, now);
+      const effects = this.vfx.queue.sample(now, entities);
+      this.pixelWorld.draw(ctx, entities, this.cameraOffset, this.zoom, myPlayerId, this.selectedTargetId, now,
+        () => this.vfx.draw(ctx, effects, this.cameraOffset, this.zoom, now, 'ground'));
+      this.vfx.draw(ctx, effects, this.cameraOffset, this.zoom, now, 'air');
       this.vfx.drawStatuses(ctx, this.warriorPresentation.visible(now, entities), entities, this.cameraOffset, this.zoom, now);
       this.renderItemDrops(width / 2, height / 2);
       this.renderFloatingText(width / 2, height / 2);

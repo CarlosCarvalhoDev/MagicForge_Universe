@@ -9,6 +9,8 @@
 > **Regra vigente — 11/11/2026:** [Expansão de bolsa e farm](EXPANSAO_BOLSA_E_FARM_2026-11-11.md). Removidos os requisitos de nível e Reborn da expansão. Ouro até 35 espaços; depois, Cash 100/200/400 ou ouro + 1 Selo de Expansão Astral, teto 50. Carteira e transação persistentes, sem concessão automática; loja/provedor e drop do selo pendentes. 309 testes de servidor e 30 de inventário aprovados. [Diagnóstico do Bárbaro](DIAGNOSTICO_BARBARO_IGNIS_2026-11-11.md) mantém regeneração 8/s; os valores históricos abaixo não substituem estas entregas. Trabalho atual na `master` local, ainda sem novo commit/push.
 
 ## 📌 Status Atual do Projeto
+
+> **Entrega consolidada — 12/11/2026:** [handoff Codex/Antigravity](HANDOFF_CODEX_ANTIGRAVITY_2026-11-12.md). Master remota `eb41ecc` integrada com as mecânicas locais: artes novas, livro do inventário, armazém e HUD do Antigravity preservados; 312 testes do servidor, 30 de inventário, automação e apresentação aprovados. As linhas datadas de 03/11 abaixo são o registro histórico da época.
 * **Data da Última Atualização**: 03/11/2026
 * **Branch Principal**: `master` (100% sincronizado com `origin/master`)
 * **Testes Automatizados**:

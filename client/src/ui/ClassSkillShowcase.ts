@@ -1,4 +1,4 @@
-import { CLASS_DEFINITIONS, getManaAttribute, getSkillsForClass, type CharacterClass } from '@magicforge/shared';
+import { CLASS_DEFINITIONS, getManaAttribute, getSkillsForClass, isSkillEffectAvailable, type CharacterClass } from '@magicforge/shared';
 import { warriorCastArt } from '../renderer/HeroAnimations';
 import { skillArtUrl } from './SkillArt';
 import { playClassSkillArtwork } from './WarriorStage';
@@ -14,10 +14,11 @@ export function renderClassSkillShowcase(host: HTMLElement, artwork: HTMLElement
   details.setAttribute('aria-live', 'polite');
   const name = document.createElement('strong');
   const meta = document.createElement('small');
+  const mechanics = document.createElement('small');
   const description = document.createElement('p');
   const resource = document.createElement('meter');
   resource.hidden = true;
-  details.append(name, meta, resource, description);
+  details.append(name, meta, resource, mechanics, description);
   name.textContent = 'Escolha uma habilidade';
   description.textContent = 'Clique ou toque em um ícone para ver a prévia no painel da classe.';
   let active: HTMLButtonElement | undefined;
@@ -51,6 +52,9 @@ export function renderClassSkillShowcase(host: HTMLElement, artwork: HTMLElement
       button.setAttribute('aria-pressed', 'true');
       name.textContent = skill.name;
       meta.textContent = `Nv. ${skill.unlockLevel} · ${skill.cost} ${skill.resourceType}${warriorCastArt(skill.skillId) ? '' : ' · Prévia ilustrada'}`;
+      const reach = skill.range > 0 ? `${skill.range.toLocaleString('pt-BR')} m` : 'Pessoal';
+      const area = skill.aoeRadius ? ` · Área: ${skill.aoeRadius.toLocaleString('pt-BR')} m` : '';
+      mechanics.textContent = `Recarga: ${skill.cooldownSec.toLocaleString('pt-BR')} s · Alcance: ${reach}${area}${isSkillEffectAvailable(skill) ? '' : ' · Efeito em preparação'}`;
       const pool = skill.resourceType === 'Mana' ? 100 + getManaAttribute(classType, CLASS_DEFINITIONS[classType].baseStats) * 8 : 100;
       resource.max = pool;
       resource.value = skill.cost;
