@@ -78,6 +78,11 @@ export interface ItemDropState {
 }
 
 export const ITEMS_DATABASE: Record<string, ItemDefinition> = {
+  seal_astral_expansion: {
+    itemId: 'seal_astral_expansion', name: 'Selo de Expansão Astral', rarity: ItemRarity.LENDARIO,
+    type: ItemType.MATERIAL, icon: '🔮', description: 'Selo raro usado com ouro para ampliar bolsas acima de 35 espaços.',
+    sellPrice: 0, maxStack: 99,
+  },
   // --- MOEDA & CONSUMÍVEIS ---
   gold: {
     itemId: 'gold',

@@ -29,6 +29,8 @@ import {
   EQUIPMENT_ADDRESSES,
   ItemType,
   getInventoryExpansion,
+  INVENTORY_EXPANSION_SEAL,
+  type InventoryExpansionPayment,
 } from '@magicforge/shared';
 import { Player } from '../entities/Player';
 import { VerifiedSocialProfile } from '../auth/SocialAuthService';
@@ -334,6 +336,16 @@ export class DatabaseManager {
 
     // Migrações da Tabela de Contas (Autenticação e Multi-Provider)
     const accountColumns = this.db.prepare('PRAGMA table_info(accounts)').all() as Array<{ name: string }>;
+    if (!accountColumns.some(column => column.name === 'cash_balance')) {
+      this.db.exec('ALTER TABLE accounts ADD COLUMN cash_balance INTEGER NOT NULL DEFAULT 0 CHECK (cash_balance >= 0)');
+    }
+    this.db.exec(`CREATE TABLE IF NOT EXISTS account_cash_transactions (
+      reference TEXT PRIMARY KEY,
+      account_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      delta INTEGER NOT NULL CHECK (delta != 0),
+      reason TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    )`);
     if (!accountColumns.some(column => column.name === 'is_admin')) {
       this.db.exec('ALTER TABLE accounts ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0 CHECK (is_admin IN (0, 1))');
     }
@@ -1410,11 +1422,70 @@ export class DatabaseManager {
 
   public expandInventorySlots(characterId: string, currentSlots: number, cost: number): number | null {
     const expansion = getInventoryExpansion(currentSlots);
-    if (!expansion || expansion.cost !== cost) return null;
+    if (!expansion || expansion.premium || expansion.cost !== cost) return null;
     // Capacity and funds are checked together: stale/replayed purchases cannot debit twice.
     const changed = this.db.prepare('UPDATE characters SET gold = gold - ?, max_inventory_slots = ? WHERE id = ? AND max_inventory_slots = ? AND gold >= ?')
       .run(cost, expansion.newMaxSlots, characterId, currentSlots, cost);
     return changed.changes === 1 ? expansion.newMaxSlots : null;
+  }
+
+  public getAccountCashBalance(accountId: string | null): number {
+    if (!accountId) return 0;
+    return Number(this.db.prepare('SELECT cash_balance FROM accounts WHERE id = ?').get(accountId)?.cash_balance ?? 0);
+  }
+
+  public getCharacterCashBalance(characterId: string): number {
+    return Number(this.db.prepare('SELECT a.cash_balance FROM accounts a JOIN characters c ON c.account_id = a.id WHERE c.id = ?')
+      .get(characterId)?.cash_balance ?? 0);
+  }
+
+  /** Trusted server integration only. No client opcode can mint cash; references are idempotent. */
+  public creditAccountCash(accountId: string, amount: number, reference: string): number {
+    if (!Number.isSafeInteger(amount) || amount <= 0 || amount > 1_000_000_000 ||
+        typeof reference !== 'string' || !reference.trim() || reference.length > 200) throw new Error('INVALID_CASH_CREDIT');
+    return this.runInTransaction(() => {
+      const previous = this.db.prepare('SELECT account_id, delta, reason FROM account_cash_transactions WHERE reference = ?').get(reference);
+      if (previous) {
+        if (previous.account_id !== accountId || previous.delta !== amount || previous.reason !== 'STORE_CREDIT') throw new Error('CASH_REFERENCE_CONFLICT');
+        return this.getAccountCashBalance(accountId);
+      }
+      const changed = this.db.prepare('UPDATE accounts SET cash_balance = cash_balance + ? WHERE id = ? AND cash_balance <= ?')
+        .run(amount, accountId, 1_000_000_000 - amount);
+      if (changed.changes !== 1) throw new Error('CASH_ACCOUNT_OR_LIMIT');
+      this.db.prepare('INSERT INTO account_cash_transactions (reference, account_id, delta, reason, created_at) VALUES (?, ?, ?, ?, ?)')
+        .run(reference, accountId, amount, 'STORE_CREDIT', Date.now());
+      return this.getAccountCashBalance(accountId);
+    });
+  }
+
+  public purchaseInventoryExpansion(characterId: string, expectedSlots: number, payment: InventoryExpansionPayment) {
+    return this.runInTransaction(() => {
+      const character = this.db.prepare('SELECT account_id, max_inventory_slots, gold FROM characters WHERE id = ?').get(characterId);
+      if (!character || character.max_inventory_slots !== expectedSlots) throw new Error('EXPANSION_STALE');
+      const expansion = getInventoryExpansion(expectedSlots);
+      if (!expansion) throw new Error('EXPANSION_MAX');
+      if ((!expansion.premium && payment !== 'gold') ||
+          (expansion.premium && payment !== 'cash' && payment !== 'gold_item')) throw new Error('EXPANSION_PAYMENT');
+      const accountId = String(character.account_id);
+      const goldSpent = payment === 'cash' ? 0 : expansion.cost;
+      const cashSpent = payment === 'cash' ? expansion.cashCost : 0;
+      if (payment === 'cash' && (!Number.isSafeInteger(cashSpent) || !cashSpent || cashSpent < 1)) throw new Error('EXPANSION_CASH_UNAVAILABLE');
+      if (Number(character.gold) < goldSpent) throw new Error('EXPANSION_GOLD');
+      if (payment === 'gold_item' && !this.consumeItemQuantity(characterId, INVENTORY_EXPANSION_SEAL, 1)) throw new Error('EXPANSION_SEAL');
+      if (payment === 'cash') {
+        const debit = this.db.prepare('UPDATE accounts SET cash_balance = cash_balance - ? WHERE id = ? AND cash_balance >= ?')
+          .run(cashSpent!, accountId, cashSpent!);
+        if (debit.changes !== 1) throw new Error('EXPANSION_CASH');
+        this.db.prepare('INSERT INTO account_cash_transactions (reference, account_id, delta, reason, created_at) VALUES (?, ?, ?, ?, ?)')
+          .run(`inventory-expansion:${characterId}:${expectedSlots}`, accountId, -cashSpent!, 'INVENTORY_EXPANSION', Date.now());
+      }
+      const changed = this.db.prepare('UPDATE characters SET gold = gold - ?, max_inventory_slots = ? WHERE id = ? AND max_inventory_slots = ? AND gold >= ?')
+        .run(goldSpent, expansion.newMaxSlots, characterId, expectedSlots, goldSpent);
+      if (changed.changes !== 1) throw new Error('EXPANSION_STALE');
+      return { newMaxSlots: expansion.newMaxSlots, goldSpent, cashSpent: cashSpent ?? 0,
+        remainingGold: this.getCharacterGold(characterId), cashBalance: this.getAccountCashBalance(accountId),
+        sealsConsumed: payment === 'gold_item' ? 1 : 0 };
+    });
   }
 
   public discardOrRecycleItem(
@@ -1425,6 +1496,7 @@ export class DatabaseManager {
     const query = this.db.prepare('SELECT id, item_id, quantity, is_equipped, is_locked FROM inventory WHERE character_id = ? AND slot_index = ?');
     const item = query.get(characterId, slotIndex) as { id: string; item_id: string; quantity: number; is_equipped: number; is_locked: number } | undefined;
     if (!item) return { success: false, reason: 'Item não encontrado no slot' };
+    if (item.item_id === INVENTORY_EXPANSION_SEAL) return { success: false, reason: 'O Selo de Expansão Astral não pode ser reciclado.' };
     if (item.is_locked === 1) return { success: false, reason: 'Item protegido. Desproteja antes de reciclar.' };
     if (item.is_equipped === 1) return { success: false, reason: 'Desequipe o item antes de reciclar!' };
 

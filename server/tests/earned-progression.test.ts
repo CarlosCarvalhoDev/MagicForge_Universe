@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CharacterClass } from '@magicforge/shared';
 import { simulateProgression } from '../tools/ProgressionSimulation';
+import { World } from '../src/game/World';
 
 test('Farm com compras usa saldo real e mantém determinismo e relógio isolados', () => {
   const random = Math.random, now = Date.now;
@@ -40,4 +41,34 @@ test('Fusão do farm consome uma receita real e não se repete', () => {
   assert.ok(result.equippedItems.some(item => item.itemId === fusions[0].itemOrSkillId));
   assert.equal(result.spentGold, 1800);
   assert.equal(result.goldBalance, result.startingGold + result.lootGold + result.autoSaleGold - result.spentGold);
+});
+
+test('Benchmark ponderado usa o botão real e financia equipamento somente com o farm', t => {
+  const original = World.prototype.autoEquipPlayer;
+  const calls = t.mock.method(World.prototype, 'autoEquipPlayer', function (this: World, player) {
+    return original.call(this, player);
+  });
+  const options = { classType: CharacterClass.ARQUEIRO, seed: 101, seconds: 300,
+    investment: 'equipment' as const, equipmentScoring: 'class-weighted' as const };
+  const run = simulateProgression(options);
+  assert.ok(calls.mock.callCount() > 0);
+  assert.equal(run.equipmentScoring, 'class-weighted');
+  assert.equal(run.goldBalance, run.startingGold + run.lootGold + run.autoSaleGold - run.spentGold);
+  assert.ok(run.goldBalance >= 0);
+  assert.ok(run.equippedItems.some(item => item.itemId.startsWith('bow_')));
+  assert.deepEqual(simulateProgression(options), run);
+});
+
+test('Perfil em nível avançado inicia no mundo solicitado sem desativar a progressão', () => {
+  const run = simulateProgression({ classType: CharacterClass.BARBARO, seed: 101, seconds: 30,
+    startingLevel: 25, startingWorld: 2 });
+  assert.equal(run.startingLevel, 25);
+  assert.equal(run.startingWorld, 2);
+  assert.equal(run.levelReachedAt[25], 0);
+  assert.ok(run.finalLevel >= 25);
+  assert.equal(run.phases[0].world, 2);
+  assert.equal(run.startingGold, 50);
+  assert.deepEqual(run.actions, []);
+  assert.throws(() => simulateProgression({ classType: CharacterClass.BARBARO, seed: 101, seconds: 1,
+    startingLevel: NaN }), /Invalid starting fixture/);
 });

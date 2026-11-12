@@ -1,0 +1,215 @@
+{
+  "date": "2026-11-11",
+  "sourceHashes": {
+    "shared/src/inventory-expansion.ts": "f30f9850c686a9b719354a9c015e14d0ed89df35ea56e58ddcab58ed87dcf3ff",
+    "shared/src/items.ts": "a03df25adef3e49f1545212ac157b3fe7c48cdea0ac40c3233a0bde3ce0b8e8d",
+    "shared/src/messages.ts": "a149edcd338e013d722bf6bb634cd7a17c83c3813d21aea64fffcc68e987ecca",
+    "server/src/database/DatabaseManager.ts": "fd18be27018fdb8ee12867ea4f13beaf49d1579210acc46b20a255da8cfedc60",
+    "server/src/game/World.ts": "8b874ad1caa0f3f6bf284e45ea1736dd8d4b75d68f0ad40f233f868d0465d6f2",
+    "server/src/network/PacketHandler.ts": "71c55d719f7df5db139fce538b8aae5a4cdfda6f536d92c3e8efd24b3b26fbf6",
+    "client/src/ui/InventoryExpansion.ts": "f5f0b248c6eb08ba988ed1deef18815db5c591c4cf95d25bd6ae2a9e996ef430",
+    "client/src/network/ClientNetwork.ts": "8bf1359026a29a557c5ce7aad3306b00b740dca48fcdda4c4d3c20a4ec4137e2",
+    "client/src/main.ts": "743725c7bf360109acf92f8c7d48e3899deed509fab44fde7b1ba8ba2e1ae780",
+    "client/index.html": "553f49d0e4c634a9109bbafdc135d7f10fa57969ed8bb14beb608d91967e257d",
+    "client/src/ui/inventory-view.css": "63cbc0cb9dc261935173e7f43005e62244c0eef17ccc5fbaec12c5dffd0f0854",
+    "server/tools/InventorySimulationPolicy.ts": "fc65098a42be842a08eb03d7c58d39cd6f63c48fe063c64d1d98bd9f0ac9396e",
+    "server/tools/ProgressionSimulation.ts": "71395c525d553bd3842e0c2e64026065366aa4a44deba6f6c7cc4ff1f9333308"
+  },
+  "benchmark": {
+    "file": "scratch/core-classes/inventory-progression-2026-11-11.json",
+    "sha256": "74bee9789dd19c40e9c0d22ade84077c0c4371068b2b91ff9731cb25de41bd2f",
+    "scenarios": 27,
+    "assumptions": {
+      "database": ":memory:",
+      "seconds": 1800,
+      "seeds": [
+        101,
+        202,
+        303
+      ],
+      "startingLevel": 1,
+      "grants": false,
+      "investment": "First compatible weapon fusion only.",
+      "retain": "Keep drops; do not expand, equip new drops or sell.",
+      "expand": "Buy gold-only expansion at 80% occupancy if affordable; no new equip/sales.",
+      "managed": "Weighted equips exclude up to three reserved identical eligible fusion inputs. Expand at 80% when affordable. At 90%, sell unprotected/unrefined/socket-free common/uncommon gear until <=75%, preserving the reserved inputs. After first fusion stop reserving copies.",
+      "payments": "Production prices and no level/Reborn gate. Cash and seals are never granted or used by this benchmark; gold-only expansion stops at 35.",
+      "limitations": "Policies bundle user decisions, not an isolated effect of capacity. Sequential solo fixtures and normal starter kit. Equal seeds diverge with decisions. No offline claim or new automatic purchase/sale feature in the live game."
+    },
+    "summary": [
+      {
+        "classType": "GUERREIRO",
+        "inventoryPolicy": "retain",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 232.05,
+        "expansionObserved": 0,
+        "medianExpansionSeconds": null,
+        "medianFinalLevel": 9,
+        "medianSlots": 20,
+        "medianFullBagSeconds": 1564,
+        "medianBossVictories": 2,
+        "medianDeaths": 9,
+        "medianManualSaleGold": 0,
+        "medianSpentGold": 1800
+      },
+      {
+        "classType": "GUERREIRO",
+        "inventoryPolicy": "expand",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 232.05,
+        "expansionObserved": 0,
+        "medianExpansionSeconds": null,
+        "medianFinalLevel": 9,
+        "medianSlots": 20,
+        "medianFullBagSeconds": 1564,
+        "medianBossVictories": 2,
+        "medianDeaths": 9,
+        "medianManualSaleGold": 0,
+        "medianSpentGold": 1800
+      },
+      {
+        "classType": "GUERREIRO",
+        "inventoryPolicy": "managed",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 232.05,
+        "expansionObserved": 2,
+        "medianExpansionSeconds": 1568.05,
+        "medianFinalLevel": 9,
+        "medianSlots": 25,
+        "medianFullBagSeconds": 619,
+        "medianBossVictories": 2,
+        "medianDeaths": 9,
+        "medianManualSaleGold": 2080,
+        "medianSpentGold": 11800
+      },
+      {
+        "classType": "BARBARO",
+        "inventoryPolicy": "retain",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 238.05,
+        "expansionObserved": 0,
+        "medianExpansionSeconds": null,
+        "medianFinalLevel": 9,
+        "medianSlots": 20,
+        "medianFullBagSeconds": 1534,
+        "medianBossVictories": 2,
+        "medianDeaths": 9,
+        "medianManualSaleGold": 0,
+        "medianSpentGold": 1800
+      },
+      {
+        "classType": "BARBARO",
+        "inventoryPolicy": "expand",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 238.05,
+        "expansionObserved": 0,
+        "medianExpansionSeconds": null,
+        "medianFinalLevel": 9,
+        "medianSlots": 20,
+        "medianFullBagSeconds": 1534,
+        "medianBossVictories": 2,
+        "medianDeaths": 9,
+        "medianManualSaleGold": 0,
+        "medianSpentGold": 1800
+      },
+      {
+        "classType": "BARBARO",
+        "inventoryPolicy": "managed",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 238.05,
+        "expansionObserved": 2,
+        "medianExpansionSeconds": 1653.55,
+        "medianFinalLevel": 9,
+        "medianSlots": 25,
+        "medianFullBagSeconds": 1271,
+        "medianBossVictories": 2,
+        "medianDeaths": 8,
+        "medianManualSaleGold": 1340,
+        "medianSpentGold": 11800
+      },
+      {
+        "classType": "ARQUEIRO",
+        "inventoryPolicy": "retain",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 160.05,
+        "expansionObserved": 0,
+        "medianExpansionSeconds": null,
+        "medianFinalLevel": 9,
+        "medianSlots": 20,
+        "medianFullBagSeconds": 1641,
+        "medianBossVictories": 2,
+        "medianDeaths": 3,
+        "medianManualSaleGold": 0,
+        "medianSpentGold": 1800
+      },
+      {
+        "classType": "ARQUEIRO",
+        "inventoryPolicy": "expand",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 160.05,
+        "expansionObserved": 3,
+        "medianExpansionSeconds": 1656.05,
+        "medianFinalLevel": 9,
+        "medianSlots": 25,
+        "medianFullBagSeconds": 1532,
+        "medianBossVictories": 2,
+        "medianDeaths": 3,
+        "medianManualSaleGold": 0,
+        "medianSpentGold": 11800
+      },
+      {
+        "classType": "ARQUEIRO",
+        "inventoryPolicy": "managed",
+        "scenarios": 3,
+        "fusionObserved": 3,
+        "medianFusionSeconds": 160.05,
+        "expansionObserved": 3,
+        "medianExpansionSeconds": 1531.05,
+        "medianFinalLevel": 9,
+        "medianSlots": 25,
+        "medianFullBagSeconds": 1320,
+        "medianBossVictories": 2,
+        "medianDeaths": 3,
+        "medianManualSaleGold": 1080,
+        "medianSpentGold": 11800
+      }
+    ]
+  },
+  "tests": {
+    "server": 309,
+    "inventory": 30,
+    "client": "npm test passed",
+    "build": "npm run build passed; final server build passed after notification catch refinement",
+    "mobile": "393x852 DOM, no horizontal overflow; real UI module with simulated transport; no active DB transaction via browser"
+  },
+  "deployment": {
+    "preserved": true,
+    "counts": {
+      "characters": 7,
+      "inventory": 145,
+      "equipment_gems": 0,
+      "character_cards": 26,
+      "equipment_fusions": 0
+    },
+    "integrity": [
+      {
+        "integrity_check": "ok"
+      }
+    ],
+    "foreignKeyErrors": 0,
+    "cashGranted": 0
+  },
+  "remaining": [
+    "Store/payment-provider credit integration",
+    "Expansion Seal shop availability and rare drop calibration",
+    "Economic targets beyond 30-minute solo fixtures"
+  ]
+}

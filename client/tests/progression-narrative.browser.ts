@@ -42,9 +42,9 @@ try {
   click('btn-expand-inventory'); expansion.setContext({ maxSlots: 25, gold: 90000, level: 30, reborn: 0 });
   check(!document.getElementById('inventory-expansion-confirm')!.hidden, 'Farm preserva confirmação quando capacidade não muda');
   expansion.setContext({ maxSlots: 45, gold: 20000000, level: 50, reborn: 0 }); click('btn-expand-inventory');
-  check(text('inventory-expansion-requirements').includes('Reborn 1'), 'Última expansão exige Reborn');
-  expansion.setContext({ maxSlots: 45, gold: 20000000, level: 1, reborn: 1 }); click('btn-expand-inventory');
-  check(!document.getElementById('inventory-expansion-confirm')!.hidden, 'Reborn permite expansão após reiniciar nível'); click('btn-cancel-expansion');
+  check(text('inventory-expansion-requirements').includes('Selo'), 'Última expansão exige selo com ouro');
+  expansion.setContext({ maxSlots: 45, gold: 20000000, level: 1, reborn: 0, cash: 400 }); click('btn-expand-inventory'); click('btn-expansion-cash');
+  check(!(document.getElementById('btn-confirm-expansion') as HTMLButtonElement).disabled, 'Cash permite última expansão no nível 1 sem Reborn'); click('btn-cancel-expansion');
   expansion.setContext({ maxSlots: 50, gold: 20000000, level: 50, reborn: 1 });
   check((document.getElementById('btn-expand-inventory') as HTMLButtonElement).disabled, 'Capacidade máxima bloqueia nova compra');
   ranking.open(); check(requests[0] === 'COMBAT_POWER', 'Hall consulta Top 20 real ao abrir');

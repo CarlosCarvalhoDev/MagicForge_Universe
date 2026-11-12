@@ -24,6 +24,7 @@ import {
   C2SAuthClaimLegacyPayload,
   C2SUpdateFarmSettingsPayload,
   C2SAutoSalvagePayload,
+  C2SExpandInventoryPayload,
   C2SRequestLeaderboardPayload,
   C2SEnterDungeonPayload,
   C2SRequestChannelListPayload,
@@ -224,7 +225,7 @@ export class PacketHandler {
         break;
 
       case Opcode.C2S_EXPAND_INVENTORY:
-        this.handleExpandInventory(connection, (message.data as { expectedMaxSlots?: number })?.expectedMaxSlots);
+        this.handleExpandInventory(connection, message.data as C2SExpandInventoryPayload);
         break;
 
       case Opcode.C2S_PERFORM_REBORN:
@@ -572,12 +573,13 @@ export class PacketHandler {
     else world.enterPortal(player);
   }
 
-  private handleExpandInventory(connection: Connection, expectedMaxSlots?: number): void {
+  private handleExpandInventory(connection: Connection, payload?: C2SExpandInventoryPayload): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
     const world = this.getActiveWorld(connection);
     const player = world.entityManager.getPlayer(connection.playerId);
     if (!player || player.isDead) return;
-    world.expandPlayerInventory(player, expectedMaxSlots);
+    world.expandPlayerInventory(player, payload?.expectedMaxSlots ?? NaN, payload?.payment ?? 'gold',
+      payload?.payment === 'cash' ? payload.quotedCost ?? NaN : payload?.quotedCost);
   }
 
   private handleDiscardItem(connection: Connection, payload: C2SDiscardItemPayload): void {

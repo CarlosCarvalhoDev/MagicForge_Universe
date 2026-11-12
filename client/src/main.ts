@@ -202,7 +202,8 @@ let playerRebornCount = 0;
 let equipmentFusion: ReturnType<typeof setupEquipmentFusion> | undefined;
 let inventoryExpansion: ReturnType<typeof setupInventoryExpansion> | undefined;
 function refreshExpansionContext() {
-  inventoryExpansion?.setContext({ maxSlots: playerMaxInventorySlots, gold: playerGold, level: playerLevel, reborn: playerRebornCount });
+  inventoryExpansion?.setContext({ maxSlots: playerMaxInventorySlots, gold: playerGold, level: playerLevel, reborn: playerRebornCount,
+    cash: playerCashBalance, seals: playerInventory.filter(item => item.itemId === 'seal_astral_expansion' && !item.isLocked && !item.isEquipped).reduce((sum, item) => sum + item.quantity, 0) });
   equipmentFusion?.setContext({ items: playerInventory, gold: playerGold, level: playerLevel, classType: myPlayerClass });
 }
 let playerCurrentXp: number = 0;
@@ -615,6 +616,7 @@ updateClassPreview();
 let playerInventory: InventoryItemPayload[] = [];
 let playerMaxInventorySlots: number = 20;
 let playerGold: number = 0;
+let playerCashBalance = 0;
 let playerCombatPower: number = 1000;
 let selectedSlotIndex: number | null = null;
 
@@ -1778,10 +1780,11 @@ equipmentFusion = setupEquipmentFusion({
 network.onFusionResult = result => equipmentFusion?.onResult(result);
 inventoryExpansion = setupInventoryExpansion({
   isReady: () => network.isConnected && network.isAuthenticated && farmPlayerReady,
-  send: expectedMaxSlots => network.sendExpandInventory(expectedMaxSlots),
+  send: (expectedMaxSlots, payment, quotedCost) => network.sendExpandInventory(expectedMaxSlots, payment, quotedCost),
   apply: result => {
     playerMaxInventorySlots = result.newMaxSlots;
     playerGold = result.remainingGold;
+    if (result.cashBalance !== undefined) playerCashBalance = result.cashBalance;
     if (playerGoldText) playerGoldText.textContent = playerGold.toLocaleString('pt-BR');
     if (inventoryGoldLabel) inventoryGoldLabel.textContent = playerGold.toLocaleString('pt-BR') + ' Ouro';
     renderInventorySlots();
@@ -2133,6 +2136,7 @@ if (btnOpenFarmGear) {
 
 // Network Event Wiring
 network.onConnectionStateChange = (connected) => {
+  if (!connected) playerCashBalance = 0;
   if (!connected) devPanel.setAdmin(false);
   if (connected) {
     if (statusDot) statusDot.classList.add('online');
@@ -2387,6 +2391,7 @@ network.onChatMessage = (payload) => {
 };
 
 network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
+  if (payload.cashBalance !== undefined) playerCashBalance = payload.cashBalance;
   playerInventory = payload.slots;
   equipmentAdvice.sync(playerInventory);
   playerGold = payload.gold;

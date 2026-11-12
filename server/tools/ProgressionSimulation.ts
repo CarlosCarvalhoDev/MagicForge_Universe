@@ -5,6 +5,7 @@ import type { Connection } from '../src/network/Connection';
 import { calculateOfflineReward } from '../src/game/OfflineRewards';
 import { FUSION_RECIPES, getFusionPreview } from '@magicforge/shared';
 import { getEquipmentSuggestions, getSkillLevel } from '@magicforge/shared';
+import { manageSimulationInventory, type InventorySimulationPolicy, type SimulationAction } from './InventorySimulationPolicy';
 
 export type ProgressionInvestment = 'none' | 'skill' | 'equipment' | 'fusion';
 
@@ -16,6 +17,10 @@ export interface SimulationOptions {
   autoSellEquipment?: boolean;
   collectFusionMilestones?: boolean;
   investment?: ProgressionInvestment;
+  equipmentScoring?: 'conservative' | 'class-weighted';
+  startingLevel?: number;
+  startingWorld?: number;
+  inventoryPolicy?: InventorySimulationPolicy;
 }
 
 /** Sequential, isolated CLI/test use only: RNG and Date.now are restored before returning. */
@@ -23,6 +28,11 @@ export function simulateProgression(options: SimulationOptions) {
   if (!Number.isInteger(options.seconds) || options.seconds < 1 || options.seconds > 7200) {
     throw new Error('Use uma duração inteira de 1 a 7200 segundos.');
   }
+  const startingLevel = options.startingLevel ?? 1, startingWorld = options.startingWorld ?? 1;
+  if (!Number.isInteger(startingLevel) || startingLevel < 1 || startingLevel > 50 ||
+      !Number.isInteger(startingWorld) || startingWorld < 1 || startingWorld > 4) throw new Error('Invalid starting fixture.');
+  if (options.inventoryPolicy && !['retain', 'expand', 'managed'].includes(options.inventoryPolicy)) throw new Error('Invalid inventory policy.');
+  if (options.autoSellEquipment && options.inventoryPolicy === 'managed') throw new Error('Managed inventory requires drops to be retained before decisions.');
   const originalRandom = Math.random;
   const originalNow = Date.now;
   const originalLog = console.log;
@@ -40,7 +50,7 @@ export function simulateProgression(options: SimulationOptions) {
     console.log = () => {};
     db = new DatabaseManager(':memory:');
     const manager = new WorldManager(db);
-    const world = manager.getOrCreateChannel(1, 1);
+    const world = manager.getOrCreateChannel(startingWorld, 1);
     const events = {
       bossAttempts: 0, bossVictories: 0, bossFailures: 0,
       firstBossSeconds: null as number | null,
@@ -68,6 +78,14 @@ export function simulateProgression(options: SimulationOptions) {
     manager.registerConnection(connection);
     const account = db.getOrCreateAccount('progression_simulation');
     const player = db.createCharacterInSlot(connection.id, account.id, 0, 'SimulationHero', options.classType);
+    if (startingLevel !== 1 || startingWorld !== 1) {
+      player.level = startingLevel;
+      player.currentWorld = player.unlockedWorld = startingWorld;
+      player.recalculateStatsFromEquipment();
+      player.currentHp = player.maxHp;
+      player.currentResource = player.maxResource;
+      db.savePlayer(player);
+    }
     connection.accountId = account.id;
     if (options.autoSellEquipment) {
       player.farmSettings.autoSellCommon = player.farmSettings.autoSellUncommon = true;
@@ -77,7 +95,7 @@ export function simulateProgression(options: SimulationOptions) {
       ITEMS_DATABASE[item.itemId].equipmentSlot === EquipmentSlot.ARMA);
     if (options.equipStarter !== false && startingWeapon) world.usePlayerItem(player, startingWeapon.slotIndex);
     const startingGold = player.gold;
-    const actions: Array<{ seconds: number; kind: string; itemOrSkillId: string; goldSpent: number; level?: number }> = [];
+    const actions: SimulationAction[] = [];
     const investment = options.investment ?? 'none';
     let maxStage = player.currentStage;
     const levelReachedAt: Record<number, number> = { [player.level]: 0 };
@@ -130,8 +148,12 @@ export function simulateProgression(options: SimulationOptions) {
       }
       // A simulated player's decisions once per second, never a production auto-purchase feature.
       // Use the current world after automatic portals, not the original channel instance.
-      if (tick % 20 === 0 && investment !== 'none' && !player.isDead) {
+      if (tick % 20 === 0 && (investment !== 'none' || (options.inventoryPolicy && options.inventoryPolicy !== 'retain')) && !player.isDead) {
         const activeWorld = connection.currentWorldInstance as typeof world;
+        actions.push(...manageSimulationInventory(activeWorld, player, {
+          policy: options.inventoryPolicy ?? 'retain', seconds: Math.round((elapsed() + .05) * 100) / 100,
+          reserveFusion: !actions.some(action => action.kind === 'fusion'),
+        }));
         const record = (kind: string, itemOrSkillId: string, beforeGold: number, level?: number) => {
           actions.push({ seconds: Math.round((elapsed() + .05) * 100) / 100, kind, itemOrSkillId, goldSpent: beforeGold - player.gold, level });
         };
@@ -144,13 +166,24 @@ export function simulateProgression(options: SimulationOptions) {
             record('skill', skillId, beforeGold, level + 1);
           }
         } else if (investment === 'equipment') {
-          // Re-evaluate after each equip; requirements and equipped stats can change.
-          for (let n = 0; n < 10; n++) {
-            const suggestion = getEquipmentSuggestions(player.inventory, player)[0];
-            if (!suggestion) break;
-            activeWorld.usePlayerItem(player, suggestion.candidate.slotIndex);
-            if (!suggestion.candidate.instanceId || !player.inventory.some(item => item.instanceId === suggestion.candidate.instanceId && item.isEquipped)) break;
-            record('equip', suggestion.candidate.itemId, player.gold);
+          if (options.inventoryPolicy === 'managed') {
+            // Equipping was already evaluated with the reserved ingredients excluded above.
+          } else if (options.equipmentScoring === 'class-weighted') {
+            const before = new Set(player.inventory.filter(item => item.isEquipped).map(item => item.instanceId));
+            // Exercise the same transactional button used by the real client.
+            activeWorld.autoEquipPlayer(player);
+            for (const item of player.inventory.filter(item => item.isEquipped && !before.has(item.instanceId))) {
+              record('equip', item.itemId, player.gold);
+            }
+          } else {
+            // Re-evaluate after each equip; requirements and equipped stats can change.
+            for (let n = 0; n < 10; n++) {
+              const suggestion = getEquipmentSuggestions(player.inventory, player)[0];
+              if (!suggestion) break;
+              activeWorld.usePlayerItem(player, suggestion.candidate.slotIndex);
+              if (!suggestion.candidate.instanceId || !player.inventory.some(item => item.instanceId === suggestion.candidate.instanceId && item.isEquipped)) break;
+              record('equip', suggestion.candidate.itemId, player.gold);
+            }
           }
           const weapon = player.inventory.find(item => item.isEquipped && ITEMS_DATABASE[item.itemId]?.equipmentSlot === EquipmentSlot.ARMA);
           // Only the guaranteed early tier; stop at +2, where starter attributes actually improve.
@@ -160,7 +193,7 @@ export function simulateProgression(options: SimulationOptions) {
             const current = player.inventory.find(item => item.instanceId === weapon.instanceId);
             if ((current?.refineLevel ?? 0) > beforeLevel) record('refine', weapon.itemId, beforeGold, current!.refineLevel);
           }
-        } else if (!actions.some(action => action.kind === 'fusion')) {
+        } else if (investment === 'fusion' && !actions.some(action => action.kind === 'fusion')) {
           // Reserve all earned ingredients for the first compatible weapon; no shop or grants.
           const recipe = Object.values(FUSION_RECIPES).find(recipe => recipe.classes.includes(player.classType) && ITEMS_DATABASE[recipe.outputItemId].equipmentSlot === EquipmentSlot.ARMA);
           if (recipe) {
@@ -171,6 +204,7 @@ export function simulateProgression(options: SimulationOptions) {
               player.inventory = db.getInventory(player.dbCharacterId);
               player.gold = db.getCharacterGold(player.dbCharacterId);
               record('fusion', result.outputItemId, beforeGold);
+              actions[actions.length - 1].inputInstanceIds = preview.selected.map(item => item.instanceId!);
               const output = player.inventory.find(item => item.instanceId === result.outputInstanceId)!;
               activeWorld.usePlayerItem(player, output.slotIndex);
               if (player.inventory.some(item => item.instanceId === output.instanceId && item.isEquipped)) record('equip', output.itemId, player.gold);
@@ -188,9 +222,12 @@ export function simulateProgression(options: SimulationOptions) {
     }
     return {
       classType: options.classType, seed: options.seed, durationSeconds: options.seconds,
+      startingLevel, startingWorld,
       starterEquipped: options.equipStarter !== false,
       autoSellEquipment: options.autoSellEquipment === true,
       investment, startingGold, actions, spentGold: actions.reduce((total, action) => total + action.goldSpent, 0),
+      equipmentScoring: options.equipmentScoring ?? 'conservative',
+      inventoryPolicy: options.inventoryPolicy ?? 'retain', maxInventorySlots: player.maxInventorySlots,
       skillLevels: { ...player.skillLevels },
       equippedItems: player.inventory.filter(item => item.isEquipped).map(item => ({ itemId: item.itemId, refineLevel: item.refineLevel ?? 0 })),
       finalLevel: player.level, finalWorld: player.currentWorld, finalStage: player.currentStage,

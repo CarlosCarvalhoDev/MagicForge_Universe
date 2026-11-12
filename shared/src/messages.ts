@@ -342,6 +342,7 @@ export interface InventoryItemPayload {
 }
 
 export interface S2CInventoryUpdatePayload {
+  cashBalance?: number;
   slots: InventoryItemPayload[];
   gold: number;
   totalCombatPower: number;
@@ -359,7 +360,7 @@ export interface C2SSellItemPayload {
   expectedInstanceId?: string;
 }
 
-export interface C2SExpandInventoryPayload { expectedMaxSlots?: number; }
+export interface C2SExpandInventoryPayload { expectedMaxSlots?: number; payment?: import('./inventory-expansion').InventoryExpansionPayment; quotedCost?: number; }
 
 export interface C2SDiscardItemPayload {
   slotIndex: number;
@@ -684,14 +685,17 @@ export interface S2CAutoSalvageResultPayload {
 // ==========================================
 // Inventory Expansion Payloads (0x84 - 0x85)
 // ==========================================
-export interface C2SExpandInventoryPayload {}
-
 export interface S2CExpandInventoryResultPayload {
   success: boolean;
   newMaxSlots: number;
   goldSpent: number;
   remainingGold: number;
+  cashBalance?: number;
+  cashSpent?: number;
+  sealsAvailable?: number;
+  sealsConsumed?: number;
   nextExpansionCost?: number;
+  nextExpansionCashCost?: number;
   nextExpansionMinLevel?: number;
   message: string;
 }

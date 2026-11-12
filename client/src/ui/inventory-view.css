@@ -81,7 +81,7 @@
 #inventory-expansion-status { color: #cbd5e1; font: 12px/1.45 system-ui,sans-serif; margin: 0; }
 #inventory-expansion-status[data-state="success"] { color: #34d399; }
 #inventory-expansion-confirm { padding: 14px; box-sizing: border-box; border: 1.5px solid #d97706; outline: 1px solid #fef08a44; outline-offset: -5px; border-radius: 6px; background: url('/assets/ui/frames/corner-tl.svg') top left / 16px 16px no-repeat, url('/assets/ui/frames/corner-tr.svg') top right / 16px 16px no-repeat, url('/assets/ui/frames/corner-bl.svg') bottom left / 16px 16px no-repeat, url('/assets/ui/frames/corner-br.svg') bottom right / 16px 16px no-repeat, linear-gradient(165deg,#141828,#080c17); }
-#inventory-expansion-confirm[hidden], #btn-inventory-offline-chest[hidden] { display: none; }
+#inventory-expansion-confirm[hidden], #inventory-expansion-payments[hidden], #btn-inventory-offline-chest[hidden] { display: none; }
 #inventory-expansion-confirm h4 { margin: 0 0 8px; color: #fef08a; font: 700 13px 'Cinzel',serif; }
 #inventory-expansion-confirm p { font: 12px/1.45 system-ui,sans-serif; margin: 5px 0; color: #d9e1ed; }
 #inventory-expansion-confirm [data-state="error"] { color: #fbbf24; }

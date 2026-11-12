@@ -85,6 +85,8 @@ import {
   getSkillLevel,
   INVENTORY_EXPANSIONS,
   getInventoryExpansion,
+  INVENTORY_EXPANSION_SEAL,
+  type InventoryExpansionPayment,
   getSkillUpgradeMultiplier,
   getClericPeriodicEffect,
   getClericPulsePower,
@@ -692,6 +694,7 @@ export class World {
       gold: player.gold,
       totalCombatPower: player.CombatPower,
       maxSlots: player.maxInventorySlots,
+      cashBalance: this.db.getCharacterCashBalance(player.dbCharacterId),
     } as S2CInventoryUpdatePayload);
 
     // 5. Sincroniza e envia progressão de estágio
@@ -3252,7 +3255,7 @@ export class World {
 
   public sellPlayerItem(player: Player, slotIndex: number): boolean {
     const item = this.db.getInventory(player.dbCharacterId).find((i) => i.slotIndex === slotIndex);
-    if (!item || item.isEquipped || item.isLocked) return false;
+    if (!item || item.isEquipped || item.isLocked || item.itemId === INVENTORY_EXPANSION_SEAL) return false;
 
     const itemDef = ITEMS_DATABASE[item.itemId];
     if (!itemDef) return false;
@@ -3958,125 +3961,54 @@ export class World {
 
   public static readonly INVENTORY_EXPANSIONS = INVENTORY_EXPANSIONS;
 
-  public expandPlayerInventory(player: Player, expectedMaxSlots?: number): { success: boolean; reason?: string; newMaxSlots?: number } {
+  public expandPlayerInventory(player: Player, expectedMaxSlots?: number, payment: InventoryExpansionPayment = 'gold', quotedCost?: number): { success: boolean; reason?: string; newMaxSlots?: number } {
     const conn = this.connections.get(player.id);
-    if (expectedMaxSlots !== undefined && expectedMaxSlots !== player.maxInventorySlots) {
-      const reason = 'A capacidade mudou. Confira a mochila antes de comprar outra expansão.';
-      conn?.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, { success: false, newMaxSlots: player.maxInventorySlots, goldSpent: 0, remainingGold: player.gold, message: reason } as S2CExpandInventoryResultPayload);
+    const sealsAvailable = () => this.db.getInventory(player.dbCharacterId).filter(item => item.itemId === INVENTORY_EXPANSION_SEAL && !item.isLocked && !item.isEquipped).reduce((sum, item) => sum + item.quantity, 0);
+    const sendFailure = (reason: string) => {
+      const record = this.db.getCharacterById(player.dbCharacterId);
+      if (record) { player.maxInventorySlots = record.max_inventory_slots ?? 20; player.gold = record.gold; }
+      const next = getInventoryExpansion(player.maxInventorySlots);
+      conn?.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
+        success: false, newMaxSlots: player.maxInventorySlots, goldSpent: 0, cashSpent: 0,
+        remainingGold: player.gold, cashBalance: this.db.getCharacterCashBalance(player.dbCharacterId), sealsAvailable: sealsAvailable(),
+        nextExpansionCost: next?.cost, nextExpansionCashCost: next?.cashCost, nextExpansionMinLevel: next?.minLevel, message: reason,
+      } satisfies S2CExpandInventoryResultPayload);
       return { success: false, reason };
+    };
+    if (expectedMaxSlots !== undefined && (!Number.isSafeInteger(expectedMaxSlots) || expectedMaxSlots !== player.maxInventorySlots)) {
+      return sendFailure('A capacidade mudou. Confira a mochila antes de comprar outra expansão.');
     }
-
-
-    if (player.maxInventorySlots >= 50) {
-      const reason = 'Mochila já atingiu a capacidade máxima (50 slots)!';
-      if (conn) {
-        conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
-          success: false,
-          newMaxSlots: player.maxInventorySlots,
-          goldSpent: 0,
-          remainingGold: player.gold,
-          message: reason,
-        } as S2CExpandInventoryResultPayload);
-      }
-      return { success: false, reason };
+    if (!['gold', 'cash', 'gold_item'].includes(payment)) return sendFailure('Escolha uma forma de pagamento válida.');
+    if (!getInventoryExpansion(player.maxInventorySlots)) return sendFailure('Capacidade máxima atingida (50 espaços).');
+    const tier = getInventoryExpansion(player.maxInventorySlots)!;
+    if (quotedCost !== undefined && (!Number.isSafeInteger(quotedCost) || quotedCost !== (payment === 'cash' ? tier.cashCost : tier.cost))) {
+      return sendFailure('O preço mudou. Confira a nova oferta antes de confirmar.');
     }
-
-    const tier = getInventoryExpansion(player.maxInventorySlots);
-    if (!tier) return { success: false, reason: 'Capacidade inválida. Reconecte para sincronizar a mochila.' };
-
-    // Validação de Reborn
-    if (tier.minReborn && player.rebornCount < tier.minReborn) {
-      const reason = `A última linha de expansão (50 slots) requer Transcendência Astral (Reborn ${tier.minReborn}+)!`;
-      if (conn) {
-        conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
-          success: false,
-          newMaxSlots: player.maxInventorySlots,
-          goldSpent: 0,
-          remainingGold: player.gold,
-          nextExpansionCost: tier.cost,
-          nextExpansionMinLevel: tier.minLevel,
-          message: reason,
-        } as S2CExpandInventoryResultPayload);
-      }
-      return { success: false, reason };
+    let result: ReturnType<DatabaseManager['purchaseInventoryExpansion']>;
+    try {
+      result = this.db.purchaseInventoryExpansion(player.dbCharacterId, player.maxInventorySlots, payment);
+    } catch (error) {
+      const messages: Record<string, string> = {
+        EXPANSION_STALE: 'A capacidade mudou. Confira a mochila antes de comprar outra expansão.',
+        EXPANSION_MAX: 'Capacidade máxima atingida (50 espaços).',
+        EXPANSION_PAYMENT: 'Acima de 35 espaços, escolha Cash ou Ouro + Selo de Expansão Astral.',
+        EXPANSION_GOLD: 'Ouro insuficiente para esta expansão.',
+        EXPANSION_SEAL: 'Requer 1 Selo de Expansão Astral livre. Selos protegidos não são consumidos.',
+        EXPANSION_CASH: 'Cash insuficiente para esta expansão.',
+        EXPANSION_CASH_UNAVAILABLE: 'A compra com Cash ainda não está disponível.',
+      };
+      return sendFailure(messages[error instanceof Error ? error.message : ''] ?? 'Não foi possível expandir. Nenhum pagamento foi consumido.');
     }
-
-    // Validação de Nível (jogadores com Reborn possuem passe livre de nível)
-    const hasRequiredLevel = player.rebornCount > 0 || player.level >= tier.minLevel;
-    if (!hasRequiredLevel) {
-      const reason = `Nível insuficiente! Requer Nível ${tier.minLevel} para expandir para ${tier.newMaxSlots} slots.`;
-      if (conn) {
-        conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
-          success: false,
-          newMaxSlots: player.maxInventorySlots,
-          goldSpent: 0,
-          remainingGold: player.gold,
-          nextExpansionCost: tier.cost,
-          nextExpansionMinLevel: tier.minLevel,
-          message: reason,
-        } as S2CExpandInventoryResultPayload);
-      }
-      return { success: false, reason };
-    }
-
-    // Validação de Ouro
-    if (player.gold < tier.cost) {
-      const reason = `Ouro insuficiente! Necessário ${tier.cost.toLocaleString()} Ouro (Você tem: ${player.gold.toLocaleString()}).`;
-      if (conn) {
-        conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
-          success: false,
-          newMaxSlots: player.maxInventorySlots,
-          goldSpent: 0,
-          remainingGold: player.gold,
-          nextExpansionCost: tier.cost,
-          nextExpansionMinLevel: tier.minLevel,
-          message: reason,
-        } as S2CExpandInventoryResultPayload);
-      }
-      return { success: false, reason };
-    }
-
-    const newSlots = this.db.expandInventorySlots(player.dbCharacterId, player.maxInventorySlots, tier.cost);
-    if (!newSlots) {
-      const reason = 'Falha ao processar expansão de mochila no banco de dados.';
-      if (conn) {
-        conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
-          success: false,
-          newMaxSlots: player.maxInventorySlots,
-          goldSpent: 0,
-          remainingGold: player.gold,
-          message: reason,
-        } as S2CExpandInventoryResultPayload);
-      }
-      return { success: false, reason };
-    }
-
-    player.maxInventorySlots = newSlots;
-    player.gold = this.db.getCharacterGold(player.dbCharacterId);
-    this.db.savePlayer(player);
-
-    const nextTier = getInventoryExpansion(player.maxInventorySlots);
-
-    if (conn) {
-      conn.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
-        success: true,
-        newMaxSlots: player.maxInventorySlots,
-        goldSpent: tier.cost,
-        remainingGold: player.gold,
-        nextExpansionCost: nextTier?.cost,
-        nextExpansionMinLevel: nextTier?.minLevel,
-        message: `🎉 Mochila expandida com sucesso para ${player.maxInventorySlots} slots (+${tier.slotsAdded} novos slots)! (-${tier.cost.toLocaleString()} Ouro)`,
-      } as S2CExpandInventoryResultPayload);
-
-      conn.send(Opcode.S2C_INVENTORY_UPDATE, {
-        slots: player.inventory,
-        gold: player.gold,
-        maxSlots: player.maxInventorySlots,
-        totalCombatPower: player.CombatPower,
-        lootMessage: `🎉 Mochila expandida para ${player.maxInventorySlots} slots! (-${tier.cost.toLocaleString()} Ouro)`,
-      } as S2CInventoryUpdatePayload);
-    }
-
+    player.maxInventorySlots = result.newMaxSlots;
+    player.gold = result.remainingGold;
+    player.inventory = this.db.getInventory(player.dbCharacterId);
+    const next = getInventoryExpansion(player.maxInventorySlots);
+    const paid = result.cashSpent ? result.cashSpent.toLocaleString('pt-BR') + ' Cash' : result.goldSpent.toLocaleString('pt-BR') + ' Ouro' + (result.sealsConsumed ? ' + 1 Selo de Expansão Astral' : '');
+    conn?.send(Opcode.S2C_EXPAND_INVENTORY_RESULT, {
+      success: true, ...result, sealsAvailable: sealsAvailable(), nextExpansionCost: next?.cost, nextExpansionCashCost: next?.cashCost,
+      nextExpansionMinLevel: next?.minLevel, message: 'Mochila expandida para ' + result.newMaxSlots + ' espaços! (' + paid + ')',
+    } satisfies S2CExpandInventoryResultPayload);
+    this.sendInventoryUpdate(player);
     return { success: true, newMaxSlots: player.maxInventorySlots };
   }
 
@@ -4535,6 +4467,7 @@ export class World {
     if (!conn) return;
 
     conn.send(Opcode.S2C_INVENTORY_UPDATE, {
+      cashBalance: this.db.getCharacterCashBalance(player.dbCharacterId),
       slots: player.inventory,
       gold: player.gold,
       maxSlots: player.maxInventorySlots,

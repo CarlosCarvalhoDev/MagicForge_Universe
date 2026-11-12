@@ -448,8 +448,8 @@ export class ClientNetwork {
   public sendAutoEquip(): void { this.send(Opcode.C2S_AUTO_EQUIP, {}); }
   public sendDevControl(command: DevCommand): void { this.send(Opcode.C2S_DEV_CONTROL, command); }
 
-  public sendExpandInventory(expectedMaxSlots?: number): void {
-    this.send(Opcode.C2S_EXPAND_INVENTORY, { expectedMaxSlots });
+  public sendExpandInventory(expectedMaxSlots?: number, payment: C2SExpandInventoryPayload['payment'] = 'gold', quotedCost?: number): void {
+    this.send(Opcode.C2S_EXPAND_INVENTORY, { expectedMaxSlots, payment, quotedCost });
   }
 
   public sendChallengeBoss(): void {

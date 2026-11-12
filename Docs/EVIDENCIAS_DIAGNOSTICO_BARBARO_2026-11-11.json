@@ -1,0 +1,1831 @@
+{
+  "date": "2026-11-11",
+  "baseCommit": "2e215f0",
+  "rawFile": "scratch/core-classes/barbarian-diagnostics-2026-11-11.json",
+  "rawSha256": "687ce4652b55208891cb531f7157783dbd75c6c219a93287131e64759de4e28b",
+  "assumptions": {
+    "database": ":memory:",
+    "classType": "BARBARO",
+    "level": 25,
+    "world": 3,
+    "boss": "Ignis",
+    "tickRate": 20,
+    "supplied": "Starter weapon, fixed level, equal supplied resources, no purchases, eight seeds, normal default potions.",
+    "experiments": "Regen 8 vs 10 on identical build and seed; the override affects this Player fixture only. Independent stone-order test preserves regen 8 and changes only the explicitly configured order. Three cantrip-1 builds separately compare skill ranks, weapon refine and fusion under the same supplied budget; material/gold spending differs and is recorded.",
+    "telemetry": "Read-only energy/readiness snapshots at start of each 50ms tick, actual successful cast costs via fixture-instance wrapper, confirmed direct/status events. Readiness samples are potential energy pressure, not server rejections or an exact decision trace. Blocked seconds overlap between skills; do not sum them as wall time.",
+    "limits": "Solo starter-equipment fixtures, not earned progression or balance targets; combat RNG starts equal and diverges with decisions. No production coefficient/rotation/default was modified."
+  },
+  "sourceHashes": {
+    "server/tools/BossInvestmentSimulation.ts": "0a6a0a7b750e6dc7d154768649d38d1af664158cb2a83c0c5cd8a5abbd53adc2",
+    "server/tools/benchmark-barbarian-diagnostics.ts": "d30baf472c646885f94a6aa54488e5936a9ecd8bd8a59e69106a0374ca657081",
+    "server/src/game/World.ts": "811804c493529282517c95d0c42bb5a5cea0fece014f93c58944389077103c00",
+    "server/src/entities/Entity.ts": "2487fe0c5ee7def7d462eea2ceef2170b892b91b88561ca08fbb0e694b209096",
+    "server/src/entities/Player.ts": "06206549d5f6a5179a8d98885314d3dbce5ad69cd99bd65023cf2b552cfb8532",
+    "server/src/entities/Monster.ts": "3d54f4ff8d85de1548449f5cf518175907e581e4e65cb481c379761eac78f8ff",
+    "shared/src/skills.ts": "2c316b0c121d28b7a2170ae43f84e114a52dafa7b6871c9375ea20281e2f3962",
+    "shared/src/skill-targeting.ts": "1c4e92b71b47b2e2910a1bd5e492fa05b21f2da85a28bd54684eef4b5c451ea1",
+    "shared/src/entities.ts": "805f5f848d815541233aa0e80db7a2826c6b2d7e691db01dc0e9686023477555"
+  },
+  "totals": [
+    {
+      "scenario": "production",
+      "scenarios": 216,
+      "victories": 25,
+      "deaths": 27,
+      "timeouts": 164,
+      "meanEnergyBlockedSeconds": 1.1444444444444446
+    },
+    {
+      "scenario": "regen10-experiment",
+      "scenarios": 216,
+      "victories": 26,
+      "deaths": 27,
+      "timeouts": 163,
+      "meanEnergyBlockedSeconds": 0
+    },
+    {
+      "scenario": "stone-order",
+      "scenarios": 16,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 16,
+      "meanEnergyBlockedSeconds": 0
+    }
+  ],
+  "summary": [
+    {
+      "key": "production/barbaro_nv1_1/barbaro_nv2_1/all-cantrips",
+      "scenarios": 24,
+      "victories": 13,
+      "deaths": 8,
+      "timeouts": 3,
+      "medianBossHpRemainingPercent": 0,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 535
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_1/barbaro_nv2_1/all-cantrips",
+      "scenarios": 24,
+      "victories": 13,
+      "deaths": 8,
+      "timeouts": 3,
+      "medianBossHpRemainingPercent": 0,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 535
+    },
+    {
+      "key": "production/barbaro_nv1_1/barbaro_nv2_2/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 24,
+      "medianBossHpRemainingPercent": 7.38,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 570
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_1/barbaro_nv2_2/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 24,
+      "medianBossHpRemainingPercent": 7.38,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 570
+    },
+    {
+      "key": "production/barbaro_nv1_1/barbaro_nv2_3/all-cantrips",
+      "scenarios": 24,
+      "victories": 11,
+      "deaths": 9,
+      "timeouts": 4,
+      "medianBossHpRemainingPercent": 1.645,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 550
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_1/barbaro_nv2_3/all-cantrips",
+      "scenarios": 24,
+      "victories": 11,
+      "deaths": 9,
+      "timeouts": 4,
+      "medianBossHpRemainingPercent": 1.645,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 550
+    },
+    {
+      "key": "production/barbaro_nv1_2/barbaro_nv2_1/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 6,
+      "timeouts": 18,
+      "medianBossHpRemainingPercent": 13.504999999999999,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 591
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_2/barbaro_nv2_1/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 6,
+      "timeouts": 18,
+      "medianBossHpRemainingPercent": 13.504999999999999,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 591
+    },
+    {
+      "key": "production/barbaro_nv1_2/barbaro_nv2_2/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 24,
+      "medianBossHpRemainingPercent": 20.975,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 606
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_2/barbaro_nv2_2/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 24,
+      "medianBossHpRemainingPercent": 20.975,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 606
+    },
+    {
+      "key": "production/barbaro_nv1_2/barbaro_nv2_3/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 4,
+      "timeouts": 20,
+      "medianBossHpRemainingPercent": 15.675,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 596
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_2/barbaro_nv2_3/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 4,
+      "timeouts": 20,
+      "medianBossHpRemainingPercent": 15.675,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 596
+    },
+    {
+      "key": "production/barbaro_nv1_3/barbaro_nv2_1/all-cantrips",
+      "scenarios": 24,
+      "victories": 1,
+      "deaths": 0,
+      "timeouts": 23,
+      "medianBossHpRemainingPercent": 5.4,
+      "medianEnergyBlockedSeconds": 3.149999999999997,
+      "medianNoAffordableReadySkillSeconds": 3.099999999999997,
+      "medianEnergySpent": 607
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_3/barbaro_nv2_1/all-cantrips",
+      "scenarios": 24,
+      "victories": 2,
+      "deaths": 0,
+      "timeouts": 22,
+      "medianBossHpRemainingPercent": 4.025,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 631
+    },
+    {
+      "key": "production/barbaro_nv1_3/barbaro_nv2_2/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 24,
+      "medianBossHpRemainingPercent": 12.629999999999999,
+      "medianEnergyBlockedSeconds": 1.1500000000000004,
+      "medianNoAffordableReadySkillSeconds": 1.1500000000000004,
+      "medianEnergySpent": 610
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_3/barbaro_nv2_2/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 24,
+      "medianBossHpRemainingPercent": 12.100000000000001,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 646
+    },
+    {
+      "key": "production/barbaro_nv1_3/barbaro_nv2_3/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 24,
+      "medianBossHpRemainingPercent": 6.865,
+      "medianEnergyBlockedSeconds": 3.7999999999999945,
+      "medianNoAffordableReadySkillSeconds": 3.7499999999999947,
+      "medianEnergySpent": 612
+    },
+    {
+      "key": "regen10-experiment/barbaro_nv1_3/barbaro_nv2_3/all-cantrips",
+      "scenarios": 24,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 24,
+      "medianBossHpRemainingPercent": 5.855,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 636
+    },
+    {
+      "key": "stone-order/barbaro_nv1_1/barbaro_nv2_2/1,2,3,4",
+      "scenarios": 8,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 8,
+      "medianBossHpRemainingPercent": 3.765,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 570
+    },
+    {
+      "key": "stone-order/barbaro_nv1_1/barbaro_nv2_2/3,1,2,4",
+      "scenarios": 8,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 8,
+      "medianBossHpRemainingPercent": 4.465,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 570
+    },
+    {
+      "key": "investment-skill/barbaro_nv1_1/barbaro_nv2_1/all-cantrips",
+      "scenarios": 8,
+      "victories": 6,
+      "deaths": 2,
+      "timeouts": 0,
+      "medianBossHpRemainingPercent": 0,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 535
+    },
+    {
+      "key": "investment-weapon/barbaro_nv1_1/barbaro_nv2_1/all-cantrips",
+      "scenarios": 8,
+      "victories": 6,
+      "deaths": 2,
+      "timeouts": 0,
+      "medianBossHpRemainingPercent": 0,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 535
+    },
+    {
+      "key": "investment-fusion/barbaro_nv1_1/barbaro_nv2_1/all-cantrips",
+      "scenarios": 8,
+      "victories": 6,
+      "deaths": 2,
+      "timeouts": 0,
+      "medianBossHpRemainingPercent": 0,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 535
+    },
+    {
+      "key": "investment-skill/barbaro_nv1_1/barbaro_nv2_2/all-cantrips",
+      "scenarios": 8,
+      "victories": 4,
+      "deaths": 0,
+      "timeouts": 4,
+      "medianBossHpRemainingPercent": 0.2,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 570
+    },
+    {
+      "key": "investment-weapon/barbaro_nv1_1/barbaro_nv2_2/all-cantrips",
+      "scenarios": 8,
+      "victories": 0,
+      "deaths": 0,
+      "timeouts": 8,
+      "medianBossHpRemainingPercent": 2.995,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 570
+    },
+    {
+      "key": "investment-fusion/barbaro_nv1_1/barbaro_nv2_2/all-cantrips",
+      "scenarios": 8,
+      "victories": 2,
+      "deaths": 0,
+      "timeouts": 6,
+      "medianBossHpRemainingPercent": 1.6099999999999999,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 570
+    },
+    {
+      "key": "investment-skill/barbaro_nv1_2/barbaro_nv2_1/all-cantrips",
+      "scenarios": 8,
+      "victories": 0,
+      "deaths": 2,
+      "timeouts": 6,
+      "medianBossHpRemainingPercent": 6.76,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 591
+    },
+    {
+      "key": "investment-weapon/barbaro_nv1_2/barbaro_nv2_1/all-cantrips",
+      "scenarios": 8,
+      "victories": 0,
+      "deaths": 2,
+      "timeouts": 6,
+      "medianBossHpRemainingPercent": 9.085,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 591
+    },
+    {
+      "key": "investment-fusion/barbaro_nv1_2/barbaro_nv2_1/all-cantrips",
+      "scenarios": 8,
+      "victories": 0,
+      "deaths": 1,
+      "timeouts": 7,
+      "medianBossHpRemainingPercent": 7.8,
+      "medianEnergyBlockedSeconds": 0,
+      "medianNoAffordableReadySkillSeconds": 0,
+      "medianEnergySpent": 591
+    }
+  ],
+  "regenGainedVictories": 1,
+  "regenLostVictories": 0,
+  "investmentPairs": [
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "victory",
+      "outcome": "victory",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "victory",
+      "gainedVictory": true,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "victory",
+      "gainedVictory": true,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "victory",
+      "gainedVictory": true,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "victory",
+      "gainedVictory": true,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "victory",
+      "gainedVictory": true,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "victory",
+      "gainedVictory": true,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_1",
+        "3": "barbaro_nv2_2",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 101,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 202,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 303,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 404,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 505,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 606,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 707,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "timeout",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "skill",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1380,
+      "materialsUsed": {
+        "dust": 3,
+        "stones": 0,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "weapon",
+      "baselineOutcome": "death",
+      "outcome": "death",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1500,
+      "materialsUsed": {
+        "dust": 0,
+        "stones": 3,
+        "ore": 0
+      }
+    },
+    {
+      "seed": 808,
+      "selectedSkills": {
+        "1": "barbaro_truque_1",
+        "2": "barbaro_nv1_2",
+        "3": "barbaro_nv2_1",
+        "4": "barbaro_nv3_1"
+      },
+      "investment": "fusion",
+      "baselineOutcome": "death",
+      "outcome": "timeout",
+      "gainedVictory": false,
+      "lostVictory": false,
+      "spentGold": 1800,
+      "materialsUsed": {
+        "dust": 8,
+        "stones": 0,
+        "ore": 6
+      }
+    }
+  ],
+  "checks": {
+    "scenarios": 520,
+    "pairedRegen": 216,
+    "pairedInvestments": 72,
+    "rejections": 0,
+    "emptyCasts": 0,
+    "telemetryCastCountAndDirectDamage": "verified",
+    "testsServer": 301,
+    "serverBuild": "passed"
+  },
+  "productionDecision": "Keep regeneration 8, coefficients, configured rotation and encounter unchanged; evidence does not support a general energy buff."
+}

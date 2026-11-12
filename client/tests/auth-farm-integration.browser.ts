@@ -93,7 +93,7 @@ try {
   }
   click('leaderboard-close');
   net.sendExpandInventory(); await until(() => lastExpansion !== null, 'expansion rejection');
-  check(lastExpansion!.success === false && lastExpansion!.newMaxSlots === 20 && lastExpansion!.goldSpent === 0 && lastExpansion!.nextExpansionCost === 10000 && lastExpansion!.nextExpansionMinLevel === 15, 'Servidor rejeita expansão prematura sem cobrar e retorna cotação real');
+  check(lastExpansion!.success === false && lastExpansion!.newMaxSlots === 20 && lastExpansion!.goldSpent === 0 && lastExpansion!.nextExpansionCost === 10000 && lastExpansion!.nextExpansionMinLevel === 1, 'Servidor rejeita compra sem capacidade confirmada e retorna cotação sem bloqueio por nível');
   net.disconnect();
   await until(() => !input('forge-account-password').disabled, 'disconnect');
   check(input('btn-save-farm-helper').disabled && auth.isOpen(), 'Desconexão limpa preferências e retorna ao login');

@@ -1,4 +1,5 @@
 import { setupInventoryExpansion } from '../src/ui/InventoryExpansion';
+import { getInventoryExpansion } from '@magicforge/shared';
 import '../src/ui/progression.css';
 import '../src/ui/inventory-view.css';
 
@@ -13,7 +14,7 @@ if (title) title.textContent = 'Prévia de teste · nenhuma compra na conta real
 const pane = modal.querySelector<HTMLElement>('.unified-submenus-right-pane');
 if (pane) pane.style.width = '100%';
 modal.querySelector('#inventory-inspector')?.remove();
-const context = { maxSlots: 31, gold: 1_000_000, level: 35, reborn: 0 };
+const context = { maxSlots: 31, gold: 1_000_000, level: 1, reborn: 0, cash: 0, seals: 0 };
 function draw() {
   document.getElementById('inventory-capacity-text')!.textContent = `MOCHILA: 31 / ${context.maxSlots}`;
   const grid = document.getElementById('inventory-slots-grid')!;
@@ -29,9 +30,10 @@ const expansion = setupInventoryExpansion({
   send(expectedMaxSlots) {
     requests++;
     if (expectedMaxSlots !== context.maxSlots) throw new Error('Stale quote');
-    context.maxSlots += 5; context.gold -= 250_000;
-    expansion.onResult({ success: true, newMaxSlots: context.maxSlots, remainingGold: context.gold, goldSpent: 250_000, message: 'Prévia: 5 espaços liberados. Nenhum ouro real foi gasto.' });
-    document.body.dataset.result = requests === 1 && context.maxSlots === 36 ? 'pass' : 'fail';
+    const next = getInventoryExpansion(context.maxSlots)!;
+    context.maxSlots = next.newMaxSlots; context.gold -= next.cost;
+    expansion.onResult({ success: true, newMaxSlots: context.maxSlots, remainingGold: context.gold, goldSpent: next.cost, message: 'Prévia: espaços liberados. Nenhum ouro real foi gasto.' });
+    document.body.dataset.result = requests === 1 && context.maxSlots === 35 ? 'pass' : 'fail';
   },
   apply() { draw(); expansion.setContext(context); },
 });
