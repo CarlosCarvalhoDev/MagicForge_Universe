@@ -2,6 +2,7 @@ import { WarehouseSession } from './WarehouseSession';
 import type { C2SMoveInputPayload, WarehouseStatePayload } from '@magicforge/shared';
 import {
   CharacterClass,
+  CREATABLE_CHARACTER_CLASSES,
   createVector3,
   distance,
   distanceSquared,
@@ -631,16 +632,10 @@ export class World {
       return;
     }
 
-    const unlockedInitialClasses = [
-      CharacterClass.GUERREIRO,
-      CharacterClass.CLERIGO,
-      CharacterClass.BARBARO,
-      CharacterClass.ARQUEIRO,
-    ];
-    if (!unlockedInitialClasses.includes(classType)) {
+    if (!CREATABLE_CHARACTER_CLASSES.includes(classType)) {
       connection.send(Opcode.S2C_ERROR, {
-        errorCode: 'INVALID_SLOT',
-        errorMessage: 'Esta classe ainda não está liberada. Escolha Guerreiro, Clérigo, Bárbaro ou Arqueiro.',
+        errorCode: 'CLASS_UNAVAILABLE',
+        errorMessage: 'Esta classe ainda não está liberada. Escolha uma classe disponível na Forja.',
         slotIndex,
       } as S2CCharacterActionErrorPayload);
       return;
@@ -1269,7 +1264,7 @@ export class World {
     if (monster.attackCooldown <= 0) {
       const damage = Math.round(monster.attackDamage*(1-Math.max(0,Math.min(.5,monster.getStatus('WEAKENED')?.magnitude??0))));
       // Dodge check based on player DEX
-      const isDodged = Math.random() < (player.attributes.destreza * 0.01);
+      const isDodged = Math.random() < (player.attributes.destreza * 0.01 + (monster.getStatus('HADAR_BLIND')?.magnitude ?? 0));
 
       if (!isDodged) {
         const dmgRes = player.takeDamage(damage, monster);
@@ -1491,7 +1486,7 @@ export class World {
 
   private clearCombatEffectsFromSource(sourceId:string):void{
     for(const monster of this.entityManager.getAllMonsters())for(const status of [...monster.activeStatuses.values()]){
-      if(status.sourceEntityId===sourceId && ['BURN','FROST_SLOW','FROZEN','BLEED','CRIPPLED','WEAKENED'].includes(status.type)){
+      if(status.sourceEntityId===sourceId && ['BURN','FROST_SLOW','FROZEN','BLEED','CRIPPLED','WEAKENED','WARLOCK_PLAGUE','WARLOCK_HEX','NECROTIC_TOUCH','HADAR_BLIND'].includes(status.type)){
         monster.removeStatus(status.statusId);this.broadcastStatusTransition('CLEARED_ON_DISCONNECT',status);
       }
     }
@@ -1504,13 +1499,13 @@ export class World {
     target.addStatus(status);this.broadcastStatusTransition('APPLIED',status);return status;
   }
 
-  private updateMageBurn(monster:Monster,status:ActiveCombatStatus,deltaTimeSec:number):void{
+  private updateMonsterDamageOverTime(monster:Monster,status:ActiveCombatStatus,deltaTimeSec:number):void{
     const periodic=status.periodic,source=this.entityManager.getPlayer(status.sourceEntityId);
     if(!periodic||!source||source.isDead)return;
-    periodic.elapsedSec=Math.min(MAGE_INITIAL_EFFECTS.burnDurationSec,periodic.elapsedSec+Math.min(deltaTimeSec,Math.max(0,status.remainingSec)));
-    while(periodic.pulsesDone<4 && periodic.elapsedSec+1e-8>=periodic.pulsesDone+1){
+    periodic.elapsedSec=Math.min(status.durationSec,periodic.elapsedSec+Math.min(deltaTimeSec,Math.max(0,status.remainingSec)));
+    while(periodic.pulsesDone<status.durationSec && periodic.elapsedSec+1e-8>=periodic.pulsesDone+1){
       if(monster.isDead||source.isDead||!monster.activeStatuses.has(status.statusId))break;
-      const power=splitMagePower(periodic.totalPower,++periodic.pulsesDone,4),previousHp=monster.currentHp;
+      const power=splitMagePower(periodic.totalPower,++periodic.pulsesDone,status.durationSec),previousHp=monster.currentHp;
       monster.takeDamage(power,source);
       const damage=Math.max(0,previousHp-monster.currentHp);
       this.broadcastStatusTransition('TICK',status,{tickDamage:damage,targetRemainingHp:monster.currentHp,isTargetDead:monster.isDead});
@@ -1521,9 +1516,10 @@ export class World {
 
   private updateAreaDamageEffect(player:Player,status:ActiveCombatStatus,deltaTimeSec:number):void{
     const pack=status.type==='SPECTRAL_PACK';
-    const duration=pack?MARTIAL_EFFECTS.packSec:MAGE_ULTIMATE_EFFECTS.cometDurationSec;
-    const pulses=pack?MARTIAL_EFFECTS.packPulses:MAGE_ULTIMATE_EFFECTS.cometPulses;
-    const interval=pack?1:MAGE_ULTIMATE_EFFECTS.cometIntervalSec;
+    const warlockArea = status.type === 'HADAR_HUNGER' || status.type === 'ABYSSAL_DEMON';
+    const duration=warlockArea ? status.durationSec : pack?MARTIAL_EFFECTS.packSec:MAGE_ULTIMATE_EFFECTS.cometDurationSec;
+    const pulses=warlockArea ? duration : pack?MARTIAL_EFFECTS.packPulses:MAGE_ULTIMATE_EFFECTS.cometPulses;
+    const interval=pack||warlockArea?1:MAGE_ULTIMATE_EFFECTS.cometIntervalSec;
     const periodic=status.periodic,center=pack?player.position:status.areaCenter;
     if(!periodic||!center||player.isDead)return;
     periodic.elapsedSec=Math.min(duration,periodic.elapsedSec+Math.min(deltaTimeSec,Math.max(0,status.remainingSec)));
@@ -1533,6 +1529,7 @@ export class World {
       const targets=this.entityManager.getAllMonsters().filter(monster=>!monster.isDead&&distanceSquared(center,monster.position)<=(status.radius??6.5)**2);
       for(const monster of targets){
         if(player.isDead)break;
+        if (status.type === 'HADAR_HUNGER') this.applySkillStatus(player, monster, 'HADAR_BLIND', 1.1, .3, status.skillId);
         const previousHp=monster.currentHp;monster.takeDamage(power,player);const damage=Math.max(0,previousHp-monster.currentHp);totalDamage+=damage;
         this.broadcast(Opcode.S2C_COMBAT_EVENT,{attackerId:player.id,targetId:monster.id,damage,isCritical:false,isDodged:false,targetRemainingHp:monster.currentHp,targetMaxHp:monster.maxHp,isTargetDead:monster.isDead,damageSource:'STATUS_TICK'} as S2CCombatEventPayload);
         if(monster.isDead)this.handleMonsterDeath(monster,player);
@@ -1553,13 +1550,13 @@ export class World {
 
       for (const [statusId, status] of Array.from(ent.activeStatuses.entries())) {
         if(!ent.activeStatuses.has(statusId))continue;
-        if(['BURN','FROST_SLOW','FROZEN','BLEED','CRIPPLED','WEAKENED'].includes(status.type)){
+        if(['BURN','FROST_SLOW','FROZEN','BLEED','CRIPPLED','WEAKENED','WARLOCK_PLAGUE','WARLOCK_HEX','NECROTIC_TOUCH','HADAR_BLIND'].includes(status.type)){
           const source=this.entityManager.getPlayer(status.sourceEntityId);
           if(!source||source.isDead){ent.removeStatus(statusId);this.broadcastStatusTransition(source?'CLEARED_ON_DEATH':'CLEARED_ON_DISCONNECT',status);continue;}
-          if(ent instanceof Monster && status.type==='BURN')this.updateMageBurn(ent,status,deltaTimeSec);
+          if(ent instanceof Monster && ['BURN','WARLOCK_PLAGUE'].includes(status.type))this.updateMonsterDamageOverTime(ent,status,deltaTimeSec);
         }
         if(ent instanceof Player && status.periodic){
-          if(status.type==='COMET_RAIN'||status.type==='SPECTRAL_PACK')this.updateAreaDamageEffect(ent,status,deltaTimeSec);
+          if(['COMET_RAIN','SPECTRAL_PACK','HADAR_HUNGER','ABYSSAL_DEMON'].includes(status.type))this.updateAreaDamageEffect(ent,status,deltaTimeSec);
           else this.updateClericPeriodicEffect(ent,status,deltaTimeSec);
         }
 
@@ -1922,11 +1919,11 @@ export class World {
           }
           targetsToDamage=chain;
         }
-        if (targetsToDamage.length === 0) {
+        if (targetsToDamage.length === 0 && skill.skillId !== 'bruxo_nv2_3') {
           this.sendSkillRejection(player, slot, 'NO_VALID_TARGET', 'Nenhum inimigo dentro da área de impacto.', skill.skillId);
           return false;
         }
-        if (!resolvedTargetId) resolvedTargetId = targetsToDamage[0].id;
+        if (!resolvedTargetId) resolvedTargetId = targetsToDamage[0]?.id;
         break;
       }
     }
@@ -1938,6 +1935,19 @@ export class World {
       this.sendSkillRejection(player,slot,'INVALID_POSITION','Ponto de salto fora do mapa.',skill.skillId);return false;
     }
     const castOrigin=cloneVector3(player.position);
+    if (skill.skillId === 'bruxo_nv2_3') {
+      const bounds = SERVER_CONFIG.MAP_BOUNDS;
+      if (Math.abs(resolvedCenter.y) > .001 || resolvedCenter.x < bounds.minX || resolvedCenter.x > bounds.maxX ||
+          resolvedCenter.z < bounds.minZ || resolvedCenter.z > bounds.maxZ) {
+        this.sendSkillRejection(player, slot, 'INVALID_POSITION', 'Destino das Brumas fora do mapa.', skill.skillId);
+        return false;
+      }
+      targetsToDamage = this.entityManager.getAllMonsters().filter(monster =>
+        !monster.isDead && distanceSquared(castOrigin, monster.position) <= (skill.aoeRadius ?? 3.5) ** 2);
+      player.stopMoving();
+      player.position = cloneVector3(resolvedCenter);
+      this.spatialGrid.updateEntity(player);
+    }
     player.consumeResource(resourceCost);
     const cooldownSec=slot===1&&player.hasStatus('ARCANE_HASTE')?skill.cooldownSec*MAGE_SECOND_CIRCLE_EFFECTS.hasteCantripCooldownMultiplier:skill.cooldownSec;
     player.setSkillCooldown(slot, cooldownSec);
@@ -1977,6 +1987,30 @@ export class World {
     } else if (skill.skillId==='mago_nv2_3') {
       const status=this.applySkillStatus(player,player,'ARCANE_HASTE',MAGE_SECOND_CIRCLE_EFFECTS.hasteDurationSec,MAGE_SECOND_CIRCLE_EFFECTS.hasteDecisionMultiplier-1,skill.skillId);
       appliedStatuses.push(this.toCombatStatusPayload(status));affectedEntityIds.push(player.id);
+    } else if (skill.skillId === 'bruxo_nv1_2') {
+      const shieldPower = Math.max(1, Math.round(player.attributes.carisma * 1.5 * upgradeMultiplier));
+      const status = this.applySkillStatus(player, player, 'SHIELD', 8, shieldPower, skill.skillId, {
+        remainingAbsorption: shieldPower, maxAbsorption: shieldPower, reflectRatio: 1, reflectOnAbsorbed: true,
+      });
+      appliedStatuses.push(this.toCombatStatusPayload(status));
+      affectedEntityIds.push(player.id);
+    } else if (skill.skillId === 'bruxo_nv2_1' || skill.skillId === 'bruxo_nv3_2') {
+      const demon = skill.skillId === 'bruxo_nv3_2';
+      const power = Math.round(player.attributes.carisma * (demon ? 4.5 : 2.4) * upgradeMultiplier * player.getDamageMultiplier());
+      const status = this.applySkillStatus(player, player, demon ? 'ABYSSAL_DEMON' : 'HADAR_HUNGER',
+        demon ? 10 : 5, power, skill.skillId, {
+          areaCenter: cloneVector3(resolvedCenter), radius: skill.aoeRadius,
+          periodic: { elapsedSec: 0, pulsesDone: 0, totalPower: power },
+        });
+      appliedStatuses.push(this.toCombatStatusPayload(status));
+      affectedEntityIds.push(player.id);
+    } else if (skill.skillId === 'bruxo_truque_3' && singleTargetMonster) {
+      const power = Math.round(player.attributes.carisma * 1.3 * upgradeMultiplier * player.getDamageMultiplier());
+      const status = this.applySkillStatus(player, singleTargetMonster, 'WARLOCK_PLAGUE', 4, power, skill.skillId, {
+        periodic: { elapsedSec: 0, pulsesDone: 0, totalPower: power },
+      });
+      appliedStatuses.push(this.toCombatStatusPayload(status));
+      affectedEntityIds.push(singleTargetMonster.id);
     } else if (skill.skillId === 'mago_nv1_2') {
       const status=this.applySkillStatus(player,player,'SHIELD',MAGE_INITIAL_EFFECTS.shieldDurationSec,basePower,skill.skillId,{remainingAbsorption:basePower,maxAbsorption:basePower,reflectRatio:MAGE_INITIAL_EFFECTS.shieldReflection,reflectOnAbsorbed:true});
       appliedStatuses.push(this.toCombatStatusPayload(status));affectedEntityIds.push(player.id);
@@ -2519,7 +2553,18 @@ export class World {
       } else {
         for (const m of targetsToDamage) {
           const wasAlive = !m.isDead;
-          const dmgRes = m.takeDamage(finalPower, player);
+          if (skill.skillId === 'bruxo_nv3_1' && !m.trainingDummy) {
+            m.isMoving = false;
+            m.velocity = createVector3(0, 0, 0);
+            m.position.x = resolvedCenter.x + (m.position.x - resolvedCenter.x) * .25;
+            m.position.z = resolvedCenter.z + (m.position.z - resolvedCenter.z) * .25;
+            this.spatialGrid.updateEntity(m);
+          }
+          const agonySecondary = skill.skillId === 'bruxo_nv3_3' && m.id !== resolvedTargetId;
+          const power = skill.skillId === 'bruxo_nv3_3'
+            ? Math.round(player.attributes.carisma * (agonySecondary ? 2.5 : 4.9) * upgradeMultiplier * player.getDamageMultiplier() * (isCritical ? 1.5 : 1))
+            : finalPower;
+          const dmgRes = m.takeDamage(power, player);
           affectedEntityIds.push(m.id);
           totalEffectiveDamageOrHeal += dmgRes.effectiveDamage;
 
@@ -2534,6 +2579,19 @@ export class World {
             isCritical,
           });
 
+          if (!m.isDead && skill.skillId === 'bruxo_nv1_3') {
+            appliedStatuses.push(this.toCombatStatusPayload(this.applySkillStatus(player, m, 'CRIPPLED', 1.5, 1, skill.skillId)));
+          }
+          if (!m.isDead && skill.skillId === 'bruxo_truque_2') {
+            appliedStatuses.push(this.toCombatStatusPayload(this.applySkillStatus(player, m, 'NECROTIC_TOUCH', 4, .5, skill.skillId)));
+          }
+          if (skill.skillId === 'bruxo_nv1_1') {
+            if (!m.isDead) appliedStatuses.push(this.toCombatStatusPayload(this.applySkillStatus(player, m, 'WARLOCK_HEX', 6, .25, skill.skillId)));
+            const heal = player.heal(Math.round(dmgRes.effectiveDamage * .25));
+            totalEffectiveDamageOrHeal += heal;
+            if (heal > 0) targetResults.push({ targetId: player.id, impactPosition: cloneVector3(player.position),
+              effectiveDamage: 0, effectiveHeal: heal, remainingHp: player.currentHp, maxHp: player.maxHp, isDead: false, isCritical: false });
+          }
           if (wasAlive && m.isDead) {
             this.handleMonsterDeath(m, player);
           }
@@ -3555,6 +3613,25 @@ export class World {
         cooldownsReset = true;
         message = 'Recargas das habilidades zeradas.';
         break;
+      case 'maxLevel':
+        if (player.isDead) {
+          message = 'Aguarde o renascimento do herói.';
+          break;
+        }
+        player.reachMaxLevel();
+        this.db.savePlayer(player);
+        this.sendExpUpdate(player, 0, 'Painel Dev');
+        this.sendInventoryUpdate(player);
+        message = `${player.name} está no nível máximo (${player.level}).`;
+        break;
+      case 'clearInventory': {
+        if (command.confirmed !== true || !player.dbCharacterId) return;
+        const removed = this.db.clearUnlockedBackpack(player.dbCharacterId);
+        player.inventory = this.db.getInventory(player.dbCharacterId);
+        this.sendInventoryUpdate(player);
+        message = `${removed} espaço(s) da mochila esvaziado(s).`;
+        break;
+      }
       case 'clearDrops':
         for (const dropId of this.activeItemDrops.keys()) {
           this.broadcast(Opcode.S2C_ITEM_DROP_DESPAWN, { dropId, reason: 'EXPIRED' } satisfies S2CItemDropDespawnPayload);

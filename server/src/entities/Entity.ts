@@ -106,7 +106,7 @@ export abstract class Entity {
 
   public getArmorMultiplier(): number {
     const armorBreak = this.getStatus('ARMOR_BREAK');
-    return armorBreak ? 1.0 + armorBreak.magnitude : 1.0;
+    return (1 + (armorBreak?.magnitude ?? 0)) * (1 + (this.getStatus('WARLOCK_HEX')?.magnitude ?? 0));
   }
 
   public getDamageMultiplier(): number {
@@ -203,7 +203,8 @@ export abstract class Entity {
   public heal(amount: number): number {
     if (this.isDead || amount <= 0) return 0;
     const prevHp = this.currentHp;
-    this.currentHp = Math.min(this.maxHp, this.currentHp + amount);
+    const effective = this.hasStatus('NECROTIC_TOUCH') ? Math.round(amount * .5) : amount;
+    this.currentHp = Math.min(this.maxHp, this.currentHp + effective);
     return this.currentHp - prevHp;
   }
 

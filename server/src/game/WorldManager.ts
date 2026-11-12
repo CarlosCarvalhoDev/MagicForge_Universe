@@ -1,5 +1,6 @@
 import {
   CharacterClass,
+  CREATABLE_CHARACTER_CLASSES,
   createVector3,
   Opcode,
   ChannelSummaryPayload,
@@ -435,16 +436,10 @@ export class WorldManager {
       return;
     }
 
-    const unlockedInitialClasses = [
-      CharacterClass.GUERREIRO,
-      CharacterClass.CLERIGO,
-      CharacterClass.BARBARO,
-      CharacterClass.ARQUEIRO,
-    ];
-    if (!unlockedInitialClasses.includes(classType)) {
+    if (!CREATABLE_CHARACTER_CLASSES.includes(classType)) {
       connection.send(Opcode.S2C_ERROR, {
-        errorCode: 'INVALID_SLOT',
-        errorMessage: 'Esta classe ainda não está liberada. Escolha Guerreiro, Clérigo, Bárbaro ou Arqueiro.',
+        errorCode: 'CLASS_UNAVAILABLE',
+        errorMessage: 'Esta classe ainda não está liberada. Escolha uma classe disponível na Forja.',
         slotIndex,
       } as S2CCharacterActionErrorPayload);
       return;

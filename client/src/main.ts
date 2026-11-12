@@ -2203,17 +2203,22 @@ network.onSnapshot = (snapshot) => {
 
 network.onCombatEvent = (event) => {
   bossNarrative.onCombatEvent(event);
-  if (combatTriggersAttack(event.damageSource)) renderer.triggerEntityAnimation(event.attackerId, 'attack');
+  const entities = snapshotBuffer.getInterpolatedEntities();
+  const caster = entities.find(entity => entity.id === event.attackerId);
+  const target = entities.find(entity => entity.id === event.targetId);
+  let delay = 0;
+  if (combatTriggersAttack(event.damageSource)) {
+    renderer.triggerEntityAnimation(event.attackerId, 'attack');
+    if (caster && target) delay = renderer.playWarlockBasicAttack(caster, target, !event.isDodged && event.damage > 0);
+  }
   if (event.isTargetDead) {
     renderer.triggerEntityAnimation(event.targetId, 'death');
-  } else if (!event.isDodged && event.damage > 0) {
+  } else if (!delay && !event.isDodged && event.damage > 0) {
     renderer.triggerEntityAnimation(event.targetId, 'hit');
   }
 
-  const entities = snapshotBuffer.getInterpolatedEntities();
-  const target = entities.find((e) => e.id === event.targetId);
   if (target) {
-    renderer.addDamageText(target.position, event.damage, event.isCritical, event.isDodged);
+    renderer.addDamageText(target.position, event.damage, event.isCritical, event.isDodged, delay);
   }
 };
 
@@ -2506,7 +2511,7 @@ network.onPlayerExpUpdate = (payload) => {
 
   const entities = snapshotBuffer.getInterpolatedEntities();
   const myPlayer = entities.find((e) => e.id === network.myPlayerId);
-  if (myPlayer) {
+  if (myPlayer && payload.expGained > 0) {
     renderer.addExperienceText(myPlayer.position, payload.expGained);
   }
 };

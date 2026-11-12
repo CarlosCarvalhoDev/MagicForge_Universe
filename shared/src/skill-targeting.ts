@@ -20,5 +20,5 @@ export function getSkillTargeting(skill: SkillDefinition): { category: SkillCate
 
 /** Remaining self-buffs have metadata, but no server effect yet. Do not spend resources on them. */
 export function isSkillEffectAvailable(skill: SkillDefinition): boolean {
-  return getSkillTargeting(skill).category !== 'SELF_BUFF' || ['guerreiro_nv2_2','barbaro_nv1_1','clerigo_nv1_2','mago_nv1_2','mago_nv2_3'].includes(skill.skillId);
+  return getSkillTargeting(skill).category !== 'SELF_BUFF' || ['guerreiro_nv2_2','barbaro_nv1_1','clerigo_nv1_2','mago_nv1_2','mago_nv2_3','bruxo_nv1_2'].includes(skill.skillId);
 }

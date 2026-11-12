@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { HERO_SHEETS, HeroAnimationClock } from '../src/renderer/HeroAnimations.ts';
+import { HERO_SHEETS, HeroAnimationClock, heroCastArt, WarriorCastClock, warriorDirectionRow } from '../src/renderer/HeroAnimations.ts';
 import { PIXEL_SHEETS, pixelFamily, directionRow } from '../src/renderer/PixelAssets.ts';
-import { planWarriorCastFx } from '../src/renderer/PixelVfx.ts';
+import { planBarbarianCastFx, planBarbarianPackPulseFx, planWarriorCastFx } from '../src/renderer/PixelVfx.ts';
 import { decodePng } from './helpers/png-rgba.mjs';
 
 function getPngSize(filePath) {
@@ -16,32 +16,33 @@ function getPngSize(filePath) {
   };
 }
 
-test('Barbarian sheets are registered with standard timing and specifications', () => {
+test('Barbarian gameplay uses transparent 4-by-8 directional sheets', () => {
   const specs = HERO_SHEETS.BARBARO;
-  assert.ok(specs, 'HERO_SHEETS.BARBARO must exist');
-  assert.equal(specs.walk.frames, 6);
-  assert.equal(specs.walk.cols, 3);
-  assert.equal(specs.walk.rows, 2);
-  assert.equal(specs.walk.fps, 9);
-
-  assert.equal(specs.attack.frames, 6);
-  assert.equal(specs.attack.cols, 3);
-  assert.equal(specs.attack.rows, 2);
-  assert.equal(specs.attack.fps, 11);
-
-  assert.equal(specs.idle.frames, 4);
-  assert.equal(specs.idle.cols, 2);
-  assert.equal(specs.idle.rows, 2);
-
-  assert.equal(specs.hit.frames, 2);
-  assert.equal(specs.hit.cols, 2);
-  assert.equal(specs.hit.rows, 1);
-
-  assert.equal(specs.death.frames, 4);
-  assert.equal(specs.death.cols, 2);
-  assert.equal(specs.death.rows, 2);
+  const timing = { idle: 5, walk: 9, attack: 8, hit: 12, death: 7 };
+  for (const [action, fps] of Object.entries(timing)) {
+    const spec = specs[action];
+    assert.equal(spec.directional, true);
+    assert.equal(spec.cols, 4);
+    assert.equal(spec.rows, 8);
+    assert.equal(spec.frames, 4);
+    assert.equal(spec.fps, fps);
+    const file = path.join('client', 'public', spec.file.slice(1));
+    const png = decodePng(fs.readFileSync(file));
+    assert.equal(png.w, 888);
+    assert.equal(png.h, 1776);
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 4; col++) {
+        let painted = 0;
+        for (let y = row * 222; y < (row + 1) * 222; y++) {
+          for (let x = col * 222; x < (col + 1) * 222; x++) {
+            if (png.data[(y * png.w + x) * 4 + 3] > 128) painted++;
+          }
+        }
+        assert.ok(painted > 1000 && painted < 42000, `Sprite missing or opaque: ${action}, row ${row}, col ${col}`);
+      }
+    }
+  }
 });
-
 test('Physical PNG files for all Barbarian sheets exist on disk with 512px cell fidelity', () => {
   const bDir = path.join('client', 'public', 'assets', 'isometric', 'animations', 'heroes', 'barbaro');
   
@@ -184,15 +185,15 @@ test('PixelAssets recognizes BARBARO class and assigns barbarian family with cor
   assert.equal(family, 'barbarian', 'pixelFamily must map BARBARO to barbarian family');
 
   assert.ok(PIXEL_SHEETS.barbarian, 'PIXEL_SHEETS.barbarian must be registered');
-  assert.equal(PIXEL_SHEETS.barbarian.walk.cols, 8);
+  assert.equal(PIXEL_SHEETS.barbarian.walk.cols, 4);
   assert.equal(PIXEL_SHEETS.barbarian.idle.cols, 4);
-  assert.equal(PIXEL_SHEETS.barbarian.attack.cols, 6);
+  assert.equal(PIXEL_SHEETS.barbarian.attack.cols, 4);
 
-  // Direction row order for barbarian must be: south=0, west=1, east=2, north=3
   assert.equal(directionRow('barbarian', 'south'), 0);
-  assert.equal(directionRow('barbarian', 'west'), 1);
-  assert.equal(directionRow('barbarian', 'east'), 2);
-  assert.equal(directionRow('barbarian', 'north'), 3);
+  assert.equal(directionRow('barbarian', 'west'), 2);
+  assert.equal(directionRow('barbarian', 'east'), 6);
+  assert.equal(directionRow('barbarian', 'north'), 4);
+  assert.deepEqual(Array.from({ length: 8 }, (_, row) => warriorDirectionRow(-45 * row)), [0, 1, 2, 3, 4, 5, 6, 7]);
 });
 
 test('All 12 Barbarian skill icon assets exist on disk for HUD action bar and Grimório', () => {
@@ -203,12 +204,35 @@ test('All 12 Barbarian skill icon assets exist on disk for HUD action bar and Gr
     'barbaro_nv3_1', 'barbaro_nv3_2', 'barbaro_nv3_3',
   ];
   const skillsDir = path.join('client', 'public', 'assets', 'skills', 'illustrated');
-  for (const id of skillIds) {
+  const clock = new WarriorCastClock();
+  const caster = { id: 'barbaro', position: { x: 0, y: 0, z: 0 }, headingYaw: 0, currentHp: 100 };
+  const target = { x: 3, y: 0, z: 2 };
+  for (const [index, id] of skillIds.entries()) {
     const file = path.join(skillsDir, `${id}.png`);
     assert.ok(fs.existsSync(file), `Skill icon ${id}.png must exist in the canonical illustrated directory`);
     const stat = fs.statSync(file);
     assert.ok(stat.size > 1000, `Skill icon ${id}.png must have valid non-empty image content`);
+    const art = heroCastArt(id);
+    assert.equal(art.row, index % 3);
+    const sheet = getPngSize(path.join('client', 'public', art.file.slice(1)));
+    assert.deepEqual([sheet.width, sheet.height], [1448, 1086]);
+    assert.equal(clock.trigger(caster.id, id, 0), true);
+    assert.equal(clock.sample(caster.id, 375).frame, 3);
+    assert.equal(clock.sample(caster.id, 500), undefined);
+    const [cast, impact] = planBarbarianCastFx({
+      skillId: id, casterId: caster.id, affectedEntityIds: ['mob'], isHeal: false,
+      targetResults: [{ targetId: 'mob', impactPosition: target, effectiveDamage: 10, effectiveHeal: 0 }],
+    }, [caster]);
+    assert.equal(cast.barbarianRow, index);
+    assert.deepEqual(impact.position, target);
+    assert.ok(impact.delayMs > cast.delayMs);
   }
+  const atlas = getPngSize(path.join('client', 'public', 'assets', 'isometric', 'review', 'barbaro', 'barbaro_world_fx.png'));
+  assert.deepEqual([atlas.width / 4, atlas.height / 12], [286, 114]);
+  const status = { type: 'SPECTRAL_PACK', targetEntityId: caster.id, radius: 7 };
+  assert.deepEqual(planBarbarianPackPulseFx({ event: 'TICK', status }, [caster]),
+    [{ kind: 'barbarianBurst', barbarianRow: 11, position: caster.position, radius: 7 }]);
+  assert.deepEqual(planBarbarianPackPulseFx({ event: 'EXPIRED', status }, [caster]), []);
 });
 
 test('planWarriorCastFx produces valid visual effects for Barbarian abilities', () => {

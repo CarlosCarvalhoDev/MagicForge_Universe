@@ -43,7 +43,8 @@ export interface S2CLoginSuccessPayload {
 
 export type DevToggle = 'pauseRespawns' | 'disableDrops' | 'doubleLegendary' | 'infiniteVitals' | 'freezeMonsters';
 export type DevCommand =
-  | { action: 'state' | 'boss' | 'clearTargets' | 'reset' | 'refillVitals' | 'clearDrops' | 'resetCooldowns' }
+  | { action: 'state' | 'boss' | 'clearTargets' | 'reset' | 'refillVitals' | 'clearDrops' | 'resetCooldowns' | 'maxLevel' }
+  | { action: 'clearInventory'; confirmed: true }
   | { action: 'killVisible'; monsterIds: string[] }
   | { action: 'toggle'; key: DevToggle; enabled: boolean }
   | { action: 'dummy' | 'teleport'; x: number; z: number };
@@ -170,6 +171,12 @@ export type CombatStatusType =
   | 'STONE_SKIN'
   | 'UNBRIDLED_RAGE'
   | 'SPECTRAL_PACK'
+  | 'HADAR_HUNGER'
+  | 'ABYSSAL_DEMON'
+  | 'WARLOCK_PLAGUE'
+  | 'WARLOCK_HEX'
+  | 'NECROTIC_TOUCH'
+  | 'HADAR_BLIND'
   | 'DEATH_IMMUNITY';
 
 export type CombatStatusEventReason =
@@ -563,7 +570,7 @@ export interface C2SDeleteCharacterSlotPayload {
 }
 
 export interface S2CCharacterActionErrorPayload {
-  errorCode: 'INVALID_SLOT' | 'SLOT_OCCUPIED' | 'NAME_TAKEN' | 'INVALID_NAME' | 'CHARACTER_NOT_FOUND' | 'UNAUTHENTICATED' | 'DELETE_CONFIRMATION_REQUIRED' | 'CHARACTER_ACTIVE';
+  errorCode: 'INVALID_SLOT' | 'CLASS_UNAVAILABLE' | 'SLOT_OCCUPIED' | 'NAME_TAKEN' | 'INVALID_NAME' | 'CHARACTER_NOT_FOUND' | 'UNAUTHENTICATED' | 'DELETE_CONFIRMATION_REQUIRED' | 'CHARACTER_ACTIVE';
   errorMessage: string;
   slotIndex?: number;
 }

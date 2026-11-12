@@ -1018,6 +1018,12 @@ export class DatabaseManager {
   /**
    * Salva o estado atualizado do jogador (posição, vida, nível, atributos, ouro)
    */
+  public clearUnlockedBackpack(characterId: string): number {
+    return Number(this.db.prepare(
+      'DELETE FROM inventory WHERE character_id = ? AND slot_index >= 0 AND is_equipped = 0 AND is_locked = 0',
+    ).run(characterId).changes);
+  }
+
   public savePlayer(player: Player, throwOnError: boolean = false): void {
     const now = Date.now();
     try {

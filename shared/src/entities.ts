@@ -16,6 +16,10 @@ export enum CharacterClass {
   ARQUEIRO = 'ARQUEIRO',
 }
 
+export const CREATABLE_CHARACTER_CLASSES: readonly CharacterClass[] = [
+  CharacterClass.GUERREIRO, CharacterClass.CLERIGO, CharacterClass.BARBARO, CharacterClass.ARQUEIRO, CharacterClass.BRUXO,
+];
+
 export enum PrimaryStatType {
   FORCA = 'FORCA',
   DESTREZA = 'DESTREZA',

@@ -55,14 +55,40 @@ test('Fúria aplica dano +25%, resistência 15% e expira sem permanência ou emp
   assert.equal(f.player.BaseDamage,base);
 });
 
-test('Efeito pessoal não implementado não consome recurso nem cooldown',t=>{
+test('Armadura Gélida absorve, reflete e expira no servidor',t=>{
   const f=setup(t,CharacterClass.BRUXO,25,1);f.player.setEquippedSkill(2,'bruxo_nv1_2');
-  assert.equal(isSkillEffectAvailable(SKILLS_DATABASE.bruxo_nv1_2),false);
+  assert.equal(isSkillEffectAvailable(SKILLS_DATABASE.bruxo_nv1_2),true);
   const resource=f.player.currentResource;
-  assert.equal(f.world.castPlayerSkill(f.player,2),false);
-  assert.equal(f.player.currentResource,resource);assert.equal(f.player.getSkillCooldown(2),0);
-  assert.equal(f.errors().at(-1)!.data.reasonCode,'UNIMPLEMENTED_EFFECT');
-  f.packets.length=0;for(let n=0;n<20;n++)f.world.update(.05);assert.equal(f.errors().length,0);
+  assert.equal(f.world.castPlayerSkill(f.player,2),true);
+  assert.equal(f.player.currentResource,resource-SKILLS_DATABASE.bruxo_nv1_2.cost);
+  assert.ok(f.player.getSkillCooldown(2)>0);
+  const attack=f.player.takeDamage(10,f.target);
+  assert.equal(attack.absorbed,10);
+  assert.equal(attack.reflected,10);
+  f.world.updateCombatStatuses(8.01);
+  assert.equal(f.player.hasStatus('SHIELD'),false);
+});
+
+test('Praga e demônio causam dano periódico e o centro do demônio permanece no alvo', t => {
+  const f = setup(t, CharacterClass.BRUXO, 50, 5);
+  const targetHp = f.target.currentHp;
+  f.player.setEquippedSkill(1, 'bruxo_truque_3');
+  assert.equal(f.world.castPlayerSkill(f.player, 1, f.target.id), true);
+  assert.equal(f.target.currentHp, targetHp);
+  f.world.updateCombatStatuses(4.01);
+  assert.ok(f.target.currentHp < targetHp);
+  assert.equal(f.target.hasStatus('WARLOCK_PLAGUE'), false);
+  f.player.currentResource = f.player.maxResource;
+  f.player.setEquippedSkill(4, 'bruxo_nv3_2');
+  assert.equal(f.world.castPlayerSkill(f.player, 4, f.target.id), true);
+  const demon = f.player.getStatus('ABYSSAL_DEMON')!;
+  assert.deepEqual(demon.areaCenter, f.target.position);
+  const before = f.target.currentHp;
+  f.world.updateCombatStatuses(9);
+  assert.ok(f.target.currentHp < before);
+  assert.ok(f.player.hasStatus('ABYSSAL_DEMON'));
+  f.world.updateCombatStatuses(1.01);
+  assert.equal(f.player.hasStatus('ABYSSAL_DEMON'), false);
 });
 
 test('Bênção aplica os três bônus por 8s, renova sem empilhar e não vende evolução sem potência',t=>{

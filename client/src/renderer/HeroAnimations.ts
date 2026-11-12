@@ -27,6 +27,38 @@ export const WARRIOR_DIRECTIONAL_SHEETS = {
   death: warriorDirectional('death', 7),
 };
 
+const barbarianSprites = '/assets/isometric/review/barbaro';
+const barbarianDirectional = (action: HeroAction, fps: number): HeroSheetSpec => ({
+  file: `${barbarianSprites}/barbaro_${action}_sheet.png`,
+  cols: 4, rows: 8, frames: 4, fps, directional: true,
+});
+
+export const BARBARIAN_DIRECTIONAL_SHEETS: HeroSheetSet = {
+  idle: barbarianDirectional('idle', 5),
+  walk: barbarianDirectional('walk', 9),
+  attack: barbarianDirectional('attack', 8),
+  hit: barbarianDirectional('hit', 12),
+  death: barbarianDirectional('death', 7),
+};
+export const BARBARIAN_GROUND = 0.95;
+const warlockSprites = '/assets/isometric/review/bruxo';
+export const WARLOCK_DIRECTIONAL_SHEETS = Object.fromEntries(
+  (['idle', 'walk', 'attack', 'hit', 'death'] as const).map((action, index) => [action, {
+    file: `${warlockSprites}/bruxo_${action}_sheet.png`,
+    cols: 4, rows: 8, frames: 4, fps: [5, 9, 8, 12, 7][index], directional: true,
+  }]),
+) as HeroSheetSet;
+export const WARLOCK_GROUND = .93;
+export const WARLOCK_CAST_SHEETS = [1, 2, 3, 4].map(slot => `${warlockSprites}/bruxo_cast_${slot}.png`);
+export const WARLOCK_FX_SHEETS = [1, 2, 3, 4].map(slot => `${warlockSprites}/bruxo_fx_${slot}.png`);
+export const WARLOCK_RELEASE_MS = 320;
+
+export function warlockSkillArt(skillId: string) {
+  const match = /^bruxo_(truque|nv1|nv2|nv3)_([123])$/.exec(skillId);
+  if (!match) return;
+  return { slot: ['truque', 'nv1', 'nv2', 'nv3'].indexOf(match[1]), row: Number(match[2]) - 1 };
+}
+
 /** Sprite rows run clockwise from south toward west. Positive yaw turns toward east. */
 export function warriorDirectionRow(yaw: number): number {
   return ((Math.round(-yaw / 45) % 8) + 8) % 8;
@@ -34,6 +66,8 @@ export function warriorDirectionRow(yaw: number): number {
 
 export const WARRIOR_CAST_SHEETS = [1, 2, 3, 4].map(slot =>
   `${warriorV5}/guerreiro_skills_slot_${slot}_sheet.png`);
+export const BARBARIAN_CAST_SHEETS = [1, 2, 3, 4].map(slot =>
+  `${barbarianSprites}/barbaro_skills_slot_${slot}_sheet.png`);
 
 // Ground baselines in the authored 362px cells. Spell trails can extend below them.
 const warriorCastGround = [[303, 301, 304], [335, 324, 316], [294, 289, 294], [328, 341, 315]];
@@ -46,11 +80,20 @@ export function warriorCastArt(skillId: string) {
   return { file: WARRIOR_CAST_SHEETS[slot], row, ground: warriorCastGround[slot][row] / 362 };
 }
 
+export function heroCastArt(skillId: string): { file: string; row: number; ground: number; cols?: number; frameMs?: number } | undefined {
+  const warlock = warlockSkillArt(skillId);
+  if (warlock) return { file: WARLOCK_CAST_SHEETS[warlock.slot], row: warlock.row, ground: WARLOCK_GROUND, cols: 6, frameMs: 80 };
+  const barbarian = /^barbaro_(truque|nv1|nv2|nv3)_([123])$/.exec(skillId);
+  if (!barbarian) return warriorCastArt(skillId);
+  const slot = ['truque', 'nv1', 'nv2', 'nv3'].indexOf(barbarian[1]);
+  return { file: BARBARIAN_CAST_SHEETS[slot], row: Number(barbarian[2]) - 1, ground: 0.94 };
+}
+
 export class WarriorCastClock {
-  private readonly casts = new Map<string, NonNullable<ReturnType<typeof warriorCastArt>> & { startedAt: number }>();
+  private readonly casts = new Map<string, NonNullable<ReturnType<typeof heroCastArt>> & { startedAt: number }>();
 
   trigger(id: string, skillId: string, now: number): boolean {
-    const art = warriorCastArt(skillId);
+    const art = heroCastArt(skillId);
     if (!art) return false;
     this.casts.set(id, { ...art, startedAt: now });
     return true;
@@ -59,13 +102,13 @@ export class WarriorCastClock {
   sample(id: string, now: number) {
     const cast = this.casts.get(id);
     if (!cast) return;
-    const frame = Math.floor(Math.max(0, now - cast.startedAt) / 125);
-    if (frame >= 4) {
+    const frame = Math.floor(Math.max(0, now - cast.startedAt) / (cast.frameMs ?? 125));
+    if (frame >= (cast.cols ?? 4)) {
       this.casts.delete(id);
       return;
     }
     const { file, row, ground } = cast;
-    return { file, row, ground, frame };
+    return cast.cols ? { file, row, ground, frame, cols: cast.cols } : { file, row, ground, frame };
   }
 
   clear(id: string): void { this.casts.delete(id); }
@@ -77,8 +120,8 @@ export class WarriorCastClock {
 
 export const HERO_SHEETS: Record<string, HeroSheetSet> = {
   GUERREIRO: WARRIOR_DIRECTIONAL_SHEETS,
-  CLERIGO: sheets('clerigo', true, 8, 12), BARBARO: sheets('barbaro'),
-  ARQUEIRO: sheets('arqueiro'),
+  CLERIGO: sheets('clerigo', true, 8, 12), BARBARO: BARBARIAN_DIRECTIONAL_SHEETS,
+  ARQUEIRO: sheets('arqueiro'), BRUXO: WARLOCK_DIRECTIONAL_SHEETS,
 };
 
 export function frameAt(spec: HeroSheetSpec, elapsedMs: number, loop: boolean): number {
