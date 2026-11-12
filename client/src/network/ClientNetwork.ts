@@ -1,3 +1,4 @@
+import type { WarehouseStatePayload } from '@magicforge/shared';
 import {
   C2SAttackTargetPayload,
   C2SCastSkillPayload,
@@ -127,6 +128,7 @@ export class ClientNetwork {
   public onLoginSuccess: MessageListener<S2CLoginSuccessPayload> | null = null;
   public onCharacterList: MessageListener<S2CCharacterListPayload> | null = null;
   public onCharacterActionError: MessageListener<S2CCharacterActionErrorPayload> | null = null;
+  public onWarehouseState: MessageListener<WarehouseStatePayload> | null = null;
   public onSnapshot: MessageListener<S2CWorldSnapshotPayload> | null = null;
   public onCombatEvent: MessageListener<S2CCombatEventPayload> | null = null;
   public onSkillCastEvent: MessageListener<S2CSkillCastEventPayload> | null = null;
@@ -372,6 +374,10 @@ export class ClientNetwork {
     this.send(Opcode.C2S_DELETE_CHARACTER_SLOT, payload);
   }
 
+  public sendWarehouseTravel(area: WarehouseStatePayload['area']): void {
+    this.send(Opcode.C2S_WAREHOUSE_TRAVEL, area);
+  }
+
   public sendMoveInput(targetPosition: Vector3, currentClientPosition: Vector3): number {
     const seq = ++this.inputSequence;
     const payload: C2SMoveInputPayload = {
@@ -602,6 +608,10 @@ export class ClientNetwork {
           this.onLoginSuccess?.(data);
           break;
         }
+
+        case Opcode.S2C_WAREHOUSE_STATE:
+          this.onWarehouseState?.(packet.data as WarehouseStatePayload);
+          break;
 
         case Opcode.S2C_WORLD_SNAPSHOT: {
           this.onSnapshot?.(packet.data as S2CWorldSnapshotPayload);

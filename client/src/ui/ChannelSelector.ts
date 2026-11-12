@@ -22,9 +22,8 @@ export class ChannelSelector {
   }
 
   private initDOM(): void {
-    // Check if zone-info-pill exists in DOM
-    const zonePill = document.querySelector('.zone-info-pill');
-    if (!zonePill) {
+    const channelControl = document.getElementById('hud-channel-control');
+    if (!channelControl) {
       return;
     }
 
@@ -32,18 +31,16 @@ export class ChannelSelector {
       return;
     }
 
-    // Create the channel selector button inside the zone pill
     this.channelPillBtn = document.createElement('button');
     this.channelPillBtn.id = 'btn-channel-pill';
     this.channelPillBtn.className = 'channel-pill-btn';
     this.channelPillBtn.title = 'Clique para ver e trocar de Canal';
     this.channelPillBtn.innerHTML = `
-      <span class="channel-indicator-dot"></span>
       <span id="channel-pill-label">Canal 1</span>
       <span style="font-size: 0.65rem; opacity: 0.8;">▾</span>
     `;
 
-    zonePill.appendChild(this.channelPillBtn);
+    channelControl.appendChild(this.channelPillBtn);
     this.channelPillLabel = this.channelPillBtn.querySelector('#channel-pill-label');
 
     this.channelPillBtn.addEventListener('click', (e) => {

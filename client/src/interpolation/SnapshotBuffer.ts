@@ -46,6 +46,8 @@ export class SnapshotBuffer {
   /**
    * Add incoming authoritative snapshot to buffer
    */
+  public clear(): void { this.snapshots = []; }
+
   public pushSnapshot(payload: S2CWorldSnapshotPayload): void {
     const receiveTime = performance.now();
     const entityMap = new Map<string, EntitySnapshotState>();

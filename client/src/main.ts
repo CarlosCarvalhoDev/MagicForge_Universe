@@ -27,6 +27,7 @@ import {
   bagItems,
   getSkillTargeting,
   isSkillEffectAvailable,
+  WAREHOUSE_ROOMS, type WarehouseRoom,
 } from '@magicforge/shared';
 import { ClientNetwork } from './network/ClientNetwork';
 import { SnapshotBuffer, InterpolatedEntity } from './interpolation/SnapshotBuffer';
@@ -164,9 +165,6 @@ const stagePhaseBadge = document.getElementById('stage-phase-badge') as HTMLSpan
 const stageProgressFill = document.getElementById('stage-progress-fill') as HTMLDivElement | null;
 const stageProgressCounter = document.getElementById('stage-progress-counter') as HTMLSpanElement | null;
 const btnBossChallenge = document.getElementById('btn-boss-challenge') as HTMLButtonElement | null;
-const currentStageBadge = document.getElementById('current-stage-badge') as HTMLSpanElement | null;
-const zoneLocationTitle = document.getElementById('zone-location-title') as HTMLSpanElement | null;
-const btnPowerSave = document.getElementById('btn-power-save') as HTMLButtonElement | null;
 const inspectorRecyclePreview = document.getElementById('inspector-recycle-preview') as HTMLElement | null;
 
 // Mobile Dock Navigation Buttons
@@ -1679,18 +1677,90 @@ if (farmHelperModal) {
 }
 
 
-// Battery Power Save mode toggle
-let isPowerSave = false;
-if (btnPowerSave) {
-  btnPowerSave.addEventListener('click', () => {
-    isPowerSave = !isPowerSave;
-    btnPowerSave.style.background = isPowerSave ? 'rgba(56, 189, 248, 0.35)' : 'rgba(15, 23, 42, 0.75)';
-    btnPowerSave.textContent = isPowerSave ? '🌙 Economia ON' : '🌙 Economia';
-  });
-}
-
 // Core Game Client Systems
 const network = new ClientNetwork();
+let inWarehouse = false;
+let warehouseRoom: WarehouseRoom | null = null;
+let warehouseTravelTimer: number | undefined;
+let warehouseCountdownTimer: number | undefined;
+let warehouseTravelAttempt = 0;
+const warehouseTravel = document.querySelector<HTMLButtonElement>('#btn-warehouse-travel');
+const warehouseIcon = warehouseTravel?.querySelector<HTMLImageElement>('img');
+const warehouseCountdown = document.querySelector<HTMLElement>('#warehouse-countdown');
+
+function resetWarehouseTravel(): void {
+  warehouseTravelAttempt++;
+  window.clearTimeout(warehouseTravelTimer);
+  window.clearInterval(warehouseCountdownTimer);
+  if (warehouseTravel) warehouseTravel.disabled = false;
+  if (warehouseCountdown) warehouseCountdown.hidden = true;
+}
+
+function showWarehouse(room: WarehouseRoom | null): void {
+  resetWarehouseTravel();
+  if (warehouseRoom === room) return;
+  warehouseRoom = room;
+  const active = room !== null;
+  inWarehouse = active;
+  document.body.classList.toggle('in-warehouse', active);
+  renderer.setWarehouse(room);
+  const location = document.querySelector('#warehouse-room-name');
+  if (location && room) location.textContent = WAREHOUSE_ROOMS[room].label;
+  snapshotBuffer.clear();
+  bossNarrative.reset();
+  if (warehouseTravel) {
+    const label = active ? 'Voltar para a batalha' : 'Ir ao armazém';
+    warehouseTravel.title = label;
+    warehouseTravel.setAttribute('aria-label', label);
+  }
+  if (warehouseIcon) warehouseIcon.src = active
+    ? '/assets/ui/icons/icon-warehouse-battle.svg'
+    : '/assets/ui/icons/icon-warehouse-home.svg';
+}
+
+warehouseTravel?.addEventListener('click', async () => {
+  if (!network.isConnected || !network.myPlayerId || warehouseTravel.disabled) return;
+  warehouseTravel.disabled = true;
+  const attempt = ++warehouseTravelAttempt;
+  const destination = inWarehouse ? 'battle' : 'warehouse';
+  const playerId = network.myPlayerId;
+  const deadline = performance.now() + 3000;
+  const updateCountdown = () => {
+    if (!warehouseCountdown) return;
+    const seconds = Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
+    const label = destination === 'warehouse' ? 'Pátio do armazém' : 'Campo de batalha';
+    const message = seconds ? `${label} em ${seconds}s` : `Teleportando para ${label.toLowerCase()}…`;
+    if (warehouseCountdown.textContent !== message) warehouseCountdown.textContent = message;
+    warehouseCountdown.hidden = false;
+  };
+  updateCountdown();
+  warehouseCountdownTimer = window.setInterval(updateCountdown, 100);
+  try {
+    await Promise.all([
+      new Promise<void>(resolve => window.setTimeout(resolve, 3000)),
+      destination === 'warehouse' ? renderer.prepareWarehouse() : Promise.resolve(),
+    ]);
+    if (attempt !== warehouseTravelAttempt) return;
+    if (!network.isConnected || network.myPlayerId !== playerId) { resetWarehouseTravel(); return; }
+    window.clearInterval(warehouseCountdownTimer);
+    updateCountdown();
+    network.sendWarehouseTravel(destination);
+    warehouseTravelTimer = window.setTimeout(() => {
+      resetWarehouseTravel();
+      addChatMessage('Sistema', 'O servidor não confirmou a viagem.', 'sys');
+    }, 4000);
+  } catch {
+    if (attempt !== warehouseTravelAttempt) return;
+    resetWarehouseTravel();
+    addChatMessage('Sistema', 'Não foi possível carregar o mapa do armazém.', 'sys');
+  }
+});
+
+network.onWarehouseState = ({ area, reason, room }) => {
+  showWarehouse(area === 'warehouse' ? room ?? 'exterior' : null);
+  if (reason) addChatMessage('Sistema', reason, 'sys');
+};
+
 skillRotationUI = setupSkillRotation({
   isReady: () => network.isConnected && network.isAuthenticated && Boolean(network.myPlayerId),
   save: (order, autoCastEnabled) => network.sendSkillRotation(order, autoCastEnabled),
@@ -1825,33 +1895,6 @@ handleResize();
 // ----------------------------------------------------
 // Interactive Camera Zoom Controls (HUD Buttons, Wheel & Pinch)
 // ----------------------------------------------------
-const btnZoomIn = document.getElementById('btn-zoom-in') as HTMLButtonElement | null;
-const btnZoomOut = document.getElementById('btn-zoom-out') as HTMLButtonElement | null;
-const hudZoomLabel = document.getElementById('hud-zoom-label') as HTMLSpanElement | null;
-
-function updateZoomDisplay() {
-  if (hudZoomLabel) {
-    hudZoomLabel.textContent = `${Math.round(renderer.zoom)}x`;
-  }
-}
-updateZoomDisplay();
-
-if (btnZoomIn) {
-  btnZoomIn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    renderer.setZoom(renderer.zoom + 1.2);
-    updateZoomDisplay();
-  });
-}
-
-if (btnZoomOut) {
-  btnZoomOut.addEventListener('click', (e) => {
-    e.stopPropagation();
-    renderer.setZoom(renderer.zoom - 1.2);
-    updateZoomDisplay();
-  });
-}
-
 // Canvas Wheel for Zoom In / Zoom Out
 canvas.addEventListener(
   'wheel',
@@ -1859,7 +1902,6 @@ canvas.addEventListener(
     e.preventDefault();
     const delta = e.deltaY < 0 ? 0.9 : -0.9;
     renderer.setZoom(renderer.zoom + delta);
-    updateZoomDisplay();
   },
   { passive: false }
 );
@@ -1890,7 +1932,6 @@ canvas.addEventListener(
       const currentDistance = Math.hypot(dx, dy);
       const factor = currentDistance / initialPinchDistance;
       renderer.setZoom(initialPinchZoom * factor);
-      updateZoomDisplay();
     }
   },
   { passive: true }
@@ -2128,6 +2169,7 @@ network.onConnectionStateChange = (connected) => {
     else authSelection.onConnected();
     addChatMessage('Sistema', 'Conectado ao servidor autoritativo MagicForge (20Hz)!', 'sys');
   } else {
+    showWarehouse(null);
     authSelection.onDisconnected();
     farmPlayerReady = false;
     pendingFarmSettings = null;
@@ -2305,19 +2347,11 @@ network.onBossEvent = (payload) => {
 let lastPortalOpenState = false;
 network.onStageUpdate = (payload) => {
   renderer.setStagePresentation(payload);
-  const biomeIcon = document.getElementById('zone-biome-icon');
-  if (biomeIcon) biomeIcon.textContent = worldAppearance(payload.world).icon;
-  if (currentStageBadge) {
-    currentStageBadge.textContent = `Fase ${payload.stage}/10`;
-  }
   if (stageWorldTitle) {
     stageWorldTitle.textContent = `${worldAppearance(payload.world).icon} ${payload.worldName}`;
   }
   if (stagePhaseBadge) {
     stagePhaseBadge.textContent = payload.isBossStage ? `Fase 10/10 [CHEFÃO]` : `Fase ${payload.stage}/10`;
-  }
-  if (zoneLocationTitle) {
-    zoneLocationTitle.textContent = `${payload.worldName} (Fase ${payload.stage})`;
   }
 
   const kills = Math.min(payload.killsRequired, payload.stageKills);
@@ -2398,6 +2432,7 @@ network.onInventoryUpdate = (payload: S2CInventoryUpdatePayload) => {
 };
 
 network.onLoginSuccess = (payload) => {
+  showWarehouse(null);
   devPanel.setAdmin(payload.isAdmin === true);
   farmPlayerReady = true;
   farmHelperUI.onCharacterLogin();
@@ -2659,6 +2694,7 @@ window.addEventListener('keydown', (e) => {
     }
   }
 
+  if (inWarehouse && /^[1-4af]$/i.test(e.key)) return;
   if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
     castSkill(parseInt(e.key, 10));
   } else if (e.key === 'a' || e.key === 'A') {
@@ -2833,7 +2869,7 @@ canvas.addEventListener('pointerdown', (event) => {
   const target = entities.find(entity => entity.type === 'MONSTER' && entity.currentHp > 0 && distance(position, entity.position) < 2.8);
   renderer.selectedTargetId = target?.id ?? null;
   const player = entities.find(entity => entity.id === network.myPlayerId);
-  if (player && player.currentHp > 0 && skillRotationUI?.canCastManually()) {
+  if (player && player.currentHp > 0 && (inWarehouse || skillRotationUI?.canCastManually())) {
     network.sendMoveInput(position, player.position);
   }
 });

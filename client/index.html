@@ -3750,6 +3750,7 @@
     <div id="hud-header">
     <div class="hud-profile-column">
     <!-- 1. Top-Left Hero Status Card (Estilo Mobile Ragnarok / Stickman Go) -->
+    <div class="hud-hero-and-gold">
     <div id="hero-status-card" class="glass-panel" data-hero-class="GUERREIRO">
       <button type="button" class="hero-avatar-box" id="hud-avatar-btn" aria-label="Abrir resumo do herói" title="Abrir resumo do herói [C]">
         <img id="hud-hero-portrait" src="/assets/portraits/GUERREIRO.jpg" alt="Avatar" class="hero-avatar-img" />
@@ -3779,6 +3780,12 @@
       </div>
     </div>
 
+        <div class="gold-wallet-capsule" title="Ouro do Jogador">
+          <span class="gold-coin-icon"><img src="/assets/ui/icons/icon-gold-coin.svg" alt="" class="gold-coin-svg" /></span>
+          <span id="player-gold-text" class="gold-amount-text">0</span>
+          <span class="gold-currency-label">G</span>
+        </div>
+    </div>
     </div>
     <div class="hud-stage-column">
     <!-- 2. Top-Center Stage Progression & Boss Card + Locked Monster Target Bar -->
@@ -3796,7 +3803,7 @@
       </div>
 
       <!-- Boss Retry Button: Hidden by default; only visible on Stage 10 if boss escapes / fails -->
-      <button id="btn-boss-challenge" class="btn-boss-challenge" style="display: none;">💀 DESAFIAR CHEFÃO NOVAMENTE</button>
+      <button id="btn-boss-challenge" class="btn-boss-challenge" style="display: none;">Desafiar chefão novamente</button>
 
       <!-- Target Monster HUD Bar (Appears when target locked) -->
       <div id="target-vital-row" style="display: none; align-items: center; gap: 8px; margin-top: 2px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08); width: 100%;">
@@ -3845,55 +3852,27 @@
 
     </div>
     <!-- 3. Top-Right Location, Session Navigation & Luxury Runic Status Bar -->
-    <div id="top-right-location-card">
-      <div class="top-right-header-row">
-        <div class="glass-panel zone-info-pill">
-          <span id="zone-biome-icon" style="font-size: 0.95rem;">🌲</span>
-          <div style="display: flex; flex-direction: column;">
-            <span id="zone-location-title" class="zone-title">Floresta da Forja (1)</span>
-            <span class="zone-coords-sub" style="font-size: 0.65rem; color: #94a3b8;">Canal 1 • Coords: (0, 0)</span>
-          </div>
-          <span id="current-stage-badge" class="stage-badge">Fase 1/10</span>
-        </div>
-
-        <div class="hud-session-controls" role="group" aria-label="Navegação de Sessão">
-          <button id="btn-return-char-select" class="hud-session-btn char-select" type="button" title="Retornar à Sala dos Forjados (Seleção de Personagens)">
-            <img src="/assets/ui/icons/icon-char-switch.svg" alt="" class="hud-session-svg" />
-            <span class="hud-session-label">Heróis</span>
-          </button>
-          <button id="btn-logout-to-login" class="hud-session-btn logout" type="button" title="Sair para a Tela de Login">
-            <img src="/assets/ui/icons/icon-logout-portal.svg" alt="" class="hud-session-svg" />
-            <span class="hud-session-label">Sair</span>
-          </button>
-        </div>
+    <div id="top-right-location-card" role="group" aria-label="Atalhos do jogo">
+      <div class="lux-ping-pill" title="Latência do Servidor">
+        <div id="status-dot" class="status-dot"></div>
+        <span id="ping-text" class="lux-ping-text">-- ms</span>
       </div>
-
-      <div class="top-status-lux-bar">
-        <div class="gold-wallet-capsule" title="Ouro do Jogador">
-          <span class="gold-coin-icon"><img src="/assets/ui/icons/icon-gold-coin.svg" alt="" class="gold-coin-svg" /></span>
-          <span id="player-gold-text" class="gold-amount-text">0</span>
-          <span class="gold-currency-label">G</span>
-        </div>
-        <div class="lux-zoom-capsule" title="Zoom da Câmera (Scroll ou +/-)">
-          <button id="btn-zoom-out" class="zoom-btn" type="button" title="Afastar Câmera">−</button>
-          <span id="hud-zoom-label" class="zoom-label">16x</span>
-          <button id="btn-zoom-in" class="zoom-btn" type="button" title="Aproximar Câmera">+</button>
-        </div>
-        <button id="btn-fullscreen-toggle" class="lux-icon-btn lux-screen-btn" type="button" title="Alternar Modo Tela Cheia">
-          <img src="/assets/ui/icons/icon-screen-fullscreen.svg" alt="" class="lux-svg-icon" />
-          <span class="lux-btn-text">Tela</span>
-        </button>
-        <button id="btn-power-save" class="lux-icon-btn" type="button" title="Modo Economia de Bateria">
-          <span id="power-save-icon">🌙</span>
-        </button>
-        <button id="btn-toggle-inspector" class="lux-icon-btn lux-net-btn" type="button" title="Alternar Painel de Rede e Simulação">
-          <span>⚙️</span><span class="lux-btn-text">Rede</span>
-        </button>
-        <div class="lux-ping-pill" title="Latência do Servidor">
-          <div id="status-dot" class="status-dot"></div>
-          <span id="ping-text" class="lux-ping-text">-- ms</span>
-        </div>
-      </div>
+      <span id="hud-channel-control"></span>
+      <button id="btn-toggle-inspector" class="lux-icon-btn lux-net-btn" type="button" title="Alternar Painel de Rede e Simulação">
+        <span aria-hidden="true">⚙️</span><span class="lux-btn-text">Rede</span>
+      </button>
+      <button id="btn-return-char-select" class="hud-session-btn char-select" type="button" title="Retornar à Sala dos Forjados">
+        <img src="/assets/ui/icons/icon-char-switch.svg" alt="" class="hud-session-svg" />
+        <span class="hud-session-label">Heróis</span>
+      </button>
+      <button id="btn-logout-to-login" class="hud-session-btn logout" type="button" title="Sair para a Tela de Login">
+        <img src="/assets/ui/icons/icon-logout-portal.svg" alt="" class="hud-session-svg" />
+        <span class="hud-session-label">Sair</span>
+      </button>
+      <button id="btn-fullscreen-toggle" class="lux-icon-btn lux-screen-btn" type="button" title="Alternar Modo Tela Cheia">
+        <img src="/assets/ui/icons/icon-screen-fullscreen.svg" alt="" class="lux-svg-icon" />
+        <span class="lux-btn-text">Tela</span>
+      </button>
     </div>
 
     </div>
@@ -3906,6 +3885,9 @@
       <span class="viewport-rune-pillar left"></span>
       <span class="viewport-rune-pillar right"></span>
     </div>
+
+    <div id="warehouse-location" role="status"><strong id="warehouse-room-name">Armazém</strong> <span>· Área pacífica</span></div>
+    <div id="warehouse-countdown" role="status" hidden></div>
 
     <!-- Canvas Viewport -->
     <canvas id="game-canvas"></canvas>
@@ -3976,6 +3958,9 @@
     <div id="hud-menu-dock">
       <button type="button" class="hud-menu-trigger" data-hud-menu-trigger aria-label="Abrir menu do jogo" aria-expanded="false" aria-controls="hud-menu-options">
         <img src="/assets/ui/icons/icon-hud-backpack.svg" alt="">
+      </button>
+      <button type="button" id="btn-warehouse-travel" aria-label="Ir ao armazém" title="Ir ao armazém">
+        <img src="/assets/ui/icons/icon-warehouse-home.svg" alt="">
       </button>
       <nav class="hud-menu-panel" id="hud-menu-options" data-hud-menu-panel aria-label="Atalhos do jogo" hidden>
         <button type="button" class="hud-menu-option" id="btn-dock-character" title="Herói [C]"><img src="/assets/ui/icons/icon-hero-bust.svg" alt=""><span>Herói</span></button>
@@ -4111,7 +4096,7 @@
           <button class="skill-square-btn" id="skill-btn-1" data-slot="1" title="Habilidade Slot 1 [1]">
             <span class="skill-square-key">1</span>
             <div class="skill-square-icon-box">
-              <img class="skill-img" id="skill-img-1" src="/assets/skills/guerreiro_1.png" alt="Slot 1" />
+              <img class="skill-img" id="skill-img-1" alt="Slot 1" />
             </div>
             <div class="skill-square-footer">
               <span class="skill-cost" id="skill-cost-1">15 EN</span>
@@ -4125,7 +4110,7 @@
           <button class="skill-square-btn" id="skill-btn-2" data-slot="2" title="Habilidade Slot 2 [2]">
             <span class="skill-square-key">2</span>
             <div class="skill-square-icon-box">
-              <img class="skill-img" id="skill-img-2" src="/assets/skills/guerreiro_2.png" alt="Slot 2" />
+              <img class="skill-img" id="skill-img-2" alt="Slot 2" />
             </div>
             <div class="skill-square-footer">
               <span class="skill-cost" id="skill-cost-2">25 EN</span>
@@ -4139,7 +4124,7 @@
           <button class="skill-square-btn" id="skill-btn-3" data-slot="3" title="Habilidade Slot 3 [3]">
             <span class="skill-square-key">3</span>
             <div class="skill-square-icon-box">
-              <img class="skill-img" id="skill-img-3" src="/assets/skills/guerreiro_3.png" alt="Slot 3" />
+              <img class="skill-img" id="skill-img-3" alt="Slot 3" />
             </div>
             <div class="skill-square-footer">
               <span class="skill-cost" id="skill-cost-3">40 EN</span>
@@ -4154,7 +4139,7 @@
             <span class="skill-square-key">4</span>
             <span class="ultimate-crown-badge">👑</span>
             <div class="skill-square-icon-box">
-              <img class="skill-img" id="skill-img-4" src="/assets/skills/guerreiro_4.png" alt="Slot 4" />
+              <img class="skill-img" id="skill-img-4" alt="Slot 4" />
             </div>
             <div class="skill-square-footer">
               <span class="skill-cost" id="skill-cost-4">70 EN</span>

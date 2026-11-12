@@ -183,7 +183,7 @@
   #hud-header #top-right-location-card { grid-area: 1 / 3; }
   #bottom-center-zone {
     left: auto !important;
-    right: calc(62px + var(--safe-right, 0px)) !important;
+    right: calc(122px + var(--safe-right, 0px)) !important;
     bottom: calc(89px + var(--safe-bottom, 0px)) !important;
     width: min(250px, 38vw) !important;
   }
@@ -194,4 +194,114 @@
   #tactical-action-bar.runic-tactical-bar #tactical-drawer-items {
     max-height: max(28px, calc(100dvh - var(--tactical-anchor) - 93px));
   }
+}
+
+/* Combat progress and boss actions share the center card. */
+#hud-header #top-center-wave-card {
+  box-sizing: border-box;
+  border: 1px solid #896949 !important;
+  border-radius: 6px !important;
+  background: linear-gradient(145deg, #2a201d, #18151a) !important;
+  box-shadow: 0 3px 12px #0006 !important;
+  display: grid;
+  gap: 7px;
+  padding: 9px 10px !important;
+}
+#hud-header .stage-header-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+#hud-header .stage-phase-badge {
+  background: #403024 !important;
+  color: #f3d4a0 !important;
+  border: 1px solid #9c784c !important;
+  padding: 3px 5px !important;
+  font-size: .64rem !important;
+  text-align: center;
+}
+#hud-header .stage-progress-track {
+  min-height: 14px;
+  background: #141113 !important;
+  border-color: #725638 !important;
+}
+#hud-header #btn-boss-challenge {
+  min-height: 28px;
+  border: 1px solid #ac6852 !important;
+  border-radius: 4px !important;
+  background: #542c28 !important;
+  color: #ffe0be !important;
+  box-shadow: none !important;
+}
+#hud-header #btn-boss-challenge:hover { background: #703c31 !important; }
+#hud-header #top-right-location-card {
+  --hud-shortcut-width: 72px;
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px !important;
+  padding: 0;
+}
+#hud-header #hud-channel-control { display: inline-flex; flex: 0 0 auto; }
+#hud-header :is(#top-right-location-card > button, .lux-ping-pill, #btn-channel-pill, .hud-hero-and-gold > .gold-wallet-capsule) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 4px !important;
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 3px 7px !important;
+  background: linear-gradient(145deg, #372820f5, #211915f5) !important;
+  border: 1px solid #896949 !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  outline: none;
+  white-space: nowrap;
+}
+#hud-header #top-right-location-card button:hover { background: #473123 !important; }
+#hud-header #top-right-location-card :is(button, .lux-ping-pill) {
+  box-sizing: border-box;
+  width: var(--hud-shortcut-width) !important;
+  height: 34px !important;
+  min-width: 0 !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding-inline: 4px !important;
+}
+#hud-header #top-right-location-card button:focus-visible { outline: 2px solid #ffe2a7; }
+#hud-header .hud-hero-and-gold {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) max-content;
+  gap: 6px;
+  align-items: start;
+  max-width: 100%;
+}
+#hud-header .hud-hero-and-gold > .gold-wallet-capsule { min-height: 22px; }
+body.in-warehouse #hud-header #hud-channel-control { display: none; }
+@media (min-width: 1041px) and (min-height: 551px) {
+  #hud-header { grid-template-columns: minmax(0, 1fr) minmax(0, 345px) minmax(0, 1fr); }
+  #hud-header .hud-profile-column { width: min(100%, 440px); }
+  #hud-header #top-right-location-card {
+    --hud-shortcut-width: clamp(48px, calc((100vw - 430px) / 12), 72px);
+    grid-area: 1 / 3;
+    width: max-content;
+    justify-self: end;
+  }
+}
+@media (max-width: 1300px) {
+  #hud-header #top-right-location-card { --hud-shortcut-width: 54px; }
+  #hud-header #top-right-location-card > button :is(img, [aria-hidden="true"]) { display: none; }
+}
+@media (max-width: 760px) {
+  #hud-header .stage-phase-badge { max-width: 110px; }
+  #hud-header .hud-hero-and-gold { grid-template-columns: minmax(0, 1fr); }
+  #hud-header .hud-hero-and-gold > .gold-wallet-capsule { justify-self: start; }
+  #hud-header #top-right-location-card { grid-area: 2 / 1 / 3 / -1; }
+  #hud-header .hud-stage-column { grid-area: 3 / 1 / 4 / -1; }
+}
+@media (max-width: 360px) {
+  #hud-header #top-right-location-card { --hud-shortcut-width: 48px; gap: 2px !important; }
+  #hud-header #top-right-location-card :is(button, .lux-ping-pill) { padding-inline: 2px !important; }
 }

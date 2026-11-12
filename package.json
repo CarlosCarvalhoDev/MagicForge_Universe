@@ -31,6 +31,6 @@
     "dev:client": "npm run dev --workspace=@magicforge/client",
     "dev:server": "npm run dev --workspace=@magicforge/server",
     "test": "node client/tests/guest-session.test.mjs && node client/tests/hero-animations.test.mjs && node client/tests/runic-ui-layout.test.mjs && node client/tests/client-network-url.test.mjs && node client/tests/barbarian-presentation.test.mjs"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
-

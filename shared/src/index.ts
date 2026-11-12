@@ -15,3 +15,4 @@ export * from './skill-targeting';
 export * from './cleric-effects';
 export * from './mage-effects';
 export * from './martial-effects';
+export * from './warehouse';

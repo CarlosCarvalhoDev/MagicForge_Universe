@@ -77,6 +77,12 @@ export interface C2SMoveInputPayload {
   inputSequence: number;
 }
 
+export interface WarehouseStatePayload {
+  area: 'battle' | 'warehouse';
+  room?: import('./warehouse').WarehouseRoom;
+  reason?: string;
+}
+
 export interface S2CWorldSnapshotPayload {
   serverTick: number;
   serverTimestamp: number;

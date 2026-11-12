@@ -1,3 +1,5 @@
+import { WarehouseSession } from './WarehouseSession';
+import type { C2SMoveInputPayload, WarehouseStatePayload } from '@magicforge/shared';
 import {
   CharacterClass,
   createVector3,
@@ -268,6 +270,96 @@ export class World {
     this.connections.set(connection.id, connection);
   }
 
+  private readonly warehouse = new Map<string, WarehouseSession>();
+
+  public getOccupancy(): number {
+    return this.entityManager.getAllPlayers().length + this.warehouse.size;
+  }
+
+  public getWarehouse(playerId: string) { return this.warehouse.get(playerId); }
+
+  public getSessionPlayer(playerId: string): Player | undefined {
+    return this.entityManager.getPlayer(playerId) ?? this.warehouse.get(playerId)?.player;
+  }
+
+  public moveInWarehouse(playerId: string, input?: C2SMoveInputPayload): void {
+    this.warehouse.get(playerId)?.move(input);
+  }
+
+  public travelWarehouse(connection: Connection, destination: unknown): void {
+    if (!connection.isAuthenticated || !connection.playerId) return;
+    const id = connection.playerId;
+    const parked = this.warehouse.get(id);
+    const sendArea = (area: WarehouseStatePayload['area'], reason?: string, room?: WarehouseStatePayload['room']) =>
+      connection.send(Opcode.S2C_WAREHOUSE_STATE, { area, reason, room } satisfies WarehouseStatePayload);
+
+    if (destination === 'warehouse') {
+      if (parked) { sendArea('warehouse', undefined, parked.room); return; }
+      const player = this.entityManager.getPlayer(id);
+      if (!player) return;
+      if (player.isDead || this.dungeonManager.isPlayerInDungeon(id)) {
+        sendArea('battle', 'O armazém está disponível para heróis vivos fora de masmorras.');
+        return;
+      }
+      player.stopMoving();
+      player.targetId = null;
+      player.currentStage = this.currentStage;
+      player.clearAllStatuses();
+      this.clearCombatEffectsFromSource(id);
+      this.entityManager.removePlayer(id);
+      this.spatialGrid.removeEntity(id);
+      for (const monster of this.entityManager.getAllMonsters()) {
+        if (monster.targetPlayer?.id !== id) continue;
+        monster.targetPlayer = null;
+        monster.targetId = null;
+        monster.state = MonsterState.IDLE;
+      }
+      this.warehouse.set(id, new WarehouseSession(player));
+      this.broadcast(Opcode.S2C_ENTITY_DESPAWN, { entityId: id, reason: 'DISCONNECTED' });
+      sendArea('warehouse', undefined, 'exterior');
+      return;
+    }
+
+    if (destination !== 'battle') return;
+    if (!parked) { sendArea('battle'); return; }
+    const player = parked.player;
+    this.warehouse.delete(id);
+    player.currentStage = this.currentStage;
+    this.entityManager.addPlayer(player);
+    this.spatialGrid.updateEntity(player);
+    sendArea('battle');
+    connection.send(Opcode.S2C_STAGE_UPDATE, {
+      world: this.currentWorld, stage: this.currentStage, worldName: this.getWorldName(this.currentWorld),
+      stageKills: this.stageKills, killsRequired: this.currentStage === 10 ? 1 : this.killsPerStage,
+      isBossStage: this.currentStage === 10, bossAvailable: this.isBossAvailable,
+      portalOpen: this.isPortalOpen, portalPosition: this.portalPosition,
+    } satisfies S2CStageUpdatePayload);
+    const boss = this.activeBossId ? this.entityManager.getMonster(this.activeBossId) : undefined;
+    if (boss && this.isBossActive) {
+      connection.send(Opcode.S2C_BOSS_EVENT, {
+        eventType: 'SPAWN', bossId: boss.id, bossName: boss.name, currentHp: boss.currentHp, maxHp: boss.maxHp,
+        timeLimitSec: 60, remainingTimeSec: this.bossTimerSec, message: `Combate contra ${boss.name} em andamento.`,
+      } satisfies S2CBossEventPayload);
+    }
+    this.sendActiveDrops(connection);
+  }
+
+  private sendActiveDrops(connection: Connection): void {
+    const now = Date.now();
+    for (const drop of this.activeItemDrops.values()) {
+      const remainingSec = Math.max(0, Math.round(drop.despawnSec - (now - drop.spawnTime) / 1000));
+      connection.send(Opcode.S2C_ITEM_DROP_SPAWN, {
+        dropId: drop.dropId,
+        itemId: drop.itemId,
+        name: drop.name,
+        rarity: drop.rarity,
+        quantity: drop.quantity,
+        position: drop.position,
+        despawnTimeSec: remainingSec,
+      } as S2CItemDropSpawnPayload);
+    }
+  }
+
   public unregisterConnection(connection: Connection): void {
     this.removePlayerFromWorld(connection, true);
   }
@@ -280,7 +372,9 @@ export class World {
     this.connections.delete(connection.id);
     if (!connection.playerId) return null;
     const playerId = connection.playerId;
-    const player = this.entityManager.removePlayer(playerId);
+    const parked = this.warehouse.get(playerId);
+    this.warehouse.delete(playerId);
+    const player = this.entityManager.removePlayer(playerId) ?? parked?.player;
     this.spatialGrid.removeEntity(playerId);
     if (player) {
       const clearedStatuses = player.clearAllStatuses();
@@ -293,7 +387,7 @@ export class World {
         });
       }
       if (saveToDb) {
-        if (markLogout) player.lastLogoutTime = Date.now();
+        if (markLogout || parked) player.lastLogoutTime = Date.now();
         this.db.savePlayer(player);
         console.log(`[World] Player "${player.name}" salvo no SQLite ao sair da instância ${this.instanceId}.`);
       }
@@ -670,19 +764,7 @@ export class World {
     }
 
     // 3. Envia drops de itens ativos no chão
-    const now = Date.now();
-    for (const drop of this.activeItemDrops.values()) {
-      const remainingSec = Math.max(0, Math.round(drop.despawnSec - (now - drop.spawnTime) / 1000));
-      connection.send(Opcode.S2C_ITEM_DROP_SPAWN, {
-        dropId: drop.dropId,
-        itemId: drop.itemId,
-        name: drop.name,
-        rarity: drop.rarity,
-        quantity: drop.quantity,
-        position: drop.position,
-        despawnTimeSec: remainingSec,
-      } as S2CItemDropSpawnPayload);
-    }
+    this.sendActiveDrops(connection);
 
     // 4. Envia inventário, moedas e CP
     connection.send(Opcode.S2C_INVENTORY_UPDATE, {
@@ -776,7 +858,7 @@ export class World {
   }
 
   public saveAllPlayers(): void {
-    const players = this.entityManager.getAllPlayers();
+    const players = [...this.entityManager.getAllPlayers(), ...Array.from(this.warehouse.values(), session => session.player)];
     for (const p of players) {
       this.db.savePlayer(p);
     }
@@ -855,7 +937,7 @@ export class World {
 
   public handleUpgradeSkill(connection: Connection, payload?: C2SUpgradeSkillPayload): void {
     if (!connection.isAuthenticated || !connection.playerId) return;
-    const player = this.entityManager.getPlayer(connection.playerId);
+    const player = this.getSessionPlayer(connection.playerId);
     if (!player) return;
     let success = false;
     let message = 'Não foi possível melhorar a habilidade. Tente novamente.';
@@ -1045,6 +1127,15 @@ export class World {
     }
 
     // 4. Build & Broadcast World Snapshot (Partitioned by Area of Interest)
+    for (const [id, session] of this.warehouse) {
+      const previousRoom = session.room;
+      session.update(deltaTimeSec);
+      if (session.room !== previousRoom) {
+        this.connections.get(id)?.send(Opcode.S2C_WAREHOUSE_STATE, {
+          area: 'warehouse', room: session.room,
+        } satisfies WarehouseStatePayload);
+      }
+    }
     this.broadcastSnapshot();
   }
 
@@ -2544,6 +2635,11 @@ export class World {
     for (const [_, conn] of this.connections) {
       if (!conn.isAuthenticated) continue;
 
+      const session = conn.playerId ? this.warehouse.get(conn.playerId) : undefined;
+      if (session) {
+        conn.send(Opcode.S2C_WORLD_SNAPSHOT, { serverTick: this.currentTick, serverTimestamp: now, entities: [session.snapshot()] });
+        continue;
+      }
       let entitiesToSend: Entity[];
 
       if (conn.playerId) {
@@ -2576,7 +2672,7 @@ export class World {
 
   public broadcast<T>(op: Opcode, data: T, excludeConnectionId?: string): void {
     for (const [id, conn] of this.connections) {
-      if (id !== excludeConnectionId && conn.isAuthenticated) {
+      if (id !== excludeConnectionId && conn.isAuthenticated && (!conn.playerId || !this.warehouse.has(conn.playerId))) {
         conn.send(op, data);
       }
     }

@@ -114,3 +114,60 @@
   #hud-menu-dock .hud-menu-trigger { width: 44px; height: 44px; }
   #hud-menu-dock .hud-menu-option { min-height: 40px; }
 }
+
+#hud-menu-dock { display: flex; align-items: center; gap: 5px; }
+#btn-warehouse-travel {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 64px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+#btn-warehouse-travel img { width: 62px; height: 62px; filter: drop-shadow(0 2px 2px #000c); }
+#btn-warehouse-travel:is(:hover, :focus-visible) img { filter: drop-shadow(0 0 4px #e8b776); }
+#btn-warehouse-travel:focus-visible { outline: 2px solid #f1cf9b; outline-offset: 1px; border-radius: 6px; }
+#btn-warehouse-travel:disabled { opacity: .6; cursor: wait; }
+#warehouse-location { display: none; }
+body.in-warehouse #warehouse-location {
+  display: block;
+  position: fixed;
+  inset: auto calc(14px + var(--safe-right, 0px)) calc(96px + var(--safe-bottom, 0px)) auto;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  z-index: 59;
+  pointer-events: none;
+  color: #f1d6a7;
+  background: #21191a;
+  border: 1px solid #9d784c;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font: 700 .8rem Cinzel, serif;
+}
+#warehouse-location span { color: #b9a18b; }
+body.in-warehouse :is(.hud-stage-column, #mobile-combat-arc-container, #tactical-action-bar, .zone-info-pill, .dev-shortcut, #btn-dock-farm) { display: none !important; }
+@media (max-width: 760px) {
+  body.in-warehouse #warehouse-location { inset: auto calc(8px + var(--safe-right, 0px)) calc(153px + var(--safe-bottom, 0px)) auto; }
+  #btn-warehouse-travel { width: 60px; height: 56px; }
+  #btn-warehouse-travel img { width: 54px; height: 54px; }
+}
+
+#warehouse-countdown {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: calc(26dvh + var(--safe-bottom, 0px));
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  pointer-events: none;
+  border: 1px solid #a68459;
+  border-radius: 6px;
+  padding: 10px 16px;
+  color: #f4dbb3;
+  background: #21191a;
+  box-shadow: 0 5px 20px #0008;
+  font: 700 .85rem Cinzel, serif;
+}

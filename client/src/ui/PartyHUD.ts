@@ -34,7 +34,7 @@ export class PartyHUD {
     this.rootCard = document.createElement('div');
     this.rootCard.id = 'party-hud-card';
     this.rootCard.className = 'glass-panel collapsed';
-    const profile = document.getElementById('hero-status-card');
+    const profile = document.querySelector('.hud-hero-and-gold') ?? document.getElementById('hero-status-card');
     if (profile) profile.after(this.rootCard);
     else document.body.appendChild(this.rootCard);
     // Toast Container
